@@ -52,16 +52,17 @@ processOneExperment <- function(expVal, dateVec)
   rtx$time = rtx$Date - rtx$Date[1]
 
   ##--- remove all rows for which all ("width", "length", "volume") NA
-  desiredCols = c("width", "length", "volume")
-  ind <- apply(rtx[, desiredCols], 1, function(x) all(is.na(x)))
-  rtx = rtx[!ind, ]
+  #desiredCols = c("width", "length", "volume")
+  #ind <- apply(rtx[, desiredCols], 1, function(x) all(is.na(x)))
+  #rtx = rtx[!ind, ]
 
-  rtl = list(width = as.numeric(rtx$width),
-             length= as.numeric(rtx$length),
-             volume= as.numeric(rtx$volume),
-             date = rtx$Date,
-             time = rtx$time)
-  return(rtl)
+  #rtl = list(width = as.numeric(rtx$width),
+  #           length= as.numeric(rtx$length),
+  #           volume= as.numeric(rtx$volume),
+  #           date = rtx$Date,
+  #           time = rtx$time)
+  #return(rtl)
+  return(rtx)
 }
 
 ##-------------------------------------------------------
@@ -75,6 +76,7 @@ creatModelId <- function(mouseID, RowName)
 ##==================================
 allExp = list(); indxAllExp = 1
 
+expNdf = data.frame()
 for(blokID in 2:length(infoBlock))
 {
   #blok = infoBlock[[4]]  ### for test
@@ -96,15 +98,17 @@ for(blokID in 2:length(infoBlock))
 
       expN$model = creatModelId( mouseID=blok[expri,2], RowName=rownames(blok[expri,]) )
       expN$drug  = drug
+      expNdf = rbind(expNdf, expN)
+
       allExp[[indxAllExp]] = expN
       indxAllExp = indxAllExp + 1
     }
-
   }
-
 }
 
 
+##save datafram for test
+saveRDS(expNdf, file="data/DC_pdxDf_test_object.Rda")
 
 ##==== Trim each experiment =====================
 getIndex <- function(inVec, indxOf)
