@@ -11,19 +11,7 @@ PharmacoPSet <- setClass( "PharmacoPSet",
                           )
 
 
-#' @export
-formatExperimentSlot <- function(experiment, model=NULL, drug=NULL)
-{
-  ##-- the table experiment must have these colomns
-  ##-- model.id
-  requredCols = c("model.id", "drug", "time", "volume","body.weight")
-  #if(colnames(experiment))
 
-  Model.IDS = unique(experiment$model.id)
-  unqExperiments = unique(experiment[, c("model.id","drug")])
-
-
-}
 
 #' if model and drug slot is NULL it will try to infer it
 #' otherwise will use the given model and drug slot

@@ -1,4 +1,5 @@
-xlFile = "data/REF001BLP1 (H2O_945_Intermittent TTK60mg+Taxol40mg_Taxol_Carbo) June 10_16.xlsx"
+#xlFile = "data/REF001BLP1 (H2O_945_Intermittent TTK60mg+Taxol40mg_Taxol_Carbo) June 10_16.xlsx"
+xlFile = "data/NOTCHB01P5-(PBSctrl_DPctrl,Fluva_DP,PBSctrl_DP,Fluva_DPctrl)-Nov 2_16.xlsx"
 
 
 library(XLConnect)
@@ -47,21 +48,9 @@ processOneExperment <- function(expVal, dateVec)
                    volume= expVal[volIndx],
                    stringsAsFactors = FALSE)
 
-  rtx$Date = dateVec[volIndx]
-  rtx$Date = as.Date(rtx$Date)
-  rtx$time = rtx$Date - rtx$Date[1]
-
-  ##--- remove all rows for which all ("width", "length", "volume") NA
-  #desiredCols = c("width", "length", "volume")
-  #ind <- apply(rtx[, desiredCols], 1, function(x) all(is.na(x)))
-  #rtx = rtx[!ind, ]
-
-  #rtl = list(width = as.numeric(rtx$width),
-  #           length= as.numeric(rtx$length),
-  #           volume= as.numeric(rtx$volume),
-  #           date = rtx$Date,
-  #           time = rtx$time)
-  #return(rtl)
+  rtx$date = dateVec[volIndx]
+  rtx$date = as.Date(rtx$date)
+  rtx$time = rtx$date - rtx$date[1]
   return(rtx)
 }
 
@@ -96,19 +85,62 @@ for(blokID in 2:length(infoBlock))
       expN = processOneExperment(expVal, dateVec)
       expN$formula = "width*width*length/2"
 
-      expN$model = creatModelId( mouseID=blok[expri,2], RowName=rownames(blok[expri,]) )
+      expN$model.id = creatModelId( mouseID=blok[expri,2], RowName=rownames(blok[expri,]) )
       expN$drug  = drug
-      expNdf = rbind(expNdf, expN)
+      expN$batch = xlFile
+      if(drug=="H20")
+      {expN$type  = "Control"} else { expN$type  = "Treatment"}
 
+      expNdf = rbind(expNdf, expN)
       allExp[[indxAllExp]] = expN
       indxAllExp = indxAllExp + 1
     }
   }
 }
 
+##--- remove empty rows from df ---------------------------
+chkCol = c("width", "length", "volume")
+valuesToAvoid = c(NA,0)
+
+rwTest = sapply(chkCol, function(x){ expNdf[,x] %in% valuesToAvoid})
+rw2Remove = apply(rwTest, 1, all)
+expNdf = expNdf[!rw2Remove, ]
+
+##----- split drug ---------------
+source("R/important_functions.R")
+#dg  = unique(expNdf$drug)
+dg  = expNdf$drug
+dgx = strsplit(dg, "\\+")
+dgy = convertListToDataFram(dgx)
+dgy = as.data.frame(apply(dgy, 2, trimws), stringsAsFactors = FALSE)
+class(dgy)
+
+colnames(dgy) = paste0("drug.", 1:dim(dgy)[2])
+
+dosx = data.frame(matrix(NA, nrow = dim(dgy)[1], ncol = dim(dgy)[2]))
+colnames(dosx) = paste0("dose.", 1:dim(dosx)[2])
+
+##---- manually put dose values -------------------------
+dosx[dgy=="Intermittent TTK 6mg"] = 6
+dgy[ dgy=="Intermittent TTK 6mg"] = "Intermittent TTK"
+
+dosx[dgy=="Taxol 40mg"] = 40
+dgy[ dgy=="Taxol 40mg"] = "Taxol"
+
+dosx[dgy=="Taxol 40mg/kg"] = 40
+dgy[ dgy=="Taxol 40mg/kg"] = "Taxol"
+##-------------------------------------------------------
+
+expNdf = cbind(expNdf, dgy, dosx)
 
 ##save datafram for test
-saveRDS(expNdf, file="data/DC_pdxDf_test_object.Rda")
+saveRDS(expNdf, file="data/DC_pdxDf_test_object2.Rda")
+
+
+
+
+
+if(1==2){
 
 ##==== Trim each experiment =====================
 getIndex <- function(inVec, indxOf)
@@ -163,7 +195,7 @@ drgName = sapply(allExp, function(x)x$drug)
 legend("topleft", legend=drgName, cex=0.8, col=colors, pch=19, lty=1, title="Drug")
 
 
-
+}
 
 
 
