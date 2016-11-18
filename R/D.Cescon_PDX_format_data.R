@@ -1,8 +1,6 @@
-#xlFile = "data/REF001BLP1 (H2O_945_Intermittent TTK60mg+Taxol40mg_Taxol_Carbo) June 10_16.xlsx"
-xlFile = "data/NOTCHB01P5-(PBSctrl_DPctrl,Fluva_DP,PBSctrl_DP,Fluva_DPctrl)-Nov 2_16.xlsx"
-
-
 library(XLConnect)
+processFile <- function(xlFile)
+{
 bc <- readWorksheetFromFile(xlFile, sheet="Data", header = FALSE )
 
 
@@ -132,7 +130,14 @@ dgy[ dgy=="Taxol 40mg/kg"] = "Taxol"
 ##-------------------------------------------------------
 
 expNdf = cbind(expNdf, dgy, dosx)
+return(expNdf)
 
+}
+
+#xlFile = "data/REF001BLP1 (H2O_945_Intermittent TTK60mg+Taxol40mg_Taxol_Carbo) June 10_16.xlsx"
+xlFile = "data/NOTCHB01P5-(PBSctrl_DPctrl,Fluva_DP,PBSctrl_DP,Fluva_DPctrl)-Nov 2_16.xlsx"
+
+expNdf = processFile(xlFile)
 ##save datafram for test
 saveRDS(expNdf, file="data/DC_pdxDf_test_object2.Rda")
 
