@@ -9,7 +9,7 @@ library(ggplot2)
 plotDrugResponse <- function(expSlot, expList)
 {
   ## read the PDX object
-  toPlt = readRDS("toPlot.Rda")
+  toPlt = readRDS("data/toPlot.Rda")
   expSlot=toPlt$expSlot
   expDesX=toPlt$expDesX
 

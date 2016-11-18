@@ -117,7 +117,7 @@ getExpDesign <- function(objNames, expDesign)
 
 
 
-gPx = readRDS("Gao_PharPx_obj.Rda")
+gPx = readRDS("data/Gao_PharPx_obj.Rda")
 expSlot  = gPx$experiment
 model = gPx$model
 expDesign = gPx$expDesign
@@ -137,7 +137,7 @@ unique(sapply(expSlot[objNames], "[[" , "tumor.type" ))
 expDesX = getExpDesign(objNames, expDesign)
 
 tosave = list(expSlot=expSlot, expDesX=expDesX)
-saveRDS(tosave, file = "toPlot.Rda")
+saveRDS(tosave, file = "data/toPlot.Rda")
 
 
 

@@ -215,7 +215,7 @@ Gao_PharPx_obj[["model"]] = checkModel(Geo_Exp$model, Gao_PharPx_obj[["experimen
 Gao_PharPx_obj[["expDesign"]] = creatExperimentDesign(Gao_PharPx_obj[["model"]], Gao_PharPx_obj[["experiment"]])
 
 
-saveRDS(Gao_PharPx_obj, file= "Gao_PharPx_obj.Rda")
+saveRDS(Gao_PharPx_obj, file= "data/Gao_PharPx_obj.Rda")
 
 
 
