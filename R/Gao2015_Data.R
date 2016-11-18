@@ -10,17 +10,83 @@ rs <- dbSendQuery(DBcon, qtxt)
 experimentX <- fetch(rs, n=-1)
 closeAllDBconn()
 
-experiment = data.frame(model.id = experimentX$Model,
-                        drug1 = experimentX$Treatment.1,
-                        drug2 = experimentX$Treatment.2,
-                        drug3 = experimentX$Treatment.3,
+modTr = unique(experimentX[, c("Model", "Treatment")])
+
+mid = lapply( unique(modTr$Model), function(x){
+                                   mx = modTr[modTr$Model==x, "Model"]
+                                   paste(mx, 1:length(mx), sep=".")})
+
+modTr$model.id = unlist(mid)
+
+experimentX$model.id = apply(experimentX, 1, function(x){ modTr[modTr$Model== x["Model"] &
+                                                                modTr$Treatment== x["Treatment"], "model.id"] })
+
+experiment = data.frame(model.id = experimentX$model.id,
+                        drug.1 = experimentX$Treatment.1,
+                        drug.2 = experimentX$Treatment.2,
+                        drug.3 = experimentX$Treatment.3,
                         time  = experimentX$Days.Post.T0,
                         volume= experimentX$`Volume.(mm3)`,
-                        body.weight = experimentX$`body.weight.(g)`)
+                        body.weight= experimentX$`body.weight.(g)`,
+                        stringsAsFactors = FALSE)
+
+tumor.type = experimentX$Tumor.Type
+tumor.type[tumor.type=="BRCA"]= "Breast Cancer" #BRCA, breast carcinoma
+tumor.type[tumor.type=="CM"]  = "Cutaneous Melanoma" #CM, cutaneous melanoma
+tumor.type[tumor.type=="CRC"] = "Colorectal Cancer"  #CRC, colorectal cancer
+tumor.type[tumor.type=="GC"]  = "Gastric Cancer"     #GC, Gastric Cancer
+tumor.type[tumor.type=="NSCLC"]="Non-small Cell Lung Carcinoma" #NSCLC, non-small cell lung carcinoma;
+tumor.type[tumor.type=="PDAC" ]="Pancreatic Ductal Carcinoma"   #PDAC, pancreatic ductal carcinoma;
+
+experiment$tumor.type = as.character(tumor.type)
+
+##====================================
+## Create design matrix -----
+####----- create model matrix ---------------
+
+exp.type = experimentX$Treatment.1 #", "model.id")]
+exp.type[exp.type=="untreated"] = "control"
+exp.type[exp.type!="control"  ] = "treatment"
+edf = experimentX[, c("model.id", "Model")]
+colnames(edf) = c("model.id", "batch")
+edf$exp.type = exp.type
+model = unique(edf)
+
+seqObjId  = sapply(strsplit(model$model.id, "[.]"), `[[`, 1)
+model$biobase.id = seqObjId
+
+#
+#edf = unique(edf)
+# trtModId = unique(edf[edf$exp.type=="treatment","model.id"])
+# cntModId = unique(edf[edf$exp.type== "control", "model.id"])
+#
+# dm = data.frame(matrix(0, nrow= length(trtModId), ncol = length(cntModId)))
+# rownames(dm) = trtModId
+# colnames(dm) = cntModId
+#
+# for(I in unique(edf$Model))
+# {
+#   bx = edf[edf$Model==I, ]
+#   trtID = edf[edf$Model==I & edf$exp.type=="treatment", "model.id" ]
+#   cntID = edf[edf$Model==I & edf$exp.type=="control", "model.id" ]
+#   dm[trtID, cntID] = 1
+# }
+
+##====================================
+
+#experiment$batch = as.character(experimentX$Model)
+#
+#exp.type = experimentX$Treatment.1
+#exp.type[exp.type=="untreated"] = "control"
+#exp.type[exp.type!="control"  ] = "treatment"
+#
+#experiment$exp.type= as.character(exp.type)
+
+geoExp = list(experiment=experiment, model = model)
+
+saveRDS(geoExp, file = "data/Geo_Exp.Rda")
 
 
-
-pdxModels = unique(experiment$Model)
 
 
 library(Biobase)
