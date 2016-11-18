@@ -6,9 +6,14 @@ library(ggplot2)
 #' @examples
 #' plotDrugResponse(PDX)
 #' @export
-plotDrugResponse <- function(PDX)
+plotDrugResponse <- function(expSlot, expList)
 {
   ## read the PDX object
-  PDX =readRDS("data/PDX_test_object.Rda")
+  toPlt = readRDS("toPlot.Rda")
+  expSlot=toPlt$expSlot
+  expDesX=toPlt$expDesX
+
+
+
 
 }
