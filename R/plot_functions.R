@@ -6,6 +6,7 @@ library(ggplot2)
 #' @examples
 #' plotDrugResponse(PDX)
 #' @export
+
 plotDrugResponse <- function(expSlot, expList)
 {
   ## read the PDX object
