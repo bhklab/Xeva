@@ -8,6 +8,7 @@ library(ggplot2)
 #' @export
 
 
+
 getExperimentDF <- function(expSlot, modelID, value)
 {
   modelID = c(modelID)
@@ -62,8 +63,6 @@ creatPlotDF <- function(expSlot, expList)
 
 
 
-
-
 plotDrugResponse <- function(expSlot, expList)
 {
   ## read the PDX object
@@ -73,10 +72,12 @@ plotDrugResponse <- function(expSlot, expList)
 
   plotData = creatPlotDF(expSlot, expList)
 
-  ##---- plot the df ------------
-
+  ##---- plot the df in ggplot and return plot --------
 
 
 }
+
+
+
 
 
