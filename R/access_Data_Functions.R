@@ -118,6 +118,10 @@ getExpDesign <- function(objNames, expDesign)
 
 
 
+##===================================================================================
+##===================================================================================
+if(1==2){
+
 
 
 gPx = readRDS("data/Gao_PharPx_obj.Rda")
@@ -217,7 +221,7 @@ legend("topleft", legend=drgName, cex=0.8, col=colors, pch=19, lty=1, title="Dru
 
 
 
-
+}
 
 
 

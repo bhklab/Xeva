@@ -1,6 +1,5 @@
-rseq = readRDS("data/Geo_RNAseq_fpkm.Rda")
-#crmt = readRDS("data/Geo_curve_metrics.Rda")
-#experiment = readRDS("data/Geo_raw_data.Rda")
+if(1==2){
+
 
 source("../PT/src/cxpMeta_mysql_functions.R")
 DBcon = getCXPMetaDB_Conn()
@@ -84,20 +83,24 @@ model$biobase.id = seqObjId
 
 geoExp = list(experiment=experiment, model = model)
 
-saveRDS(geoExp, file = "data/Geo_Exp.Rda")
+##==========================================================================
+##====== get the drug datafram =============================================
 
+pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
+drgNames = apply(geoExp$experiment[, c("drug.1","drug.2","drug.3")], 1, pasteWithoutNA)
+drgNames = unique(drgNames)
+drug = data.frame(drug.id = drgNames,
+                 standard.name = drgNames)
 
+geoExp$drug = drug
 
-
+##------------------------------------------------------
 library(Biobase)
+rseq = readRDS("data/Geo_RNAseq_fpkm.Rda")
 assaydata = as.matrix(rseq[1:50,]) ##only 50 genes
 
 sampleID = colnames(assaydata)
-
-
-models = sapply(sampleID, function(x){ if(x%in%pdxModels) x else NA })
-
-rnaseqMeta = data.frame(sampleID=sampleID, model.id=models )
+rnaseqMeta = data.frame(sampleID=sampleID)
 rownames(rnaseqMeta) = rnaseqMeta$sampleID
 phenodata   <- new("AnnotatedDataFrame", data = rnaseqMeta)
 
@@ -105,12 +108,18 @@ featureDF = data.frame(geneName = rownames(assaydata), ensembl.id = NA)
 rownames(featureDF) = featureDF$geneName
 featuredata <- new("AnnotatedDataFrame", data = featureDF)
 
-eset <- ExpressionSet(assayData=assaydata,
+rnaseq <- ExpressionSet(assayData=assaydata,
                       phenoData=phenodata,
                       featureData=featuredata)
 
 
 
-##---- creat exprement slot --------
-##---- creat Model slot ------------
-#model = data.frame(model.id=)
+geoExp$RNASeq = rnaseq
+
+
+
+saveRDS(geoExp, file = "data/Geo_Exp.Rda")
+
+#geoExp = readRDS("data/Geo_Exp.Rda")
+
+}

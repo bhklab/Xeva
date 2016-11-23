@@ -119,6 +119,8 @@ experimentSlotfromDf <- function(experiment)
     experiment[, "drug"] = apply(experiment[,drgColName.No], 1, pasteWithoutNA)
   }
 
+  ##------- if drug names are already in drug1 + drug2 split them ----------
+
   expSlot = list()
   u.modDrg.id = unique(experiment[, c("model.id", "drug")])
   for (i in 1:dim(u.modDrg.id)[1])
@@ -137,16 +139,20 @@ experimentSlotfromDf <- function(experiment)
     stop(msg)
   }
 
-  #expNames = make.unique(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} ), sep="_")
+  expNames = make.unique(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} ), sep="_")
   names(expSlot) = mod.ids
-  #for(i in 1:length(expSlot))
-  #{ expSlot[[i]][["name"]] = expNames[i] }
+  for(i in 1:length(expSlot))
+  { expSlot[[i]][["experiment.id"]] = expNames[i] }
 
   return(expSlot)
 }
 
 
 
+
+
+###=================================================================
+if(1==2){
 checkModel <- function(model, expSlot)
 {
   reqColName = c("model.id", "batch", "exp.type", "biobase.id")#, "drug.join.name")
@@ -216,7 +222,7 @@ Gao_PharPx_obj[["expDesign"]] = creatExperimentDesign(Gao_PharPx_obj[["model"]],
 
 
 saveRDS(Gao_PharPx_obj, file= "data/Gao_PharPx_obj.Rda")
-
+}
 
 
 
