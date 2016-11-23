@@ -117,6 +117,9 @@ getExpDesign <- function(objNames, expDesign)
 
 
 
+
+
+
 gPx = readRDS("data/Gao_PharPx_obj.Rda")
 expSlot  = gPx$experiment
 model = gPx$model
