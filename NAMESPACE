@@ -3,6 +3,7 @@
 export(creatPharmacoPXSet)
 export(documentationExample)
 export(experimentSlotfromDf)
+export(getExpDesign)
 export(getExperimentDF)
 export(hello)
 export(helloWorld)
