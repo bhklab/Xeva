@@ -1,4 +1,6 @@
 library(ggplot2)
+#importFrom("grDevices", "rainbow")
+
 #' Given a PDX object this will plot drug response curve
 #' i.e. Time vs Volume
 #' @param PDX a PDX object
@@ -27,7 +29,7 @@ getExperimentDF <- function(expSlot, modelID, value)
 creatPlotDF <- function(expSlot, expList)
 {
 
-  col = rainbow(length(expDesX))
+  col = grDevices::rainbow(length(expDesX))
   px = list()
 
   for(I in 1:length(expDesX))
@@ -69,7 +71,7 @@ plotDrugResponse <- function(expSlot, expList)
 
   plotData = creatPlotDF(expSlot, expList)
 
-  col = rainbow(length(expDesX))
+  col = grDevices::rainbow(length(expDesX))
   px = list()
 
   for(I in 1:length(expDesX))
@@ -208,5 +210,5 @@ plotDrugResponse <- function(expSlot, expList)
 
 }
 
-plotDrugResponse(drugName = 'LCL161 + paclitaxel')
+#plotDrugResponse(drugName = 'LCL161 + paclitaxel')
 

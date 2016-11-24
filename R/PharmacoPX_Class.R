@@ -59,11 +59,12 @@ creatExperimentDesign <- function(model, expSlot)
 
 #' @export
 PharmacoPSet <- setClass( "PharmacoPSet",
-                          slots = list( molecularProfiles = "list",
-                                     model = "data.frame",
-                                     drug = "data.frame",
-                                     experiment = "list",
-                                     expDesign = "list")
+                          slots = list(annotation = "list",
+                                       molecularProfiles = "list",
+                                       model = "data.frame",
+                                       drug = "data.frame",
+                                       experiment = "list",
+                                       expDesign = "list")
                           )
 
 
@@ -79,13 +80,19 @@ creatPharmacoPXSet <- function(name,
                                drug  = data.frame())
 {
 
+  annotation <- list( name <- as.character(name),
+                      dateCreated <- date(),
+                      sessionInfo <- sessionInfo())
+  #annotation$call <- match.call()
+
   expSlot = experimentSlotfromDf(experiment)
 
   model = checkModel(model, expSlot)
 
   expDesign = creatExperimentDesign(model, expSlot)
 
-  pxset = PharmacoPSet(molecularProfiles = molecularProfiles,
+  pxset = PharmacoPSet(annotation=annotation,
+                       molecularProfiles = molecularProfiles,
                        model = model,
                        drug  = drug,
                        experiment= expSlot,
@@ -108,7 +115,7 @@ creatPharmacoPXSet <- function(name,
 #' @param Whatever u put here
 #' @return The sum of \code{x} and \code{y} and \code{z} . z is nothing
 #' @examples
-#' add(1, 1)
+#' documentationExample(1, 1)
 #' This will be also included
 #' @export
 documentationExample <- function(x, y) {

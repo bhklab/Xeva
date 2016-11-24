@@ -1,5 +1,5 @@
 ##to for datafram to Exp slot
-library(BBmisc)
+#library(BBmisc)
 creatListFromDF <- function(exp.mod.dg)
 {
   rtx = list()
@@ -65,7 +65,7 @@ creatListFromDF <- function(exp.mod.dg)
 
   rtxData[ ,doseColsNames]= sapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )
 
-  rtxData = sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
+  rtxData = BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
   rtx$data= rtxData
   return(rtx)

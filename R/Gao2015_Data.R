@@ -95,18 +95,21 @@ drug = data.frame(drug.id = drgNames,
 geoExp$drug = drug
 
 ##------------------------------------------------------
-library(Biobase)
-rseq = readRDS("data/Geo_RNAseq_fpkm.Rda")
+#library(Biobase)
+rseq = readRDS("DATA/Geo_RNAseq_fpkm.rdata")
 assaydata = as.matrix(rseq[1:50,]) ##only 50 genes
 
 sampleID = colnames(assaydata)
 rnaseqMeta = data.frame(sampleID=sampleID)
 rownames(rnaseqMeta) = rnaseqMeta$sampleID
-phenodata   <- new("AnnotatedDataFrame", data = rnaseqMeta)
+phenodata   <- Biobase::AnnotatedDataFrame(data = rnaseqMeta)
+#phenodata   <- new("AnnotatedDataFrame", data = rnaseqMeta)
 
 featureDF = data.frame(geneName = rownames(assaydata), ensembl.id = NA)
 rownames(featureDF) = featureDF$geneName
-featuredata <- new("AnnotatedDataFrame", data = featureDF)
+#featuredata <- new("AnnotatedDataFrame", data = featureDF)
+featuredata <- Biobase::AnnotatedDataFrame(data = featureDF)
+
 
 rnaseq <- ExpressionSet(assayData=assaydata,
                       phenoData=phenodata,
@@ -118,8 +121,8 @@ geoExp$RNASeq = rnaseq
 
 
 
-saveRDS(geoExp, file = "data/Geo_Exp.Rda")
+saveRDS(geoExp, file = "DATA/Geo_Exp.Rda")
 
-#geoExp = readRDS("data/Geo_Exp.Rda")
+#geoExp = readRDS("DATA/Geo_Exp.Rda")
 
 }
