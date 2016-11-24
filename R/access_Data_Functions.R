@@ -103,7 +103,7 @@ getTreatmentControlX <- function(expSlot, objNames, model)
 }
 
 
-
+#' @export
 getExpDesign <- function(objNames, expDesign)
 {
   expDesIndx = sapply(expDesign, function(x){
