@@ -66,7 +66,7 @@ creatPlotDF <- function(expSlot, expList)
 plotDrugResponse <- function(expSlot, expList)
 {
   ## read the PDX object
-  toPlt = readRDS("data/toPlot.Rda")
+  toPlt = readRDS("DATA-raw/toPlot.rdata")
   expSlot=toPlt$expSlot
   expDesX=toPlt$expDesX
 

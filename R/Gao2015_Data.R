@@ -54,32 +54,7 @@ model = unique(edf)
 seqObjId  = sapply(strsplit(model$model.id, "[.]"), `[[`, 1)
 model$biobase.id = seqObjId
 
-#
-#edf = unique(edf)
-# trtModId = unique(edf[edf$exp.type=="treatment","model.id"])
-# cntModId = unique(edf[edf$exp.type== "control", "model.id"])
-#
-# dm = data.frame(matrix(0, nrow= length(trtModId), ncol = length(cntModId)))
-# rownames(dm) = trtModId
-# colnames(dm) = cntModId
-#
-# for(I in unique(edf$Model))
-# {
-#   bx = edf[edf$Model==I, ]
-#   trtID = edf[edf$Model==I & edf$exp.type=="treatment", "model.id" ]
-#   cntID = edf[edf$Model==I & edf$exp.type=="control", "model.id" ]
-#   dm[trtID, cntID] = 1
-# }
 
-##====================================
-
-#experiment$batch = as.character(experimentX$Model)
-#
-#exp.type = experimentX$Treatment.1
-#exp.type[exp.type=="untreated"] = "control"
-#exp.type[exp.type!="control"  ] = "treatment"
-#
-#experiment$exp.type= as.character(exp.type)
 
 geoExp = list(experiment=experiment, model = model)
 
@@ -96,7 +71,7 @@ geoExp$drug = drug
 
 ##------------------------------------------------------
 #library(Biobase)
-rseq = readRDS("DATA/Geo_RNAseq_fpkm.rdata")
+rseq = readRDS("DATA-raw/Geo_RNAseq_fpkm.rdata")
 assaydata = as.matrix(rseq[1:50,]) ##only 50 genes
 
 sampleID = colnames(assaydata)
@@ -121,7 +96,7 @@ geoExp$RNASeq = rnaseq
 
 
 
-saveRDS(geoExp, file = "DATA/Geo_Exp.Rda")
+saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 
 #geoExp = readRDS("DATA/Geo_Exp.Rda")
 
