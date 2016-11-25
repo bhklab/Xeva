@@ -3,44 +3,19 @@ if(1==2){ print("this is running....")
 library(ggplot2)
 
 
-geoExp = readRDS("DATA/Geo_Exp.Rda")
-experiment = geoExp$experiment
-model = geoExp$model
+geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
+#experiment = geoExp$experiment
+#model = geoExp$model
 
-#expSlot = experimentSlotfromDf(experiment)
-
-#model = checkModel(model, expSlot)
-
-#expDesign = creatExperimentDesign(model, expSlot)
-
-
-
-pdxe = creatPharmacoPXSet("PDXE",
+pdxe = creatPharmacoPXSet(name = "PDXE",
                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
                           experiment = geoExp$experiment,
                           model = geoExp$model,
                           drug  = geoExp$drug
                           )
+save(pdxe, file = "data/pdxe.rda")
 
-
-
-
-
-
-
-
-
-if(1==2){
-
-
-
-  gPx = readRDS("data/Gao_PharPx_obj.Rda")
-  expSlot  = gPx$experiment
-  model = gPx$model
-  expDesign = gPx$expDesign
-
-
-
+data("pdxe")
 
 
 
@@ -129,23 +104,78 @@ if(1==2){
 
 
 
+##================================================================
+
+  setClass(
+    Class = "Circle",
+    representation = representation(
+      radius = "numeric",
+      diameter = "numeric"
+    ) )
+
+  a <- new("Circle")
+  a@radius = 1
+  radius(a) ##gives error could not find function "radius"
+  radius(a) <- 2 ##gives error could not find function "radius<-"
+
+  # define radius
+  setGeneric("radius", function(self) standardGeneric("radius"))
+  setMethod("radius",
+            signature(self = "Circle"),
+            function(self) {
+              self@radius
+            } )
+
+  radius(a) ##this works
+  radius(a) <- 2  ##gives error could not find function "radius<-"
+
+  setGeneric("radius<-", function(self, value) standardGeneric("radius<-"))
+  setReplaceMethod("radius",
+                   "Circle",
+                   function(self, value) {
+                     self@radius <- value
+                     self
+                   } )
+
+
+  radius(a) <- 2  ##Now this works
+  radius(a) ##this will give 2
+
+
+
+  ## to get the diameter
+  setGeneric("diameter", function(self) standardGeneric("diameter"))
+  setMethod("diameter",
+            signature(self = "Circle"),
+            function(self) {
+              self@diameter
+            }
+  )
+
+  ## to set the diameter
+  setGeneric("diameter<-", function(self, value) standardGeneric("diameter<-"))
+  setReplaceMethod("diameter", "Circle",
+                   function(self, value) {
+                     self@diameter <- value
+                     self
+                   } )
+
+
+  # Method that calculates one value from another
+  setGeneric("calc_diameter", function(self) { standardGeneric("calc_diameter")})
+  setMethod("calc_diameter",
+            signature(self = "Circle"),
+            function(self) {
+              self@diameter <- self@radius * 2
+              self
+            }
+  )
+
+
+
+
 
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
 
