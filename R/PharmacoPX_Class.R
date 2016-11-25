@@ -57,7 +57,10 @@ creatExperimentDesign <- function(model, expSlot)
 ##================================================================================================
 
 
-#' @export
+#' An S4 class for PharmacoPSet
+#'
+#' @slot molecularProfiles List of molecular profiles
+#' @slot model A datafram containing model infromation
 PharmacoPSet <- setClass( "PharmacoPSet",
                           slots = list(annotation = "list",
                                        molecularProfiles = "list",
@@ -80,10 +83,9 @@ creatPharmacoPXSet <- function(name,
                                drug  = data.frame())
 {
 
-  annotation <- list( name <- as.character(name),
-                      dateCreated <- date(),
-                      sessionInfo <- sessionInfo())
-  #annotation$call <- match.call()
+  annotation <- list( name = as.character(name),
+                      dateCreated = date(),
+                      sessionInfo = sessionInfo())
 
   expSlot = experimentSlotfromDf(experiment)
 
@@ -99,6 +101,66 @@ creatPharmacoPXSet <- function(name,
                        expDesign = expDesign )
   return(pxset)
 }
+
+
+
+#' A method to display object
+#' for "show" setGeneric is already defined
+#' @export
+setMethod(f="show",
+          signature="PharmacoPSet",
+          definition= function(object)
+          {
+            slotsName = paste(slotNames(object), collapse = "\n")
+            cat(sprintf("Slots are:\n%s\n", slotsName))
+          }
+          )
+
+
+
+##--------------------------------------------------------------------------
+
+##----- get drugInfo -------------
+#' drugInfo Generic
+#' Generic for drugInfo method
+#'
+#' @examples
+#' data(pdxe)
+#' drugInfo(pdxe)
+#' @param object The \code{PharmacoPSet} to retrieve drug info from
+#' @return a \code{data.frame} with the drug annotations
+setGeneric(name = "drugInfo", def = function(object) {standardGeneric("drugInfo")} )
+
+#### @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
+#' @export
+setMethod( f=drugInfo, signature="PharmacoPSet", definition=function(object){ dim(object@drug) } )
+
+
+
+#' drugInfo<- Generic
+#' Generic for drugInfo replace method
+#' @examples
+#' data(pdxe)
+#' drugInfo(pdxe) <- drugInfo(pdxe)
+#' @param object The \code{PharmacoPSet} to replace drug info in
+#' @param value A \code{data.frame} with the new drug annotations
+#' @return Updated \code{PharmacoPSet}
+setGeneric(name= "drugInfo<-", def = function(object, value) {standardGeneric("drugInfo<-")} )
+
+###### @describeIn PharmacoSet Update the drug annotations
+#' @export
+setMethod( f="drugInfo<-",
+           signature="PharmacoPSet",
+           definition=function(object, value)
+           {
+             object@annotation$drugInfo = value
+             #object@drugInfo = value  ##This will not work as slot drugInfo already have to be present
+             object
+           } )
+
+
+
+
 
 
 
