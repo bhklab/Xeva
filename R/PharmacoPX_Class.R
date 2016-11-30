@@ -19,12 +19,29 @@ creatExperimentDesign <- function(model, expSlot)
   drgNames  = unique(sapply(expSlot, "[[", c("drug", "join.name")))
   tretBatch = unique(model[,  "batch"])
 
+  expModDrg = lapply(expSlot, function(x){ c(x$drug$join.name, x$model.id, x$experiment.id)})
+  expModDrg = plyr::ldply(expModDrg, rbind, .id = NULL)
+  colnames(expModDrg) = c("drug.join.name", "model.id", "experiment.id")
+  expModDrg = as.data.frame(as.matrix(expModDrg),stringsAsFactors=FALSE)
+  expModDrg$batch = NA
+  expModDrg$exp.type = NA
+  #model[model]
+
+
+
   rtx=list()
   for(drgI in drgNames)
   {
     for(batI in tretBatch)
     {
       Lx = list(drug.join.name = drgI, batch = batI)
+      modBatchx = model[model$batch== batI, ]
+      expModDrgBi = expModDrg[expModDrg$model.id %in% modBatchx$model.id, ]
+
+
+
+
+
       Lx$treatment = unique(model[model$drug.join.name == drgI &
                                     model$batch == batI &
                                     model$exp.type == "treatment", "model.id"] )
@@ -59,8 +76,6 @@ creatExperimentDesign <- function(model, expSlot)
 
 #' An S4 class for PharmacoPSet
 #'
-#' @slot molecularProfiles List of molecular profiles
-#' @slot model A datafram containing model infromation
 PharmacoPSet <- setClass( "PharmacoPSet",
                           slots = list(annotation = "list",
                                        molecularProfiles = "list",
@@ -70,13 +85,30 @@ PharmacoPSet <- setClass( "PharmacoPSet",
                                        expDesign = "list")
                           )
 
-
-
-
-#' if model and drug slot is NULL it will try to infer it
-#' otherwise will use the given model and drug slot
+######################################################################
+#' Creat PharmacoPx class object
+#'
+#' \code{creatPharmacoPxSet} returns PharmacoPX class object
+#'
+#' @param name A \code{character} string detailing the name of the dataset
+#' @param molecularProfiles A \code{list} of ExpressionSet objects containing molecular profiles
+#' @param experiment A \code{data.frame} containg all experiment information
+#' @param model A \code{data.frame} containg the annotations for all models used in the experiment
+#' @param drug A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types
+#'
+#' @return  Returns PharmacoPx object
+#'
+#' @examples
+#' geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
+#' pdxe = creatPharmacoPxSet(name = "PDXE",
+#'                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
+#'                           experiment = geoExp$experiment,
+#'                           model = geoExp$model,
+#'                           drug  = geoExp$drug )
+#' save(pdxe, file = "data/pdxe.rda")
+#' data("pdxe")
 #' @export
-creatPharmacoPXSet <- function(name,
+creatPharmacoPxSet <- function(name,
                                molecularProfiles = list(),
                                experiment = data.frame(),
                                model = data.frame(),

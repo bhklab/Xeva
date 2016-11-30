@@ -116,6 +116,14 @@ getExpDesign <- function(objNames, expDesign)
 
 
 
+getExperimentValues <- function(object, name = c("experiment.id"))
+{
+  #object = pdxe
+  #name = c("drug", "join.name")
+  rt  = sapply(object@experiment, "[[", c(name))
+  return(rt)
+}
+
 
 
 
