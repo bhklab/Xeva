@@ -8,11 +8,4 @@
 \description{
 An S4 class for PharmacoPSet
 }
-\section{Slots}{
-
-\describe{
-\item{\code{molecularProfiles}}{List of molecular profiles}
-
-\item{\code{model}}{A datafram containing model infromation}
-}}
 

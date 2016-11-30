@@ -39,15 +39,19 @@ creatPlotDF <- function(expSlot, expList)
     CnmodelID= expDesX[[I]][["control"]]
     cdf = getExperimentDF(expSlot, modelID=CnmodelID, value="data")
 
-    ##--- add batch ID -----------------
-    tdf$batch = expDesX[[I]][["batch"]]
-    cdf$batch = expDesX[[I]][["batch"]]
-
     ##---add drug name -----------------
     tdf$drug = expDesX[[I]][["drug.join.name"]]
     cdf$drug = expDesX[[I]][["drug.join.name"]]
 
-    ## same color for one treatment and control
+    ##--- add batch ID -----------------
+    tdf$batch = expDesX[[I]][["batch"]]
+    cdf$batch = expDesX[[I]][["batch"]]
+
+    ##--- add type ID -----------------
+    tdf$exp.type = "treatment"
+    cdf$exp.type = "control"
+
+    ## same color for all treatment and control
     tdf$color = col[I]
     cdf$color = col[I]
 
@@ -71,6 +75,9 @@ plotDrugResponse <- function(expSlot, expList)
   expDesX=toPlt$expDesX
 
   plotData = creatPlotDF(expSlot, expList)
+  #saveRDS(plotData, file = "DATA-raw/toPlot_DF.Rda")
+
+  plotData = readRDS("DATA-raw/toPlot_DF.Rda")
 
   ##---- plot the df in ggplot and return plot --------
 

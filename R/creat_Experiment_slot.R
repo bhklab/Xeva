@@ -19,9 +19,9 @@ creatListFromDF <- function(exp.mod.dg)
 
   rtx$drug = drug
 
-  ##--- elements with unique function
-  #for (u in c("batch", "exp.type", "formula", "tumor.type"))
-  for (u in c("formula", "tumor.type"))
+  ##--- elements with unique function -----------------
+  eleUnq = c("formula", "tumor.type", "batch", "exp.type")
+  for (u in eleUnq)
   {
     if(is.element(u, colnames(exp.mod.dg)))
     {
@@ -35,12 +35,12 @@ creatListFromDF <- function(exp.mod.dg)
     }
   }
 
-  #if(!is.null(rtx$exp.type) & !is.element(rtx$exp.type, c("control", "treatment")))
-  #{
-  #  msg = sprintf("For model.id %s and drug %s, exp.type should be control OR treatment
-  #                it is %s\n", rtx$model.id, rtx$drug$join.name, rtx$exp.type)
-  #  stop(msg)
-  #}
+  if(!is.null(rtx$exp.type) & !is.element(rtx$exp.type, c("control", "treatment")))
+  {
+    msg = sprintf("For model.id %s and drug %s, exp.type should be control OR treatment
+                  it is %s\n", rtx$model.id, rtx$drug$join.name, rtx$exp.type)
+    stop(msg)
+  }
 
   doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
   dataColName = c("time", "volume", "width","length", doseColsNames, "weight", "date")
@@ -100,7 +100,7 @@ experimentSlotfromDf <- function(experiment)
 
   doseColsName = colnames(experiment)[grep("dose",colnames(experiment))]
   standardCols = c(requredCols, doseColsName, "width","length", "date", "time",
-                   "formula", "body.weight", "tumor.type") #"batch", "exp.type"
+                   "formula", "body.weight", "tumor.type", "batch", "exp.type")
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
@@ -140,9 +140,9 @@ experimentSlotfromDf <- function(experiment)
   }
 
   expNames = make.unique(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} ), sep="_")
-  names(expSlot) = mod.ids
   for(i in 1:length(expSlot))
   { expSlot[[i]][["experiment.id"]] = expNames[i] }
+  names(expSlot) = expNames
 
   return(expSlot)
 }
@@ -213,7 +213,7 @@ creatExperimentDesign <- function(model, expSlot)
 #DC_pdxDf_exp_object = experimentSlotfromDf(readRDS("data/DC_pdxDf_test_object.Rda"))
 #saveRDS(DC_pdxDf_exp_object, file= "DC_pdxDf_ExpSlot_object.Rda")
 
-Geo_Exp = readRDS("data/Geo_Exp.Rda")
+Geo_Exp = readRDS("DATA-raw/Geo_Exp.Rda")
 Gao_PharPx_obj = list()
 Gao_PharPx_obj[["experiment"]] = experimentSlotfromDf(Geo_Exp$experiment)
 Gao_PharPx_obj[["model"]] = checkModel(Geo_Exp$model, Gao_PharPx_obj[["experiment"]])

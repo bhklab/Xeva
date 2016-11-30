@@ -39,11 +39,18 @@ tumor.type[tumor.type=="PDAC" ]="Pancreatic Ductal Carcinoma"   #PDAC, pancreati
 
 experiment$tumor.type = as.character(tumor.type)
 
+experiment$batch  = sapply(strsplit(experiment$model.id, "[.]"), `[[`, 1)
+
+exp.type = experiment$drug.1
+exp.type[exp.type=="untreated"] = "control"
+exp.type[exp.type!="control"  ] = "treatment"
+experiment$exp.type = exp.type
+
 ##====================================
 ## Create design matrix -----
 ####----- create model matrix ---------------
 
-exp.type = experimentX$Treatment.1 #", "model.id")]
+exp.type = experimentX$Treatment.1
 exp.type[exp.type=="untreated"] = "control"
 exp.type[exp.type!="control"  ] = "treatment"
 edf = experimentX[, c("model.id", "Model")]
@@ -54,10 +61,16 @@ model = unique(edf)
 seqObjId  = sapply(strsplit(model$model.id, "[.]"), `[[`, 1)
 model$biobase.id = seqObjId
 
-
-
 geoExp = list(experiment=experiment, model = model)
 
+
+###=========================================================================
+##========= creat experiment design list ===================================
+#expDesignDf = data.frame(model.id = "",
+#                         batch = "",
+#                         exp.type = "",
+#                         drug = ""
+#                         )
 ##==========================================================================
 ##====== get the drug datafram =============================================
 
