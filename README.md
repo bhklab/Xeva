@@ -1,1 +1,3 @@
-ELUSIV: Extended compEndium of patient-derived modeLs for drUg Screening In Vivo
+XenoR
+
+Integration of molecular and pharmacological profiles of patient-derived models 
