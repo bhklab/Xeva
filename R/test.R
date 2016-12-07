@@ -7,7 +7,7 @@ geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
 #experiment = geoExp$experiment
 #model = geoExp$model
 
-pdxe = creatPharmacoPXSet(name = "PDXE",
+pdxe = creatPharmacoPxSet(name = "PDXE",
                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
                           experiment = geoExp$experiment,
                           model = geoExp$model,
