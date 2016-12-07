@@ -1,11 +1,11 @@
-Package: PharmacoPX
+Package: XenoR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Integration of molecular and pharmacological profiles of patient-derived xenograft models 
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: Arvind Mer
+Maintainer: Who to complain to <amer@uhnresearch.ca>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: Give me Beer, I will fix it license
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Imports:

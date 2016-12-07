@@ -3,7 +3,7 @@
 tumorVolumeChange <- function(volume)
 {
   Vini = volume[1]
-  return( sapply(exdf$volume, function(vt){ 100*(vt-Vini)/Vini }) )
+  return( sapply(volume, function(vt){ 100*(vt-Vini)/Vini }) )
 }
 
 avgResponse <- function(volume.change)
@@ -12,28 +12,44 @@ avgResponse <- function(volume.change)
   return(ar)
 }
 
+
+checkNumericIntCharZero <- function(u)
+{
+  if(length(u)==0){return(NA)}
+  return(u)
+}
+
 getBestResponse <- function(exdf, ResColName, min.time=10)
 {
   exdfMinAge = exdf[exdf$time >= min.time, ]
   minIndxA = which.min( exdfMinAge[, ResColName] )
   minIndx = minIndxA + dim(exdf)[1] - dim(exdfMinAge)[1]
-  return(list(time = exdf[minIndx, "time"],
-              value= exdf[minIndx, ResColName],
-              index= minIndx))
+
+  rtz = list(time = exdf[minIndx, "time"],
+             value= exdf[minIndx, ResColName],
+             index= minIndx)
+
+  rtz$time  = checkNumericIntCharZero(rtz$time)
+  rtz$value = checkNumericIntCharZero(rtz$value)
+  rtz$index = checkNumericIntCharZero(rtz$index)
+  return(rtz)
 }
 
-calculateResponses <- function(exdf, responseName = "volume")
+calculateResponses <- function(exdf, responseName = "volume", min.time=10)
 {
   exdf$volume.change = tumorVolumeChange(exdf[,responseName])
   exdf$average.response= avgResponse(exdf$volume.change)
 
-  best.response = getBestResponse(exdf, ResColName ="volume.change", min.time=10)
-  best.average.response = getBestResponse(exdf, ResColName ="average.response", min.time=10)
+  best.response = getBestResponse(exdf, ResColName ="volume.change", min.time=min.time)
+  best.average.response = getBestResponse(exdf, ResColName ="average.response", min.time=min.time)
+
   return(list(data = exdf,
               best.response=best.response,
               best.average.response=best.average.response))
 }
 
+
+##check PDTX curve
 
 ######################################################################
 #' Computes the mRECIST
@@ -51,24 +67,30 @@ calculateResponses <- function(exdf, responseName = "volume")
 computemRECIST <- function(best.response, best.average.response)
 {
   mRecist = NA
-  if(best.response < -95 & best.average.response < -40)
-  {mRecist = "mCR"}
+  if(is.na(best.response) | is.na(best.average.response) )
+  {return(mRecist)}
 
-  if(best.response < -50 & best.average.response < -20)
-  {mRecist = "mPR"}
+  if(!is.na(best.response) & !is.na(best.average.response))
+  {
+    if(best.response < -95 & best.average.response < -40)
+    {mRecist = "mCR"}
 
-  if(best.response <  35 & best.average.response <  30)
-  {mRecist = "mSD"}
+    if(best.response < -50 & best.average.response < -20)
+    {mRecist = "mPR"}
 
-  if(is.na(mRecist)){mRecist = "mPD"}
+    if(best.response <  35 & best.average.response <  30)
+    {mRecist = "mSD"}
+
+    if(is.na(mRecist)){mRecist = "mPD"}
+  }
 
   return(mRecist)
 }
 
 
-getmRECIST <- function(exdf, responseName = "volume")
+# @export
+mRECISTForModel <- function(modx)
 {
-  #modx = pdxe@experiment[[4]] #$data
   if(is.null(modx$best.response$value))
   {
     modxDataMat = calculateResponses(modx$data, responseName = "volume")
@@ -78,11 +100,94 @@ getmRECIST <- function(exdf, responseName = "volume")
   }
 
   modx$mRECIST = computemRECIST(best.response = modx$best.response$value,
-                               best.average.response= modx$best.average.response$value)
-
+                                best.average.response= modx$best.average.response$value)
+  return(modx)
 }
 
 
+###===============================================================================================
+###===============================================================================================
+
+#' setmRECIST<- Generic for setmRECIST replace method
+#' @examples
+#' data(pdxe)
+#' #calculate mRECIST for each experiment
+#' setmRECIST(pdxe)<- setmRECIST(pdxe)
+#' getmRECIST(pdxe)
+#' @param object The \code{XenoSet} object
+#' @return Updated \code{XenoSet}
+setGeneric(name= "setmRECIST", def = function(object) {standardGeneric("setmRECIST")} )
+
+#' @export
+setMethod( f="setmRECIST",
+           signature = "XenoSet",
+           definition= function(object)
+           {
+             if(is(object, "XenoSet"))
+             {
+               for(I in names(object@experiment))
+               {
+                 object@experiment[[I]] = mRECISTForModel(object@experiment[[I]])
+               }
+             }
+             return(object)
+           } )
+
+
+setGeneric(name= "setmRECIST<-", def = function(object,value) {standardGeneric("setmRECIST<-")} )
+
+## @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
+#' @export
+setMethod( f="setmRECIST<-",
+           signature= signature(object="XenoSet"),
+           definition=function(object, value)
+           {
+             object = value
+             object
+           } )
+
+
+###===============================================================================================
+###===============================================================================================
+#' getmRECIST Generic
+#' Generic for getmRECIST method
+#'
+#' @examples
+#' data(pdxe)
+#' # calculate mRECIST for each experiment
+#' setmRECIST(pdxe)<- setmRECIST(pdxe)
+#' getmRECIST(pdxe, group.by="biobase.id")
+#' @param object The \code{XenoSet} to retrieve mRECIST from
+#' @param group.by The name of column which will be mapped to model.id
+#' @return a \code{data.frame} with the mRECIST values, rows are drugs and columns are model.id
+setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {standardGeneric("getmRECIST")} )
+
+
+#' @export
+setMethod( f=getmRECIST,
+           signature="XenoSet",
+           definition= function(object, group.by)
+           {
+             rtx = data.frame(matrix(NA, nrow = length(object@experiment), ncol = 3))
+             colnames(rtx) = c("drug.join.name", "model.id", "mRECIST")
+             dfI = 1
+             for(I in object@experiment)
+             {
+               if(is.null(I$mRECIST))
+                 {
+                 msg = sprintf("mRECIST not present for model %s\nRun setmRECIST(object)<- setmRECIST(object) first\n", I$model.id)
+                 stop(msg)
+                 }
+              rtx[dfI, ] <- c(I$drug$join.name, I$model.id, I$mRECIST)
+              dfI = dfI+1
+             }
+             rownames(rtx)= NULL
+
+             ##----map to patient id
+             rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
+             return(rtx)
+           }
+           )
 
 
 
