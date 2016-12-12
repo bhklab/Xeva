@@ -43,7 +43,7 @@ creatListFromDF <- function(exp.mod.dg)
   }
 
   doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
-  dataColName = c("time", "volume", "width","length", doseColsNames, "weight", "date")
+  dataColName = c("time", "volume", "width","length", doseColsNames, "body.weight", "date")
   for (w in dataColName)
   {
       if(is.element(w, colnames(exp.mod.dg))==FALSE)
@@ -60,7 +60,7 @@ creatListFromDF <- function(exp.mod.dg)
   rtxData$volume= as.numeric(rtxData$volume)
   rtxData$width = as.numeric(rtxData$width)
   rtxData$length= as.numeric(rtxData$length)
-  rtxData$weight= as.numeric(rtxData$weight)
+  rtxData$body.weight= as.numeric(rtxData$body.weight)
   rtxData$date  = as.Date(rtxData$date)
 
   rtxData[ ,doseColsNames]= sapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )

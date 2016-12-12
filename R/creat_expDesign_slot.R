@@ -40,14 +40,12 @@ creatExperimentDesign <- function(expSlot)
 
   if(!is.null(modNoControl))
   {
-    txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = ",\n"))
+    txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = ", "))
     cat(txt)
-
-
   }
 
-  if(!is.null(modNoTreatme))
-  { txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = ","))}
+  #if(!is.null(modNoTreatme))
+  #{ txt = sprintf("These models have no Treatment\n%s", paste(unique(modNoControl), collapse = ","))}
 
   return(rtx)
 }

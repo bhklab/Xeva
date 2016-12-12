@@ -1,21 +1,32 @@
 if(1==2){ print("this is running....")
 
-library(ggplot2)
-
+#library(ggplot2)
 
 geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
-#experiment = geoExp$experiment
-#model = geoExp$model
 
-pdxe = creatPharmacoPxSet(name = "PDXE",
+pdxe = creatXenoSet(name = "PDXE",
                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
                           experiment = geoExp$experiment,
                           model = geoExp$model,
                           drug  = geoExp$drug
                           )
+
+setmRECIST(pdxe)<- setmRECIST(pdxe)
 save(pdxe, file = "data/pdxe.rda")
 
-data("pdxe")
+data(pdxe)
+
+
+
+
+##-------------------------------------------------------------------------------
+
+z = getModels(pdxe@experiment, drug="LEE011 + everolimus", drug.exact.match=TRUE, tumor.type=NULL)
+pdxe@experiment[["X-023.5.LEE011 + everolimus"]]
+
+##-------------------------------------------------------------------------------
+
+
 
 
 

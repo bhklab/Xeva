@@ -24,6 +24,7 @@ tumorTypeMatchFun<- function(tumor.type, objPDX)
 }
 
 
+#' @export
 getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tumor.type=NULL)
 {
   objIndx = list()
@@ -50,9 +51,6 @@ getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tumor.type=NULL
 getTreatmentControlForModel <- function(model.idx)
 {
   batchID = model[model$model.id ==model.idx, "batch"]
-  #treatment= model[model$batch==batchID & model$exp.type=="treatment", "model.id"]
-  #control  = model[model$batch==batchID & model$exp.type=="control"  , "model.id"]
-  #return(list(treatment=model.idx, control=control))
   return(model[model$batch==batchID, c("model.id", "batch", "exp.type")])
 }
 
@@ -123,6 +121,7 @@ getExperimentValues <- function(object, name = c("experiment.id"))
   rt  = sapply(object@experiment, "[[", c(name))
   return(rt)
 }
+
 
 
 

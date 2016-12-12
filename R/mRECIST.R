@@ -22,6 +22,8 @@ checkNumericIntCharZero <- function(u)
 getBestResponse <- function(exdf, ResColName, min.time=10)
 {
   exdfMinAge = exdf[exdf$time >= min.time, ]
+  if(dim(exdfMinAge)[1]==0)
+    {exdfMinAge = exdf}
   minIndxA = which.min( exdfMinAge[, ResColName] )
   minIndx = minIndxA + dim(exdf)[1] - dim(exdfMinAge)[1]
 
@@ -72,23 +74,35 @@ computemRECIST <- function(best.response, best.average.response)
 
   if(!is.na(best.response) & !is.na(best.average.response))
   {
-    if(best.response < -95 & best.average.response < -40)
-    {mRecist = "mCR"}
+    # if(best.response < -95 & best.average.response < -40)
+    # {mRecist = "mCR"}
+    #
+    # if(best.response < -50 & best.average.response < -20)
+    # {mRecist = "mPR"}
+    #
+    # if(best.response <  35 & best.average.response <  30)
+    # {mRecist = "mSD"}
+    #
+    # if(is.na(mRecist)){mRecist = "mPD"}
 
-    if(best.response < -50 & best.average.response < -20)
-    {mRecist = "mPR"}
+    ####---- the order of aRecist assignment is really important ----------
+    mRecist = "PD"
 
     if(best.response <  35 & best.average.response <  30)
-    {mRecist = "mSD"}
+    {mRecist = "SD"}
 
-    if(is.na(mRecist)){mRecist = "mPD"}
+    if(best.response < -50 & best.average.response < -20)
+    {mRecist = "PR"}
+
+    if(best.response < -95 & best.average.response < -40)
+    {mRecist = "CR"}
   }
 
   return(mRecist)
 }
 
 
-# @export
+
 mRECISTForModel <- function(modx)
 {
   if(is.null(modx$best.response$value))
@@ -97,6 +111,11 @@ mRECISTForModel <- function(modx)
     modx$data = modxDataMat$data
     modx$best.response = modxDataMat$best.response
     modx$best.average.response = modxDataMat$best.average.response
+  }
+
+  if(is.null(modx$data$body.weight.change))
+  {
+    modx$data$body.weight.change = tumorVolumeChange(modx$data$body.weight)
   }
 
   modx$mRECIST = computemRECIST(best.response = modx$best.response$value,
@@ -185,7 +204,9 @@ setMethod( f=getmRECIST,
 
              ##----map to patient id
              rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
-             return(rtx)
+             dataColName = c(group.by, "model.id", "drug.join.name", "mRECIST")
+             rtx = BBmisc::sortByCol(rtx , dataColName, asc = rep(TRUE, length(dataColName)))
+             return(rtx[,dataColName])
            }
            )
 
