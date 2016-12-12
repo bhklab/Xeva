@@ -51,7 +51,7 @@ XenoSet <- setClass( "XenoSet",
 #' save(pdxe, file = "data/pdxe.rda")
 #' data("pdxe")
 #' @export
-creatPharmacoPxSet <- function(name,
+creatXenoSet <- function(name,
                                molecularProfiles = list(),
                                experiment = data.frame(),
                                model = data.frame(),
