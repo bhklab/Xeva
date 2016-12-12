@@ -99,9 +99,9 @@ rownames(featureDF) = featureDF$geneName
 featuredata <- Biobase::AnnotatedDataFrame(data = featureDF)
 
 
-rnaseq <- ExpressionSet(assayData=assaydata,
-                      phenoData=phenodata,
-                      featureData=featuredata)
+rnaseq <- Biobase::ExpressionSet(assayData=assaydata,
+                                 phenoData=phenodata,
+                                 featureData=featuredata)
 
 
 
@@ -111,6 +111,5 @@ geoExp$RNASeq = rnaseq
 
 saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 
-#geoExp = readRDS("DATA/Geo_Exp.Rda")
 
 }
