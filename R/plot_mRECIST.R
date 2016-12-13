@@ -1,8 +1,4 @@
-library(ComplexHeatmap)
-if(1==2){
-####==============================================
 
-library(ComplexHeatmap)
 getTestMat = function()
 {
   mat = matrix(NA, nrow = 5, ncol = 4)
@@ -11,16 +7,16 @@ getTestMat = function()
   mat[3,] = c("CR;PR;CR","SD;PD;PD;SD", "PD;PD", "PR")
   mat[4,] = c("PR","CR", "SD", "PR")
   mat[5,] = c("CR","SD;SD", "PR;PD", "SD")
+  rownames(mat)=paste0("Drug", 1:dim(mat)[1])
+  colnames(mat)=paste0("Sample", 1:dim(mat)[2])
   mat
 }
 
-
-
 ###-------------------------------------------------
-.splitmR <- function(mRx, sort=TRUE)
+.splitValue <- function(mRx, splitBy=";", sort=TRUE)
 {
   if(is.na(mRx)){return(NA)}
-  mRy = strsplit(mRx, ";")[[1]]
+  mRy = strsplit(mRx, splitBy)[[1]]
   if(sort==TRUE)
   {mRy = sort(mRy)}
   return(mRy)
@@ -39,16 +35,16 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   return(list(x=XV, y=YV))
 }
 
-.cell_funXeva <- function(x, y, w, h, value, colPalette, backgroundCol)
+.cell_funXeva <- function(x, y, w, h, value, colPalette, backgroundCol, splitBy=";", sort=TRUE)
 {
-  factR = 0.99
+  factR = 0.95
   wr=w*0.5*factR;   hr=h*0.5*factR
   x0=x-wr; x1=x+wr; y0=y-hr; y1=y+hr
   x0=convertX(x0, "npc", valueOnly = TRUE)
   x1=convertX(x1, "npc", valueOnly = TRUE)
   y0=convertX(y0, "npc", valueOnly = TRUE)
   y1=convertX(y1, "npc", valueOnly = TRUE)
-  vx = .splitmR(value, sort = FALSE)
+  vx = .splitValue(value, splitBy=";", sort = sort)
   filCol = unlist(colPalette[vx])
   N=length(vx)
   cordXY = getCellBoxCordi(x0,x1, y0, y1, N)
@@ -58,64 +54,134 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
                gp = gpar(fill = c(NA, filCol), col = NA))
 }
 
-plotHeatmapX <- function()
+
+
+calculatRowColStat <- function(mat, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+{
+  cltab = list()
+  for(I in 1:dim(mat)[1])
   {
-    mat = getTestMat()
-    colPalette = list("CR" = "blue", "PR" = "green", "SD" = "yellow", "PD"="red")
-    nameSpc = unique(as.vector(mat))
-    backgroundCol = "gray"
-    bgCol = rep(backgroundCol, length(nameSpc))
-    #z=list() ; saveRDS(z, file="cellFunValue.Rda")
-    Heatmap(mat, name = "Drug & Models", col=bgCol,
-            cluster_rows = FALSE, cluster_columns = FALSE,
-            #column_dend_height = unit(5, "cm"),
-            show_row_dend = FALSE,
-            show_row_names = TRUE, row_names_side = "left",
-            show_column_names = TRUE, column_names_side = "top",
-            rect_gp = gpar(col = "white", lty = 1, lwd = 1),
-            show_heatmap_legend = FALSE,
-            cell_fun =function(j, i, x, y, width, height, fill)
-            {.cell_funXeva(x, y, width, height, mat[i,j], colPalette, fill)
-              } )
+    C = unlist(lapply(mat[I,], .splitValue, splitBy=splitBy))
+    cltab[[I]] = as.vector(table(C), mode = "list")
+  }
 
+  rwtab = list()
+  for(I in 1:dim(mat)[2])
+  {
+    R = unlist(lapply(mat[,I], .splitValue, splitBy=splitBy))
+    rwtab[[I]] = as.vector(table(R), mode = "list")
+  }
+
+  creatDataFram <- function(inLst)
+  {
+  nColVal = unique(unlist(lapply(inLst, names)))
+  rxt = data.frame(matrix(NA, nrow = length(inLst), ncol=length(nColVal)))
+  colnames(rxt) = nColVal
+  for(I in 1:length(inLst))
+  {
+    rx = sapply(nColVal, function(x){ w= inLst[[I]][[x]]
+                                      if(is.null(w))
+                                        {return(NA)} else{return(w)} })
+    rxt[I,] = rx[nColVal]
+  }
+  return(rxt)
+  }
+  rwdf = creatDataFram(rwtab)
+  cldf = creatDataFram(cltab)
+  rwdf[is.na(rwdf)]=0
+  cldf[is.na(cldf)]=0
+
+  if(scaleRow==TRUE){ rwdf = t(apply(rwdf, 1, function(x)100*x/sum(x))) }
+  if(scaleCol==TRUE){ cldf = t(apply(rwdf, 1, function(x)100*x/sum(x))) }
+
+  return(list(rowSt=rwdf, colSt=cldf))
+}
+
+creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+{
+  rcDF = calculatRowColStat(mat, splitBy, scaleRow=TRUE, scaleCol=TRUE)
+
+  colorX = unlist(colPalette[colnames(rcDF$colSt)])
+  colBar = anno_barplot(rcDF$colSt, which = "column", axis = TRUE, gp = gpar(fill = colorX))
+  column_ha = HeatmapAnnotation(barplot = colBar)
+  #foo1 = rcDF$colSt
+  #column_ha = HeatmapAnnotation(foo1 = anno_barplot(foo1, axis = TRUE))
+
+
+  colorX = unlist(colPalette[colnames(rcDF$rowSt)])
+  rowbar = anno_barplot(rcDF$rowSt, which = "row", axis = TRUE, axis_side = "top", gp = gpar(fill = colorX))
+  row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"))
+  return(list(colPlt= column_ha, rowPlt= row_ha))
+}
+
+.sortPlotMat <- function(mat, controlD =NA, control.col="green", drug.col="black")
+{
+  rwNM = rownames(mat); clNm = colnames(mat)
+  rwNM = sort(rwNM); clNm = sort(clNm)
+
+  ##---------for row ------------------------------------------
+  controlD =c(controlD)
+  if(length(controlD[!is.na(controlD)])>0)
+  {
+    nonCntr = rwNM[!(rwNM %in% controlD)]
+    rwNMx = c(controlD, nonCntr)
+    rwNameCol = c(rep(control.col, length(controlD)),
+                  rep(drug.col, length(nonCntr) ))
+  } else{
+    rwNMx = rwNM
+    rwNameCol = rep(drug.col, length(rwNM))
+  }
+
+  ##--------for column ------------------------------------------
+  clNameCol = rep("black", length(clNm))
+  rtx = list(mat= mat[rwNMx, clNm],
+             row.name.col = rwNameCol,
+             col.name.col = clNameCol)
+  return(rtx)
+
+}
+
+plot.mR <- function(mat)
+{
+  library(ComplexHeatmap)
+  groupBy = "biobase.id"
+  control.name = c("untreated")
+  data(pdxe)
+  #setmRECIST(pdxe)<- setmRECIST(pdxe)
+  df = getmRECIST(pdxe)
+  df = df[1:500,]
+
+  mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")
+  matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
+  mat = as.matrix(matRC$mat)
+
+  #mat = getTestMat()
+  colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
+  nameSpc = unique(as.vector(as.matrix(mat)))
+  backgroundCol = "gray"
+  bgCol = rep(backgroundCol, length(nameSpc))
+  splitBy=";"
+  sortCellValue = TRUE #FALSE
+
+  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+  pltX = Heatmap(mat, name = "Drug & Models", col=bgCol,
+                 top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
+                 cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
+                 show_row_names = TRUE, row_names_side = "left",
+                 row_names_gp = gpar(col = matRC$row.name.col),
+                 show_column_names = TRUE, column_names_side = "top",
+                 rect_gp = gpar(col = "white", lty = 1, lwd = 1),
+                 show_heatmap_legend = FALSE,
+                 cell_fun =function(j, i, x, y, width, height, fill)
+                 {.cell_funXeva(x, y, width, height, mat[i,j], colPalette, fill, splitBy, sortCellValue)
+                 }) + sidePlt$rowPlt
+
+
+  colVec = unlist(colPalette)[names(colPalette)]
+  HLeg = legendGrob(names(colPalette), pch=22,
+                    gp=gpar(col = colVec, fill = colVec))
+  draw(pltX, heatmap_legend_list = list(HLeg))
 
 }
 
 
-Heatmap(mat, name = "go", rect_gp = gpar(type = "none"),
-        cell_fun = function(j, i, x, y, w, h, col) {
-          grid.rect(x, y, w, h, gp = gpar(fill = "#dcb35c", col = NA))
-          if(i == 1) {
-            grid.segments(x, y-h*0.5, x, y)
-          } else if(i == nrow(mat)) {
-            grid.segments(x, y, x, y+h*0.5)
-          } else { grid.segments(x, y-h*0.5, x, y+h*0.5) }
-          if(j == 1) {
-            grid.segments(x, y, x+w*0.5, y)
-          } else if(j == ncol(mat)) {
-            grid.segments(x-w*0.5, y, x, y)
-          } else { grid.segments(x-w*0.5, y, x+w*0.5, y)}
-
-          if(i %in% c(4, 10, 16) & j %in% c(4, 10, 16)) {
-            grid.points(x, y, pch = 16, size = unit(2, "mm"))
-          }
-
-          r = min(unit.c(w, h))*0.45
-          if(is.na(mat[i, j])) {
-          } else if(mat[i, j] == "W") {
-            grid.circle(x, y, r, gp = gpar(fill = "red", col = "white"))
-          } else if(mat[i, j] == "B") {
-            grid.circle(x, y, r, gp = gpar(fill = "green", col = "black"))
-          }
-        },
-        col = c("B" = "black", "W" = "white"),
-        show_row_names = FALSE, show_column_names = FALSE,
-        column_title = "One famous GO game",
-        heatmap_legend_param = list(title = "Player", at = c("B", "W"),
-                                    labels = c("player1", "player2"), grid_border = "black")
-)
-
-
-
-
-}
