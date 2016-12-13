@@ -99,7 +99,7 @@ plotDrugResponse <- function(expSlot, expList)
   title <- paste(length(unique(plotData$batch)), 'Experiments for', unique(plotData$drug))
 
   ##---- plot the df in ggplot and return plot --------
-  p1 <- ggplot(plotData, aes(time, volume, group = batch)) + xlab('Time') + ylab('Volume') + ggtitle(title)
+  p1 <- ggplot(plotData, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
 
   p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6) + guides(color=FALSE)
 
