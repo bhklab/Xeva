@@ -56,7 +56,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
 
 
-calculatRowColStat <- function(mat, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+.calculatRowColStat <- function(mat, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
   cltab = list()
   for(I in 1:dim(mat)[1])
@@ -88,18 +88,19 @@ calculatRowColStat <- function(mat, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
   }
   rwdf = creatDataFram(rwtab)
   cldf = creatDataFram(cltab)
+
   rwdf[is.na(rwdf)]=0
   cldf[is.na(cldf)]=0
 
   if(scaleRow==TRUE){ rwdf = t(apply(rwdf, 1, function(x)100*x/sum(x))) }
-  if(scaleCol==TRUE){ cldf = t(apply(rwdf, 1, function(x)100*x/sum(x))) }
+  if(scaleCol==TRUE){ cldf = t(apply(cldf, 1, function(x)100*x/sum(x))) }
 
-  return(list(rowSt=rwdf, colSt=cldf))
+  return(list(rowSt=cldf, colSt=rwdf))
 }
 
 creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
-  rcDF = calculatRowColStat(mat, splitBy, scaleRow=TRUE, scaleCol=TRUE)
+  rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
 
   colorX = unlist(colPalette[colnames(rcDF$colSt)])
   colBar = anno_barplot(rcDF$colSt, which = "column", axis = TRUE, gp = gpar(fill = colorX))
@@ -141,7 +142,19 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 }
 
-plot.mR <- function(mat)
+
+
+#' Plot mRECIST for models and drugs
+#'
+#' @examples
+#' data(pdxe)
+#' # get experiment type for model.id
+#' getTreatment(object=pdxe, model.id="X-6047.21")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#' @return returns \code{treatment} or \code{control}
+#' @export
+plot.mR <- function(df)
 {
   library(ComplexHeatmap)
   groupBy = "biobase.id"
@@ -155,6 +168,7 @@ plot.mR <- function(mat)
   matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
   mat = as.matrix(matRC$mat)
 
+  #mat[1,]="PD";mat[,1]="PD"
   #mat = getTestMat()
   colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
   nameSpc = unique(as.vector(as.matrix(mat)))
@@ -163,7 +177,7 @@ plot.mR <- function(mat)
   splitBy=";"
   sortCellValue = TRUE #FALSE
 
-  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=FALSE, scaleCol=FALSE)
   pltX = Heatmap(mat, name = "Drug & Models", col=bgCol,
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
                  cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
@@ -180,7 +194,9 @@ plot.mR <- function(mat)
   colVec = unlist(colPalette)[names(colPalette)]
   HLeg = legendGrob(names(colPalette), pch=22,
                     gp=gpar(col = colVec, fill = colVec))
-  draw(pltX, heatmap_legend_list = list(HLeg))
+  #pdf(file="DATA-raw/mRECIST_plot.pdf", width=12, height=9)
+  draw(pltX, heatmap_legend_list = list(HLeg), padding = unit(c(10, 10, 10, 10), "mm"))
+  #dev.off()
 
 }
 

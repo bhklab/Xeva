@@ -31,3 +31,10 @@ getIndex <- function(inVec, indxOf)
   }
   return(dfx)
 }
+
+
+.appendToList <- function(in.list, value)
+{
+  in.list[[length(in.list)+1]]=value
+  return(in.list)
+}

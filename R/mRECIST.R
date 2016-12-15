@@ -202,8 +202,10 @@ setMethod( f=getmRECIST,
              }
              rownames(rtx)= NULL
 
-             ##----map to patient id
-             rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
+             ##----map to patient id -----------------
+             #rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
+             rtx = merge(rtx, object@model[, c("model.id", group.by)], by.x = "model.id", by.y = "model.id")
+
              dataColName = c(group.by, "model.id", "drug.join.name", "mRECIST")
              rtx = BBmisc::sortByCol(rtx , dataColName, asc = rep(TRUE, length(dataColName)))
              return(rtx[,dataColName])

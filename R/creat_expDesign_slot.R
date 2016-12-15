@@ -23,7 +23,8 @@ creatExperimentDesign <- function(expSlot)
                                             modBatchx$drug.join.name==Lx$drug.join.name, "model.id"])
 
 
-    namx = sprintf("%s.%s", Lx$drug.join.name, Lx$batch)
+    #namx = sprintf("%s.%s", Lx$drug.join.name, Lx$batch) ##-- no need for name here
+    namx = length(rtx)+1
     rtx[[namx]]= Lx
   }
 
