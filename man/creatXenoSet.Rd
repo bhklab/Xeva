@@ -2,7 +2,7 @@
 % Please edit documentation in R/XenoSet_Class.R
 \name{creatXenoSet}
 \alias{creatXenoSet}
-\title{Creat XenoR class object}
+\title{Creat Xeva class object}
 \usage{
 creatXenoSet(name, molecularProfiles = list(), experiment = data.frame(),
   model = data.frame(), drug = data.frame())
@@ -19,10 +19,10 @@ creatXenoSet(name, molecularProfiles = list(), experiment = data.frame(),
 \item{drug}{A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types}
 }
 \value{
-Returns XenoR object
+Returns Xeva object
 }
 \description{
-\code{creatPharmacoPxSet} returns XenoR class object
+\code{creatPharmacoPxSet} returns Xeva class object
 }
 \examples{
 geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
