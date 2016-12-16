@@ -14,9 +14,7 @@ checkModel <- function(model, expSlot)
 }
 
 
-##================================================================================================
-
-
+##=====================================================================
 #' An S4 class for XenoSet
 #'
 XenoSet <- setClass( "XenoSet",
@@ -29,9 +27,9 @@ XenoSet <- setClass( "XenoSet",
                           )
 
 ######################################################################
-#' Creat XenoR class object
+#' Creat Xeva class object
 #'
-#' \code{creatPharmacoPxSet} returns XenoR class object
+#' \code{creatPharmacoPxSet} returns Xeva class object
 #'
 #' @param name A \code{character} string detailing the name of the dataset
 #' @param molecularProfiles A \code{list} of ExpressionSet objects containing molecular profiles
@@ -39,7 +37,7 @@ XenoSet <- setClass( "XenoSet",
 #' @param model A \code{data.frame} containg the annotations for all models used in the experiment
 #' @param drug A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types
 #'
-#' @return  Returns XenoR object
+#' @return  Returns Xeva object
 #'
 #' @examples
 #' geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
@@ -79,6 +77,7 @@ creatXenoSet <- function(name,
 
 
 
+##===============================================================================
 #' A method to display object
 #' for "show" setGeneric is already defined
 #' @export
@@ -90,72 +89,4 @@ setMethod(f="show",
             cat(sprintf("Slots are:\n%s\n", slotsName))
           }
           )
-
-
-
-##--------------------------------------------------------------------------
-
-##----- get drugInfo -------------
-#' drugInfo Generic
-#' Generic for drugInfo method
-#'
-#' @examples
-#' data(pdxe)
-#' drugInfo(pdxe)
-#' @param object The \code{XenoSet} to retrieve drug info from
-#' @return a \code{data.frame} with the drug annotations
-setGeneric(name = "drugInfo", def = function(object) {standardGeneric("drugInfo")} )
-
-#### @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
-#' @export
-setMethod( f=drugInfo, signature="XenoSet", definition=function(object){ dim(object@drug) } )
-
-
-
-#' drugInfo<- Generic
-#' Generic for drugInfo replace method
-#' @examples
-#' data(pdxe)
-#' drugInfo(pdxe) <- drugInfo(pdxe)
-#' @param object The \code{XenoSet} to replace drug info in
-#' @param value A \code{data.frame} with the new drug annotations
-#' @return Updated \code{XenoSet}
-setGeneric(name= "drugInfo<-", def = function(object, value) {standardGeneric("drugInfo<-")} )
-
-###### @describeIn PharmacoSet Update the drug annotations
-#' @export
-setMethod( f="drugInfo<-",
-           signature="XenoSet",
-           definition=function(object, value)
-           {
-             object@annotation$drugInfo = value
-             #object@drugInfo = value  ##This will not work as slot drugInfo already have to be present
-             object
-           } )
-
-
-
-
-
-
-
-
-
-
-
-
-
-#' Add together two numbers.
-#'
-#' @param x A number.
-#' @param y A number.
-#' @param Whatever u put here
-#' @return The sum of \code{x} and \code{y} and \code{z} . z is nothing
-#' @examples
-#' documentationExample(1, 1)
-#' This will be also included
-#' @export
-documentationExample <- function(x, y) {
-  x + y
-}
 

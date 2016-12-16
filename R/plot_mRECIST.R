@@ -35,7 +35,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   return(list(x=XV, y=YV))
 }
 
-.cell_funXeva <- function(x, y, w, h, value, colPalette, backgroundCol, splitBy=";", sort=TRUE)
+.custom_cell_fun <- function(x, y, w, h, value, colPalette, backgroundCol, splitBy=";", sort=TRUE)
 {
   factR = 0.95
   wr=w*0.5*factR;   hr=h*0.5*factR
@@ -143,33 +143,40 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 }
 
 
-
+##============================================================================
 #' Plot mRECIST for models and drugs
+#'
+#' \code{plot.mRECIST} plots the mRECIST
+#'
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#'
+#' @return plot
 #'
 #' @examples
 #' data(pdxe)
-#' # get experiment type for model.id
-#' getTreatment(object=pdxe, model.id="X-6047.21")
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return returns \code{treatment} or \code{control}
+#' #groupBy = "biobase.id"
+#' control.name = c("untreated")
+#' df = getmRECIST(pdxe)
+#' df = df[1:500,]
+#' plot.mRECIST(df,groupBy = "biobase.id", control.name = "untreated")
+#'
 #' @export
-plot.mR <- function(df)
+plot.mRECIST <- function(df,groupBy = "biobase.id", control.name = "untreated")
 {
-  library(ComplexHeatmap)
-  groupBy = "biobase.id"
-  control.name = c("untreated")
-  data(pdxe)
+  #library(ComplexHeatmap)
+  #groupBy = "biobase.id"
+  #control.name = c("untreated")
+  #data(pdxe)
   #setmRECIST(pdxe)<- setmRECIST(pdxe)
-  df = getmRECIST(pdxe)
-  df = df[1:500,]
+  #df = getmRECIST(pdxe)
+  #df = df[1:500,]
 
+  control.name = c(control.name)
   mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")
   matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
   mat = as.matrix(matRC$mat)
 
-  #mat[1,]="PD";mat[,1]="PD"
-  #mat = getTestMat()
   colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
@@ -178,7 +185,7 @@ plot.mR <- function(df)
   sortCellValue = TRUE #FALSE
 
   sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=FALSE, scaleCol=FALSE)
-  pltX = Heatmap(mat, name = "Drug & Models", col=bgCol,
+  pltX = ComplexHeatmap::Heatmap(mat, name = "Drug & Models", col=bgCol,
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
                  cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
                  show_row_names = TRUE, row_names_side = "left",
@@ -187,7 +194,7 @@ plot.mR <- function(df)
                  rect_gp = gpar(col = "white", lty = 1, lwd = 1),
                  show_heatmap_legend = FALSE,
                  cell_fun =function(j, i, x, y, width, height, fill)
-                 {.cell_funXeva(x, y, width, height, mat[i,j], colPalette, fill, splitBy, sortCellValue)
+                 {.custom_cell_fun(x, y, width, height, mat[i,j], colPalette, fill, splitBy, sortCellValue)
                  }) + sidePlt$rowPlt
 
 
@@ -197,7 +204,6 @@ plot.mR <- function(df)
   #pdf(file="DATA-raw/mRECIST_plot.pdf", width=12, height=9)
   draw(pltX, heatmap_legend_list = list(HLeg), padding = unit(c(10, 10, 10, 10), "mm"))
   #dev.off()
-
 }
 
 
