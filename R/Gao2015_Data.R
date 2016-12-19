@@ -122,6 +122,7 @@ for(b in unique(dsg$batch))
   dx = dsg[dsg$batch==b, ]
   ##--- for a batch all ids with "control" will be considered as control
   controlIDs = c(unique( dx[dx$exp.type=="control", "model.id"]))
+  if(length(controlIDs)==0){controlIDs=c(NULL)}
   tretDrugs = unique( dx[dx$exp.type=="treatment", "drug"] )
   for(drugI in tretDrugs)
   {

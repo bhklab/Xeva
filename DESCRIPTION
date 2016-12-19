@@ -12,4 +12,5 @@ Imports:
   BBmisc,
   Biobase,
   plyr,
+  ggplot2,
   ComplexHeatmap
