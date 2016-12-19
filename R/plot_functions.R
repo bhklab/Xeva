@@ -84,9 +84,18 @@ creatPlotDF <- function(expSlot, expList)
   return(plotData)
 }
 
-plotDrugResponse <- function(expSlot, expList)
+# function to assign a seperate color
+getColor <- function(plotData)
+{
+  plotData$color <- ifelse(plotData$exp.type == 'treatment', 'blue', 'grey')
+  return(plotData)
+}
+
+
+plotDrugResponse <- function(expSlot, expList, err.bars, colors = 'different')
 {
 
+  ##---- plot the df in ggplot and return plot --------
   dataX = .get_Data()
   plotData = dataX[[1]] ## data without error bars
   plotData2= dataX[[2]] ## data with error bars
@@ -95,17 +104,47 @@ plotDrugResponse <- function(expSlot, expList)
   plotData = plotData[plotData$batch=="X-2094",] ##select data for one patient
   ### The plot should give 2 lines: one control and one treatment
   ### but this gives only one line
-
   title <- paste(length(unique(plotData$batch)), 'Experiments for', unique(plotData$drug))
 
-  ##---- plot the df in ggplot and return plot --------
-  p1 <- ggplot(plotData, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
+  # recode color for plotData (different color for treatment and control)
+  if (colors == 'different') {
+    plotData <- getColor(plotData)
+    plotData2 <- getColor(plotData2)
 
-  p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6) + guides(color=FALSE)
+    p1 <- ggplot(plotData2, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
 
-  p_point <- p_line + geom_point(aes(shape = factor(pch)))
+    if (err.bars) {
+      # scale_fill_manual(name="Bar",values=cols, guide="none")
+      p1 <- p1 + geom_errorbar(aes(ymin = SE.lower, ymax = SE.upper))
 
-  p_legend <- p_point + scale_shape_discrete(name = "", breaks=c(16, 18), labels=c("Treatment", "Control"))
+    }
+
+    p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6)
+    # + guides(color=FALSE)
+    p_legend <- p_line + scale_colour_manual(name = "", values=c("blue", "black"), labels=c("Treatment", "Control"))
+
+    p_point <- p_line + geom_point(aes(shape = factor(pch)))
+
+
+  } else {
+
+
+    p1 <- ggplot(plotData2, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
+
+    if (err.bars) {
+
+      p1 <- ggplot(plotData2, aes(time, volume, group = exp.type )) + xlab('Time') + ylab('Volume') + ggtitle(title)
+      p1 <- p1 + geom_errorbar(aes(ymin = SE.lower, ymax = SE.upper))
+
+    }
+
+    p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6) + guides(color=FALSE)
+
+    p_point <- p_line + geom_point(aes(shape = factor(pch)))
+
+    p_legend <- p_point + scale_shape_discrete(name = "", breaks=c(16, 18), labels=c("Treatment", "Control"))
+
+  }
 
   plotObject <- p_legend + theme(panel.background=element_rect(fill="#F0F0F0"),
                                  plot.background=element_rect(fill="#F0F0F0"),
