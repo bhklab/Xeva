@@ -133,16 +133,16 @@ mRECISTForModel <- function(modx)
 #' #calculate mRECIST for each experiment
 #' setmRECIST(pdxe)<- setmRECIST(pdxe)
 #' getmRECIST(pdxe)
-#' @param object The \code{XenoSet} object
-#' @return Updated \code{XenoSet}
+#' @param object The \code{XevaSet} object
+#' @return Updated \code{XevaSet}
 setGeneric(name= "setmRECIST", def = function(object) {standardGeneric("setmRECIST")} )
 
 #' @export
 setMethod( f="setmRECIST",
-           signature = "XenoSet",
+           signature = "XevaSet",
            definition= function(object)
            {
-             if(is(object, "XenoSet"))
+             if(is(object, "XevaSet"))
              {
                for(I in names(object@experiment))
                {
@@ -158,7 +158,7 @@ setGeneric(name= "setmRECIST<-", def = function(object,value) {standardGeneric("
 ## @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
 #' @export
 setMethod( f="setmRECIST<-",
-           signature= signature(object="XenoSet"),
+           signature= signature(object="XevaSet"),
            definition=function(object, value)
            {
              object = value
@@ -176,7 +176,7 @@ setMethod( f="setmRECIST<-",
 #' # calculate mRECIST for each experiment
 #' setmRECIST(pdxe)<- setmRECIST(pdxe)
 #' getmRECIST(pdxe, group.by="biobase.id")
-#' @param object The \code{XenoSet} to retrieve mRECIST from
+#' @param object The \code{XevaSet} to retrieve mRECIST from
 #' @param group.by The name of column which will be mapped to model.id
 #' @return a \code{data.frame} with the mRECIST values, rows are drugs and columns are model.id
 setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {standardGeneric("getmRECIST")} )
@@ -184,7 +184,7 @@ setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {s
 
 #' @export
 setMethod( f=getmRECIST,
-           signature="XenoSet",
+           signature="XevaSet",
            definition= function(object, group.by)
            {
              rtx = data.frame(matrix(NA, nrow = length(object@experiment), ncol = 3))

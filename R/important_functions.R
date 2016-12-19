@@ -38,3 +38,50 @@ getIndex <- function(inVec, indxOf)
   in.list[[length(in.list)+1]]=value
   return(in.list)
 }
+
+
+#' paste a vector elements togather while removing NA
+#'
+#' \code{pasteWithoutNA} paste a vector elements togather while removing NA
+#'
+#' @param L A vector with values and NA
+#' @param collapse Collapse string default " + "
+#'
+#' @return  Returns an string with vector values paste togather
+#'
+#' @examples
+#' L = c("A", NA, "B", NA, NA, "C")
+#' pasteWithoutNA(L, collapse = " + ")
+#' @export
+pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
+
+##------------------------------------------------------------------------------------------
+#' paste a data.frame columns togather while removing NA
+#'
+#' \code{pasteColTogather} paste a data.frame columns togather while removing NA
+#'
+#' @param df A data.frame
+#' @param collapse Collapse string default " + "
+#'
+#' @return  Returns an vector of strings where column values paste togather
+#'
+#' @examples
+#' df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
+#' pasteColTogather(df, collapse = " + ")
+#' @export
+pasteColTogather <- function(df, collapse = " + ")
+{
+  apply(df, 1, pasteWithoutNA, collapse =collapse)
+}
+
+
+
+##------------------------------------------------------------------------
+##--- this will creat empty theme for ggplot -----------------------------
+.ggplotEmptyTheme <- function(plt){
+  plt +  ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                        panel.grid.minor = ggplot2::element_blank(),
+                        panel.background = ggplot2::element_blank(),
+                        axis.line = ggplot2::element_line(colour = "black"))
+}
+

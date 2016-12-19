@@ -13,7 +13,7 @@ setGeneric(name = "getControls", def = function(object, model.id) {standardGener
 
 #' @export
 setMethod( f=getControls,
-           signature="XenoSet",
+           signature="XevaSet",
            definition= function(object,model.id)
            {
              rtx = list()
@@ -42,7 +42,7 @@ setGeneric(name = "getTreatment", def = function(object, model.id) {standardGene
 
 #' @export
 setMethod( f=getTreatment,
-           signature="XenoSet",
+           signature="XevaSet",
            definition= function(object,model.id)
            {
              rtx = list()
@@ -80,13 +80,13 @@ setMethod( f=getTreatment,
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return returns \code{treatment} or \code{control}
-setGeneric(name = "expType", def = function(object, model.id) {standardGeneric("expType")} )
+setGeneric(name = "experimentType", def = function(object, model.id) {standardGeneric("experimentType")} )
 
 ###------- don't look in pdxe@experiment slot -----------
 ###------- use always pdxe@expDesign slot ---------------
 #' @export
-setMethod( f=expType,
-           signature="XenoSet",
+setMethod( f=experimentType,
+           signature="XevaSet",
            definition= function(object,model.id)
            {
              ct.indx = .getModelIdIndexInExpDesign(object, model.id)
@@ -108,7 +108,7 @@ setMethod( f=expType,
 
 ###-------------------------------------------------------------------------------------
 ##--------------------------------------------------------------------------------------
-
+#' @export
 plotTreatmentControl <- function(object, type="compact")
 {
 
@@ -143,17 +143,65 @@ plotTreatmentControl <- function(object, type="compact")
   dfp[, groupBy] = factor(dfp[, groupBy], levels = tx[, groupBy])
   dfp[dfp$variable=="control", "value"] = -(dfp[dfp$variable=="control", "value"])
 
-  plt = ggplot(dfp, aes_string(x=groupBy, y="value", fill="variable")) +
-    geom_bar(stat="identity", position="identity")
-  plt = plt + scale_fill_manual(values=c('#91cf60','#fc8d59'))
-  plt = plt +  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-               panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  plt = ggplot2::ggplot(dfp, ggplot2::aes_string(x=groupBy, y="value", fill="variable")) +
+    ggplot2::geom_bar(stat="identity", position="identity")
+  plt = plt + ggplot2::scale_fill_manual(values=c('#91cf60','#fc8d59'))
+  plt = .ggplotEmptyTheme(plt)# +  ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = element_blank(),
+               #panel.background = element_blank(), axis.line = ggplot2::element_line(colour = "black"))
 
-  plt = plt + theme( axis.text.x = element_blank())
+  plt = plt + ggplot2::theme( axis.text.x = ggplot2::element_blank())
   #pdf("DATA-raw/treatmentContr.pdf", width = 11, height = 5)
   print(plt)
   #dev.off()
 }
+
+#' @export
+experimentDesignSummary <- function(object)
+{
+  cat(sprintf("number of experiment designs = %d\n", length(object@expDesign)))
+
+  tretAll = sapply(object@expDesign, "[[", "treatment")
+  contAll = sapply(object@expDesign, "[[", "control")
+
+  tret = unlist(tretAll)
+  cont = unlist(contAll)
+  exp.type = c(rep("treatment",length(tret)), rep("control", length(cont)))
+  df = data.frame(model.id = c(tret, cont),
+                  exp.type = exp.type, stringsAsFactors = FALSE)
+  df = unique(df)
+  cat(sprintf("number of experiments (in experiment designs) = %d\n", dim(df)[1]))
+  cat(sprintf("number of experiments decleared as control= %d\n", dim(df[df$exp.type=="control",])[1]))
+  cat(sprintf("number of experiments decleared as treatment= %d\n", dim(df[df$exp.type=="treatment",])[1]))
+
+  tlx = sapply(tretAll, length)
+  cat(sprintf("experiment designs without treatment= %d\n", length(tlx[tlx==0])))
+
+  ctx = sapply(contAll, length)
+  cat(sprintf("experiment designs without control = %d\n", length(ctx[ctx==0])))
+
+  tretWithoutCont =c()
+  contWithoutTret =c()
+  for(I in object@expDesign)
+  {
+    if(length(I$control)==0)  { tretWithoutCont = c(tretWithoutCont, I$treatment) }
+    if(length(I$treatment)==0){ contWithoutTret = c(contWithoutTret, I$control) }
+  }
+  tretWithoutCont =unique(tretWithoutCont)
+  contWithoutTret =unique(contWithoutTret)
+
+  cat(sprintf("number of experiments without control = %d\n", length(tretWithoutCont)))
+  cat(sprintf("number of experiments without treatment = %d\n", length(contWithoutTret)))
+
+  mdfTr = accessModel(object, tretWithoutCont)
+  cat(sprintf("Patients without control = %d\n", length(unique(mdfTr$patient.id))))
+
+  mdfCn = accessModel(object, contWithoutTret)
+  cat(sprintf("Patients without treatment = %d\n", length(unique(mdfCn$patient.id))))
+
+
+}
+
+
 
 
 

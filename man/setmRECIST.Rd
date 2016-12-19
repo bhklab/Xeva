@@ -7,10 +7,10 @@
 setmRECIST(object)
 }
 \arguments{
-\item{object}{The \code{XenoSet} object}
+\item{object}{The \code{XevaSet} object}
 }
 \value{
-Updated \code{XenoSet}
+Updated \code{XevaSet}
 }
 \description{
 setmRECIST<- Generic for setmRECIST replace method

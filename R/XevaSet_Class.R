@@ -1,23 +1,9 @@
 
-checkModel <- function(model, expSlot)
-{
-  reqColName = c("model.id", "batch", "exp.type", "biobase.id")#, "drug.join.name")
-  if(all(reqColName %in% colnames(model))==FALSE)
-  {
-    msg = sprintf("The required colmns for model are\n%s", paste(reqColName, collapse = ', '))
-    stop(msg)
-  }
-
-  ##---- add drug column ---------------
-  model$drug.join.name = sapply(model$model.id, function(x){ expSlot[[x]]$drug$join.name})
-  return(model)
-}
-
 
 ##=====================================================================
-#' An S4 class for XenoSet
+#' An S4 class for XevaSet
 #'
-XenoSet <- setClass( "XenoSet",
+XevaSet <- setClass( "XevaSet",
                           slots = list(annotation = "list",
                                        molecularProfiles = "list",
                                        model = "data.frame",
@@ -49,11 +35,12 @@ XenoSet <- setClass( "XenoSet",
 #' save(pdxe, file = "data/pdxe.rda")
 #' data("pdxe")
 #' @export
-creatXenoSet <- function(name,
-                               molecularProfiles = list(),
-                               experiment = data.frame(),
-                               model = data.frame(),
-                               drug  = data.frame())
+creatXevaSet <- function(name,
+                         molecularProfiles = list(),
+                         experiment = data.frame(),
+                         expDesign  = list(),
+                         model = data.frame(),
+                         drug  = data.frame())
 {
 
   annotation <- list( name = as.character(name),
@@ -62,11 +49,12 @@ creatXenoSet <- function(name,
 
   expSlot = experimentSlotfromDf(experiment)
 
-  model = checkModel(model, expSlot)
+  model = .checkModel(model, expSlot)
 
-  expDesign = creatExperimentDesign(expSlot)
+  #expDesign = creatExperimentDesign(expSlot)
+  expDesign = .checkExperimentDesign(expDesign)
 
-  pxset = XenoSet(annotation=annotation,
+  pxset = XevaSet(annotation=annotation,
                        molecularProfiles = molecularProfiles,
                        model = model,
                        drug  = drug,
@@ -82,7 +70,7 @@ creatXenoSet <- function(name,
 #' for "show" setGeneric is already defined
 #' @export
 setMethod(f="show",
-          signature="XenoSet",
+          signature="XevaSet",
           definition= function(object)
           {
             slotsName = paste(slotNames(object), collapse = "\n")
