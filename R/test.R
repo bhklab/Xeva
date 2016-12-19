@@ -4,7 +4,7 @@ if(1==2){ print("this is running....")
 
 geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
 
-pdxe = creatXenoSet(name = "PDXE",
+pdxe = creatXevaSet(name = "PDXE",
                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
                           experiment = geoExp$experiment,
                           model = geoExp$model,

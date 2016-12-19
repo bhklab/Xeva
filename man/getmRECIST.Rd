@@ -8,7 +8,7 @@ Generic for getmRECIST method}
 getmRECIST(object, group.by = "biobase.id")
 }
 \arguments{
-\item{object}{The \code{XenoSet} to retrieve mRECIST from}
+\item{object}{The \code{XevaSet} to retrieve mRECIST from}
 
 \item{group.by}{The name of column which will be mapped to model.id}
 }

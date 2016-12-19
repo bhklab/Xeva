@@ -27,26 +27,37 @@ creatExperimentDesign <- function(expSlot)
     namx = length(rtx)+1
     rtx[[namx]]= Lx
   }
+  rtx = .checkExperimentDesign(rtx)
+  return(rtx)
+}
 
+
+.checkExperimentDesign<- function(expDesign)
+{
   modNoControl = c()
   modNoTreatme = c()
-  for(I in rtx)
+  for(I in expDesign)
   {
-    if(is.null(I$control) & is.null(I$treatment))
-    {stop("Error Treatmetn and Control both NULL!")}
+    if(length(I$control)==0 & length(I$treatment)==0)
+    {stop("Error Treatmetn and Control are missing in expDesign!")}
 
     if(length(I$control)==0)  { modNoControl = c(modNoControl, I$treatment)}
     if(length(I$treatment)==0){ modNoTreatme = c(modNoTreatme, I$control)}
   }
 
+
   if(!is.null(modNoControl))
   {
-    txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = ", "))
+    txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = "\n"))
     cat(txt)
   }
-
-  #if(!is.null(modNoTreatme))
-  #{ txt = sprintf("These models have no Treatment\n%s", paste(unique(modNoControl), collapse = ","))}
-
-  return(rtx)
+  return(expDesign)
 }
+
+
+
+
+
+
+
+
