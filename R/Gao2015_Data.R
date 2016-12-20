@@ -60,15 +60,19 @@ experiment = data.frame(model.id = experimentX$model.id,
                         body.weight= experimentX$`body.weight.(g)`,
                         stringsAsFactors = FALSE)
 
+
 tumor.type = experimentX$Tumor.Type
-tumor.type[tumor.type=="BRCA"]= "Breast Cancer" #BRCA, breast carcinoma
-tumor.type[tumor.type=="CM"]  = "Cutaneous Melanoma" #CM, cutaneous melanoma
-tumor.type[tumor.type=="CRC"] = "Colorectal Cancer"  #CRC, colorectal cancer
-tumor.type[tumor.type=="GC"]  = "Gastric Cancer"     #GC, Gastric Cancer
-tumor.type[tumor.type=="NSCLC"]="Non-small Cell Lung Carcinoma" #NSCLC, non-small cell lung carcinoma;
-tumor.type[tumor.type=="PDAC" ]="Pancreatic Ductal Carcinoma"   #PDAC, pancreatic ductal carcinoma;
+tumor.type.name = tumor.type
+tumor.type.name[tumor.type=="BRCA"]= "Breast Cancer" #BRCA, breast carcinoma
+tumor.type.name[tumor.type=="CM"]  = "Cutaneous Melanoma" #CM, cutaneous melanoma
+tumor.type.name[tumor.type=="CRC"] = "Colorectal Cancer"  #CRC, colorectal cancer
+tumor.type.name[tumor.type=="GC"]  = "Gastric Cancer"     #GC, Gastric Cancer
+tumor.type.name[tumor.type=="NSCLC"]="Non-small Cell Lung Carcinoma" #NSCLC, non-small cell lung carcinoma;
+tumor.type.name[tumor.type=="PDAC" ]="Pancreatic Ductal Carcinoma"   #PDAC, pancreatic ductal carcinoma;
 
 experiment$tumor.type = as.character(tumor.type)
+experiment$tumor.type.name = as.character(tumor.type.name)
+
 
 #experiment$batch  = sapply(strsplit(experiment$model.id, "[.]"), `[[`, 1)
 experiment$batch  = experimentX$Model
@@ -81,20 +85,9 @@ experiment$exp.type = exp.type
 ##====================================
 ####----- create model matrix ---------------
 
-model = unique(experiment[, c("model.id", "batch")])
-colnames(model) = c("model.id", "biobase.id")
+model = unique(experiment[, c("model.id", "batch","tumor.type", "tumor.type.name")])
+colnames(model) = c("model.id", "biobase.id", "tumor.type", "tumor.type.name")
 model$patient.id = model$biobase.id
-#exp.type = experimentX$Treatment.1
-#exp.type[exp.type=="untreated"] = "control"
-#exp.type[exp.type!="control"  ] = "treatment"
-#edf = experimentX[, c("model.id", "Model")]
-#colnames(edf) = c("model.id", "batch")
-#edf$exp.type = exp.type
-#model = unique(edf)
-
-#seqObjId  = sapply(strsplit(model$model.id, "[.]"), `[[`, 1)
-#model$biobase.id = seqObjId
-#model$biobase.id = experiment$batch
 
 geoExp = list(experiment=experiment, model = model)
 
@@ -183,7 +176,5 @@ creatXevaObject <- function()
 
   data(pdxe)
 }
-
-
 
 #creatXevaObject()

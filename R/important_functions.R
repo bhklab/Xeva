@@ -40,6 +40,32 @@ getIndex <- function(inVec, indxOf)
 }
 
 
+.rbindListOfDataframs<- function(inList)
+{
+  allColNames = lapply(inList, colnames)
+  allColNames = unique(unlist(allColNames))
+  rtx = data.frame(); ncolX=0;
+  for(dfi in inList)
+  {
+    if( length(colnames(dfi)) > ncolX)
+    { ncolX= length(colnames(dfi))
+      maxCols =colnames(dfi)}
+
+    for(cx in allColNames)
+    {
+      if(is.element(cx, colnames(dfi))==FALSE)
+      {dfi[, cx]=NA}
+    }
+    rtx = rbind(rtx, dfi[, allColNames])
+  }
+
+  rtx1 = rtx[, maxCols]
+  rtx2 = rtx[, setdiff(colnames(rtx), maxCols)]
+  RTz = cbind(rtx1, rtx2)
+  return(RTz)
+}
+
+
 #' paste a vector elements togather while removing NA
 #'
 #' \code{pasteWithoutNA} paste a vector elements togather while removing NA

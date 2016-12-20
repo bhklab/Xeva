@@ -164,13 +164,6 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @export
 plot.mRECIST <- function(df,groupBy = "biobase.id", control.name = "untreated")
 {
-  #library(ComplexHeatmap)
-  #groupBy = "biobase.id"
-  #control.name = c("untreated")
-  #data(pdxe)
-  #setmRECIST(pdxe)<- setmRECIST(pdxe)
-  #df = getmRECIST(pdxe)
-  #df = df[1:500,]
 
   control.name = c(control.name)
   mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")

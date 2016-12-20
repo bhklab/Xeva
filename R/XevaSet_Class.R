@@ -54,6 +54,8 @@ creatXevaSet <- function(name,
   #expDesign = creatExperimentDesign(expSlot)
   expDesign = .checkExperimentDesign(expDesign)
 
+  ##----check if drug present in both drug slot and expSlot
+
   pxset = XevaSet(annotation=annotation,
                        molecularProfiles = molecularProfiles,
                        model = model,
