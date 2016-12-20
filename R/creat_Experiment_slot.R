@@ -1,5 +1,5 @@
 ##to for datafram to Exp slot
-#library(BBmisc)
+
 creatListFromDF <- function(exp.mod.dg)
 {
   rtx = list()
@@ -14,7 +14,7 @@ creatListFromDF <- function(exp.mod.dg)
   {
     drug.N = sapply(drgColName.No, function(x){unique(exp.mod.dg[,x])  })
     drug.N = drug.N[!is.na(drug.N)]
-    drug[["names"]] = drug.N
+    drug[["names"]] = as.list(drug.N)
   }
 
   rtx$drug = drug
@@ -35,12 +35,12 @@ creatListFromDF <- function(exp.mod.dg)
     }
   }
 
-  if(!is.null(rtx$exp.type) & !is.element(rtx$exp.type, c("control", "treatment")))
-  {
-    msg = sprintf("For model.id %s and drug %s, exp.type should be control OR treatment
-                  it is %s\n", rtx$model.id, rtx$drug$join.name, rtx$exp.type)
-    stop(msg)
-  }
+  #if(!is.null(rtx$exp.type) & !is.element(rtx$exp.type, c("control", "treatment")))
+  #{
+  #  msg = sprintf("For model.id %s and drug %s, exp.type should be control OR treatment
+  #                it is %s\n", rtx$model.id, rtx$drug$join.name, rtx$exp.type)
+  #  stop(msg)
+  #}
 
   doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
   dataColName = c("time", "volume", "width","length", doseColsNames, "body.weight", "date")
@@ -75,8 +75,6 @@ creatListFromDF <- function(exp.mod.dg)
 #' @export
 experimentSlotfromDf <- function(experiment)
 {
-  #experiment = readRDS("data/DC_pdxDf_test_object.Rda")
-
   response = "volume" ## Default response colomn
   drugColsName = colnames(experiment)[grep("drug",colnames(experiment))]
 
@@ -100,7 +98,7 @@ experimentSlotfromDf <- function(experiment)
 
   doseColsName = colnames(experiment)[grep("dose",colnames(experiment))]
   standardCols = c(requredCols, doseColsName, "width","length", "date", "time",
-                   "formula", "body.weight", "tumor.type", "batch", "exp.type")
+                   "formula", "body.weight" ) #, "tumor.type", "batch", "exp.type")
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {

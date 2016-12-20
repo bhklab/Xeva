@@ -1,3 +1,42 @@
+##----- get modelInfo -------------
+#' modelInfo Generic
+#' Generic for ModelInfo method
+#'
+#' @examples
+#' data(pdxe)
+#' ModelInfo(pdxe)
+#' @param object The \code{XevaSet} to retrieve drug info from
+#' @return a \code{data.frame} with the model annotations
+setGeneric(name = "ModelInfo", def = function(object) {standardGeneric("ModelInfo")} )
+
+#' @export
+setMethod( f=ModelInfo, signature="XevaSet",
+           definition=function(object)
+           { object@model } )
+
+
+#' ModelInfo<- Generic
+#' Generic for ModelInfo replace method
+#' @examples
+#' data(pdxe)
+#' ModelInfo(pdxe) <- ModelInfo(pdxe)
+#' @param object The \code{XevaSet} to replace drug info in
+#' @param value A \code{data.frame} with the new model annotations
+#' @return Updated \code{XevaSet}
+setGeneric(name= "ModelInfo<-", def = function(object, value) {standardGeneric("ModelInfo<-")} )
+
+#' @export
+setMethod( f="ModelInfo<-",
+           signature=c(object = "XevaSet", value="data.frame"),
+           definition=function(object, value)
+           {
+             object@model = value
+             return(object)
+           } )
+
+##-----------------------------------------------------------------------------------------
+##-----------------------------------------------------------------------------------------
+
 .checkIfColPresentinModel <- function(object, nameCol)
 {
   if(is.element(nameCol, colnames(object@model)) ==FALSE)
@@ -40,6 +79,7 @@ setMethod( f=mapModelSlotIds,
               }
              return(rtd)
            })
+
 
 
 
