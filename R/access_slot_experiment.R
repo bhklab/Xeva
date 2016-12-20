@@ -32,173 +32,112 @@
     }
     ###------------------------------------------------
   }
-  rdx = data.frame(model.id=unique(modList), drug=drugName)
+  rdx = data.frame(model.id=unique(modList), drug=drugName, stringsAsFactors = FALSE)
   return(rdx)
 }
 
-
-
-#' #' get experiment time series data for a given biobase.id or model.id
-#' #'
-#' #' @examples
-#' #' data(pdxe)
-#' #' # extract controls for a given model.id
-#' #' getExperimentData(object=pdxe, id ="X.007.trab", id.type="model.id")
-#' #' getExperimentData(object=pdxe, id ="X-007", id.type="biobase.id")
-#' #' @param object The \code{Xeva} dataset
-#' #' @param model.id The \code{model.id}
-#' #' @return a \code{vector} with control model.id
-#' setGeneric(name = "getExperimentData", def = function(object, id, id.name, exact.match) {standardGeneric("getExperimentData")})
-#'
-#' #' @export
-#' setMethod( f=getExperimentData,
-#'            signature=c(object="XevaSet"),
-#'            definition= function(object, id, id.name, exact.match=TRUE)
-#'            {
-#'
-#'              if(id.name=="drug")
-#'              { modId = .subsetExperimentSlotForDrug(object, drugName, exact.match=TRUE) }
-#'
-#'              if(id.name!="model.id")
-#'              {
-#'                if(is.element(id.name, colnames(object@model))==TRUE)
-#'                {
-#'                  #mdf = getModelIds(object, id=id, id.name=id.name)
-#'                  #mapModelSlotIds(object, id, id.name, map.to)
-#'                }
-#'              }
-#'
-#'
-#'              lRt = list()
-#'              for(I in 1:dim(mdf)[1])
-#'              {
-#'                model.id= mdf[I, "model.id"]
-#'                map.id  = mdf[I, id.type]
-#'
-#'                expSubSet = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
-#'                if(length(expSubSet)>0)
-#'                {
-#'                  dfy = do.call(rbind, lapply(expSubSet, "[[", "data"))
-#'                  dfy[, "model.id"] = model.id
-#'                  dfy[, id.name] = map.id
-#'                  lRt = .appendToList(lRt, dfy)
-#'                }
-#'              }
-#'              dfRt = .rbindListOfDataframs(lRt)
-#'              dfRt = dfRt[, !apply(is.na(dfRt), 2, all)]
-#'              return(dfRt)
-#'            })
-
-##----------------------------------------------------
-
-
-
-#' get experiment time series data for any id (biobase.id, model.id or tumor.type)
+##-----------------------------------------------------------------------------------------------------
+##-----------------------------------------------------------------------------------------------------
+##----- get model Ids -----------------------------
+#' getModelIds Generic
+#' Generic for getModelIds method
 #'
 #' @examples
 #' data(pdxe)
-#' # extract controls for a given model.id
-#' GCdf = getModelTimeSeries(object=pdxe, id ="GC", id.name ="tumor.type")
-#' GCdf = getModelTimeSeries(object=pdxe, id ="GC", id.name ="tumor.type",
-#'                           drug="binimetinib", drug.match.exact=TRUE, include=NULL)
-#' GCdf = getModelTimeSeries(object=pdxe, id ="GC", id.name ="tumor.type",
-#'                           drug="binimetinib", drug.match.exact=TRUE,
-#'                           include=c("mRECIST"))
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return a \code{vector} with control model.id
-getModelTimeSeries <- function(object,id=NULL, id.name=NULL,
-                       drug=NULL, drug.match.exact=TRUE, include=NULL)
+#' getModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+#' @param object The \code{XevaSet} to retrieve drug info from
+#' @return a \code{list} with the all experiment designs
+setGeneric(name = "getModelIds",
+           def = function(object,
+                          drug=NULL, drug.match.exact=TRUE,
+                          tumor.type=NULL)
+                  {standardGeneric("getModelIds")} )
+
+#' @export
+setMethod( f=getModelIds, signature="XevaSet",
+           definition=function(object,
+                               drug=NULL, drug.match.exact=TRUE,
+                               tumor.type=NULL)
 {
+  if(is.null(drug) & is.null(tumor.type))
+  {stop("drug and tumor.type both NULL, Please provide atleast one")}
 
-  include= c(include, id.name)
-
-  IDfrmMod = NULL
-  if(!is.null(id))
-  {
-    if(is.null(id.name)){stop("For id id.name must be specifyied")}
-    IDfrmMod = mapModelSlotIds(object, id = id, id.name = id.name, map.to="all")
-  }
-
-  IDfrmDrug = NULL
+  ModIdsDrug = NULL
   if(!is.null(drug))
   {
-    IDfrmDrug = .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
+    drug = c(drug)
+    ModIdsDrug = .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
   }
 
-  ##---- get the intersect of model.id ---------------------------------
-  if(!is.null(IDfrmMod) & !is.null(IDfrmDrug))
+  ModIdsTumor = NULL
+  if(!is.null(tumor.type))
   {
-    mid = intersect(IDfrmMod$model.id, IDfrmDrug$model.id)
-  } else
-  {
-    if(!is.null(IDfrmMod) ){ mid = IDfrmMod$model.id }
-    if(!is.null(IDfrmDrug)){ mid = IDfrmDrug$model.id}
+    tumor.type = c(tumor.type)
+    ModIdsTumor = mapModelSlotIds(object, id = tumor.type, id.name = "tumor.type", map.to="all")
   }
 
-  if(!is.null(include))
-  {
-    if(is.vector(include))
-    {
-      includeLt = as.list(include)
-      names(includeLt) = include
-    }
 
-    ##----for nested values creat list -----------------
-    #if(grep("^best.response$", includeLt))
-  } else{includeLt=NULL}
+  if(!is.null(drug) & is.null(tumor.type))
+  { return(ModIdsDrug$model.id) }
 
-  rtx = list()
-  for(mx in mid)
+  if(is.null(drug) & !is.null(tumor.type))
+  { return(ModIdsTumor$model.id) }
+
+  if(!is.null(drug) & !is.null(tumor.type))
   {
-    expSubSetX= .subsetExperimentSlot(object, id=mx, id.type="model.id")
-    expSubSet = expSubSetX[[1]]
-    dfx = expSubSet[["data"]]
-    dfx[, "model.id"] = mx
-    dfx[, "drug.name"] = expSubSet[["drug"]][["join.name"]]
-    if(!is.null(includeLt))
-    {
-      ##--- change for nasted values ---------------
-      for(incl in includeLt)
-      {
-        dfx[, incl] =  expSubSet[[incl]]
-      }
-    }
-    rtx = .appendToList(rtx, dfx)
+    rtx = intersect(ModIdsDrug$model.id, ModIdsTumor$model.id)
+    return(rtx)
   }
+})
 
-  dfRt = .rbindListOfDataframs(rtx)
 
-  if(!is.null(includeLt))
-  {
-    for(incl in includeLt)
-    {
-      if(is.element(incl, colnames(dfRt))==FALSE)
-      {
-        if(is.element(incl, colnames(object@model))==TRUE)
-        {
-          clx = mapModelSlotIds(object, id = dfRt$model.id,
-                                id.name = "model.id", map.to=incl)
-          dfRt = merge(dfRt, clx, by.x = "model.id", by.y = "model.id")
-        }
-      }
-    }
-  }
 
-  ##---- remove NA cols ----------------------
-  dfRt = dfRt[, !apply(is.na(dfRt), 2, all)]
+###-----------------------------------------------------------------------------------------------------
+###-----------------------------------------------------------------------------------------------------
+.getExperimentDataFromAModelID <- function(object, model.id)
+{
+  modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
+  if(length(modX)==1)
+  { mod = modX[[1]] }else
+  {return(NULL)}
 
-  return(dfRt)
+  mod.data = mod$data
+  mod$data = NULL
+  modDf = reshape2::melt(mod)
+  collpsCol = sort(colnames(modDf)[colnames(modDf)!="value"])
+  collpsVal = apply(modDf[,collpsCol], 1, pasteWithoutNA, collapse="." )
+  modDf[,"value.name"] = collpsVal
+  for(I in 1:nrow(modDf))
+  { mod.data[, modDf[I, "value.name"]] = as.character(modDf[I, "value"]) }
+
+  mod.data = .removeNAcol(mod.data)
+  mod.data = .reorderCol(mod.data, "model.id", 1)
+  mod.data = .reorderCol(mod.data, "drug.join.name", 2)
+  return(mod.data)
 }
 
+##--------------------------------------------------------------------------------------------------
+##----- get experiment data in flat data.fram ------------------------------------------------------
+#' getExperiment Generic
+#' Generic for getExperiment method
+#'
+#' @examples
+#' data(pdxe)
+#' getExperiment(pdxe, model.id="X.1655.LE11.biib")
+#' getExperiment(pdxe, model.id=c("X.1655.LE11.biib", "X.1298.pael") )
+#' @param object The \code{XevaSet} to retrieve drug info from
+#' @return a \code{list} with the all experiment designs
+setGeneric(name = "getExperiment", def = function(object, model.id){standardGeneric("getExperiment")} )
 
-
-
-
-
-
-
-
+#' @export
+setMethod( f=getExperiment, signature="XevaSet",
+           definition=function(object, model.id)
+           {
+             model.ids = unique(c(model.id))
+             rtx = lapply(model.ids, .getExperimentDataFromAModelID, object=object)
+             rtz = .rbindListOfDataframs(rtx)
+             return(rtz)
+           })
 
 
 

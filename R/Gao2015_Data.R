@@ -60,7 +60,12 @@ experiment = data.frame(model.id = experimentX$model.id,
                         body.weight= experimentX$`body.weight.(g)`,
                         stringsAsFactors = FALSE)
 
+experimentMin = experiment
+geoExp = list(experiment=experimentMin)
 
+##---------------------------------------------------------------------------------------------------------
+##=========================================================================================================
+####----- create model matrix ------------------------
 tumor.type = experimentX$Tumor.Type
 tumor.type.name = tumor.type
 tumor.type.name[tumor.type=="BRCA"]= "Breast Cancer" #BRCA, breast carcinoma
@@ -69,29 +74,21 @@ tumor.type.name[tumor.type=="CRC"] = "Colorectal Cancer"  #CRC, colorectal cance
 tumor.type.name[tumor.type=="GC"]  = "Gastric Cancer"     #GC, Gastric Cancer
 tumor.type.name[tumor.type=="NSCLC"]="Non-small Cell Lung Carcinoma" #NSCLC, non-small cell lung carcinoma;
 tumor.type.name[tumor.type=="PDAC" ]="Pancreatic Ductal Carcinoma"   #PDAC, pancreatic ductal carcinoma;
-
 experiment$tumor.type = as.character(tumor.type)
 experiment$tumor.type.name = as.character(tumor.type.name)
-
-
-#experiment$batch  = sapply(strsplit(experiment$model.id, "[.]"), `[[`, 1)
 experiment$batch  = experimentX$Model
-
 exp.type = experiment$drug.1
 exp.type[exp.type=="untreated"] = "control"
 exp.type[exp.type!="control"  ] = "treatment"
 experiment$exp.type = exp.type
 
-##====================================
-####----- create model matrix ---------------
-
 model = unique(experiment[, c("model.id", "batch","tumor.type", "tumor.type.name")])
 colnames(model) = c("model.id", "biobase.id", "tumor.type", "tumor.type.name")
 model$patient.id = model$biobase.id
 
-geoExp = list(experiment=experiment, model = model)
+geoExp$model = model
 
-##====== get the drug datafram =============================================
+##====== get the drug datafram ===================================================================
 
 drgNames = apply(geoExp$experiment[, c("drug.1","drug.2","drug.3")], 1, Xeva::pasteWithoutNA)
 drgNames = unique(drgNames)
@@ -101,7 +98,7 @@ drug = data.frame(drug.id = drgNames,
 geoExp$drug = drug
 
 
-##====================================
+##=================================================================================================
 ## Create design matrix ---------------------------------
 
 #head(experiment)
@@ -164,6 +161,7 @@ creatXevaObject <- function()
 {
   processRawData()
   geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
+  library(Xeva)
   pdxe = creatXevaSet(name = "PDXE",
                molecularProfiles = list(RNASeq = geoExp$RNASeq),
                experiment = geoExp$experiment,

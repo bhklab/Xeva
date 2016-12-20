@@ -8,10 +8,13 @@ Description: More about what it does (maybe more than one line)
 License: Give me Beer, I will fix it license
 LazyData: TRUE
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr
+Suggests: knitr
 Imports:
   BBmisc,
   Biobase,
   plyr,
   stringr,
   ggplot2,
-  ComplexHeatmap
+  ComplexHeatmap,
+  reshape2

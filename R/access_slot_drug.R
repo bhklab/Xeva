@@ -1,4 +1,3 @@
-
 ##----- get drugInfo -------------
 #' drugInfo Generic
 #' Generic for drugInfo method
@@ -10,10 +9,10 @@
 #' @return a \code{data.frame} with the drug annotations
 setGeneric(name = "drugInfo", def = function(object) {standardGeneric("drugInfo")} )
 
-#### @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
 #' @export
-setMethod( f=drugInfo, signature="XevaSet", definition=function(object){ dim(object@drug) } )
-
+setMethod( f=drugInfo, signature="XevaSet",
+           definition=function(object)
+             { object@drug } )
 
 
 #' drugInfo<- Generic
@@ -29,11 +28,16 @@ setGeneric(name= "drugInfo<-", def = function(object, value) {standardGeneric("d
 ###### @describeIn PharmacoSet Update the drug annotations
 #' @export
 setMethod( f="drugInfo<-",
-           signature="XevaSet",
+           signature=c(object = "XevaSet", value="data.frame"),
            definition=function(object, value)
            {
-             object@annotation$drugInfo = value
-             #object@drugInfo = value  ##This will not work as slot drugInfo already have to be present
-             object
+             #object@annotation$drugInfo = value
+             object@drugInfo = value
+             return(object)
            } )
+
+
+
+
+
 

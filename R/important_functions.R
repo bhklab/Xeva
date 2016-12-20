@@ -65,7 +65,22 @@ getIndex <- function(inVec, indxOf)
   return(RTz)
 }
 
+##------------------------------------------------------------------------------------------
+##---------------remove NA col--------------------------------------------------------------
+.removeNAcol <- function(df)
+{ return(df[, !apply(is.na(df), 2, all)]) }
 
+##------------------------------------------------------------------------------------------
+##---------------reorder column ------------------------------------------------------------
+.reorderCol <- function(df, columnName, newIndx)
+{
+  OtherCN = colnames(df)[colnames(df)!=columnName]
+  newCN = append(OtherCN, columnName, after= (newIndx-1) )
+  return(df[,newCN])
+}
+
+##------------------------------------------------------------------------------------------
+##------------------------------------------------------------------------------------------
 #' paste a vector elements togather while removing NA
 #'
 #' \code{pasteWithoutNA} paste a vector elements togather while removing NA
@@ -81,6 +96,7 @@ getIndex <- function(inVec, indxOf)
 #' @export
 pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
 
+##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------
 #' paste a data.frame columns togather while removing NA
 #'

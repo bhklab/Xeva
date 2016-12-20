@@ -1,3 +1,5 @@
+if(1==2){
+
 ##---- functions to acess experiment slot --------
 
 drugMatchFun <- function(drug, objPDX, exact.match)
@@ -125,8 +127,4 @@ getExperimentValues <- function(object, name = c("experiment.id"))
 
 
 
-
-
-
-
-
+}

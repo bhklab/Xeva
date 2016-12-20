@@ -20,6 +20,6 @@ Extract controls for a given model.id
 \examples{
 data(pdxe)
 # extract controls for a given model.id
-getControls(object=pdxe, model.id="X-6047.16")
+getControls(object=pdxe, model.id="X.1655.LE11.biib")
 }
 
