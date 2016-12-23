@@ -1,13 +1,122 @@
 library(ggplot2)
-#' Given a PDX object this will plot drug response curve
-#' i.e. Time vs Volume
-#' @param PDX a PDX object
-#' @return ggplot object
+
+#' To plot drug response curve
 #' @examples
-#' plotDrugResponse(PDX)
+#' data(pdxe)
+#' plotDrugResponse(pdxe, drug="LEE011 + binimetinib")
+#' plotDrugResponse(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+#' @param object The \code{XevaSet} to replace drug info in
+#' @param drug Name of the drug
+#' @return Updated \code{XevaSet}
+setGeneric(name= "plotDrugResponse",
+           def = function(object,
+                          drug, drug.match.exact=TRUE,
+                          tumor.type=NULL,
+                          control=TRUE)
+             {standardGeneric("plotDrugResponse")} )
+
 #' @export
+setMethod( f=plotDrugResponse,
+           signature=c(object = "XevaSet"),
+           definition=function(object,
+                               drug, drug.match.exact=TRUE,
+                               tumor.type=NULL,
+                               control=TRUE)
+           {
+
+             allExpIds = getExperimentIds(object, drug=drug, drug.match.exact=drug.match.exact,
+                                     tumor.type=tumor.type)
+
+             if(length(allModIds)==0)
+             {stop("No experiment present")}
+
+             allExpIds = allExpIds[1:3]
+
+             allExpModIds = mapModelSlotIds(object, id=allExpIds, id.name="experiment.id", map.to="model.id")
+
+             allBatchIds = c(unlist(sapply(allExpModIds$model.id, function(x) getBatchName(object, x))))
+
+             expDesign2plt = lapply(allBatchIds, function(x) expDesignInfo(object)[[x]])
+
+             DFlst = lapply(expDesign2plt, function(ed) getTimeVarData(object, ed, var = "volume", collapse=TRUE))
+
+             ##------ get color for each list element -----------
+             colVec = grDevices::rainbow(length(DFlst))
+             names(colVec) = names(DFlst)
+
+             DFlstx = list()
+             for(x in names(DFlst))
+             {
+               DFlstx[[x]] = .addColorPchLty(DFlst[[x]], colVec[x],
+                                             treatment.lty="solid", control.lty="dashed")
+             }
+
+             DF = do.call(rbind, DFlstx)
+             return(DF)
+           } )
 
 
+
+.addColorPchLty <- function(DFx, col, treatment.lty="solid", control.lty="dashed")
+{
+  lty = as.character(DFx$exp.type)
+  lty[lty=="treatment"] = treatment.lty
+  lty[lty=="control"] = control.lty
+  DFx$lty = lty
+  DFx$color = col
+  return(DFx)
+}
+
+
+
+NewPlotFunction <- function(DF, drug.join.name)
+{
+  DF = readRDS("DATA-raw/toPlot_DF.Rda")
+  drug.join.name = "paclitaxel"
+
+  ##-----
+
+  p1 = ggplot(DF, aes(time, mean, group = exp.type)) #+ xlab('Time') + ylab('Volume') + ggtitle(title)
+
+  p_line = p1 + geom_line(aes(time, mean, colour = color), data = DF, size = 0.7, alpha = 0.6)
+
+  p_legend <- p_line + scale_colour_manual(name = "", values=c("blue", "black"), labels=c("Treatment", "Control"))
+
+  p_point <- p_line + geom_point(aes(shape = factor(pch)))
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+##===============================================
+.creatPlotDF <- function(object, DFx)
+{
+  rtx = list()
+  for(I in 1:nrow(DFx))
+  {
+    expData = getExperiment(object, experiment.id= DFx[I, "experiment.id"])
+    expData$batch.name= DFx[I, "batch.name"]
+    expData$exp.type  = DFx[I, "exp.type"]
+    rtx = .appendToList(rtx, expData)
+  }
+  rtz = do.call(rbind, rtx)
+
+  return(rtz)
+}
+
+##================================================
 
 getExperimentDF <- function(expSlot, modelID, value)
 {
@@ -92,7 +201,7 @@ getColor <- function(plotData)
 }
 
 
-plotDrugResponse <- function(expSlot, expList, err.bars, colors = 'different')
+plotDrugResponse_old <- function(expSlot, expList, err.bars, colors = 'different')
 {
 
   ##---- plot the df in ggplot and return plot --------

@@ -18,7 +18,9 @@
 #' @param batch.name The \code{batch.name} for new batch
 #' @param replace If TRUE will replace the old batch with new values
 #' @return returns \code{Xeva} dataset with new experimental design added
-setGeneric(name = "addExperimentalDesign", def = function(object, treatment, control=NULL, batch.name=NULL,replace=FALSE) {standardGeneric("addExperimentalDesign")} )
+setGeneric(name = "addExperimentalDesign",
+           def = function(object, treatment, control=NULL, batch.name=NULL,replace=FALSE)
+                          {standardGeneric("addExperimentalDesign")} )
 
 #' @export
 setMethod( f=addExperimentalDesign,
@@ -42,20 +44,17 @@ setMethod( f=addExperimentalDesign,
              } else
              { batch.name = .generateNewNameForBatch(allBatchName, "batch")}
 
-             object@expDesign = .appendToList(object@expDesign,
-                                              list(batch.name=batch.name,
+             #object@expDesign = .appendToList(object@expDesign,
+             #                                list(batch.name=batch.name,
+             #                                     treatment=c(treatment),
+             #                                      control=c(control) ))
+             object@expDesign[[batch.name]] = list(batch.name=batch.name,
                                                    treatment=c(treatment),
-                                                   control=c(control) ))
+                                                   control=c(control) )
+
              return(object)
            })
 
 
 
-
-
-
-addExperiment <- function()
-{
-  ##this will add an Experiment in dataset
-}
 
