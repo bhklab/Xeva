@@ -21,5 +21,6 @@ Get experiment type (treatment or control) for a given model.id
 data(pdxe)
 # get experiment type for model.id
 experimentType(object=pdxe, model.id="X.1655.LE11.biib")
+getTreatment(object=pdxe, model.id="X-6047.21")
 }
 

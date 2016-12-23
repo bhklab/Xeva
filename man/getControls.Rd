@@ -21,5 +21,6 @@ Extract controls for a given model.id
 data(pdxe)
 # extract controls for a given model.id
 getControls(object=pdxe, model.id="X.1655.LE11.biib")
+getControls(object=pdxe, model.id="X-6047.16")
 }
 

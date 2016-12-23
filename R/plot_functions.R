@@ -1,11 +1,22 @@
 library(ggplot2)
-#' Given a PDX object this will plot drug response curve
-#' i.e. Time vs Volume
-#' @param PDX a PDX object
-#' @return ggplot object
+
+#' To plot drug response curve
 #' @examples
-#' plotDrugResponse(PDX)
+#' data(pdxe)
+#' plotDrugResponse(pdxe, drug="LEE011 + binimetinib")
+#' @param object The \code{XevaSet} to replace drug info in
+#' @param drug Name of the drug
+#' @return Updated \code{XevaSet}
+setGeneric(name= "plotDrugResponse", def = function(object, drug) {standardGeneric("plotDrugResponse")} )
+
 #' @export
+setMethod( f=plotDrugResponse,
+           signature=c(object = "XevaSet"),
+           definition=function(object, drug)
+           {
+             #object@expDesign = value
+             return(object)
+           } )
 
 
 
@@ -92,7 +103,7 @@ getColor <- function(plotData)
 }
 
 
-plotDrugResponse <- function(expSlot, expList, err.bars, colors = 'different')
+plotDrugResponse_old <- function(expSlot, expList, err.bars, colors = 'different')
 {
 
   ##---- plot the df in ggplot and return plot --------

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ##----- get expDesignInfo -------------
 #' expDesignInfo Generic
 #' Generic for expDesignInfo method
@@ -39,19 +38,13 @@ setMethod( f="expDesignInfo<-",
 
 ##-------------------------------------------------------------------------------------
 ##-------------------------------------------------------------------------------------
-=======
-
->>>>>>> d7e7b7b404f7033baab1bd2319fa8576acc4ee0d
 #' Extract controls for a given model.id
 #'
 #' @examples
 #' data(pdxe)
 #' # extract controls for a given model.id
-<<<<<<< HEAD
 #' getControls(object=pdxe, model.id="X.1655.LE11.biib")
-=======
 #' getControls(object=pdxe, model.id="X-6047.16")
->>>>>>> d7e7b7b404f7033baab1bd2319fa8576acc4ee0d
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return a \code{vector} with control model.id
@@ -72,22 +65,14 @@ setMethod( f=getControls,
             return(unlist(rtx))
             })
 
-<<<<<<< HEAD
-=======
 
-
-
->>>>>>> d7e7b7b404f7033baab1bd2319fa8576acc4ee0d
 #' Extract treatment for a given model.id
 #'
 #' @examples
 #' data(pdxe)
 #' # extract treatment for a given model.id
-<<<<<<< HEAD
 #' getTreatment(object=pdxe, model.id="X.1655.uned")
-=======
 #' getTreatment(object=pdxe, model.id="X-6047.21")
->>>>>>> d7e7b7b404f7033baab1bd2319fa8576acc4ee0d
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return a \code{vector} with treatment model.id
@@ -130,11 +115,8 @@ setMethod( f=getTreatment,
 #' @examples
 #' data(pdxe)
 #' # get experiment type for model.id
-<<<<<<< HEAD
 #' experimentType(object=pdxe, model.id="X.1655.LE11.biib")
-=======
 #' getTreatment(object=pdxe, model.id="X-6047.21")
->>>>>>> d7e7b7b404f7033baab1bd2319fa8576acc4ee0d
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return returns \code{treatment} or \code{control}

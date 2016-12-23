@@ -21,5 +21,6 @@ Extract treatment for a given model.id
 data(pdxe)
 # extract treatment for a given model.id
 getTreatment(object=pdxe, model.id="X.1655.uned")
+getTreatment(object=pdxe, model.id="X-6047.21")
 }
 
