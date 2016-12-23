@@ -9,11 +9,10 @@
   return(rtx)
 }
 
-
 .subsetExperimentSlotForDrug <- function(object, drugName, exact.match=TRUE)
 {
   drgNames = stringr::str_trim(strsplit(drugName, "\\+")[[1]])
-  modList = c()
+  expList = c()
   for(Ix in object@experiment)
   {
     if(exact.match==TRUE)
@@ -21,40 +20,40 @@
       if(length(drgNames) == length(Ix$drug$names))
       {
         if(all(drgNames %in% Ix$drug$names)==TRUE)
-        {modList = c(modList, Ix$model.id)}
+        {expList = c(expList, Ix$experiment.id)}
       }
     }
     ###------------------------------------------------
     if(exact.match==FALSE)
     {
       if(any(drgNames %in% Ix$drug$names)==TRUE)
-      {modList = c(modList, Ix$model.id)}
+      {expList = c(expList, Ix$experiment.id)}
     }
     ###------------------------------------------------
   }
-  rdx = data.frame(model.id=unique(modList), drug=drugName, stringsAsFactors = FALSE)
+  rdx = data.frame(experiment.id=unique(expList), drug=drugName, stringsAsFactors = FALSE)
   return(rdx)
 }
 
 ##-----------------------------------------------------------------------------------------------------
 ##-----------------------------------------------------------------------------------------------------
-##----- get model Ids -----------------------------
-#' getModelIds Generic
-#' Generic for getModelIds method
+##----- get experiment Ids -----------------------------
+#' getExperimentIds Generic
+#' Generic for getExperimentIds method
 #'
 #' @examples
 #' data(pdxe)
-#' getModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+#' getExperimentIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{list} with the all experiment designs
-setGeneric(name = "getModelIds",
+setGeneric(name = "getExperimentIds",
            def = function(object,
                           drug=NULL, drug.match.exact=TRUE,
                           tumor.type=NULL)
-                  {standardGeneric("getModelIds")} )
+                  {standardGeneric("getExperimentIds")} )
 
 #' @export
-setMethod( f=getModelIds, signature="XevaSet",
+setMethod( f=getExperimentIds, signature="XevaSet",
            definition=function(object,
                                drug=NULL, drug.match.exact=TRUE,
                                tumor.type=NULL)
@@ -62,30 +61,30 @@ setMethod( f=getModelIds, signature="XevaSet",
   if(is.null(drug) & is.null(tumor.type))
   {stop("drug and tumor.type both NULL, Please provide atleast one")}
 
-  ModIdsDrug = NULL
+  ExpIdsDrug = NULL
   if(!is.null(drug))
   {
     drug = c(drug)
-    ModIdsDrug = .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
+    ExpIdsDrug = .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
   }
 
-  ModIdsTumor = NULL
+  ExpIdsTumor = NULL
   if(!is.null(tumor.type))
   {
     tumor.type = c(tumor.type)
-    ModIdsTumor = mapModelSlotIds(object, id = tumor.type, id.name = "tumor.type", map.to="all")
+    ExpIdsTumor = mapModelSlotIds(object, id = tumor.type, id.name = "tumor.type", map.to="all")
   }
 
 
   if(!is.null(drug) & is.null(tumor.type))
-  { return(ModIdsDrug$model.id) }
+  { return(ExpIdsDrug$experiment.id) }
 
   if(is.null(drug) & !is.null(tumor.type))
-  { return(ModIdsTumor$model.id) }
+  { return(ExpIdsTumor$experiment.id) }
 
   if(!is.null(drug) & !is.null(tumor.type))
   {
-    rtx = intersect(ModIdsDrug$model.id, ModIdsTumor$model.id)
+    rtx = intersect(ExpIdsDrug$experiment.id, ExpIdsTumor$experiment.id)
     return(rtx)
   }
 })
@@ -94,9 +93,9 @@ setMethod( f=getModelIds, signature="XevaSet",
 
 ###-----------------------------------------------------------------------------------------------------
 ###-----------------------------------------------------------------------------------------------------
-.getExperimentDataFromAModelID <- function(object, model.id)
+.getExperimentDataFromAExpID <- function(object, experiment.id)
 {
-  modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
+  modX = .subsetExperimentSlot(object, id=experiment.id, id.type="experiment.id")
   if(length(modX)==1)
   { mod = modX[[1]] }else
   {return(NULL)}
@@ -123,23 +122,22 @@ setMethod( f=getModelIds, signature="XevaSet",
 #'
 #' @examples
 #' data(pdxe)
-#' getExperiment(pdxe, model.id="X.1655.LE11.biib")
-#' getExperiment(pdxe, model.id=c("X.1655.LE11.biib", "X.1298.pael") )
+#' getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
+#' getExperiment(pdxe, experiment.id=c("X.1286.pael.paclitaxel", "X.1298.pael.paclitaxel") )
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{list} with the all experiment designs
-setGeneric(name = "getExperiment", def = function(object, model.id){standardGeneric("getExperiment")} )
+setGeneric(name = "getExperiment", def = function(object, experiment.id){standardGeneric("getExperiment")} )
 
 #' @export
-setMethod( f=getExperiment, signature="XevaSet",
-           definition=function(object, model.id)
+setMethod( f=getExperiment,
+           signature="XevaSet",
+           definition=function(object, experiment.id)
            {
-             model.ids = unique(c(model.id))
-             rtx = lapply(model.ids, .getExperimentDataFromAModelID, object=object)
+             experiment.ids = unique(c(experiment.id))
+             rtx = lapply(experiment.ids, .getExperimentDataFromAExpID, object=object)
              rtz = .rbindListOfDataframs(rtx)
              return(rtz)
            })
-
-
 
 
 

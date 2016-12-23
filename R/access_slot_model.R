@@ -48,7 +48,7 @@ setMethod( f="ModelInfo<-",
 }
 
 ##---------------------------------------------------
-##---------------------------------------------------
+##
 #' map one id type to another in model slot
 #' model.id given a "biobase.id" or "patient id" or any other id that is a column in model slot
 #'
@@ -82,6 +82,7 @@ setMethod( f=mapModelSlotIds,
 
 
 
+##--------------------------------------------------------------------------------------
 
 
 

@@ -5,7 +5,7 @@
 \title{getExperiment Generic
 Generic for getExperiment method}
 \usage{
-getExperiment(object, model.id)
+getExperiment(object, experiment.id)
 }
 \arguments{
 \item{object}{The \code{XevaSet} to retrieve drug info from}
@@ -19,7 +19,7 @@ Generic for getExperiment method
 }
 \examples{
 data(pdxe)
-getExperiment(pdxe, model.id="X.1655.LE11.biib")
-getExperiment(pdxe, model.id=c("X.1655.LE11.biib", "X.1298.pael") )
+getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
+getExperiment(pdxe, experiment.id=c("X.1286.pael.paclitaxel", "X.1298.pael.paclitaxel") )
 }
 
