@@ -35,10 +35,10 @@ setMethod( f=plotDrugResponse,
              allExpIds = getExperimentIds(object, drug=drug, drug.match.exact=drug.match.exact,
                                      tumor.type=tumor.type)
 
-             if(length(allModIds)==0)
+             if(length(allExpIds)==0)
              {stop("No experiment present")}
 
-             allExpIds = allExpIds[1:3]
+             #allExpIds = allExpIds[1:3]
 
              allExpModIds = mapModelSlotIds(object, id=allExpIds, id.name="experiment.id", map.to="model.id")
 
@@ -46,17 +46,18 @@ setMethod( f=plotDrugResponse,
 
              expDesign2plt = lapply(allBatchIds, function(x) expDesignInfo(object)[[x]])
 
-             DFlst = lapply(expDesign2plt, function(ed) getTimeVarData(object, ed, var = "volume", collapse=TRUE))
-
+             batchNames = names(expDesign2plt)
              ##------ get color for each list element -----------
-             colVec = grDevices::rainbow(length(DFlst))
-             names(colVec) = names(DFlst)
+             colVec = grDevices::rainbow(length(batchNames))
+             names(colVec) = batchNames
 
              DFlstx = list()
-             for(x in names(DFlst))
+             for(en in batchNames)
              {
-               DFlstx[[x]] = .addColorPchLty(DFlst[[x]], colVec[x],
-                                             treatment.lty="solid", control.lty="dashed")
+
+               dx = getTimeVarData(object, expDesign2plt[[en]], var = "volume", collapse=TRUE)
+
+               DFlstx[[en]] = .addColorPchLty(dx, colVec[en], treatment.lty="solid", control.lty="dashed")
              }
 
              DF = do.call(rbind, DFlstx)
@@ -75,12 +76,13 @@ setMethod( f=plotDrugResponse,
   return(DFx)
 }
 
-
+##----------------------------------------------------------------
 
 NewPlotFunction <- function(DF, drug.join.name)
 {
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
+
 
 }
 

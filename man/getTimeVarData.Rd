@@ -9,7 +9,7 @@ getTimeVarData(object, ExpDesign, var, collapse)
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
-\item{expDesign}{A list with batch.name, treatment and control}
+\item{ExpDesign}{A list with batch.name, treatment and control}
 }
 \value{
 a \code{data.fram} with treatment, control and batch.name
@@ -20,7 +20,7 @@ Given a model.id it will return a data.fram of experiemt design
 \examples{
 data(pdxe)
 # extract controls for a given model.id
-expDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
-getTimeVarData(object=pdxe, expDesign, var = "volume", collapse=TRUE)
+ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
+getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
 }
 
