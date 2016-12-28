@@ -134,10 +134,10 @@ setMethod( f=getExpDesignDF,
 #' @examples
 #' data(pdxe)
 #' # extract controls for a given model.id
-#' expDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
-#' getTimeVarData(object=pdxe, expDesign, var = "volume", collapse=TRUE)
+#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
+#' getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
 #' @param object The \code{Xeva} dataset
-#' @param expDesign A list with batch.name, treatment and control
+#' @param ExpDesign A list with batch.name, treatment and control
 #' @return a \code{data.fram} with treatment, control and batch.name
 setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var, collapse) {standardGeneric("getTimeVarData")} )
 
@@ -195,7 +195,7 @@ setMethod( f=getTimeVarData,
              rtxTretX$exp.type="treatment"
              rtxContX$exp.type="control"
              rtX = rbind(rtxTretX, rtxContX)
-             rtX$batch.name = expDesign$batch.name
+             rtX$batch.name = ExpDesign$batch.name
              return(rtX)
            })
 
