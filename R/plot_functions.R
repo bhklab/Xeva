@@ -15,6 +15,14 @@ setGeneric(name= "plotDrugResponse",
                           control=TRUE)
              {standardGeneric("plotDrugResponse")} )
 
+#' @param object The \code{XevaSet} to replace drug info in
+#' @param drug Name of the drug
+#' @return Updated \code{XevaSet}
+setGeneric(name= "plotDrugResponse", def = function(object,
+                                                    drug, drug.match.exact,
+                                                    tumor.type, control)
+                                            {standardGeneric("plotDrugResponse")} )
+
 #' @export
 setMethod( f=plotDrugResponse,
            signature=c(object = "XevaSet"),
@@ -73,18 +81,6 @@ NewPlotFunction <- function(DF, drug.join.name)
 {
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
-
-  ##-----
-
-  p1 = ggplot(DF, aes(time, mean, group = exp.type)) #+ xlab('Time') + ylab('Volume') + ggtitle(title)
-
-  p_line = p1 + geom_line(aes(time, mean, colour = color), data = DF, size = 0.7, alpha = 0.6)
-
-  p_legend <- p_line + scale_colour_manual(name = "", values=c("blue", "black"), labels=c("Treatment", "Control"))
-
-  p_point <- p_line + geom_point(aes(shape = factor(pch)))
-
-
 
 }
 
