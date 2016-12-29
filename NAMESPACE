@@ -3,6 +3,7 @@
 S3method(plot,mRECIST)
 export()
 export(.convertListToDataFram)
+export(NewPlotFunction)
 export(computemRECIST)
 export(creatXevaSet)
 export(experimentDesignSummary)
