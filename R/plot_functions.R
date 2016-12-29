@@ -77,12 +77,13 @@ setMethod( f=plotDrugResponse,
 }
 
 ##----------------------------------------------------------------
-
+#' @export
 NewPlotFunction <- function(DF, drug.join.name)
 {
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
 
+  ##ggplot2::ggplot(DF, ggplot2::aes(time, mean, group = exp.type))+ ggplot2::geom_line()
 
 }
 
