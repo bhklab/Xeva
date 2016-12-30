@@ -83,19 +83,43 @@ NewPlotFunction <- function(DF, drug.join.name)
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
 
-  ##ggplot2::ggplot(DF, ggplot2::aes(time, mean, group = exp.type))+ ggplot2::geom_line()
+  # create title objects
+  drug_name <- unique(DF$drug.join.name[DF$drug.join.name != 'untreated'])
+  title <- paste(length(DF$drug.join.name), 'Experiments for', drug_name)
+
+  # create a unique variable combining patient.id and exp.type
+  DF$patient.exp <- paste(DF$patient.id, DF$exp.type, sep = '_')
+
+  # create basic plot object
+  plot.1 <- ggplot2::ggplot(DF, ggplot2::aes(time, mean, group = patient.exp)) +
+    xlab('Time') +
+    ylab('Volume') +
+    ggtitle(title)
+
+
+    if (!all(is.na(err.bars))) {
+      # add error bars if not all of the error bar columns are NA
+      plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
+
+    }
+
+  # plot add legend to plot.1 and points
+  plot.final <- plot.1 + ggplot2::geom_line(ggplot2::aes(time, mean, colour = exp.type), data = DF, size = 0.7, alpha = 0.6) +
+  ggplot2::scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Control", "Treatment"))
+
+  # add final theme to plot.final
+  plotObject <- plot.final + theme(panel.background=element_rect(fill="#F0F0F0"),
+                                   plot.background=element_rect(fill="#F0F0F0"),
+                                   panel.grid.major=element_line(colour="#D0D0D0",size=.75), axis.ticks=element_blank(),
+                                   legend.position="bottom",  plot.title=element_text(face="bold",colour="Black",size=10),
+                                   axis.text.x=element_text(size=11,colour="#535353",face="bold"),
+                                   axis.text.y=element_text(size=11,colour="#535353",face="bold"),
+                                   axis.title.y=element_text(size=11,colour="#535353",face="bold",vjust=1.5),
+                                   axis.title.x=element_text(size=11,colour="#535353",face="bold",vjust=-.5))
+
+  return(plotObject)
 
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -200,61 +224,63 @@ getColor <- function(plotData)
 }
 
 
-plotDrugResponse_old <- function(expSlot, expList, err.bars, colors = 'different')
+plotDrugResponse_old <- function(expSlot, expList, diff.colors, patient.id = "X-1004")
 {
 
   ##---- plot the df in ggplot and return plot --------
   dataX = .get_Data()
-  plotData = dataX[[1]] ## data without error bars
-  plotData2= dataX[[2]] ## data with error bars
+
+  ##---- get error bar information -------
+  err.bars <- append(dataX$upper, dataX$lower)
 
   ##this seems a bug ----------------------------
-  plotData = plotData[plotData$batch=="X-2094",] ##select data for one patient
+  dataX = dataX[dataX$patient.id==patient.id,] ##select data for one patient
   ### The plot should give 2 lines: one control and one treatment
   ### but this gives only one line
-  title <- paste(length(unique(plotData$batch)), 'Experiments for', unique(plotData$drug))
+  drug_name <- unique(dataX$drug.join.name[dataX$drug.join.name != 'untreated'])
+  title <- paste(length(dataX$drug.join.name), 'Experiments for', drug_name)
 
-  # recode color for plotData (different color for treatment and control)
-  if (colors == 'different') {
-    plotData <- getColor(plotData)
-    plotData2 <- getColor(plotData2)
+  # create basic plot object
+  plot.1 <- ggplot2::ggplot(dataX, ggplot2::aes(time, mean, group = exp.type)) +
+  xlab('Time') +
+  ylab('Volume') +
+  ggtitle(title)
+  # recode color for dataX (different color for treatment and control)
+  if (diff.colors) {
 
-    p1 <- ggplot(plotData2, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
+    dataX <- getColor(dataX)
 
-    if (err.bars) {
-      # scale_fill_manual(name="Bar",values=cols, guide="none")
-      p1 <- p1 + geom_errorbar(aes(ymin = SE.lower, ymax = SE.upper))
+    if (!all(is.na(err.bars))) {
+      # add error bars if not all of the error bar columns are NA
+      plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
 
     }
 
-    p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6)
-    # + guides(color=FALSE)
-    p_legend <- p_line + scale_colour_manual(name = "", values=c("blue", "black"), labels=c("Treatment", "Control"))
-
-    p_point <- p_line + geom_point(aes(shape = factor(pch)))
+    # plot add legend to plot.1 and points
+    plot.final <- plot.1 + ggplot2::geom_line(ggplot2::aes(time, mean, colour = color), data = dataX, size = 0.7, alpha = 0.6) +
+      ggplot2::scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Treatment", "Control")) +
+      ggplot2::geom_point()
 
 
   } else {
 
+    if (!all(is.na(err.bars))) {
 
-    p1 <- ggplot(plotData2, aes(time, volume, group = exp.type)) + xlab('Time') + ylab('Volume') + ggtitle(title)
-
-    if (err.bars) {
-
-      p1 <- ggplot(plotData2, aes(time, volume, group = exp.type )) + xlab('Time') + ylab('Volume') + ggtitle(title)
-      p1 <- p1 + geom_errorbar(aes(ymin = SE.lower, ymax = SE.upper))
+      # add error bars if not all of the error bar columns are NA
+      plot.1 <- plot.1 + ggplot2::geom_errorbar(aes(ymin = lower, ymax = upper))
 
     }
 
-    p_line <- p1 + geom_line(aes(time, volume, colour = color), data = plotData, size = 0.7, alpha = 0.6) + guides(color=FALSE)
-
-    p_point <- p_line + geom_point(aes(shape = factor(pch)))
-
-    p_legend <- p_point + scale_shape_discrete(name = "", breaks=c(16, 18), labels=c("Treatment", "Control"))
+    # plot add legend to plot.1 and points - on this one the no color distinction and
+    # legend reflects pch, not color.
+    plot.final <- plot.1 + ggplot2::geom_line(aes(time, mean, colour = color), data = dataX, size = 0.7, alpha = 0.6) +
+      guides(color=FALSE) + ggplot2::geom_point(aes(shape = factor(lty))) +
+      scale_shape_discrete(name = "", breaks=c("solid", "dashed"), labels=c("Treatment", "Control"))
 
   }
 
-  plotObject <- p_legend + theme(panel.background=element_rect(fill="#F0F0F0"),
+  # add final theme to plot.final
+  plotObject <- plot.final + theme(panel.background=element_rect(fill="#F0F0F0"),
                                  plot.background=element_rect(fill="#F0F0F0"),
                                  panel.grid.major=element_line(colour="#D0D0D0",size=.75), axis.ticks=element_blank(),
                                  legend.position="bottom",  plot.title=element_text(face="bold",colour="Black",size=10),
@@ -265,6 +291,10 @@ plotDrugResponse_old <- function(expSlot, expList, err.bars, colors = 'different
 
   return(plotObject)
 }
+
+# plot once with different colors, once with same colors, using pch to differentiate.
+plotDrugResponse_old(diff.colors = T)
+plotDrugResponse_old(diff.colors = F)
 
 
 
