@@ -77,9 +77,12 @@ setMethod( f=plotDrugResponse,
 }
 
 ##----------------------------------------------------------------
+
 #' @export
+#' @import ggplot2
 NewPlotFunction <- function(DF, drug.join.name)
 {
+
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
 
@@ -91,21 +94,19 @@ NewPlotFunction <- function(DF, drug.join.name)
   DF$patient.exp <- paste(DF$patient.id, DF$exp.type, sep = '_')
 
   # create basic plot object
-  plot.1 <- ggplot2::ggplot(DF, ggplot2::aes(time, mean, group = patient.exp)) +
-    xlab('Time') +
-    ylab('Volume') +
-    ggtitle(title)
+  plot.1 <- ggplot(DF, aes(time, mean, group = patient.exp)) +
+    xlab('Time') + ylab('Volume') + ggtitle(title)
 
 
-    if (!all(is.na(err.bars))) {
-      # add error bars if not all of the error bar columns are NA
-      plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
-
-    }
+    # if (!all(is.na(err.bars))) {
+    #   # add error bars if not all of the error bar columns are NA
+    #   plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
+    #
+    # }
 
   # plot add legend to plot.1 and points
-  plot.final <- plot.1 + ggplot2::geom_line(ggplot2::aes(time, mean, colour = exp.type), data = DF, size = 0.7, alpha = 0.6) +
-  ggplot2::scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Control", "Treatment"))
+  plot.final <- plot.1 + geom_line(aes(time, mean, colour = exp.type), data = DF, size = 0.7, alpha = 0.6) +
+  scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Control", "Treatment"))
 
   # add final theme to plot.final
   plotObject <- plot.final + theme(panel.background=element_rect(fill="#F0F0F0"),
