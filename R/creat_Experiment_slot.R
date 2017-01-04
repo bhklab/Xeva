@@ -121,6 +121,12 @@ experimentSlotfromDf <- function(experiment)
 
   expSlot = list()
   u.modDrg.id = unique(experiment[, c("model.id", "drug")])
+  if(any(is.na(u.modDrg.id$model.id)))
+  { stop("model.id is NA") }
+
+  if(any(is.na(u.modDrg.id$drug)))
+  { stop("drug is NA") }
+
   for (i in 1:dim(u.modDrg.id)[1])
   {
     exp.mod.dg = subset(experiment,
@@ -130,14 +136,14 @@ experimentSlotfromDf <- function(experiment)
     expSlot[[i]] = creatListFromDF(exp.mod.dg)
   }
 
-  mod.ids = sapply(expSlot , "[[" , "model.id" )
+  mod.ids = unlist(sapply(expSlot , "[[" , "model.id" ))
   if(any(table(mod.ids)!=1))
   {
     msg = sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
     stop(msg)
   }
 
-  expNames = make.unique(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} ), sep="_")
+  expNames = make.unique(unlist(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} )), sep="_")
   for(i in 1:length(expSlot))
   { expSlot[[i]][["experiment.id"]] = expNames[i] }
   names(expSlot) = expNames

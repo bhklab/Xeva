@@ -40,6 +40,7 @@ getIndex <- function(inVec, indxOf)
 }
 
 
+#' @export
 .rbindListOfDataframs<- function(inList)
 {
   allColNames = lapply(inList, colnames)
