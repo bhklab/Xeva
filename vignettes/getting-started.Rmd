@@ -25,13 +25,15 @@ data(pdxe)
 
 Get all model.id for which drug "paclitaxel" was used and tumor.type is "BRCA"
 ```{r, echo=TRUE}
-modelIds = getModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
-print(modelIds)
+#modelIds = getModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+#print(modelIds)
+df = getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
+head(df)
 ```
 
 To get the data for a model id 
 ```{r, echo=TRUE}
-df = getExperiment(pdxe, model.id="X.1655.LE11.biib")
+df = getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
 head(df)
 ```
 
@@ -39,6 +41,14 @@ head(df)
 To get all mode
 
 
+
+\pagebreak
+
+```{r, echo=TRUE}
+library(Xeva)
+data("celineData")
+head(ModelInfo(lpdx))
+```
 
 
 

@@ -2,7 +2,8 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{getControls}
 \alias{getControls}
-\title{Extract controls for a given model.id}
+\title{Extract controls for a given model.id
+If no control found it will return NULL}
 \usage{
 getControls(object, model.id)
 }
@@ -16,11 +17,13 @@ a \code{vector} with control model.id
 }
 \description{
 Extract controls for a given model.id
+If no control found it will return NULL
 }
 \examples{
 data(pdxe)
 # extract controls for a given model.id
 getControls(object=pdxe, model.id="X.1655.LE11.biib")
-getControls(object=pdxe, model.id="X-6047.16")
+# if no control found it will return NULL
+getControls(object=pdxe, model.id="X.1655.uned")
 }
 

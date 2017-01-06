@@ -8,10 +8,14 @@
 }
 
 
-#' add a new experimental design
+#' Add a new experimental design
 #'
+#'
+#' Add a new experimental design in expDesign slot.
 #' @examples
 #' data(pdxe)
+#' pdxe = addExperimentalDesign(object=pdxe, treatment= c("X.010.BG98"), control=c("X.010.uned"),
+#'                              batch.name="new.batch", replace=FALSE)
 #' @param object The \code{Xeva} dataset
 #' @param treatment The \code{model.id} of treatment
 #' @param control The \code{model.id} of control

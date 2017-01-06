@@ -40,12 +40,12 @@ setMethod( f="expDesignInfo<-",
 ##-------------------------------------------------------------------------------------
 ## get ExpDesign Slot DF
 #' Given a model.id it will return a data.fram of experiemt design
+#' with columns as "treatment", "control", "batch.name"
 #'
 #' @examples
 #' data(pdxe)
-#' # extract controls for a given model.id
+#' # This will give a data.fram with columns as "treatment", "control", "batch.name"
 #' getExpDesignDF(object=pdxe, model.id="X.1655.LE11.biib")
-#' getExpDesignDF(object=pdxe, model.id="X-6047.16")
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return a \code{data.fram} with treatment, control and batch.name
@@ -126,90 +126,91 @@ setMethod( f=getExpDesignDF,
   return(pidX)
 }
 
-##-------------------------------------------------------------------------------------
-##-------------------------------------------------------------------------------------
-## get ExpDesign Slot DF
-#' Given a model.id it will return a data.fram of experiemt design
+## get time vs volume data with standard error
+#'
+#' Get time vs volume data with standard error
+#'
+#'
+#' Given a batch (treatment and control model ids)
+#' it will return a data.fram with time vs volume (or any other variable)
+#' with standard error calculated. Note that this function do not check if
+#' model.id in given batch belongs to same patient or biobase id
+#' Note: Write a function to check integrity of a batch
 #'
 #' @examples
 #' data(pdxe)
-#' # extract controls for a given model.id
-#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
-#' getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
+#' # creat a experiment desing
+#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98", "X.010.BG98"), control=c("X.010.uned"))
+#' df = getTimeVarData(object=pdxe, ExpDesign, var = "volume")
+#'
 #' @param object The \code{Xeva} dataset
 #' @param ExpDesign A list with batch.name, treatment and control
+#' @param var Name of the variable, default \code{volume}
 #' @return a \code{data.fram} with treatment, control and batch.name
-setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var, collapse) {standardGeneric("getTimeVarData")} )
+setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var = "volume")
+  {standardGeneric("getTimeVarData")} )
 
 #' @export
 setMethod( f=getTimeVarData,
            signature=c(object="XevaSet", ExpDesign="list"),
-           definition= function(object, ExpDesign, var = "volume", collapse=TRUE)
+           definition= function(object, ExpDesign, var = "volume")
            {
-             rtxTret = list()
-             for(i in ExpDesign$treatment)
-             {
-               expID = mapModelSlotIds(object, id=i, id.name="model.id", map.to="experiment.id")
-               expData = getExperiment(object, experiment.id= expID[1, "experiment.id"])
-               expData = expData[, c("model.id", "experiment.id", "drug.join.name", "time", var)]
-               patient.idx = mapModelSlotIds(object, id=expData$model.id, id.name="model.id", map.to="patient.id")
-               expData$patient.id = patient.idx[1, "patient.id"]
-               rtxTret = .appendToList(rtxTret, expData)
-             }
-             ###-------------------------------------------------------------------------------------
-             rtxCont = list()
-             for(j in ExpDesign$control)
-             {
-               conID = mapModelSlotIds(object, id=j, id.name="model.id", map.to="experiment.id")
-               conData = getExperiment(object, experiment.id= conID[1, "experiment.id"])
-               conData = conData[, c("model.id", "experiment.id", "drug.join.name", "time", var)]
-               patient.idx = mapModelSlotIds(object, id=conData$model.id, id.name="model.id", map.to="patient.id")
-               conData$patient.id = patient.idx[1, "patient.id"]
+             if(is.null(ExpDesign$treatment) & is.null(ExpDesign$control))
+             {stop("treatment and control both NULL")}
 
-               rtxCont = .appendToList(rtxCont, conData)
+             trDF = data.frame()
+             cnDF = data.frame()
+             if(!is.null(ExpDesign$treatment))
+             {
+             trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment)
+             trDF = .collapseRplicate(trLs, var = var)
+             trDF$exp.type = "treatment"
+             trDF$batch.name = ExpDesign$batch.name
              }
 
-             if(collapse==TRUE)
+             if(!is.null(ExpDesign$control))
              {
-               trD = .checkDrugNameSame(rtxTret)
-               tpi = .checkPatientIDSame(rtxTret)
-
-               rtxTretX =.collapseRplicate(rtxTret, var)
-               rtxTretX$drug.join.name = trD
-               rtxTretX$patient.id = tpi
-
-               ##----------for control ------------------------
-               cnD = .checkDrugNameSame(rtxCont)
-               cpi = .checkPatientIDSame(rtxCont)
-
-               rtxContX =.collapseRplicate(rtxCont, var)
-               rtxContX$drug.join.name = cnD
-               rtxContX$patient.id = cpi
-
-             } else
-             {
-               rtxTretX = do.call(rbind, rtxTret)
-               rtxContX = do.call(rbind, rtxCont)
+             cnLs = .getExperimentMultipalIDs(object, ExpDesign$control)
+             cnDF = .collapseRplicate(cnLs, var = var)
+             cnDF$exp.type = "control"
+             cnDF$batch.name = ExpDesign$batch.name
              }
 
-             rtxTretX$exp.type="treatment"
-             rtxContX$exp.type="control"
-             rtX = rbind(rtxTretX, rtxContX)
-             rtX$batch.name = ExpDesign$batch.name
-             return(rtX)
+             rdf = rbind(trDF, cnDF)
+             return(rdf)
            })
+
+
+.getExperimentMultipalIDs <- function(object, mids)
+{
+  rtx = list()
+  for(i in mids)
+  {
+    miD = getExperiment(object, model.id= i)
+    rtx = .appendToList(rtx, miD)
+  }
+  return(rtx)
+}
+
+
+
+
+
+
 
 
 
 ##-------------------------------------------------------------------------------------
 ##-------------------------------------------------------------------------------------
 #' Extract controls for a given model.id
+#' If no control found it will return NULL
 #'
 #' @examples
 #' data(pdxe)
 #' # extract controls for a given model.id
 #' getControls(object=pdxe, model.id="X.1655.LE11.biib")
-#' getControls(object=pdxe, model.id="X-6047.16")
+#' # if no control found it will return NULL
+#' getControls(object=pdxe, model.id="X.1655.uned")
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return a \code{vector} with control model.id
@@ -234,9 +235,8 @@ setMethod( f=getControls,
 #'
 #' @examples
 #' data(pdxe)
-#' # extract treatment for a given model.id
+#' # extract treatment model.id for a given model.id
 #' getTreatment(object=pdxe, model.id="X.1655.uned")
-#' getTreatment(object=pdxe, model.id="X-6047.21")
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return a \code{vector} with treatment model.id
@@ -261,12 +261,12 @@ setMethod( f=getTreatment,
 #'
 #' @examples
 #' data(pdxe)
-#' # extract treatment for a given model.id
+#' # extract batch.name for a given model.id
 #' getBatchName(object=pdxe, model.id="X.1655.uned")
 #' getBatchName(object=pdxe, model.id="X.010.fiab")
 #' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return a \code{vector} with treatment model.id
+#' @param model.id The \code{model.id} for which batch name required
+#' @return a \code{vector} with all batch names
 setGeneric(name = "getBatchName", def = function(object, model.id){standardGeneric("getBatchName")} )
 
 #' @export
@@ -307,7 +307,7 @@ setMethod( f=getBatchName,
 #' data(pdxe)
 #' # get experiment type for model.id
 #' experimentType(object=pdxe, model.id="X.1655.LE11.biib")
-#' getTreatment(object=pdxe, model.id="X-6047.21")
+#' experimentType(object=pdxe, model.id="X.1655.uned")
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
 #' @return returns \code{treatment} or \code{control}
@@ -433,6 +433,91 @@ experimentDesignSummary <- function(object)
 }
 
 
+
+
+
+
+##=======================================================================================
+##=======================================================================================
+##-------------------------------------------------------------------------------------
+##-------------------------------------------------------------------------------------
+## get time vs volume data with standard error
+#'
+#' Given a treatment and control model ids
+#' it will return a data.fram with time vs volume (or any other variable)
+#'
+#' @examples
+#' data(pdxe)
+#' # creat a experiment desing
+#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
+#' df = getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
+#' ## if collapse=FALSE it will not calculate standard error
+#' df2= getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=FALSE)
+#'
+#' @param object The \code{Xeva} dataset
+#' @param ExpDesign A list with batch.name, treatment and control
+#' @param var Name of the variable, default \code{volume}
+#' @param collapse Default \code{TRUE}. It will summerize all models which belongs to same treatment or control group
+#' @return a \code{data.fram} with treatment, control and batch.name
+setGeneric(name = "Old_getTimeVarData", def = function(object, ExpDesign, var, collapse) {standardGeneric("Old_getTimeVarData")} )
+
+########## @export
+setMethod( f=Old_getTimeVarData,
+           signature=c(object="XevaSet", ExpDesign="list"),
+           definition= function(object, ExpDesign, var = "volume", collapse=TRUE)
+           {
+
+             rtxTret = list()
+             for(i in ExpDesign$treatment)
+             {
+               expData = getExperiment(object, model.id= i)
+               expData = expData[, c("model.id", "drug.join.name", "time", var)]
+               patient.idx = mapModelSlotIds(object, id=expData$model.id, id.name="model.id", map.to="patient.id")
+               expData$patient.id = patient.idx[1, "patient.id"]
+               rtxTret = .appendToList(rtxTret, expData)
+             }
+             ###-------------------------------------------------------------------------------------
+             rtxCont = list()
+             for(j in ExpDesign$control)
+             {
+               conData = getExperiment(object, model.id= i)
+               conData = conData[, c("model.id", "drug.join.name", "time", var)]
+               patient.idx = mapModelSlotIds(object, id=conData$model.id, id.name="model.id", map.to="patient.id")
+               conData$patient.id = patient.idx[1, "patient.id"]
+
+               rtxCont = .appendToList(rtxCont, conData)
+             }
+
+             if(collapse==TRUE)
+             {
+               trD = .checkDrugNameSame(rtxTret)
+               tpi = .checkPatientIDSame(rtxTret)
+
+               rtxTretX =.collapseRplicate(rtxTret, var)
+               rtxTretX$drug.join.name = trD
+               rtxTretX$patient.id = tpi
+
+               ##----------for control ------------------------
+               cnD = .checkDrugNameSame(rtxCont)
+               cpi = .checkPatientIDSame(rtxCont)
+
+               rtxContX =.collapseRplicate(rtxCont, var)
+               rtxContX$drug.join.name = cnD
+               rtxContX$patient.id = cpi
+
+             } else
+             {
+               rtxTretX = do.call(rbind, rtxTret)
+               rtxContX = do.call(rbind, rtxCont)
+             }
+
+             rtxTretX$exp.type="treatment"
+             rtxContX$exp.type="control"
+             rtX = rbind(rtxTretX, rtxContX)
+             rtX$batch.name = ExpDesign$batch.name
+             return(rtX)
+           })
+##--------------------------------------------------------------------------------------------------------------------
 
 
 

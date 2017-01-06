@@ -22,16 +22,26 @@
 
   #rownames(model) = NULL
 
-  ##----- set model slot rownames as experiment.id ----------------
-  meid = lapply(expSlot, function(x) c(model.id=x$model.id, experiment.id=x$experiment.id))
-  meidf = .convertListToDataFram(meid)
+  ##----- set model slot rownames as model.id ----------------
+  mdup = model$model.id[duplicated(model$model.id)]
+  if(length(mdup)>0)
+  {
+    msg = sprintf("duplicated model.id in model slot:\n%s\n", paste(mdup, collapse = "\n"))
+    stop(msg)
+  }
+  rownames(model) = as.character(model$model.id)
 
-  modelX = merge(meidf, model, by.x = "model.id", by.y = "model.id")
+  # ##----- set model slot rownames as experiment.id ----------------
+  # meid = lapply(expSlot, function(x) c(model.id=x$model.id, experiment.id=x$experiment.id))
+  # meidf = .convertListToDataFram(meid)
+  #
+  # modelX = merge(meidf, model, by.x = "model.id", by.y = "model.id")
+  #
+  # if(length(modelX$experiment.id)!= length(unique(modelX$experiment.id)))
+  # {stop("experiment.id should be unique!!!")}
+  #
+  # rownames(modelX) = as.character(modelX$experiment.id)
 
-  if(length(modelX$experiment.id)!= length(unique(modelX$experiment.id)))
-  {stop("experiment.id should be unique!!!")}
 
-  rownames(modelX) = as.character(modelX$experiment.id)
-
-  return(modelX)
+  return(model)
 }

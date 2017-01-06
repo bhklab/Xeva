@@ -9,17 +9,17 @@ getBatchName(object, model.id)
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
-\item{model.id}{The \code{model.id}}
+\item{model.id}{The \code{model.id} for which batch name required}
 }
 \value{
-a \code{vector} with treatment model.id
+a \code{vector} with all batch names
 }
 \description{
 Extract batch.name for a given model.id
 }
 \examples{
 data(pdxe)
-# extract treatment for a given model.id
+# extract batch.name for a given model.id
 getBatchName(object=pdxe, model.id="X.1655.uned")
 getBatchName(object=pdxe, model.id="X.010.fiab")
 }

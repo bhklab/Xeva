@@ -2,24 +2,25 @@
 % Please edit documentation in R/access_slot_experiment.R
 \name{getExperiment}
 \alias{getExperiment}
-\title{getExperiment Generic
-Generic for getExperiment method}
+\title{For a given  model.id, it will return a data.fram
+containing all data stored in experiment slot}
 \usage{
-getExperiment(object, experiment.id)
+getExperiment(object, model.id)
 }
 \arguments{
-\item{object}{The \code{XevaSet} to retrieve drug info from}
+\item{object}{The \code{XevaSet}}
+
+\item{model.id}{The \code{model.id} for which data is required}
 }
 \value{
-a \code{list} with the all experiment designs
+a \code{data.fram} will all the the values stored in experiment slot
 }
 \description{
-getExperiment Generic
-Generic for getExperiment method
+For a given  model.id, it will return a data.fram
+containing all data stored in experiment slot
 }
 \examples{
 data(pdxe)
-getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
-getExperiment(pdxe, experiment.id=c("X.1286.pael.paclitaxel", "X.1298.pael.paclitaxel") )
+getExperiment(pdxe, model.id="X.1004.pael")
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/expDesign_manuplation.R
 \name{addExperimentalDesign}
 \alias{addExperimentalDesign}
-\title{add a new experimental design}
+\title{Add a new experimental design}
 \usage{
 addExperimentalDesign(object, treatment, control = NULL, batch.name = NULL,
   replace = FALSE)
@@ -22,9 +22,11 @@ addExperimentalDesign(object, treatment, control = NULL, batch.name = NULL,
 returns \code{Xeva} dataset with new experimental design added
 }
 \description{
-add a new experimental design
+Add a new experimental design in expDesign slot.
 }
 \examples{
 data(pdxe)
+pdxe = addExperimentalDesign(object=pdxe, treatment= c("X.010.BG98"), control=c("X.010.uned"),
+                             batch.name="new.batch", replace=FALSE)
 }
 

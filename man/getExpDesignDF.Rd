@@ -2,7 +2,8 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{getExpDesignDF}
 \alias{getExpDesignDF}
-\title{Given a model.id it will return a data.fram of experiemt design}
+\title{Given a model.id it will return a data.fram of experiemt design
+with columns as "treatment", "control", "batch.name"}
 \usage{
 getExpDesignDF(object, model.id)
 }
@@ -16,11 +17,11 @@ a \code{data.fram} with treatment, control and batch.name
 }
 \description{
 Given a model.id it will return a data.fram of experiemt design
+with columns as "treatment", "control", "batch.name"
 }
 \examples{
 data(pdxe)
-# extract controls for a given model.id
+# This will give a data.fram with columns as "treatment", "control", "batch.name"
 getExpDesignDF(object=pdxe, model.id="X.1655.LE11.biib")
-getExpDesignDF(object=pdxe, model.id="X-6047.16")
 }
 
