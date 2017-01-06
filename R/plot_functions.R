@@ -32,7 +32,7 @@ setMethod( f=plotDrugResponse,
                                control=TRUE)
            {
 
-             allExpIds = getExperimentIds(object, drug=drug, drug.match.exact=drug.match.exact,
+             allExpIds = selectModelIds(object, drug=drug, drug.match.exact=drug.match.exact,
                                      tumor.type=tumor.type)
 
              if(length(allExpIds)==0)
@@ -40,9 +40,10 @@ setMethod( f=plotDrugResponse,
 
              #allExpIds = allExpIds[1:3]
 
-             allExpModIds = mapModelSlotIds(object, id=allExpIds, id.name="experiment.id", map.to="model.id")
+             #allExpModIds = mapModelSlotIds(object, id=allExpIds, id.name="experiment.id", map.to="model.id")
+             #allBatchIds = c(unlist(sapply(allExpModIds$model.id, function(x) getBatchName(object, x))))
 
-             allBatchIds = c(unlist(sapply(allExpModIds$model.id, function(x) getBatchName(object, x))))
+             allBatchIds = unlist(sapply(allExpIds, function(x) getBatchName(object, x)))
 
              expDesign2plt = lapply(allBatchIds, function(x) expDesignInfo(object)[[x]])
 
@@ -55,7 +56,7 @@ setMethod( f=plotDrugResponse,
              for(en in batchNames)
              {
 
-               dx = getTimeVarData(object, expDesign2plt[[en]], var = "volume", collapse=TRUE)
+               dx = getTimeVarData(object, expDesign2plt[[en]], var = "volume")
 
                DFlstx[[en]] = .addColorPchLty(dx, colVec[en], treatment.lty="solid", control.lty="dashed")
              }
@@ -130,7 +131,7 @@ NewPlotFunction <- function(DF, drug.join.name)
   rtx = list()
   for(I in 1:nrow(DFx))
   {
-    expData = getExperiment(object, experiment.id= DFx[I, "experiment.id"])
+    expData = getExperiment(object, model.id= DFx[I, "model.id"])
     expData$batch.name= DFx[I, "batch.name"]
     expData$exp.type  = DFx[I, "exp.type"]
     rtx = .appendToList(rtx, expData)

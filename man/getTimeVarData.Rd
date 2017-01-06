@@ -2,25 +2,32 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{getTimeVarData}
 \alias{getTimeVarData}
-\title{Given a model.id it will return a data.fram of experiemt design}
+\title{Get time vs volume data with standard error}
 \usage{
-getTimeVarData(object, ExpDesign, var, collapse)
+getTimeVarData(object, ExpDesign, var = "volume")
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
 \item{ExpDesign}{A list with batch.name, treatment and control}
+
+\item{var}{Name of the variable, default \code{volume}}
 }
 \value{
 a \code{data.fram} with treatment, control and batch.name
 }
 \description{
-Given a model.id it will return a data.fram of experiemt design
+Given a batch (treatment and control model ids)
+it will return a data.fram with time vs volume (or any other variable)
+with standard error calculated. Note that this function do not check if
+model.id in given batch belongs to same patient or biobase id
+Note: Write a function to check integrity of a batch
 }
 \examples{
 data(pdxe)
-# extract controls for a given model.id
-ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
-getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
+# creat a experiment desing
+ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98", "X.010.BG98"), control=c("X.010.uned"))
+df = getTimeVarData(object=pdxe, ExpDesign, var = "volume")
+
 }
 

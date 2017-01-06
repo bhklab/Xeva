@@ -3,10 +3,10 @@ summaryData <- function(pdxe)
 {
   ##----------------------------
   totalExp = length(pdxe@experiment)
-  controlName = sapply(pdxe@experiment, function(x){if(x$exp.type=="control"){return(x$experiment.id)}else{return(NA)}})
+  controlName = sapply(pdxe@experiment, function(x){if(x$exp.type=="control"){return(x$model.id)}else{return(NA)}})
   controlName = controlName[!is.na(controlName)]
 
-  treatmentName = sapply(pdxe@experiment, function(x){if(x$exp.type=="treatment"){return(x$experiment.id)}else{return(NA)}})
+  treatmentName = sapply(pdxe@experiment, function(x){if(x$exp.type=="treatment"){return(x$model.id)}else{return(NA)}})
   treatmentName = treatmentName[!is.na(treatmentName)]
 
 

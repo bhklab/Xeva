@@ -2,8 +2,7 @@
 % Please edit documentation in R/access_slot_model.R
 \name{mapModelSlotIds}
 \alias{mapModelSlotIds}
-\title{map one id type to another in model slot
-model.id given a "biobase.id" or "patient id" or any other id that is a column in model slot}
+\title{Map ids of model slot}
 \usage{
 mapModelSlotIds(object, id, id.name, map.to)
 }
@@ -20,8 +19,8 @@ mapModelSlotIds(object, id, id.name, map.to)
 a \code{data.fram} with id and mapped id
 }
 \description{
-map one id type to another in model slot
-model.id given a "biobase.id" or "patient id" or any other id that is a column in model slot
+Map one id type to another in model slot.
+For example map a model.id to biobase.id
 }
 \examples{
 data(pdxe)

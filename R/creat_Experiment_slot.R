@@ -1,6 +1,12 @@
 ##to for datafram to Exp slot
 
-creatListFromDF <- function(exp.mod.dg)
+
+
+
+
+
+
+creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 {
   rtx = list()
   exp.mod.dg <- data.frame(lapply(exp.mod.dg, as.character), stringsAsFactors=FALSE)
@@ -19,7 +25,8 @@ creatListFromDF <- function(exp.mod.dg)
 
   rtx$drug = drug
 
-  ##--- elements with unique function -----------------
+  ##--- elements with unique function ----------------------------------------------
+  ## except formula we do not need this infromation so remove it
   eleUnq = c("formula", "tumor.type", "batch", "exp.type")
   for (u in eleUnq)
   {
@@ -34,16 +41,11 @@ creatListFromDF <- function(exp.mod.dg)
       }
     }
   }
-
-  #if(!is.null(rtx$exp.type) & !is.element(rtx$exp.type, c("control", "treatment")))
-  #{
-  #  msg = sprintf("For model.id %s and drug %s, exp.type should be control OR treatment
-  #                it is %s\n", rtx$model.id, rtx$drug$join.name, rtx$exp.type)
-  #  stop(msg)
-  #}
+  ##---------------------------------------------------------------------------------
 
   doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
-  dataColName = c("time", "volume", "width","length", doseColsNames, "body.weight", "date")
+  dataColName = c("time", "volume", "width","length",
+                  doseColsNames, "body.weight", "date", "comment")
   for (w in dataColName)
   {
       if(is.element(w, colnames(exp.mod.dg))==FALSE)
@@ -68,17 +70,35 @@ creatListFromDF <- function(exp.mod.dg)
   rtxData = BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
   rtx$data= rtxData
+
+  ###--------- add extra information --------------------------------------------------------
+  #if(!is.null(extraCol))
+  #{  }
+
   return(rtx)
 }
 
 
-#' @export
+###----- define standard column names -----------
+getColumnsDF <- function()
+{
+  standCol = c("model.id", "drug", "time", "volume", "width","length",
+               "date", "body.weight","formula")
+
+  requredCols = c("model.id", "time", "volume", "drug")
+  rtz = list(standCol=standCol,requredCols=requredCols)
+  return(rtz)
+}
+
+
+## @export
 experimentSlotfromDf <- function(experiment)
 {
-  response = "volume" ## Default response colomn
+  clnm = getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
+
   drugColsName = colnames(experiment)[grep("drug",colnames(experiment))]
 
-  requredCols = c("model.id", "time", response, drugColsName)
+  requredCols = c("model.id", "time", "volume", drugColsName)
   colAbsent = setdiff(requredCols, colnames(experiment))
   if(length(colAbsent)>0)
   {
@@ -98,7 +118,7 @@ experimentSlotfromDf <- function(experiment)
 
   doseColsName = colnames(experiment)[grep("dose",colnames(experiment))]
   standardCols = c(requredCols, doseColsName, "width","length", "date", "time",
-                   "formula", "body.weight" ) #, "tumor.type", "batch", "exp.type")
+                   "formula", "body.weight", "comment" )
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
@@ -119,21 +139,29 @@ experimentSlotfromDf <- function(experiment)
 
   ##------- if drug names are already in drug1 + drug2 split them ----------
 
-  expSlot = list()
+
   u.modDrg.id = unique(experiment[, c("model.id", "drug")])
   if(any(is.na(u.modDrg.id$model.id)))
   { stop("model.id is NA") }
 
-  if(any(is.na(u.modDrg.id$drug)))
-  { stop("drug is NA") }
+  mdup = u.modDrg.id$model.id[duplicated(u.modDrg.id$model.id)]
+  if(length(mdup)>0)
+  {
+    msg = sprintf("Duplicated model.id\n%s\nuse different model.id for different drugs\n", paste(mdup, collapse = "\n"))
+    stop(msg)
+  }
 
+  #if(any(is.na(u.modDrg.id$drug)))
+  #{ stop("drug is NA") }
+
+  expSlot = list()
   for (i in 1:dim(u.modDrg.id)[1])
   {
     exp.mod.dg = subset(experiment,
                      experiment$model.id== u.modDrg.id[i, "model.id"] &
                      experiment$drug == u.modDrg.id[i, "drug"] )
 
-    expSlot[[i]] = creatListFromDF(exp.mod.dg)
+    expSlot[[i]] = creatListFromDF(exp.mod.dg, extraCol=extraCol)
   }
 
   mod.ids = unlist(sapply(expSlot , "[[" , "model.id" ))
@@ -143,9 +171,11 @@ experimentSlotfromDf <- function(experiment)
     stop(msg)
   }
 
-  expNames = make.unique(unlist(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} )), sep="_")
-  for(i in 1:length(expSlot))
-  { expSlot[[i]][["experiment.id"]] = expNames[i] }
+  #expNames = make.unique(unlist(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} )), sep="_")
+  #for(i in 1:length(expSlot))
+  #{ expSlot[[i]][["experiment.id"]] = expNames[i] }
+
+  expNames = unlist(sapply(expSlot, "[[", "model.id"))
   names(expSlot) = expNames
 
   return(expSlot)
