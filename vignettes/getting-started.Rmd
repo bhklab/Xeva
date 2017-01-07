@@ -14,61 +14,52 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Load Xeva
-Load Xeva library and data
-
-```{r, echo=TRUE}
+Load Xeva library and data.
+```{r load, echo=TRUE}
 library(Xeva)
-data(pdxe)
+cdf = readRDS("~/CXP/Xeva/DATA-raw/celineData.Rds")
+head(ModelInfo(cdf))
 ```
 
-## Access experiment slot
-
-Get all model.id for which drug "paclitaxel" was used and tumor.type is "BRCA"
+Models which belongs to same batch are in one list which is stored in expDesign slot. For example
 ```{r, echo=TRUE}
-#modelIds = getModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
-#print(modelIds)
-df = getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
-head(df)
+print(cdf@expDesign[[1]]) 
 ```
 
-To get the data for a model id 
+To calculate angle between the treatment and control samples of this batch
 ```{r, echo=TRUE}
-df = getExperiment(pdxe, experiment.id="X.1004.pael.paclitaxel")
-head(df)
+batch = cdf@expDesign[[1]]
+ang = calculateAngle(cdf, batch, plot=TRUE)
+print(ang)
 ```
 
 
-To get all mode
+<!-- \pagebreak -->
 
 
 
-\pagebreak
 
-```{r, echo=TRUE}
-library(Xeva)
-data("celineData")
-head(ModelInfo(lpdx))
-```
+<!-- This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. -->
+
+<!-- When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this: -->
+
+<!-- ```{r cars} -->
+<!-- summary(cars) -->
+<!-- ``` -->
 
 
+<!-- ```{r cars2} -->
+<!-- summary(cars) -->
+<!-- ``` -->
+<!-- ## Including Plots -->
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+<!-- You can also embed plots, for example: -->
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+<!-- ```{r pressureX, , include=TRUE, echo=FALSE} -->
+<!-- plot(pressure) -->
+<!-- ``` -->
 
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressureX, , include=TRUE, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+<!-- Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. -->
 
 
 
