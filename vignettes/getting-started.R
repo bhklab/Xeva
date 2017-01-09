@@ -11,7 +11,7 @@ print(batchNames(cdf))
 
 ## ---- echo=TRUE----------------------------------------------------------
 batchNames = batchNames(cdf)
-expDesign  = expDesign(cdf, batchNames[3])
+expDesign  = expDesign(cdf, batchNames[4])
 ang = calculateAngle(cdf, expDesign, plot=TRUE)
 print(ang)
 
