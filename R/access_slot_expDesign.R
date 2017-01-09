@@ -37,6 +37,284 @@ setMethod( f="expDesignInfo<-",
 
 
 ##-------------------------------------------------------------------------------------
+#' Get all batch names
+#'
+#' Get all batch.name from a Xeva dataset
+#' @examples
+#' data(pdxe)
+#' batchNames(pdxe)
+#' @param object The \code{XevaSet} to replace drug info in
+#' @return A \code{Vector} with all batch.name
+setGeneric(name= "batchNames", def = function(object) {standardGeneric("batchNames")} )
+
+#' @export
+setMethod( f="batchNames",
+           signature=c(object = "XevaSet"),
+           definition=function(object)
+           {
+             rtx = unlist(sapply(object@expDesign, "[[", "batch.name"))
+             return(rtx)
+           } )
+
+#' Given a batch.name get batch
+#'
+#' Given a batch.name get batch from a Xeva dataset
+#' @examples
+#' data(pdxe)
+#' expDesign(pdxe, batch.name = "X-6047.paclitaxel")
+#' @param object The \code{XevaSet}
+#' @param object The \code{batch.name}
+#' @return A \code{Vector} with all batch.name
+setGeneric(name= "expDesign", def = function(object, batch.name) {standardGeneric("expDesign")} )
+
+#' @export
+setMethod( f="expDesign",
+           signature=c(object = "XevaSet"),
+           definition=function(object, batch.name)
+           {
+             sapply(object@expDesign, function(x){x$batch.name == batch.name})
+             for(x in object@expDesign)
+             {
+               if(x$batch.name == batch.name)return(x)
+             }
+             #return(NULL) ##by default will return NULL
+           } )
+
+##-------------------------------------------------------------------------------------
+##-------------------------------expDesign sanity check -------------------------------
+
+.checkDrugNameSame <- function(inLst)
+{
+  Tdfx = do.call(rbind, inLst)
+  drgNames = c(unique(Tdfx$drug.join.name))
+  if(length(drgNames)>1)
+  {
+    txt = sprintf("You are collapsing experiment with different drug. Drug used are:\n%s\n",
+                  paste(drgNames, collapse = "\n"))
+    warning(txt)
+    drgNamesX = paste(drgNames, collapse = " OR ")
+  } else{drgNamesX =drgNames[1]}
+
+  return(drgNamesX)
+}
+
+.checkPatientIDSame <- function(inLst)
+{
+  Tdfx = do.call(rbind, inLst)
+  pid = c(unique(Tdfx$patient.id))
+  if(length(pid)>1)
+  {
+    txt = sprintf("You are collapsing togather experiment from different patients. Patient ids are:\n%s\n",
+                  paste(pid, collapse = "\n"))
+    warning(txt)
+    pidX = paste(pid, collapse = " OR ")
+  } else{pidX = pid[1]}
+
+  return(pidX)
+}
+
+.sanityCheckExpDesign <- function(object, expDesign)
+{
+  if(length(expDesign$control)==0 & length(expDesign$treatment)==0)
+  {stop("Error Treatmetn and Control are missing in expDesign!")}
+
+
+  if(length(expDesign$treatment)>0)
+  {
+    tr = lapply(expDesign$treatment, function(x){getExperiment(object, model.id=x)})
+    trx= .rbindListOfDataframs(tr)
+
+    drgNamesTr = unique(trx$drug.join.name)
+    if(length(drgNamesTr)>1)
+    {
+
+      msg = sprintf("For batch.name = %s drug names in treatment is not same. Drug names are:\n%s\n",
+                    expDesign$batch.name, paste(drgNamesTr, collapse = "\n"))
+      warning(msg)
+    }
+
+
+    patient.idx = mapModelSlotIds(object, id=trx$model.id, id.name="model.id", map.to="patient.id")
+    trx = merge(trx, patient.idx, by.x = "model.id", by.y = "model.id")
+    patName= unique(trx$patient.id)
+    if(length(patName)>1)
+    {
+      msg = sprintf("For batch.name = %s patient.id in treatment are not same. patient.id are:\n%s\n",
+                    expDesign$batch.name, paste(patName, collapse = "\n"))
+      warning(msg)
+    }
+  }
+
+  if(length(expDesign$control)>0)
+  {
+    cr = lapply(expDesign$control, function(x){getExperiment(object, model.id=x)})
+    crx= .rbindListOfDataframs(cr)
+
+    drgNamesCr = unique(crx$drug.join.name)
+    if(length(drgNamesCr)>1)
+    {
+      msg = sprintf("For batch.name = %s drug name in control is not same. Drug names are:\n%s\n",
+                    expDesign$batch.name, paste(drgNamesTr, collapse = "\n"))
+      warning(msg)
+    }
+
+    patient.idx = mapModelSlotIds(object, id=crx$model.id, id.name="model.id", map.to="patient.id")
+    trx = merge(crx, patient.idx, by.x = "model.id", by.y = "model.id")
+    patName= unique(crx$patient.id)
+    if(length(patName)>1)
+    {
+      msg = sprintf("For batch.name = %s patient.id in control are not same. patient.id are:\n%s\n",
+                    expDesign$batch.name, paste(patName, collapse = "\n"))
+      warning(msg)
+    }
+  }
+
+}
+
+
+
+
+
+##-------------------------------------------------------------------------------------
+##-------------------------------------------------------------------------------------
+#' Get controls for a given model.id
+#'
+#' Get controls for a given model.id.
+#' If no control found it will return NULL
+#'
+#' @examples
+#' data(pdxe)
+#' # extract controls for a given model.id
+#' getControls(object=pdxe, model.id="X.1655.LE11.biib")
+#' # if no control found it will return NULL
+#' getControls(object=pdxe, model.id="X.1655.uned")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#' @return a \code{vector} with control model.id
+setGeneric(name = "getControls", def = function(object, model.id) {standardGeneric("getControls")} )
+
+#' @export
+setMethod( f=getControls,
+           signature="XevaSet",
+           definition= function(object,model.id)
+           {
+             rtx = list()
+             for(ed in object@expDesign)
+             {
+               if(is.element(model.id, ed$treatment))
+               { rtx = .appendToList(rtx, ed$control) }
+             }
+             return(unlist(rtx))
+           })
+
+
+#' Get treatment for a given model.id
+#'
+#' Get treatment for a given model.id.
+#' If no treatment found it will return NULL
+#' @examples
+#' data(pdxe)
+#' # extract treatment model.id for a given model.id
+#' getTreatment(object=pdxe, model.id="X.1655.uned")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#' @return a \code{vector} with treatment model.id
+setGeneric(name = "getTreatment", def = function(object, model.id) {standardGeneric("getTreatment")} )
+
+#' @export
+setMethod( f=getTreatment,
+           signature="XevaSet",
+           definition= function(object,model.id)
+           {
+             rtx = list()
+             for(ed in object@expDesign)
+             {
+               if(is.element(model.id, ed$control))
+               { rtx = .appendToList(rtx, ed$treatment) }
+             }
+             return(unlist(rtx))
+           })
+
+
+#' Get batch.name for a given model.id
+#'
+#'
+#' Get batch.name for a given model.id.
+#' If no batch.name found it will return NULL
+#' @examples
+#' data(pdxe)
+#' # extract batch.name for a given model.id
+#' getBatchName(object=pdxe, model.id="X.1655.uned")
+#' getBatchName(object=pdxe, model.id="X.010.fiab")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id} for which batch name required
+#' @return a \code{vector} with all batch names
+setGeneric(name = "getBatchName", def = function(object, model.id){standardGeneric("getBatchName")} )
+
+#' @export
+setMethod( f=getBatchName,
+           signature="XevaSet",
+           definition= function(object,model.id)
+           {
+             rtx = list()
+             for(ed in object@expDesign)
+             {
+               if(is.element(model.id, ed$treatment) | is.element(model.id, ed$control))
+               { rtx = .appendToList(rtx, ed$batch.name) }
+             }
+             return(unlist(rtx))
+           })
+
+
+
+
+.getModelIdIndexInExpDesign<- function(object, model.id)
+{
+  cntrL = c(); tretL = c()
+  for(i in 1:length(object@expDesign))
+  {
+    ed = object@expDesign[[i]]
+    if(is.element(model.id, ed$control))
+    { cntrL = c(cntrL, i) }
+
+    if(is.element(model.id, ed$treatment))
+    { tretL = c(cntrL, i) }
+  }
+  return(list(control.indx=cntrL, treat.indx=tretL))
+}
+
+#' Get experiment type (treatment or control) for a given model.id
+#'
+#' @examples
+#' data(pdxe)
+#' # get experiment type for model.id
+#' experimentType(object=pdxe, model.id="X.1655.LE11.biib")
+#' experimentType(object=pdxe, model.id="X.1655.uned")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#' @return returns \code{treatment} or \code{control}
+setGeneric(name = "experimentType", def = function(object, model.id) {standardGeneric("experimentType")} )
+
+#' @export
+setMethod( f=experimentType,
+           signature="XevaSet",
+           definition= function(object,model.id)
+           {
+             ct.indx = .getModelIdIndexInExpDesign(object, model.id)
+             if(length(ct.indx$control.indx)>0 & length(ct.indx$treat.indx)==0)
+             {return("control")}
+
+             if(length(ct.indx$control.indx)==0 & length(ct.indx$treat.indx)>0)
+             {return("treatment")}
+
+             if(length(ct.indx$control.indx)>0 & length(ct.indx$treat.indx)>0)
+             {return("control and treatment")}
+             return(NA)
+           })
+
+
+
+##-------------------------------------------------------------------------------------
 ##-------------------------------------------------------------------------------------
 ## get ExpDesign Slot DF
 #' Given a model.id it will return a data.fram of experiemt design
@@ -95,36 +373,7 @@ setMethod( f=getExpDesignDF,
 }
 
 
-.checkDrugNameSame <- function(inLst)
-{
-  ##----- add drug.join.name -------------
-  Tdfx = do.call(rbind, inLst)
-  drgNames = c(unique(Tdfx$drug.join.name))
-  if(length(drgNames)>1)
-  {
-    txt = sprintf("You are collapsing experiment with different drug. Drug used are:\n%s\n",
-                  paste(drgNames, collapse = "\n"))
-    warning(txt)
-    drgNamesX = paste(drgNames, collapse = " OR ")
-  } else{drgNamesX =drgNames[1]}
 
-  return(drgNamesX)
-}
-
-.checkPatientIDSame <- function(inLst)
-{
-  Tdfx = do.call(rbind, inLst)
-  pid = c(unique(Tdfx$patient.id))
-  if(length(pid)>1)
-  {
-    txt = sprintf("You are collapsing togather experiment from different patients. Patient ids are:\n%s\n",
-                  paste(pid, collapse = "\n"))
-    warning(txt)
-    pidX = paste(pid, collapse = " OR ")
-  } else{pidX = pid[1]}
-
-  return(pidX)
-}
 
 ## get time vs volume data with standard error
 #'
@@ -180,7 +429,6 @@ setMethod( f=getTimeVarData,
              return(rdf)
            })
 
-
 .getExperimentMultipalIDs <- function(object, mids)
 {
   rtx = list()
@@ -191,150 +439,6 @@ setMethod( f=getTimeVarData,
   }
   return(rtx)
 }
-
-
-
-
-
-
-
-
-
-##-------------------------------------------------------------------------------------
-##-------------------------------------------------------------------------------------
-#' Extract controls for a given model.id
-#' If no control found it will return NULL
-#'
-#' @examples
-#' data(pdxe)
-#' # extract controls for a given model.id
-#' getControls(object=pdxe, model.id="X.1655.LE11.biib")
-#' # if no control found it will return NULL
-#' getControls(object=pdxe, model.id="X.1655.uned")
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return a \code{vector} with control model.id
-setGeneric(name = "getControls", def = function(object, model.id) {standardGeneric("getControls")} )
-
-#' @export
-setMethod( f=getControls,
-           signature="XevaSet",
-           definition= function(object,model.id)
-           {
-             rtx = list()
-             for(ed in object@expDesign)
-             {
-               if(is.element(model.id, ed$treatment))
-               { rtx = .appendToList(rtx, ed$control) }
-             }
-            return(unlist(rtx))
-            })
-
-
-#' Extract treatment for a given model.id
-#'
-#' @examples
-#' data(pdxe)
-#' # extract treatment model.id for a given model.id
-#' getTreatment(object=pdxe, model.id="X.1655.uned")
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return a \code{vector} with treatment model.id
-setGeneric(name = "getTreatment", def = function(object, model.id) {standardGeneric("getTreatment")} )
-
-#' @export
-setMethod( f=getTreatment,
-           signature="XevaSet",
-           definition= function(object,model.id)
-           {
-             rtx = list()
-             for(ed in object@expDesign)
-             {
-               if(is.element(model.id, ed$control))
-               { rtx = .appendToList(rtx, ed$treatment) }
-             }
-             return(unlist(rtx))
-           })
-
-
-#' Extract batch.name for a given model.id
-#'
-#' @examples
-#' data(pdxe)
-#' # extract batch.name for a given model.id
-#' getBatchName(object=pdxe, model.id="X.1655.uned")
-#' getBatchName(object=pdxe, model.id="X.010.fiab")
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id} for which batch name required
-#' @return a \code{vector} with all batch names
-setGeneric(name = "getBatchName", def = function(object, model.id){standardGeneric("getBatchName")} )
-
-#' @export
-setMethod( f=getBatchName,
-           signature="XevaSet",
-           definition= function(object,model.id)
-           {
-             rtx = list()
-             for(ed in object@expDesign)
-             {
-               if(is.element(model.id, ed$treatment) | is.element(model.id, ed$control))
-               { rtx = .appendToList(rtx, ed$batch.name) }
-             }
-             return(unlist(rtx))
-           })
-
-
-
-
-.getModelIdIndexInExpDesign<- function(object, model.id)
-{
-  cntrL = c(); tretL = c()
-  for(i in 1:length(object@expDesign))
-  {
-    ed = object@expDesign[[i]]
-    if(is.element(model.id, ed$control))
-    { cntrL = c(cntrL, i) }
-
-    if(is.element(model.id, ed$treatment))
-    { tretL = c(cntrL, i) }
-  }
-  return(list(control.indx=cntrL, treat.indx=tretL))
-}
-
-#' Get experiment type (treatment or control) for a given model.id
-#'
-#' @examples
-#' data(pdxe)
-#' # get experiment type for model.id
-#' experimentType(object=pdxe, model.id="X.1655.LE11.biib")
-#' experimentType(object=pdxe, model.id="X.1655.uned")
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
-#' @return returns \code{treatment} or \code{control}
-setGeneric(name = "experimentType", def = function(object, model.id) {standardGeneric("experimentType")} )
-
-###------- don't look in pdxe@experiment slot -----------
-###------- use always pdxe@expDesign slot ---------------
-#' @export
-setMethod( f=experimentType,
-           signature="XevaSet",
-           definition= function(object,model.id)
-           {
-             ct.indx = .getModelIdIndexInExpDesign(object, model.id)
-             if(length(ct.indx$control.indx)>0 & length(ct.indx$treat.indx)==0)
-             {return("control")}
-
-             if(length(ct.indx$control.indx)==0 & length(ct.indx$treat.indx)>0)
-             {return("treatment")}
-
-             if(length(ct.indx$control.indx)>0 & length(ct.indx$treat.indx)>0)
-             {return("control and treatment")}
-             return(NA)
-           })
-
-
-
-
 
 
 ###-------------------------------------------------------------------------------------

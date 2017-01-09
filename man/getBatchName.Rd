@@ -2,7 +2,7 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{getBatchName}
 \alias{getBatchName}
-\title{Extract batch.name for a given model.id}
+\title{Get batch.name for a given model.id}
 \usage{
 getBatchName(object, model.id)
 }
@@ -15,7 +15,8 @@ getBatchName(object, model.id)
 a \code{vector} with all batch names
 }
 \description{
-Extract batch.name for a given model.id
+Get batch.name for a given model.id.
+If no batch.name found it will return NULL
 }
 \examples{
 data(pdxe)
