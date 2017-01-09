@@ -2,11 +2,10 @@ Xeva
 
 Integration of molecular and pharmacological profiles of patient-derived models
 
-How to install:
-
-At present there are 2 ways to use/test Xeva:
+How to install: At present there are 3 ways to use/test Xeva:
 
 1. Download zip file from Xeva github page. Unzip it. and install 
+    library(devtools)
     install("Xeva-master")
 
 2. Using install_github : To do this you will required devtools. Install devtools in R as:
@@ -24,10 +23,6 @@ At present there are 2 ways to use/test Xeva:
     It will install Xeva to your system. 
 
 
-3. Other way to use Xeva is to copy the Xeva as R project on your local machine. 
-    On the Xeva github page click on the 
+3. Clone the Xeva repo on your local system. Open the Xeva.Rproj in Rstudio. Click on the Build and then Build and Reload in Rstudio.
 
 
-To install Xeva 
-Download the zip
-https://github.com/bhklab/Xeva/archive/master.zip
