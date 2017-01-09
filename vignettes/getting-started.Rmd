@@ -23,13 +23,14 @@ head(ModelInfo(cdf))
 
 Models which belongs to same batch are in one list which is stored in expDesign slot. For example
 ```{r, echo=TRUE}
-print(cdf@expDesign[[1]]) 
+print(batchNames(cdf)) 
 ```
 
 To calculate angle between the treatment and control samples of this batch
 ```{r, echo=TRUE}
-batch = cdf@expDesign[[1]]
-ang = calculateAngle(cdf, batch, plot=TRUE)
+batchNames = batchNames(cdf)
+expDesign  = expDesign(cdf, batchNames[4])
+ang = calculateAngle(cdf, expDesign, plot=TRUE)
 print(ang)
 ```
 

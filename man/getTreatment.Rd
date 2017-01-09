@@ -2,7 +2,7 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{getTreatment}
 \alias{getTreatment}
-\title{Extract treatment for a given model.id}
+\title{Get treatment for a given model.id}
 \usage{
 getTreatment(object, model.id)
 }
@@ -15,7 +15,8 @@ getTreatment(object, model.id)
 a \code{vector} with treatment model.id
 }
 \description{
-Extract treatment for a given model.id
+Get treatment for a given model.id.
+If no treatment found it will return NULL
 }
 \examples{
 data(pdxe)

@@ -1,35 +1,4 @@
-#
-# creatExperimentDesign <- function(expSlot)
-# {
-#
-#   expModDrg = lapply(expSlot, function(x){ c(x$experiment.id, x$model.id, x$drug$join.name, x$batch, x$exp.type)})
-#   expModDrg = as.data.frame(do.call(rbind, expModDrg), stringsAsFactors = FALSE)
-#   colnames(expModDrg) = c("experiment.id", "model.id", "drug.join.name", "batch", "exp.type")
-#
-#   dxBat = as.data.frame(table(expModDrg[expModDrg$exp.type=="treatment", c("drug.join.name", "batch") ]))
-#   dxBat = dxBat[dxBat$Freq>0, ]
-#
-#   rtx=list()
-#
-#   for(I in 1:dim(dxBat)[1])
-#   {
-#
-#     Lx = list(batch = as.character(dxBat[I, "batch"]))
-#     modBatchx = expModDrg[expModDrg$batch == Lx$batch, ]
-#     Lx$control = as.character(modBatchx[modBatchx$exp.type=="control",  "model.id"] )
-#
-#     Lx$drug.join.name = as.character(dxBat[I, "drug.join.name"])
-#     Lx$treatment = as.character(modBatchx[modBatchx$exp.type=="treatment" &
-#                                             modBatchx$drug.join.name==Lx$drug.join.name, "model.id"])
-#
-#
-#     #namx = sprintf("%s.%s", Lx$drug.join.name, Lx$batch) ##-- no need for name here
-#     namx = length(rtx)+1
-#     rtx[[namx]]= Lx
-#   }
-#   rtx = .checkExperimentDesign(rtx)
-#   return(rtx)
-# }
+
 
 
 .checkExperimentDesign<- function(expDesign)

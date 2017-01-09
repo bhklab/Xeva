@@ -7,10 +7,11 @@ cdf = readRDS("~/CXP/Xeva/DATA-raw/celineData.Rds")
 head(ModelInfo(cdf))
 
 ## ---- echo=TRUE----------------------------------------------------------
-print(cdf@expDesign[[1]]) 
+print(batchNames(cdf)) 
 
 ## ---- echo=TRUE----------------------------------------------------------
-batch = cdf@expDesign[[1]]
-ang = calculateAngle(cdf, batch, plot=TRUE)
+batchNames = batchNames(cdf)
+expDesign  = expDesign(cdf, batchNames[3])
+ang = calculateAngle(cdf, expDesign, plot=TRUE)
 print(ang)
 
