@@ -81,13 +81,6 @@ setMethod( f=mapModelSlotIds,
                if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
                rtd = unique(rtd)
              }
-
-             # if(unique!=TRUE)
-             # {
-             #   idDF = data.frame(id=id); colnames(idDF)=id.name
-             #   rtd = merge(x=idDF, y=rtd, by.x=id.name, by.y=id.name)
-             # }
-
              return(rtd)
            })
 
