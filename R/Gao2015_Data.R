@@ -41,15 +41,6 @@ experimentX$model.id = apply(experimentX, 1, function(x){ modTr[modTr$Model== x[
                                                                   modTr$Treatment== x["Treatment"], "model.id"] })
 
 ##-------------------------------------------------------------------------
-#modTr = unique(experimentX[, c("Model", "Treatment")])
-#mid = lapply( unique(modTr$Model), function(x){
-#                                   mx = modTr[modTr$Model==x, "Model"]
-#                                   paste(mx, 1:length(mx), sep=".")})
-#
-#modTr$model.id = unlist(mid)
-#experimentX$model.id = apply(experimentX, 1, function(x){ modTr[modTr$Model== x["Model"] &
-#                                                                modTr$Treatment== x["Treatment"], "model.id"] })
-
 
 experiment = data.frame(model.id = experimentX$model.id,
                         drug.1 = experimentX$Treatment.1,
@@ -155,6 +146,41 @@ saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 
 
 }
+
+
+read_curveMetrics <- function()
+{
+
+  rd = readRDS("~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_raw_data.Rda")
+  rdv = unique(rd[, c("Model","Tumor.Type")])
+  #naModID = dzv[is.na(dzv$Tumor.Type), "Model"]
+  #dzv[dzv$Model%in%naModID,]
+  ##--- remove NA
+  rdv = rdv[!is.na(rdv$Tumor.Type),]
+  ##--- read and merge the curve matrix ---------------------------------------
+  fl = "~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_curve_metrics.Rda"
+  cvm = readRDS(fl)
+
+  cvm = merge(cvm, rdv, by.x = "Model", by.y = "Model")
+  pubLung = unique(cvm[cvm$Tumor.Type=="NSCLC", c("Model","Treatment")])
+  table(pubLung$Treatment)
+
+  data(pdxe)
+  dfx = getmRECIST(pdxe)
+  dfMap = mapModelSlotIds(object=pdxe, id=dfx$model.id, id.name="model.id",
+                          map.to="tumor.type", unique=TRUE)
+
+  dfx = merge(dfx, dfMap, by.x = "model.id", by.y = "model.id")
+  lungDf = dfx[dfx$tumor.type=="NSCLC",]
+
+  pubLung[!(pubLung$Model %in% lungDf$biobase.id),]
+
+  lungDf[!(lungDf$biobase.id %in% pubLung$Model), "biobase.id"]
+
+}
+
+
+
 
 
 creatXevaObject <- function()

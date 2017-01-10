@@ -117,8 +117,13 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 .sortPlotMat <- function(mat, controlD =NA, control.col="green", drug.col="black")
 {
+  ##-------first sort by NA -----------------------------------
+  rowNa = apply(mat, 1, function(x)sum(is.na(x)))
+  colNa = apply(mat, 2, function(x)sum(is.na(x)))
+  mat = mat[names(sort(rowNa)), names(sort(colNa))]
+  ##------------------------------------------------------------
   rwNM = rownames(mat); clNm = colnames(mat)
-  rwNM = sort(rwNM); clNm = sort(clNm)
+  #rwNM = sort(rwNM); clNm = sort(clNm)
 
   ##---------for row ------------------------------------------
   controlD =c(controlD)
@@ -153,10 +158,16 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @examples
 #' data(pdxe)
 #' df = getmRECIST(pdxe)
-#' df = df[1:500,]
-#' plotmRECIST(df,groupBy = "biobase.id", control.name = "untreated")
+#' ## add tumor.type information
+#' dfMap = mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id",
+#'                                 map.to="tumor.type", unique=FALSE)
+#' df$tumor.type = dfMap$tumor.type
+#' ## select only lung cancer models
+#' lungDf = df[df$tumor.type=="NSCLC",]
+#' plotmRECIST(lungDf, groupBy = "biobase.id", control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
+#' @import grid
 plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
 {
 
@@ -165,7 +176,9 @@ plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
   matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
   mat = as.matrix(matRC$mat)
 
-  colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
+  #mat = sortByNa(mat)
+  #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
+  colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
   bgCol = rep(backgroundCol, length(nameSpc))
@@ -189,9 +202,7 @@ plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
   colVec = unlist(colPalette)[names(colPalette)]
   HLeg = legendGrob(names(colPalette), pch=22,
                     gp=gpar(col = colVec, fill = colVec))
-  #pdf(file="DATA-raw/mRECIST_plot.pdf", width=12, height=9)
   draw(pltX, heatmap_legend_list = list(HLeg), padding = unit(c(10, 10, 10, 10), "mm"))
-  #dev.off()
 }
 
 

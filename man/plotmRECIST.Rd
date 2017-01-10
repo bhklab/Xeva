@@ -22,7 +22,12 @@ Plot mRECIST for models and drugs
 \examples{
 data(pdxe)
 df = getmRECIST(pdxe)
-df = df[1:500,]
-plotmRECIST(df,groupBy = "biobase.id", control.name = "untreated")
+## add tumor.type information
+dfMap = mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id",
+                                map.to="tumor.type", unique=FALSE)
+df$tumor.type = dfMap$tumor.type
+## select only lung cancer models
+lungDf = df[df$tumor.type=="NSCLC",]
+plotmRECIST(lungDf, groupBy = "biobase.id", control.name = "untreated")
 }
 

@@ -4,7 +4,7 @@
 \alias{mapModelSlotIds}
 \title{Map ids of model slot}
 \usage{
-mapModelSlotIds(object, id, id.name, map.to = "all", unique = TRUE)
+mapModelSlotIds(object, id, id.name, map.to = "all")
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
