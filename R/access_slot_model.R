@@ -62,13 +62,14 @@ setMethod( f="ModelInfo<-",
 #' @param id The \code{id}
 #' @param id.name The \code{id} name
 #' @param map.to The name of the mapped id. Default \code{all}
+#' @param unique Default \code{TRUE}. If unique=FALSE output will be mapped to input
 #' @return a \code{data.fram} with id and mapped id
-setGeneric(name = "mapModelSlotIds", def = function(object, id, id.name, map.to="all") {standardGeneric("mapModelSlotIds")})
+setGeneric(name = "mapModelSlotIds", def = function(object, id, id.name, map.to="all",unique=TRUE) {standardGeneric("mapModelSlotIds")})
 
 #' @export
 setMethod( f=mapModelSlotIds,
            signature=c(object="XevaSet"),
-           definition= function(object, id, id.name, map.to="all")
+           definition= function(object, id, id.name, map.to="all", unique=TRUE)
            {
              id = c(id)
              .checkIfColPresentinModel(object, id.name)
@@ -81,11 +82,11 @@ setMethod( f=mapModelSlotIds,
                if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
                rtd = unique(rtd)
              }
+
+             if(unique==FALSE)
+             { rtd = rtd[match(id, rtd[,id.name]),] }
              return(rtd)
            })
-
-
-
 
 ##--------------------------------------------------------------------------------------
 
