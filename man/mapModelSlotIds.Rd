@@ -4,7 +4,7 @@
 \alias{mapModelSlotIds}
 \title{Map ids of model slot}
 \usage{
-mapModelSlotIds(object, id, id.name, map.to)
+mapModelSlotIds(object, id, id.name, map.to = "all", unique = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -13,7 +13,7 @@ mapModelSlotIds(object, id, id.name, map.to)
 
 \item{id.name}{The \code{id} name}
 
-\item{map.to}{The name of the mapped id}
+\item{map.to}{The name of the mapped id. Default \code{all}}
 }
 \value{
 a \code{data.fram} with id and mapped id

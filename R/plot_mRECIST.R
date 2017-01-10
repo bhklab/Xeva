@@ -145,24 +145,19 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 ##============================================================================
 #' Plot mRECIST for models and drugs
-#'
 #' \code{plot.mRECIST} plots the mRECIST
 #'
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
-#'
 #' @return plot
-#'
 #' @examples
 #' data(pdxe)
-#' #groupBy = "biobase.id"
-#' control.name = c("untreated")
 #' df = getmRECIST(pdxe)
 #' df = df[1:500,]
-#' plot.mRECIST(df,groupBy = "biobase.id", control.name = "untreated")
-#'
+#' plotmRECIST(df,groupBy = "biobase.id", control.name = "untreated")
 #' @export
-plot.mRECIST <- function(df,groupBy = "biobase.id", control.name = "untreated")
+#' @import ComplexHeatmap
+plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
 {
 
   control.name = c(control.name)
