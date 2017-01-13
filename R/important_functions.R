@@ -19,15 +19,30 @@ getIndex <- function(inVec, indxOf)
 }
 
 
-.castDataFram <- function(df, row.var, col.var, value)
+.castDataFram <- function(df, row.var, col.var, value, collapse = ";")
 {
   uqR = unique(as.character(df[,row.var]))
   uqC = unique(as.character(df[,col.var]))
   dfx = data.frame( matrix(NA, nrow = length(uqR), ncol = length(uqC) ))
   rownames(dfx) = uqR ; colnames(dfx) = uqC
-  for(I in 1:dim(df)[1])
+
+  for(r in rownames(dfx))
   {
-    dfx[as.character(df[I,row.var]), as.character(df[I,col.var])] = df[I, value]
+    for(c in colnames(dfx))
+    {
+      v = df[df[,row.var]==r & df[,col.var]==c, value]
+
+      if(collapse =="mean") {
+         vz = mean(as.numeric(v[!is.na(v)]))
+      } else if (collapse =="median"){
+        vz = median(as.numeric(v[!is.na(v)]))
+      } else {
+        vz= pasteWithoutNA(v, collapse = collapse)
+        if(vz==""){vz=NA}
+      }
+
+      dfx[r,c]=vz
+    }
   }
   return(dfx)
 }

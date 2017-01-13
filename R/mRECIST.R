@@ -51,7 +51,6 @@ calculateResponses <- function(exdf, responseName = "volume", min.time=10)
 }
 
 
-##check PDTX curve
 
 ######################################################################
 #' Computes the mRECIST
@@ -74,17 +73,6 @@ computemRECIST <- function(best.response, best.average.response)
 
   if(!is.na(best.response) & !is.na(best.average.response))
   {
-    # if(best.response < -95 & best.average.response < -40)
-    # {mRecist = "mCR"}
-    #
-    # if(best.response < -50 & best.average.response < -20)
-    # {mRecist = "mPR"}
-    #
-    # if(best.response <  35 & best.average.response <  30)
-    # {mRecist = "mSD"}
-    #
-    # if(is.na(mRecist)){mRecist = "mPD"}
-
     ####---- the order of aRecist assignment is really important ----------
     mRecist = "PD"
 
@@ -121,6 +109,7 @@ mRECISTForModel <- function(modx)
   modx$mRECIST = computemRECIST(best.response = modx$best.response$value,
                                 best.average.response= modx$best.average.response$value)
   return(modx)
+
 }
 
 
@@ -144,18 +133,20 @@ setMethod( f="setmRECIST",
            {
              if(is(object, "XevaSet"))
              {
-               for(I in names(object@experiment))
+               #rtx = list()
+               for(I in 1:length(object@experiment))
                {
                  object@experiment[[I]] = mRECISTForModel(object@experiment[[I]])
+                 #mod = object@experiment[[I]]
+                 #rtx[[mod$model.id]] = mRECISTForModel(mod)
                }
              }
              return(object)
+             #return(rtx)
            } )
 
 
 setGeneric(name= "setmRECIST<-", def = function(object,value) {standardGeneric("setmRECIST<-")} )
-
-## @describeIn PharmacoSet Returns the annotations for all the drugs tested in the PharmacoSet
 #' @export
 setMethod( f="setmRECIST<-",
            signature= signature(object="XevaSet"),
@@ -163,6 +154,7 @@ setMethod( f="setmRECIST<-",
            {
              object = value
              object
+
            } )
 
 

@@ -1,32 +1,32 @@
 ##----- get modelInfo -------------
 #' modelInfo Generic
-#' Generic for ModelInfo method
+#' Generic for modelInfo method
 #'
 #' @examples
 #' data(pdxe)
-#' ModelInfo(pdxe)
+#' modelInfo(pdxe)
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{data.frame} with the model annotations
-setGeneric(name = "ModelInfo", def = function(object) {standardGeneric("ModelInfo")} )
+setGeneric(name = "modelInfo", def = function(object) {standardGeneric("modelInfo")} )
 
 #' @export
-setMethod( f=ModelInfo, signature="XevaSet",
+setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object)
            { object@model } )
 
 
-#' ModelInfo<- Generic
-#' Generic for ModelInfo replace method
+#' modelInfo<- Generic
+#' Generic for modelInfo replace method
 #' @examples
 #' data(pdxe)
-#' ModelInfo(pdxe) <- ModelInfo(pdxe)
+#' modelInfo(pdxe) <- modelInfo(pdxe)
 #' @param object The \code{XevaSet} to replace drug info in
 #' @param value A \code{data.frame} with the new model annotations
 #' @return Updated \code{XevaSet}
-setGeneric(name= "ModelInfo<-", def = function(object, value) {standardGeneric("ModelInfo<-")} )
+setGeneric(name= "modelInfo<-", def = function(object, value) {standardGeneric("modelInfo<-")} )
 
 #' @export
-setMethod( f="ModelInfo<-",
+setMethod( f="modelInfo<-",
            signature=c(object = "XevaSet", value="data.frame"),
            definition=function(object, value)
            {

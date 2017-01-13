@@ -31,90 +31,93 @@
   return(pidX)
 }
 
-## get time vs volume data with standard error
+
+
 #'
-#' Given a treatment and control model ids
-#' it will return a data.fram with time vs volume (or any other variable)
+#' ## get time vs volume data with standard error
+#' #'
+#' #' Given a treatment and control model ids
+#' #' it will return a data.fram with time vs volume (or any other variable)
+#' #'
+#' #' @examples
+#' #' data(pdxe)
+#' #' # creat a experiment desing
+#' #' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
+#' #' df = getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
+#' #' ## if collapse=FALSE it will not calculate standard error
+#' #' df2= getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=FALSE)
+#' #'
+#' #' @param object The \code{Xeva} dataset
+#' #' @param ExpDesign A list with batch.name, treatment and control
+#' #' @param var Name of the variable, default \code{volume}
+#' #' @param collapse Default \code{TRUE}. It will summerize all models which belongs to same treatment or control group
+#' #' @return a \code{data.fram} with treatment, control and batch.name
+#' setGeneric(name = "Old_getTimeVarData", def = function(object, ExpDesign, var, collapse) {standardGeneric("Old_getTimeVarData")} )
 #'
-#' @examples
-#' data(pdxe)
-#' # creat a experiment desing
-#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98"), control=c("X.010.uned"))
-#' df = getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=TRUE)
-#' ## if collapse=FALSE it will not calculate standard error
-#' df2= getTimeVarData(object=pdxe, ExpDesign, var = "volume", collapse=FALSE)
+#' ########## @export
+#' setMethod( f=Old_getTimeVarData,
+#'            signature=c(object="XevaSet", ExpDesign="list"),
+#'            definition= function(object, ExpDesign, var = "volume", collapse=TRUE)
+#'            {
 #'
-#' @param object The \code{Xeva} dataset
-#' @param ExpDesign A list with batch.name, treatment and control
-#' @param var Name of the variable, default \code{volume}
-#' @param collapse Default \code{TRUE}. It will summerize all models which belongs to same treatment or control group
-#' @return a \code{data.fram} with treatment, control and batch.name
-setGeneric(name = "Old_getTimeVarData", def = function(object, ExpDesign, var, collapse) {standardGeneric("Old_getTimeVarData")} )
-
-########## @export
-setMethod( f=Old_getTimeVarData,
-           signature=c(object="XevaSet", ExpDesign="list"),
-           definition= function(object, ExpDesign, var = "volume", collapse=TRUE)
-           {
-
-             rtxTret = list()
-             for(i in ExpDesign$treatment)
-             {
-               expData = getExperiment(object, model.id= i)
-               expData = expData[, c("model.id", "drug.join.name", "time", var)]
-               patient.idx = mapModelSlotIds(object, id=expData$model.id, id.name="model.id", map.to="patient.id")
-               expData$patient.id = patient.idx[1, "patient.id"]
-               rtxTret = .appendToList(rtxTret, expData)
-             }
-             ###-------------------------------------------------------------------------------------
-             rtxCont = list()
-             for(j in ExpDesign$control)
-             {
-               conData = getExperiment(object, model.id= i)
-               conData = conData[, c("model.id", "drug.join.name", "time", var)]
-               patient.idx = mapModelSlotIds(object, id=conData$model.id, id.name="model.id", map.to="patient.id")
-               conData$patient.id = patient.idx[1, "patient.id"]
-
-               rtxCont = .appendToList(rtxCont, conData)
-             }
-
-             if(collapse==TRUE)
-             {
-               trD = .checkDrugNameSame(rtxTret)
-               tpi = .checkPatientIDSame(rtxTret)
-
-               rtxTretX =.collapseRplicate(rtxTret, var)
-               rtxTretX$drug.join.name = trD
-               rtxTretX$patient.id = tpi
-
-               ##----------for control ------------------------
-               cnD = .checkDrugNameSame(rtxCont)
-               cpi = .checkPatientIDSame(rtxCont)
-
-               rtxContX =.collapseRplicate(rtxCont, var)
-               rtxContX$drug.join.name = cnD
-               rtxContX$patient.id = cpi
-
-             } else
-             {
-               rtxTretX = do.call(rbind, rtxTret)
-               rtxContX = do.call(rbind, rtxCont)
-             }
-
-             rtxTretX$exp.type="treatment"
-             rtxContX$exp.type="control"
-             rtX = rbind(rtxTretX, rtxContX)
-             rtX$batch.name = ExpDesign$batch.name
-             return(rtX)
-           })
-
-
-
-
-##-------------------------------------------------------------------------------------
-##-------------------------------------------------------------------------------------
-
-
-
-
-
+#'              rtxTret = list()
+#'              for(i in ExpDesign$treatment)
+#'              {
+#'                expData = getExperiment(object, model.id= i)
+#'                expData = expData[, c("model.id", "drug.join.name", "time", var)]
+#'                patient.idx = mapModelSlotIds(object, id=expData$model.id, id.name="model.id", map.to="patient.id")
+#'                expData$patient.id = patient.idx[1, "patient.id"]
+#'                rtxTret = .appendToList(rtxTret, expData)
+#'              }
+#'              ###-------------------------------------------------------------------------------------
+#'              rtxCont = list()
+#'              for(j in ExpDesign$control)
+#'              {
+#'                conData = getExperiment(object, model.id= i)
+#'                conData = conData[, c("model.id", "drug.join.name", "time", var)]
+#'                patient.idx = mapModelSlotIds(object, id=conData$model.id, id.name="model.id", map.to="patient.id")
+#'                conData$patient.id = patient.idx[1, "patient.id"]
+#'
+#'                rtxCont = .appendToList(rtxCont, conData)
+#'              }
+#'
+#'              if(collapse==TRUE)
+#'              {
+#'                trD = .checkDrugNameSame(rtxTret)
+#'                tpi = .checkPatientIDSame(rtxTret)
+#'
+#'                rtxTretX =.collapseRplicate(rtxTret, var)
+#'                rtxTretX$drug.join.name = trD
+#'                rtxTretX$patient.id = tpi
+#'
+#'                ##----------for control ------------------------
+#'                cnD = .checkDrugNameSame(rtxCont)
+#'                cpi = .checkPatientIDSame(rtxCont)
+#'
+#'                rtxContX =.collapseRplicate(rtxCont, var)
+#'                rtxContX$drug.join.name = cnD
+#'                rtxContX$patient.id = cpi
+#'
+#'              } else
+#'              {
+#'                rtxTretX = do.call(rbind, rtxTret)
+#'                rtxContX = do.call(rbind, rtxCont)
+#'              }
+#'
+#'              rtxTretX$exp.type="treatment"
+#'              rtxContX$exp.type="control"
+#'              rtX = rbind(rtxTretX, rtxContX)
+#'              rtX$batch.name = ExpDesign$batch.name
+#'              return(rtX)
+#'            })
+#'
+#'
+#'
+#'
+#' ##-------------------------------------------------------------------------------------
+#' ##-------------------------------------------------------------------------------------
+#'
+#'
+#'
+#'
+#'

@@ -3,23 +3,34 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----load, echo=TRUE-----------------------------------------------------
 library(Xeva)
-cdf = readRDS("~/CXP/Xeva/DATA-raw/celineData.Rds")
-head(ModelInfo(cdf))
+data(lpdx)
+head(modelInfo(lpdx))
 
 ## ---- echo=TRUE----------------------------------------------------------
-print(batchNames(cdf)) 
+print(batchNames(lpdx)) 
 
 ## ---- echo=TRUE----------------------------------------------------------
-batchNames = batchNames(cdf)
-expDesign  = expDesign(cdf, batchNames[4])
-ang = calculateAngle(cdf, expDesign, plot=TRUE)
+batchNames <- batchNames(lpdx)
+expDesign  <- expDesign(lpdx, batchNames[4])
+ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 print(ang)
 
-## ---- echo=TRUE, fig.width = 10, fig.height = 10-------------------------
+## ---- echo=TRUE----------------------------------------------------------
+lpdx_slop <- summarizeResponse(lpdx, response.measure = "slop", 
+                               group.by="patient.id", summary.stat = "mean")
+
+
+
+## ---- echo=TRUE----------------------------------------------------------
+lpdx_angle <- summarizeResponse(lpdx, response.measure = "angle")
+
+
+## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
-df = getmRECIST(pdxe)
+df <- getmRECIST(pdxe)
 ## add tumor.type information
-dfMap = mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id", map.to="tumor.type", unique = FALSE)
+dfMap <- mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id",
+                        map.to="tumor.type", unique = FALSE)
 #dfx = merge(df, dfMap, by.x = "model.id", by.y = "model.id")
 if(all(df$model.id==dfMap$model.id)) {df$tumor.type = dfMap$tumor.type}
 lungDf = df[df$tumor.type=="NSCLC", ]

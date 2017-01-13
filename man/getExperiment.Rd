@@ -5,12 +5,14 @@
 \title{For a given  model.id, it will return a data.fram
 containing all data stored in experiment slot}
 \usage{
-getExperiment(object, model.id)
+getExperiment(object, model.id, treatment.only = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
 
 \item{model.id}{The \code{model.id} for which data is required}
+
+\item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
 }
 \value{
 a \code{data.fram} will all the the values stored in experiment slot
