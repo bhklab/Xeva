@@ -115,7 +115,7 @@ getValueFromModel <- function(object, model.id, values)
 #'
 #' Summarize Response of PDXs.
 #'
-#' @param object The \code{XevaSet} to retrieve drug info from
+#' @param object The \code{XevaSet}
 #' @param response.measure \code{character} . Which response measure to use? Use the responseMeasures function to find out what measures are available for each Xeva set.
 #' @param group.by default \code{patient.id}. How the models should be grouped togather.
 #' @param summary.stat which summary method to use if more then multipal model.id response is found
