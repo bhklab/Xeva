@@ -367,13 +367,13 @@ setMethod( f=getExpDesignDF,
 #' @param ExpDesign A list with batch.name, treatment and control
 #' @param var Name of the variable, default \code{volume}
 #' @return a \code{data.fram} with treatment, control and batch.name
-setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var = "volume")
+setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var = "volume", treatment.only=FALSE)
   {standardGeneric("getTimeVarData")} )
 
 #' @export
 setMethod( f=getTimeVarData,
-           signature=c(object="XevaSet", ExpDesign="list"),
-           definition= function(object, ExpDesign, var = "volume")
+           signature=c(object="XevaSet"),
+           definition= function(object, ExpDesign, var = "volume", treatment.only=FALSE)
            {
              if(is.null(ExpDesign$treatment) & is.null(ExpDesign$control))
              {stop("treatment and control both NULL")}
@@ -382,7 +382,7 @@ setMethod( f=getTimeVarData,
              cnDF = data.frame()
              if(!is.null(ExpDesign$treatment))
              {
-             trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment)
+             trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment, treatment.only=treatment.only)
              trDF = .collapseRplicate(trLs, var = var)
              trDF$exp.type = "treatment"
              trDF$batch.name = ExpDesign$batch.name
@@ -390,7 +390,7 @@ setMethod( f=getTimeVarData,
 
              if(!is.null(ExpDesign$control))
              {
-             cnLs = .getExperimentMultipalIDs(object, ExpDesign$control)
+             cnLs = .getExperimentMultipalIDs(object, ExpDesign$control, treatment.only=treatment.only)
              cnDF = .collapseRplicate(cnLs, var = var)
              cnDF$exp.type = "control"
              cnDF$batch.name = ExpDesign$batch.name
@@ -400,12 +400,12 @@ setMethod( f=getTimeVarData,
              return(rdf)
            })
 
-.getExperimentMultipalIDs <- function(object, mids)
+.getExperimentMultipalIDs <- function(object, mids, treatment.only=TRUE)
 {
   rtx = list()
   for(i in mids)
   {
-    miD = getExperiment(object, model.id= i)
+    miD = getExperiment(object, model.id= i,treatment.only=treatment.only)
     rtx = .appendToList(rtx, miD)
   }
   return(rtx)

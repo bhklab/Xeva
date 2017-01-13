@@ -176,7 +176,6 @@ plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
   matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
   mat = as.matrix(matRC$mat)
 
-  #mat = sortByNa(mat)
   #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
   colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
   nameSpc = unique(as.vector(as.matrix(mat)))

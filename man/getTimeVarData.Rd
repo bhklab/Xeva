@@ -4,7 +4,7 @@
 \alias{getTimeVarData}
 \title{Get time vs volume data with standard error}
 \usage{
-getTimeVarData(object, ExpDesign, var = "volume")
+getTimeVarData(object, ExpDesign, var = "volume", treatment.only = FALSE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}

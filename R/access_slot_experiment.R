@@ -1,11 +1,21 @@
 .subsetExperimentSlot <- function(object, id, id.type)
 {
   rtx = list()
-  for(Ix in object@experiment)
+  if(id.type=="model.id")
   {
-    if(is.element(id, Ix[[id.type]])==TRUE)
-    {rtx = .appendToList(rtx, Ix) }
+    for(mid in c(id))
+    {
+      rtx = .appendToList(rtx, object@experiment[[mid]])
+    }
+  } else
+  {
+    for(Ix in object@experiment)
+    {
+      if(is.element(id, Ix[[id.type]])==TRUE)
+      {rtx = .appendToList(rtx, Ix) }
+    }
   }
+
   return(rtx)
 }
 
@@ -97,26 +107,35 @@ setMethod( f=selectModelIds, signature="XevaSet",
 ###########################################################################
 ###-----------------------------------------------------------------------------------------------------
 ###-----------------------------------------------------------------------------------------------------
-.getExperimentDataFromAExpID <- function(object, model.id)
+.getExperimentDataFromAExpID <- function(object, model.id, treatment.only=FALSE)
 {
-  #modX = .subsetExperimentSlot(object, id=experiment.id, id.type="experiment.id")
   modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
   if(length(modX)==1)
   { mod = modX[[1]] }else
   {return(NULL)}
 
   mod.data = mod$data
-  mod$data = NULL
-  modDf = reshape2::melt(mod)
-  collpsCol = sort(colnames(modDf)[colnames(modDf)!="value"])
-  collpsVal = apply(modDf[,collpsCol], 1, pasteWithoutNA, collapse="." )
-  modDf[,"value.name"] = collpsVal
-  for(I in 1:nrow(modDf))
-  { mod.data[, modDf[I, "value.name"]] = as.character(modDf[I, "value"]) }
+
+  #mod$data = NULL
+  #modDf = reshape2::melt(mod)
+  #collpsCol = sort(colnames(modDf)[colnames(modDf)!="value"])
+  #collpsVal = apply(modDf[,collpsCol], 1, pasteWithoutNA, collapse="." )
+  #modDf[,"value.name"] = collpsVal
+  #for(I in 1:nrow(modDf))
+  #{ mod.data[, modDf[I, "value.name"]] = as.character(modDf[I, "value"]) }
+
+  mod.data$model.id = mod$model.id
+  mod.data$drug.join.name = mod$drug$join.name
 
   mod.data = .removeNAcol(mod.data)
   mod.data = .reorderCol(mod.data, "model.id", 1)
   mod.data = .reorderCol(mod.data, "drug.join.name", 2)
+
+  if(treatment.only==TRUE & !is.null(mod.data$dose))
+  {
+    tretIndx = extractBetweenTags(mod.data$dose, start.tag=0, end.tag=0)
+    mod.data = mod.data[tretIndx, ]
+  }
   return(mod.data)
 }
 
@@ -130,16 +149,20 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #' getExperiment(pdxe, model.id="X.1004.pael")
 #' @param object The \code{XevaSet}
 #' @param model.id The \code{model.id} for which data is required
+#' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @return a \code{data.fram} will all the the values stored in experiment slot
-setGeneric(name = "getExperiment", def = function(object, model.id){standardGeneric("getExperiment")} )
+setGeneric(name = "getExperiment", def = function(object, model.id,treatment.only=FALSE)
+  {standardGeneric("getExperiment")} )
 
 #' @export
 setMethod( f=getExperiment,
            signature="XevaSet",
-           definition=function(object, model.id)
+           definition=function(object, model.id, treatment.only=FALSE)
            {
              model.ids = unique(c(model.id))
-             rtx = lapply(model.ids, .getExperimentDataFromAExpID, object=object)
+             rtx = lapply(model.ids, function(modID)
+               {.getExperimentDataFromAExpID(object=object,
+                                             modID, treatment.only=treatment.only)})
              rtz = .rbindListOfDataframs(rtx)
              return(rtz)
            })

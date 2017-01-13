@@ -4,7 +4,8 @@
 \alias{calculateAngle}
 \title{Calculate angle between control and treatment groups}
 \usage{
-calculateAngle(object, ExpDesign, var = "volume", plot = TRUE)
+calculateAngle(object, ExpDesign = NULL, var = "volume",
+  treatment.only = TRUE, plot = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -25,7 +26,7 @@ the linear fit of treatment and control group
 data(pdxe)
 # creat a experiment desing
 ExpDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
-df = calculateAngle(object=pdxe, ExpDesign, var = "volume", plot=TRUE)
+df = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
 
 }
 
