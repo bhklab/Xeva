@@ -8,7 +8,7 @@ summarizeResponse(object, response.measure = "mRECIST_recomputed",
   group.by = "patient.id", summary.stat = c("mean", "median", ";"))
 }
 \arguments{
-\item{object}{The \code{XevaSet} to retrieve drug info from}
+\item{object}{The \code{XevaSet}}
 
 \item{response.measure}{\code{character} . Which response measure to use? Use the responseMeasures function to find out what measures are available for each Xeva set.}
 

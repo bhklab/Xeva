@@ -50,6 +50,23 @@ lpdx_angle <- summarizeResponse(lpdx, response.measure = "angle")
 
 ```
 
+
+Get mutation expression profile 
+```{r, echo=TRUE}
+ldxe_mut <- getMolecularProfiles(lpdx, data.type="mutation")
+print(ldxe_mut)
+```
+
+The sample names in expression set are called biobase.id in model slot.
+Sample names from the expression set canb be be mapped to individual PDX model.ids as
+```{r, echo=TRUE}
+# get sample names
+library(Biobase)
+sn <- Biobase::sampleNames(ldxe_mut)
+smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id")
+head(smap)
+```
+
 \pagebreak
 
 Create mRECIST plot for PDXE Lung Cancer data

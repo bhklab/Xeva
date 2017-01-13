@@ -25,6 +25,17 @@ lpdx_slop <- summarizeResponse(lpdx, response.measure = "slop",
 lpdx_angle <- summarizeResponse(lpdx, response.measure = "angle")
 
 
+## ---- echo=TRUE----------------------------------------------------------
+ldxe_mut <- getMolecularProfiles(lpdx, data.type="mutation")
+print(ldxe_mut)
+
+## ---- echo=TRUE----------------------------------------------------------
+# get sample names
+library(Biobase)
+sn <- Biobase::sampleNames(ldxe_mut)
+smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id")
+head(smap)
+
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
 df <- getmRECIST(pdxe)
