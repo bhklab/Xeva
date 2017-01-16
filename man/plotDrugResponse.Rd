@@ -4,22 +4,15 @@
 \alias{plotDrugResponse}
 \title{To plot drug response curve}
 \usage{
-plotDrugResponse(object, drug, drug.match.exact, tumor.type, control)
-
-plotDrugResponse(object, drug, drug.match.exact, tumor.type, control)
+plotDrugResponse(object, drug, drug.match.exact = TRUE, tumor.type = NULL,
+  control = TRUE)
 }
 \arguments{
 \item{object}{The \code{XevaSet} to replace drug info in}
 
 \item{drug}{Name of the drug}
-
-\item{object}{The \code{XevaSet} to replace drug info in}
-
-\item{drug}{Name of the drug}
 }
 \value{
-Updated \code{XevaSet}
-
 Updated \code{XevaSet}
 }
 \description{

@@ -15,14 +15,6 @@ setGeneric(name= "plotDrugResponse",
                           control=TRUE)
              {standardGeneric("plotDrugResponse")} )
 
-#' @param object The \code{XevaSet} to replace drug info in
-#' @param drug Name of the drug
-#' @return Updated \code{XevaSet}
-setGeneric(name= "plotDrugResponse", def = function(object,
-                                                    drug, drug.match.exact,
-                                                    tumor.type, control)
-                                            {standardGeneric("plotDrugResponse")} )
-
 #' @export
 setMethod( f=plotDrugResponse,
            signature=c(object = "XevaSet"),
@@ -87,9 +79,57 @@ NewPlotFunction <- function(DF, drug.join.name)
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
 
+
+  ##--- get range ------------------
+  xr = range(DF$time, na.rm = TRUE)
+  yr = range(DF$mean, DF$upper, DF$lower, na.rm = TRUE)
+
+  ##--------
+  #plt = ggplot() + geom_line(data = DF, aes(x=time, y=c2))
+  plt = ggplot(DF, aes(x = time, y = mean))+ xlim(xr) + ylim(yr) + geom_blank()
+
+  ## add one line
+  dt = DF[DF$patient.id=="X-1004" & DF$exp.type=="treatment",]
+  dc = DF[DF$patient.id=="X-1004" & DF$exp.type=="control",]
+
+  addLine2Plot <- function(plt, dx, colour="blue")
+  {
+    plt = plt + geom_line(colour= colour, aes_string(x="time", y="mean"), dx)
+    return(plt)
+  }
+
+  plt = addLine2Plot(plt, dt, colour="blue")
+  plt = addLine2Plot(plt, dc, colour="red")
+
+
+  plt = plt +  geom_line(colour="blue", aes_string(x="time", y="mean"), dt)
+  plt = plt +  geom_line(colour="red", aes_string(x="time", y="mean"), dc)
+
+
+
+
+
+
+  d<-data.frame(x=1:5, y1=1:5, y2=2:6)
+  ggplot(d, aes(x)) +
+    geom_line(aes(y=y1, colour="1")) +
+    geom_line(aes(y=y2, colour="2")) +
+    scale_colour_manual(values=c("red", "blue"))
+
+
+
+
+
+
+
+
+
+
   # create title objects
   drug_name <- unique(DF$drug.join.name[DF$drug.join.name != 'untreated'])
   title <- paste(length(DF$drug.join.name), 'Experiments for', drug_name)
+
+
 
   # create a unique variable combining patient.id and exp.type
   DF$patient.exp <- paste(DF$patient.id, DF$exp.type, sep = '_')
