@@ -40,7 +40,7 @@ getIndex <- function(inVec, indxOf)
         vz= pasteWithoutNA(v, collapse = collapse)
         if(vz==""){vz=NA}
       }
-
+      if(is.nan(vz)){vz = NA}
       dfx[r,c]=vz
     }
   }
