@@ -14,7 +14,7 @@ getMolecularProfiles <- function(object, data.type)
 {
   if(is.element(data.type, names(object@molecularProfiles))==FALSE)
   {
-    msg = sprintf("avalibale expression sets are\n%s\n",
+    msg = sprintf("available molecular data are\n%s\n",
                   paste(names(object@molecularProfiles), collapse ="\n"))
     stop(msg)
   }
