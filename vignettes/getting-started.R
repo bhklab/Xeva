@@ -16,13 +16,12 @@ ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 print(ang)
 
 #par(mfrow=c(5,3))
-#for(I in batchNames)
-#{
-#  expDesign  <- expDesign(lpdx, I)
-#  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, #plot=TRUE)
+for(I in batchNames)
+{
+  expDesign  <- expDesign(lpdx, I)
+  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 #  print(ang)
-#}
-
+}
 
 
 ## ---- echo=TRUE----------------------------------------------------------

@@ -27,20 +27,19 @@ print(batchNames(lpdx))
 ```
 
 To calculate angle between the treatment and control samples of this batch
-```{r, echo=TRUE}
+```{r, echo=TRUE,fig.width = 12, fig.height = 12}
 batchNames <- batchNames(lpdx)
 expDesign  <- expDesign(lpdx, batchNames[1])
 ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 print(ang)
 
 #par(mfrow=c(5,3))
-#for(I in batchNames)
-#{
-#  expDesign  <- expDesign(lpdx, I)
-#  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, #plot=TRUE)
+for(I in batchNames)
+{
+  expDesign  <- expDesign(lpdx, I)
+  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 #  print(ang)
-#}
-
+}
 
 ```
 

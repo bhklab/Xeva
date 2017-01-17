@@ -16,20 +16,12 @@
   ##------------------------------------------------
   #ang = atan(coef(fit)[["x"]]) *180 / pi
   ang = atan(coef(fit)[["I(x - p)"]]) *180 / pi
-  return(list(fit=fit, angel=ang))
+  return(list(fit=fit, angel=ang, data=data))
   ##-------- do lm -------------------------------------------------
   #f <- paste("mean", "~", paste("time", collapse=" + "))
   #fitC = lm(f, data=dfC)
 }
 
-
-.testPlot<- function(x,y, fit)
-{
-  par(pty="s")
-  plot(x, y, col="red",  pch=19, xlim = range(x), ylim = range(y))
-  points(x,  y, col="blue", pch=19)
-  abline(fit, col="red")
-}
 
 .plotAngelAndFit <- function(dfT, dfC, fitT, fitC)
 {
@@ -63,9 +55,129 @@
 }
 
 
+####-----------------------------------------------------------
+plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT)
+{
+  xrng = range(sapply(dt.fit, function(i) range(i$data$x)),
+               sapply(dc.fit, function(i) range(i$data$x)))
+
+  yrng = range(sapply(dt.fit, function(i) range(i$data$y)),
+               sapply(dc.fit, function(i) range(i$data$y)))
+
+  opar <- par()      # make a copy of current settings
+  par(pty="s",  xpd=TRUE)
+  plot(NA, col="red",  pch=19,
+       xlab = "time", ylab = "tumor volume",
+       xlim = xrng, ylim = yrng)
+
+  .plt1Mod <- function(d.fit, col){
+  for(dfX in d.fit)
+  {
+    #points(dfX$data$x,  dfX$data$y, col="blue", pch=19)
+    #lx = predict(dfX$fit, newdata = list(x=0))+dfX$data$y[1]
+    #abline(lx, coef(dfX$fit), col="blue")
+    lines(dfX$data$x,  dfX$data$y, col=col,type="b", lty=3, pch=19)
+  } }
+
+  .plt1Mod(dc.fit, col = "#6baed6")
+  .plt1Mod(dt.fit, col = "#fc8d59")
+
+  ##----- add line ------
+  if(1==2){
+  dfX =dc.fit[[5]]
+  points(dfX$data$x,  dfX$data$y, col="blue", pch=19)
+  lx = predict(dfX$fit, newdata = list(x=0))+dfX$data$y[1]
+  yl = coef(dfX$fit)
+  #avgAng = mean(sapply(dc.fit, "[[", "angel"))
+  avgAng = mean(sapply(dc.fit, function(x)coef(x$fit)))
+  yv = c(avgAng*xrng[1], avgAng*xrng[2])
+  lines(xrng, yv, col="red")
+  #lx1 = predict(dfX$fit, newdata = list(x=xrng[1]))+dfX$data$y[1]
+  #lx2 = predict(dfX$fit, newdata = list(x=xrng[2]))+dfX$data$y[1]
+  #abline(lx, coef(dfX$fit), col="blue")
+  #lines(c(0,110), c(4.006887*0+lx, 4.006887*110+lx), col="red")
+  }
+
+
+  legend("bottomright", inset=c(-0.38,0),
+         legend=c("Treatment", "Control"),
+         fill=c("#a50f15", "#081d58"), cex=0.8)
+
+  par(xpd=FALSE)
+
+  lxT = predict(fitT$fit, newdata = list(x=0))+dfT$mean[1]
+  abline(lxT, coef(fitT$fit), col="#a50f15")
+
+  lxC = predict(fitC$fit, newdata = list(x=0))+dfC$mean[1]
+  abline(lxC, coef(fitC$fit), col="#081d58")
+
+  par(pty=opar$pty, xpd=opar$xpd)
+
+}
+
+
+
+####-----------------------------------------------------------
+#' expDegI = list(batch.name = "myBatch", treatment = "X.015.BY19", control = "X.015.uned")
 computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
 {
+  ##------ for each model get fit ---------
+  dt.fit= list()
+  if(length(expDegI$treatment)>0)
+  {
+    for(ti in expDegI$treatment)
+    {
+      dt = getExperiment(object, ti, treatment.only = TRUE)
+      dt.fit[[ti]] = .computSlopFun(dt$time, dt[,var])
+    }
+  }
+  ###-------------
+  dc.fit= list()
+  if(length(expDegI$control)>0)
+  {
+    for(ci in expDegI$control)
+    {
+      dc = getExperiment(object, ci, treatment.only = TRUE)
+      dc.fit[[ci]] = .computSlopFun(dc$time, dc[,var])
+    }
+  }
+
   DFx = getTimeVarData(object, expDegI, var=var, treatment.only=treatment.only)
+
+
+  dfC = DFx[DFx$exp.type=="control",]
+  dfT = DFx[DFx$exp.type=="treatment",]
+
+  if(nrow(dfC)==0)
+  {
+    warning("Control have no data!")
+    return(NA)
+  }
+
+  if(nrow(dfT)==0)
+  {
+    warning("treatment have no data!")
+    return(NA)
+  }
+  fitC = .computSlopFun(dfC$time, dfC$mean)
+  fitT = .computSlopFun(dfT$time, dfT$mean)
+  angDiff = fitC$angel - fitT$angel
+
+  if(plot==TRUE)
+  { plot_Batch_angel(dt.fit, dc.fit, fitC, fitT,dfC, dfT)}
+
+  return(angDiff)
+}
+
+
+
+
+
+computAngelFor1ExpDesign_old <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
+{
+  DFx = getTimeVarData(object, expDegI, var=var, treatment.only=treatment.only)
+
+
   dfC = DFx[DFx$exp.type=="control",]
   dfT = DFx[DFx$exp.type=="treatment",]
 
@@ -271,9 +383,4 @@ setMethod( f="setSlop<-",
              }
              return(object)
            })
-
-
-
-
-
 
