@@ -2,12 +2,16 @@
 % Please edit documentation in R/calculate_angle_functions.R
 \name{computAngelFor1ExpDesign}
 \alias{computAngelFor1ExpDesign}
-\title{expDegI = list(batch.name = "myBatch", treatment = "X.015.BY19", control = "X.015.uned")}
+\title{data(lpdx); object=lpdx
+batchNames <- batchNames(lpdx)
+expDegI  <- expDesign(lpdx, "PHLC111_P7")}
 \usage{
 computAngelFor1ExpDesign(object, expDegI, var = "volume",
-  treatment.only = TRUE, plot = FALSE)
+  treatment.only = TRUE, plot = FALSE, log.y = TRUE)
 }
 \description{
-expDegI = list(batch.name = "myBatch", treatment = "X.015.BY19", control = "X.015.uned")
+data(lpdx); object=lpdx
+batchNames <- batchNames(lpdx)
+expDegI  <- expDesign(lpdx, "PHLC111_P7")
 }
 

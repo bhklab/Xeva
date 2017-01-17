@@ -4,7 +4,7 @@
 \alias{setSlop}
 \title{setSlop generic}
 \usage{
-setSlop(object, treatment.only = TRUE)
+setSlop(object, treatment.only = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{XevaSet} to retrieve drug info from}
