@@ -1,25 +1,25 @@
 
 
-.computSlopFun <- function(x,y)
+.computSlopFun <- function(x,y, log.y=TRUE)
 {
   #fit = lm(y~x)
 
+  if(log.y==TRUE)
+  {y = log(y)}
+
+  #print(log(y))
   ##-------------------------------------------------------------
-  data= data.frame(x=x, y=y)
-  p= x[1]; q = y[1]
+  data = data.frame(x=x, y=y)
+  ##---- remove all non finite (Inf, NA, NaN) data --------------
+  data = data[is.finite(data$x), ]
+  data = data[is.finite(data$y), ]
+
+  p= data$x[1]; q = data$y[1]
   fit <- (lm(I(y-q)~I(x-p) +0, data))
-
-  #nd = predict(fit, newdata = list(x=0))+q
-  #.testPlot(x,y, nmod)
-  #abline(nd, coef(nmod), col='blue')
-
   ##------------------------------------------------
   #ang = atan(coef(fit)[["x"]]) *180 / pi
-  ang = atan(coef(fit)[["I(x - p)"]]) *180 / pi
+  ang = atan(coef(fit)[["I(x - p)"]]) *180/3.141593
   return(list(fit=fit, angel=ang, data=data))
-  ##-------- do lm -------------------------------------------------
-  #f <- paste("mean", "~", paste("time", collapse=" + "))
-  #fitC = lm(f, data=dfC)
 }
 
 
@@ -56,7 +56,7 @@
 
 
 ####-----------------------------------------------------------
-plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT)
+plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT, title="plot")
 {
   xrng = range(sapply(dt.fit, function(i) range(i$data$x)),
                sapply(dc.fit, function(i) range(i$data$x)))
@@ -66,7 +66,7 @@ plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT)
 
   opar <- par()      # make a copy of current settings
   par(pty="s",  xpd=TRUE)
-  plot(NA, col="red",  pch=19,
+  plot(NA, col="red",  pch=19, main=title,
        xlab = "time", ylab = "tumor volume",
        xlim = xrng, ylim = yrng)
 
@@ -98,17 +98,19 @@ plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT)
   #lines(c(0,110), c(4.006887*0+lx, 4.006887*110+lx), col="red")
   }
 
-
   legend("bottomright", inset=c(-0.38,0),
          legend=c("Treatment", "Control"),
          fill=c("#a50f15", "#081d58"), cex=0.8)
 
   par(xpd=FALSE)
 
-  lxT = predict(fitT$fit, newdata = list(x=0))+dfT$mean[1]
+  tPoint0 = mean(sapply(dt.fit, function(i) i$data$y[1]))
+
+  lxT = predict(fitT$fit, newdata = list(x=0))+ tPoint0 # dfT$y[1]
   abline(lxT, coef(fitT$fit), col="#a50f15")
 
-  lxC = predict(fitC$fit, newdata = list(x=0))+dfC$mean[1]
+  cPoint0 = mean(sapply(dc.fit, function(i) i$data$y[1]))
+  lxC = predict(fitC$fit, newdata = list(x=0))+ cPoint0 # dfC$y[1]
   abline(lxC, coef(fitC$fit), col="#081d58")
 
   par(pty=opar$pty, xpd=opar$xpd)
@@ -118,8 +120,10 @@ plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT)
 
 
 ####-----------------------------------------------------------
-#' expDegI = list(batch.name = "myBatch", treatment = "X.015.BY19", control = "X.015.uned")
-computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
+#' data(lpdx); object=lpdx
+#' expDegI  <- expDesign(lpdx, "PHLC111_P7")
+computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE,
+                                     plot=FALSE, log.y=TRUE)
 {
   ##------ for each model get fit ---------
   dt.fit= list()
@@ -128,7 +132,8 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
     for(ti in expDegI$treatment)
     {
       dt = getExperiment(object, ti, treatment.only = TRUE)
-      dt.fit[[ti]] = .computSlopFun(dt$time, dt[,var])
+
+      dt.fit[[ti]] = .computSlopFun(dt$time, dt[,var], log.y=log.y)
     }
   }
   ###-------------
@@ -138,7 +143,7 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
     for(ci in expDegI$control)
     {
       dc = getExperiment(object, ci, treatment.only = TRUE)
-      dc.fit[[ci]] = .computSlopFun(dc$time, dc[,var])
+      dc.fit[[ci]] = .computSlopFun(dc$time, dc[,var], log.y=log.y)
     }
   }
 
@@ -159,12 +164,12 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
     warning("treatment have no data!")
     return(NA)
   }
-  fitC = .computSlopFun(dfC$time, dfC$mean)
-  fitT = .computSlopFun(dfT$time, dfT$mean)
+  fitC = .computSlopFun(dfC$time, dfC$mean, log.y=log.y)
+  fitT = .computSlopFun(dfT$time, dfT$mean, log.y=log.y)
   angDiff = fitC$angel - fitT$angel
 
   if(plot==TRUE)
-  { plot_Batch_angel(dt.fit, dc.fit, fitC, fitT,dfC, dfT)}
+  { plot_Batch_angel(dt.fit, dc.fit, fitC, fitT,dfC, dfT, title=expDegI$batch.name)}
 
   return(angDiff)
 }
@@ -172,36 +177,6 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
 
 
 
-
-computAngelFor1ExpDesign_old <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
-{
-  DFx = getTimeVarData(object, expDegI, var=var, treatment.only=treatment.only)
-
-
-  dfC = DFx[DFx$exp.type=="control",]
-  dfT = DFx[DFx$exp.type=="treatment",]
-
-  if(nrow(dfC)==0)
-  {
-    warning("Control have no data!")
-    return(NA)
-  }
-
-  if(nrow(dfT)==0)
-  {
-    warning("treatment have no data!")
-    return(NA)
-  }
-  fitC = .computSlopFun(dfC$time, dfC$mean)
-  fitT = .computSlopFun(dfT$time, dfT$mean)
-
-  angDiff = fitC$angel - fitT$angel
-
-  if(plot==TRUE)
-  { .plotAngelAndFit(dfT, dfC, fitT, fitC) }
-
-  return(angDiff)
-}
 
 
 ## calculate angle between control and treatment groups
@@ -223,13 +198,16 @@ computAngelFor1ExpDesign_old <- function(object, expDegI, var="volume", treatmen
 #' @param ExpDesign A list with batch.name, treatment and control
 #' @param var Name of the variable, default \code{volume}
 #' @return a \code{data.fram} with treatment, control and batch.name
-setGeneric(name = "calculateAngle", def = function(object, ExpDesign=NULL, var="volume", treatment.only=TRUE, plot=TRUE)
-{standardGeneric("calculateAngle")} )
+setGeneric(name = "calculateAngle",
+           def = function(object, ExpDesign=NULL, var="volume", treatment.only=TRUE,
+                          plot=TRUE, log.y=TRUE)
+                          {standardGeneric("calculateAngle")} )
 
 #' @export
 setMethod( f=calculateAngle,
            signature=c(object="XevaSet"),
-           definition= function(object, ExpDesign=NULL, var="volume", treatment.only=TRUE, plot=TRUE)
+           definition= function(object, ExpDesign=NULL, var="volume", treatment.only=TRUE,
+                                plot=TRUE, log.y=TRUE)
            {
              if(!is.null(ExpDesign))
              { ExpDesign = list(ExpDesign) }
@@ -241,8 +219,8 @@ setMethod( f=calculateAngle,
              for(I in 1:length(ExpDesign))
              {
                expDegI = ExpDesign[[I]]
-               angDiffX[[expDegI$batch.name]] = computAngelFor1ExpDesign(object, expDegI, var=var,
-                                                                     treatment.only=treatment.only, plot=plot)
+               angDiffX[[expDegI$batch.name]] = computAngelFor1ExpDesign(object, expDegI, var=var, treatment.only=treatment.only,
+                                                                         plot=plot, log.y=log.y)
              }
              return(angDiffX)
            })
@@ -346,15 +324,16 @@ computeSlope <- function(object, model.id, treatment.only=TRUE)
 #' @param treatment.only Default \code{TRUE}, take only first periode of treatment where dose is not zero
 #' @details If dose column is not present treatment.only will be considered FALSE
 #' @return a \code{list} with slop of each model.id
-setGeneric(name = "setSlop", def = function(object, treatment.only=TRUE) {standardGeneric("setSlop")} )
+setGeneric(name = "setSlop", def = function(object, treatment.only=TRUE, verbose=TRUE) {standardGeneric("setSlop")} )
 
 #' @export
 setMethod( f="setSlop", signature="XevaSet",
-           definition=function(object, treatment.only=TRUE)
+           definition=function(object, treatment.only=TRUE, verbose=TRUE)
            {
              rtz = list()
              for(model.id in names(object@experiment))
              {
+               if(verbose==TRUE){cat(sprintf("Calculating slope for %s\n", model.id))}
                fa = computeSlope(object, model.id, treatment.only=treatment.only)
                rtz[[model.id]] = fa$angel
              }
