@@ -5,7 +5,7 @@
 \title{Calculate angle between control and treatment groups}
 \usage{
 calculateAngle(object, ExpDesign = NULL, var = "volume",
-  treatment.only = TRUE, plot = TRUE)
+  treatment.only = TRUE, plot = TRUE, log.y = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}

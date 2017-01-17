@@ -76,6 +76,16 @@ smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id"
 head(smap)
 ```
 
+
+
+What should we do here 
+```{r, echo=TRUE}
+df = getExperiment(lpdx,"PHLC119_P5.506.B1.3")
+print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
+```
+
+
+
 \pagebreak
 
 Create mRECIST plot for PDXE Lung Cancer data
@@ -135,9 +145,10 @@ df = data.frame(mR= mR, slope= as.numeric(slope), stringsAsFactors = FALSE)
 df$mR= factor(df$mR, c("CR", "PR", "SD", "PD"))
 
 colPalette = c("#377eb8", "#4daf4a", "#fec44f", "#e41a1c")
+#pdf(file="DATA-raw/boxplot_lungCancer.pdf", width=12, height=10)
 boxplot(slope~mR, data=df, col=colPalette,
   main="mRECIST vs slope", xlab="mRECIST", ylab="slope")
-
+#dev.off()
 ```
 
 

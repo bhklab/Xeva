@@ -9,7 +9,7 @@ head(modelInfo(lpdx))
 ## ---- echo=TRUE----------------------------------------------------------
 print(batchNames(lpdx)) 
 
-## ---- echo=TRUE----------------------------------------------------------
+## ---- echo=TRUE,fig.width = 12, fig.height = 12--------------------------
 batchNames <- batchNames(lpdx)
 expDesign  <- expDesign(lpdx, batchNames[1])
 ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
@@ -93,7 +93,8 @@ df = data.frame(mR= mR, slope= as.numeric(slope), stringsAsFactors = FALSE)
 df$mR= factor(df$mR, c("CR", "PR", "SD", "PD"))
 
 colPalette = c("#377eb8", "#4daf4a", "#fec44f", "#e41a1c")
+#pdf(file="DATA-raw/boxplot_lungCancer.pdf", width=12, height=10)
 boxplot(slope~mR, data=df, col=colPalette,
   main="mRECIST vs slope", xlab="mRECIST", ylab="slope")
-
+#dev.off()
 

@@ -33,7 +33,6 @@
 
 
 
-#'
 #' ## get time vs volume data with standard error
 #' #'
 #' #' Given a treatment and control model ids
@@ -116,8 +115,39 @@
 #'
 #' ##-------------------------------------------------------------------------------------
 #' ##-------------------------------------------------------------------------------------
-#'
-#'
-#'
-#'
-#'
+
+
+
+
+
+
+
+computAngelFor1ExpDesign_old <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
+{
+  DFx = getTimeVarData(object, expDegI, var=var, treatment.only=treatment.only)
+
+
+  dfC = DFx[DFx$exp.type=="control",]
+  dfT = DFx[DFx$exp.type=="treatment",]
+
+  if(nrow(dfC)==0)
+  {
+    warning("Control have no data!")
+    return(NA)
+  }
+
+  if(nrow(dfT)==0)
+  {
+    warning("treatment have no data!")
+    return(NA)
+  }
+  fitC = .computSlopFun(dfC$time, dfC$mean)
+  fitT = .computSlopFun(dfT$time, dfT$mean)
+
+  angDiff = fitC$angel - fitT$angel
+
+  if(plot==TRUE)
+  { .plotAngelAndFit(dfT, dfC, fitT, fitC) }
+
+  return(angDiff)
+}
