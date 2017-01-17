@@ -2,14 +2,34 @@
 
 .computSlopFun <- function(x,y)
 {
-  fit = lm(y~x)
-  ang = atan(coef(fit)[["x"]]) *180 / pi
+  #fit = lm(y~x)
+
+  ##-------------------------------------------------------------
+  data= data.frame(x=x, y=y)
+  p= x[1]; q = y[1]
+  fit <- (lm(I(y-q)~I(x-p) +0, data))
+
+  #nd = predict(fit, newdata = list(x=0))+q
+  #.testPlot(x,y, nmod)
+  #abline(nd, coef(nmod), col='blue')
+
+  ##------------------------------------------------
+  #ang = atan(coef(fit)[["x"]]) *180 / pi
+  ang = atan(coef(fit)[["I(x - p)"]]) *180 / pi
   return(list(fit=fit, angel=ang))
   ##-------- do lm -------------------------------------------------
   #f <- paste("mean", "~", paste("time", collapse=" + "))
   #fitC = lm(f, data=dfC)
 }
 
+
+.testPlot<- function(x,y, fit)
+{
+  par(pty="s")
+  plot(x, y, col="red",  pch=19, xlim = range(x), ylim = range(y))
+  points(x,  y, col="blue", pch=19)
+  abline(fit, col="red")
+}
 
 .plotAngelAndFit <- function(dfT, dfC, fitT, fitC)
 {
@@ -26,12 +46,24 @@
          legend=c("Treatment", "Control"), fill=c("red", "blue"), cex=0.8)
 
   par(xpd=FALSE);
-  abline(fitT$fit, col="red"); abline(fitC$fit, col="blue")
+
+  #nd = predict(fit, newdata = list(x=0))+q
+  #.testPlot(x,y, nmod)
+  #abline(nd, coef(nmod), col='blue')
+  lxT = predict(fitT$fit, newdata = list(x=0))+dfT$mean[1]
+  abline(lxT, coef(fitT$fit), col="red")
+
+  lxC = predict(fitC$fit, newdata = list(x=0))+dfC$mean[1]
+  abline(lxC, coef(fitC$fit), col="blue")
+
+  #abline(fitT$fit, col="red"); abline(fitC$fit, col="blue")
+
+
   par(pty=opar$pty, xpd=opar$xpd) ## reset par to old setting
 }
 
 
-computAngelForOneExp <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
+computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE, plot=FALSE)
 {
   DFx = getTimeVarData(object, expDegI, var=var, treatment.only=treatment.only)
   dfC = DFx[DFx$exp.type=="control",]
@@ -97,7 +129,7 @@ setMethod( f=calculateAngle,
              for(I in 1:length(ExpDesign))
              {
                expDegI = ExpDesign[[I]]
-               angDiffX[[expDegI$batch.name]] = computAngelForOneExp(object, expDegI, var=var,
+               angDiffX[[expDegI$batch.name]] = computAngelFor1ExpDesign(object, expDegI, var=var,
                                                                      treatment.only=treatment.only, plot=plot)
              }
              return(angDiffX)

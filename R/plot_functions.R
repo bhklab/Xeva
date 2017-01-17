@@ -102,10 +102,6 @@ NewPlotFunction <- function(DF, drug.join.name)
   plt = addLine2Plot(plt, dc, colour="red")
 
 
-  plt = plt +  geom_line(colour="blue", aes_string(x="time", y="mean"), dt)
-  plt = plt +  geom_line(colour="red", aes_string(x="time", y="mean"), dc)
-
-
 
 
 

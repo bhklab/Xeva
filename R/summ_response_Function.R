@@ -84,6 +84,7 @@ getValueFromModel <- function(object, model.id, values)
   {
     df = getmRECIST(object)
     valueColName = "mRECIST"
+    summary.stat=";"
   }
 
   if(response.measure =="slop")
@@ -93,6 +94,11 @@ getValueFromModel <- function(object, model.id, values)
                 values=c("model.id","drug.join.name", "slop")
                 getValueFromModel(object, model.id, values)} )
     df = .convertListToDataFram(df)
+    #if(any(is.na(df$slop)))
+    #{
+    #  df = df[!is.na(df$slop), ]
+    #  warning("removing slope with NA")
+    #}
     valueColName = "slop"
   }
 
