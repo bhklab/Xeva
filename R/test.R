@@ -10,16 +10,17 @@ z=dc.fit[[2]]
 par(pty="s")
 plot(z$data$x, z$data$y)
 abline(z$fit)
-Point0 = z$data$y[1]
 
+Point0 = z$data$y[1]
 lxT = predict(z$fit, newdata = list(x=0))+ Point0
+
 abline(lxT, coef(z$fit), col="#a50f15")
 
 x = z$data$x
 y = (coef(z$fit)* x) + lxT
 lines(x, y)
 
-
+##---- create line from angle
 ang = atan(coef(z$fit)[["I(x - p)"]])
 yt = (tan(ang)* x) + lxT
 lines(x, yt)
