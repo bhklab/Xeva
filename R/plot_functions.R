@@ -76,41 +76,81 @@ setMethod( f=plotDrugResponse,
 NewPlotFunction <- function(DF, drug.join.name)
 {
 
+  library(ggplot2)
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
   drug.join.name = "paclitaxel"
 
 
+  dt = DF[DF$patient.id=="X-1004" & DF$exp.type=="treatment",]
+  dc = DF[DF$patient.id=="X-1004" & DF$exp.type=="control",]
   ##--- get range ------------------
   xr = range(DF$time, na.rm = TRUE)
   yr = range(DF$mean, DF$upper, DF$lower, na.rm = TRUE)
 
+
+
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  plt <- ggplot(DF, aes_string(x="time", y="mean", colour="color", group="color"))
+
+  plt <- plt + geom_errorbar(aes_string(ymin="lower", ymax="upper"), colour="black", width=.1, position=pd)
+  plt <- plt + geom_line(position=pd)
+  plt <- plt + geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
+  plt +    theme(legend.justification=c(1,0), legend.position=c(1,0))               # Position legend in bottom right
+
+    xlab("Dose (mg)") +
+    ylab("Tooth length") +
+    scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
+                     breaks=c("OJ", "VC"),
+                     labels=c("Orange juice", "Ascorbic acid"),
+                     l=40) +                    # Use darker colors, lightness=40
+    ggtitle("The Effect of Vitamin C on\nTooth Growth in Guinea Pigs") +
+    expand_limits(y=0) +                        # Expand y range
+    scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
+    theme_bw() +
+
+
+
+
+
   ##--------
-  #plt = ggplot() + geom_line(data = DF, aes(x=time, y=c2))
-  plt = ggplot(DF, aes(x = time, y = mean))+ xlim(xr) + ylim(yr) + geom_blank()
+  line1 = "dt"
+  plt = ggplot(dt, aes_string(x = "time", y = "mean", colour="color"))
+  plt = plt+ geom_point()
+
+  plt = plt + geom_line(aes(time, mean, color="My Line"), data=dc)
+  plt
+
 
   ## add one line
-  dt = DF[DF$patient.id=="X-1004" & DF$exp.type=="treatment",]
-  dc = DF[DF$patient.id=="X-1004" & DF$exp.type=="control",]
-
-  addLine2Plot <- function(plt, dx, colour="blue")
+  addLine2Plot <- function(plt, dx, colour="blue", legend="")
   {
-    plt = plt + geom_line(colour= colour, aes_string(x="time", y="mean"), dx)
+    plt = plt + geom_line(colour= colour, aes_string(x="time", y="mean", colour=legend), dx)
     return(plt)
   }
 
-  plt = addLine2Plot(plt, dt, colour="blue")
-  plt = addLine2Plot(plt, dc, colour="red")
+  plt = addLine2Plot(plt, dt, colour="blue", legend="l1")
+  plt = addLine2Plot(plt, dc, colour="red",  legend="l2")
 
 
+  #plt = ggplot() + geom_line(data = DF, aes(x=time, y=mean))
+  DF$leg = "red"
+  plt = ggplot(DF, aes(x = time, y = mean))+ xlim(xr) + ylim(yr) + geom_blank()
 
 
+  plt = ggplot(DF, aes(x = time, y = mean, colour=leg))+ geom_point() #+ xlim(xr) + ylim(yr) + geom_blank()
+
+  p <- ggplot(dt, aes(x=time, y=mean))
+  p = p + geom_line(aes_string(x="time", y="mean", colour="mean"), dt)
+  p = p + geom_line(aes_string(x="time", y="mean", colour="mean"), dc)
+  p + theme(legend.position="bottom")
 
 
-  d<-data.frame(x=1:5, y1=1:5, y2=2:6)
-  ggplot(d, aes(x)) +
-    geom_line(aes(y=y1, colour="1")) +
-    geom_line(aes(y=y2, colour="2")) +
-    scale_colour_manual(values=c("red", "blue"))
+  library(ggplot2)
+  line.data <- data.frame(x=seq(0, 10, length.out=10), y=runif(10, 0, 10))
+
+  plt = qplot(Sepal.Length, Petal.Length, color=Species, data=iris)
+  plt = plt + geom_line(colour= "black", aes(x, y, color="My Line"), data=line.data)
+  plt
 
 
 

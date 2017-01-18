@@ -117,6 +117,50 @@ plot_Batch_angel <- function(dt.fit, dc.fit, fitC, fitT, dfC, dfT, title="plot")
 
 }
 
+##--------------------------------------------------------------------
+
+#' @import ggplot2
+plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, fitC, fitT, title="plot")
+{
+
+  ##-----make one DF ----------------------------------------
+  dft = do.call(rbind, lapply(names(dt.fit), function(n)
+                       {d=dt.fit[[n]]$data; d$model.id=n; d } ))
+  dft$type = "treatment"
+
+  dfc = do.call(rbind, lapply(names(dc.fit), function(n)
+                       {d=dc.fit[[n]]$data; d$model.id=n; d } ))
+  dfc$type = "control"
+
+  DF = rbind(dft, dfc)
+  tcCol <- c("control" = "#6baed6", "treatment" = "#fc8d59")
+
+  plt <- ggplot(DF, aes_string(x="x", y="y", color= "type", group="model.id"))
+  plt <- plt + geom_line(linetype = 2)+ geom_point()
+  plt <- plt + scale_color_manual(values=tcCol)
+
+  ##-------add lm line -----------------------------------------------------------
+  addLMfitLines <- function(plt, fit, p0, color="black")
+  {
+    lx = predict(fit, newdata = list(x=0))+ p0
+    plt + geom_abline(intercept = lx, slope = coef(fit)[1], color=color)
+  }
+
+  plt <- addLMfitLines(plt, fit = fitC$fit, p0= fitC$data$y[1], color="blue")
+  plt <- addLMfitLines(plt, fit = fitT$fit, p0= fitT$data$y[1], color="red")
+  ##-------------------------------------------------------------------------------
+  plt <- plt + theme(aspect.ratio=1)
+  plt <- .ggplotEmptyTheme(plt)
+  plt <- plt + labs(title = title, x = "time", y = "log(volume)", colour = "")
+  plt <- plt + theme(plot.title = element_text(hjust = 0.5))
+  plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
+  #p + theme(legend.position='none')
+  return(plt)
+}
+
+
+
+
 
 
 ####-----------------------------------------------------------
@@ -169,7 +213,12 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
   angDiff = fitC$angel - fitT$angel
 
   if(plot==TRUE)
-  { plot_Batch_angel(dt.fit, dc.fit, fitC, fitT,dfC, dfT, title=expDegI$batch.name)}
+  {
+    #plot_Batch_angel(dt.fit, dc.fit, fitC, fitT,dfC, dfT, title=expDegI$batch.name)
+    plt <- plot_Batch_angel_ggplot(dt.fit, dc.fit, fitC, fitT, title=expDegI$batch.name)
+    #print(plt)
+    return(list(angle= angDiff, plot=plt))
+  }
 
   return(angDiff)
 }
@@ -182,8 +231,7 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
 ## calculate angle between control and treatment groups
 #'
 #' Calculate angle between control and treatment groups
-#'
-#'
+#' @description
 #' Given a batch (control and treatment model ids)
 #' it will return angle (in Degree) between
 #' the linear fit of treatment and control group
@@ -192,11 +240,22 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
 #' data(pdxe)
 #' # creat a experiment desing
 #' ExpDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
-#' df = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
-#'
+#' angl = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
+#' #print angle
+#' print(angl$angle)
+#' #print plot
+#' print(angl$myBatch$plot)
+#' #print without legend
+#' print(angl$myBatch$plot+ theme(legend.position='none'))
 #' @param object The \code{Xeva} dataset
 #' @param ExpDesign A list with batch.name, treatment and control
 #' @param var Name of the variable, default \code{volume}
+#' @param treatment.only default {TRUE}. If TRUE only treatment periode will be considered
+#' @param plot default \code{TRUE} will return a list with element \code{angle} value and plot
+#' @param log.y default \code{TRUE} will take log of the values before linear regression. After taking log all non-numeric (-Inf, Inf, NaN) values will be ignored
+#'
+#' @details If plot==TRUE, this will return a list with angle and plot. The plot is made using ggplot and can be ggplot customized for aesthetics. See example for details
+#'
 #' @return a \code{data.fram} with treatment, control and batch.name
 setGeneric(name = "calculateAngle",
            def = function(object, ExpDesign=NULL, var="volume", treatment.only=TRUE,
