@@ -3,7 +3,6 @@
 \name{computAngelFor1ExpDesign}
 \alias{computAngelFor1ExpDesign}
 \title{data(lpdx); object=lpdx
-batchNames <- batchNames(lpdx)
 expDegI  <- expDesign(lpdx, "PHLC111_P7")}
 \usage{
 computAngelFor1ExpDesign(object, expDegI, var = "volume",
@@ -11,7 +10,6 @@ computAngelFor1ExpDesign(object, expDegI, var = "volume",
 }
 \description{
 data(lpdx); object=lpdx
-batchNames <- batchNames(lpdx)
 expDegI  <- expDesign(lpdx, "PHLC111_P7")
 }
 

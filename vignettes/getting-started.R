@@ -45,6 +45,10 @@ sn <- Biobase::sampleNames(ldxe_mut)
 smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id")
 head(smap)
 
+## ---- echo=TRUE----------------------------------------------------------
+df = getExperiment(lpdx,"PHLC119_P5.506.B1.3")
+print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
+
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
 df <- getmRECIST(pdxe)
