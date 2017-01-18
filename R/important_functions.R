@@ -140,6 +140,7 @@ pasteColTogather <- function(df, collapse = " + ")
   plt +  ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
                         panel.grid.minor = ggplot2::element_blank(),
                         panel.background = ggplot2::element_blank(),
+                        legend.key=element_blank(),   ##removes legend background
                         axis.line = ggplot2::element_line(colour = "black"))
 }
 

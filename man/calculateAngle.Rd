@@ -13,6 +13,12 @@ calculateAngle(object, ExpDesign = NULL, var = "volume",
 \item{ExpDesign}{A list with batch.name, treatment and control}
 
 \item{var}{Name of the variable, default \code{volume}}
+
+\item{treatment.only}{default {TRUE}. If TRUE only treatment periode will be considered}
+
+\item{plot}{default \code{TRUE} will return a list with element \code{angle} value and plot}
+
+\item{log.y}{default \code{TRUE} will take log of the values before linear regression. After taking log all non-numeric (-Inf, Inf, NaN) values will be ignored}
 }
 \value{
 a \code{data.fram} with treatment, control and batch.name
@@ -22,11 +28,19 @@ Given a batch (control and treatment model ids)
 it will return angle (in Degree) between
 the linear fit of treatment and control group
 }
+\details{
+If plot==TRUE, this will return a list with angle and plot. The plot is made using ggplot and can be ggplot customized for aesthetics. See example for details
+}
 \examples{
 data(pdxe)
 # creat a experiment desing
 ExpDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
-df = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
-
+angl = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
+#print angle
+print(angl$angle)
+#print plot
+print(angl$plot)
+#print without legend
+print(angl$plot+ + theme(legend.position='none'))
 }
 
