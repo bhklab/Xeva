@@ -71,24 +71,50 @@ setMethod( f=mapModelSlotIds,
            signature=c(object="XevaSet"),
            definition= function(object, id, id.name, map.to="all", unique=TRUE)
            {
-             id = c(id)
-             .checkIfColPresentinModel(object, id.name)
+             id = c(as.character(id))
 
-             rtd = object@model[object@model[,id.name] %in% id, ]
-             if(map.to!="all")
+             if(id.name=="batch.name")
              {
-               .checkIfColPresentinModel(object, map.to)
-               rtd = rtd[, c(id.name, map.to)]
-               if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
-               rtd = unique(rtd)
+               rtd = .mapBatchName2Id(object, id, map.to)
+             } else{
+
+               .checkIfColPresentinModel(object, id.name)
+               rtd = object@model[object@model[,id.name] %in% id, ]
+               if(map.to!="all")
+               {
+                 .checkIfColPresentinModel(object, map.to)
+                 rtd = rtd[, c(id.name, map.to)]
+                 if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
+                 rtd = unique(rtd)
+               }
+
+               if(unique==FALSE)
+               { rtd = rtd[match(id, rtd[,id.name]),] }
              }
 
-             if(unique==FALSE)
-             { rtd = rtd[match(id, rtd[,id.name]),] }
              return(rtd)
            })
 
 ##--------------------------------------------------------------------------------------
+##-------------------------------------------------------------------------------------
+##-----map batch to patient.id --------------------------------------------------------
+##
+.mapBatchName2Id <- function(object, id, map.to)
+{
+  btMapRet = data.frame()
+  for(batch.name in id)
+  {
+    bt <- expDesign(object, batch.name = batch.name)
+    bt.Mod <- unique(c(bt$treatment, bt$control))
+    btMap = mapModelSlotIds(object, id= bt.Mod, id.name="model.id", map.to=map.to, unique=TRUE)
+    btMap[, "batch.name"] = batch.name
+    btMapRet = rbind(btMapRet, btMap)
+  }
+  btMapRet <- btMapRet[, c("batch.name", map.to)]
+  btMapRet <- unique(btMapRet); rownames(btMapRet)=NULL
+  return(btMapRet)
+}
+
 
 
 

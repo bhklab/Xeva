@@ -70,135 +70,68 @@ setMethod( f=plotDrugResponse,
 }
 
 ##----------------------------------------------------------------
+.takeLogOfDF <- function(DF, colN, removeNan=TRUE)
+{
+  DF[, colN] = log(DF[, colN])
+  if(removeNan==TRUE){
+  DF = DF[is.finite(DF[, colN]), ] }
+  return(DF)
+}
+
+
 
 #' @export
 #' @import ggplot2
-NewPlotFunction <- function(DF, drug.join.name)
+NewPlotFunction <- function(DF, control.col = "#6baed6", treatment.col="#fc8d59",
+                            title="", xlab = "Time", ylab = "Volume", SE.plot = "errorbar")
 {
 
+  #SE.plot = "errorbar"; #SE.plot = "ribbon"
+
   library(ggplot2)
+  #saveRDS(DFx, file = "DATA-raw/toPlot_DF.Rda")
   DF = readRDS("DATA-raw/toPlot_DF.Rda")
-  drug.join.name = "paclitaxel"
 
+  #if(log.y==TRUE & ylab=="Volume"){ylab = "Volume (in log)"}
+  #if(log.y==TRUE)
+  #{
+  #DF = .takeLogOfDF(DF, "mean")
+  #DF = .takeLogOfDF(DF, "upper")
+  #DF = .takeLogOfDF(DF, "lower")
+  #
+  #  DF = DF[is.finite(DF$mean), ]
+  #}
 
-  dt = DF[DF$patient.id=="X-1004" & DF$exp.type=="treatment",]
-  dc = DF[DF$patient.id=="X-1004" & DF$exp.type=="control",]
-  ##--- get range ------------------
-  xr = range(DF$time, na.rm = TRUE)
-  yr = range(DF$mean, DF$upper, DF$lower, na.rm = TRUE)
+  plt <- ggplot(DF, aes_string(x="time", y="mean", color= "exp.type"))#, group="model.id"))
+  plt <- plt + geom_line(linetype = 1)+ geom_point()
 
-
-
-  pd <- position_dodge(0.1) # move them .05 to the left and right
-  plt <- ggplot(DF, aes_string(x="time", y="mean", colour="color", group="color"))
-
-  plt <- plt + geom_errorbar(aes_string(ymin="lower", ymax="upper"), colour="black", width=.1, position=pd)
-  plt <- plt + geom_line(position=pd)
-  plt <- plt + geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-  plt +    theme(legend.justification=c(1,0), legend.position=c(1,0))               # Position legend in bottom right
-
-    xlab("Dose (mg)") +
-    ylab("Tooth length") +
-    scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
-                     breaks=c("OJ", "VC"),
-                     labels=c("Orange juice", "Ascorbic acid"),
-                     l=40) +                    # Use darker colors, lightness=40
-    ggtitle("The Effect of Vitamin C on\nTooth Growth in Guinea Pigs") +
-    expand_limits(y=0) +                        # Expand y range
-    scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
-    theme_bw() +
-
-
-
-
-
-  ##--------
-  line1 = "dt"
-  plt = ggplot(dt, aes_string(x = "time", y = "mean", colour="color"))
-  plt = plt+ geom_point()
-
-  plt = plt + geom_line(aes(time, mean, color="My Line"), data=dc)
-  plt
-
-
-  ## add one line
-  addLine2Plot <- function(plt, dx, colour="blue", legend="")
+  if(!is.null(DF$upper) & !is.null(DF$upper))
   {
-    plt = plt + geom_line(colour= colour, aes_string(x="time", y="mean", colour=legend), dx)
-    return(plt)
+    if(all(is.na(DF$upper))==FALSE & all(is.na(DF$lower))==FALSE)
+    {
+      if(SE.plot == "errorbar")
+      {
+        plt <- plt + geom_errorbar(aes_string(ymin = "lower", ymax = "upper"))
+      }
+      if(SE.plot == "ribbon")
+      {
+        plt <- plt + geom_ribbon(aes_string(ymin ="lower", ymax ="upper"), linetype=0, fill = "grey80")
+        plt <- plt + geom_line(aes_string(y = "mean"))+ geom_point()
+      }
+
+    }
   }
 
-  plt = addLine2Plot(plt, dt, colour="blue", legend="l1")
-  plt = addLine2Plot(plt, dc, colour="red",  legend="l2")
+  tcCol <- c("control" = control.col, "treatment" = treatment.col)
+  plt <- plt + scale_color_manual(values=tcCol)
+  #plt <- plt + theme(aspect.ratio=1)
+  plt <- .ggplotEmptyTheme(plt)
+  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = "")
+  plt <- plt + theme(plot.title = element_text(hjust = 0.5))
+  plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
 
-
-  #plt = ggplot() + geom_line(data = DF, aes(x=time, y=mean))
-  DF$leg = "red"
-  plt = ggplot(DF, aes(x = time, y = mean))+ xlim(xr) + ylim(yr) + geom_blank()
-
-
-  plt = ggplot(DF, aes(x = time, y = mean, colour=leg))+ geom_point() #+ xlim(xr) + ylim(yr) + geom_blank()
-
-  p <- ggplot(dt, aes(x=time, y=mean))
-  p = p + geom_line(aes_string(x="time", y="mean", colour="mean"), dt)
-  p = p + geom_line(aes_string(x="time", y="mean", colour="mean"), dc)
-  p + theme(legend.position="bottom")
-
-
-  library(ggplot2)
-  line.data <- data.frame(x=seq(0, 10, length.out=10), y=runif(10, 0, 10))
-
-  plt = qplot(Sepal.Length, Petal.Length, color=Species, data=iris)
-  plt = plt + geom_line(colour= "black", aes(x, y, color="My Line"), data=line.data)
-  plt
-
-
-
-
-
-
-
-
-
-
-  # create title objects
-  drug_name <- unique(DF$drug.join.name[DF$drug.join.name != 'untreated'])
-  title <- paste(length(DF$drug.join.name), 'Experiments for', drug_name)
-
-
-
-  # create a unique variable combining patient.id and exp.type
-  DF$patient.exp <- paste(DF$patient.id, DF$exp.type, sep = '_')
-
-  # create basic plot object
-  plot.1 <- ggplot(DF, aes(time, mean, group = patient.exp)) +
-    xlab('Time') + ylab('Volume') + ggtitle(title)
-
-
-    # if (!all(is.na(err.bars))) {
-    #   # add error bars if not all of the error bar columns are NA
-    #   plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
-    #
-    # }
-
-  # plot add legend to plot.1 and points
-  plot.final <- plot.1 + geom_line(aes(time, mean, colour = exp.type), data = DF, size = 0.7, alpha = 0.6) +
-  scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Control", "Treatment"))
-
-  # add final theme to plot.final
-  plotObject <- plot.final + theme(panel.background=element_rect(fill="#F0F0F0"),
-                                   plot.background=element_rect(fill="#F0F0F0"),
-                                   panel.grid.major=element_line(colour="#D0D0D0",size=.75), axis.ticks=element_blank(),
-                                   legend.position="bottom",  plot.title=element_text(face="bold",colour="Black",size=10),
-                                   axis.text.x=element_text(size=11,colour="#535353",face="bold"),
-                                   axis.text.y=element_text(size=11,colour="#535353",face="bold"),
-                                   axis.title.y=element_text(size=11,colour="#535353",face="bold",vjust=1.5),
-                                   axis.title.x=element_text(size=11,colour="#535353",face="bold",vjust=-.5))
-
-  return(plotObject)
-
+  return(plt)
 }
-
 
 
 ##===============================================
@@ -218,90 +151,6 @@ NewPlotFunction <- function(DF, drug.join.name)
 }
 
 ##================================================
-
-getExperimentDF <- function(expSlot, modelID, value)
-{
-  modelID = c(modelID)
-  rtx = lapply(modelID, function(x){expSlot[[x]][[value]]})
-
-  if(length(rtx)>1)
-  {
-    ##merge it, they are replacte
-  }
-  ## for now select 1
-  rtx = rtx[[1]]
-
-  return(rtx[,c("time", "volume")])
-}
-
-
-creatPlotDF <- function(expSlot, expList)
-{
-
-  col = rainbow(length(expDesX))
-  px = list()
-
-  for(I in 1:length(expDesX))
-  {
-    TrmodelID= expDesX[[I]][["treatment"]]
-    tdf = getExperimentDF(expSlot, modelID = TrmodelID, value="data")
-
-    CnmodelID= expDesX[[I]][["control"]]
-    cdf = getExperimentDF(expSlot, modelID=CnmodelID, value="data")
-
-    ##---add drug name -----------------
-    tdf$drug = expDesX[[I]][["drug.join.name"]]
-    cdf$drug = expDesX[[I]][["drug.join.name"]]
-
-    ##--- add batch ID -----------------
-    tdf$batch = expDesX[[I]][["batch"]]
-    cdf$batch = expDesX[[I]][["batch"]]
-
-    ##--- add type ID -----------------
-    tdf$exp.type = "treatment"
-    cdf$exp.type = "control"
-
-    ## same color for all treatment and control
-    tdf$color = col[I]
-    cdf$color = col[I]
-
-    tdf$pch = 16
-    cdf$pch = 18
-
-    px[[I]] = rbind(tdf, cdf)
-  }
-
-  plotData = do.call(rbind, px)
-  return(plotData)
-}
-
-
-.get_Data <- function()
-{
-  if(1==2){
-  ## read the PDX object
-  toPlt = readRDS("DATA-raw/toPlot.rdata")
-  expSlot=toPlt$expSlot
-  expDesX=toPlt$expDesX
-  plotData = creatPlotDF(expSlot, expList)
-  plotData2 = plotData[plotData$batch=="X-2094",]
-  SE = (plotData2$volume/sum(plotData2$volume))*1000
-  plotData2$SE.lower = plotData2$volume - SE
-  plotData2$SE.upper = plotData2$volume + SE
-  saveRDS(list(plotData, plotData2), file = "DATA-raw/toPlot_DF.Rda")
-  }
-  plotData = readRDS("DATA-raw/toPlot_DF.Rda")
-  return(plotData)
-}
-
-# function to assign a seperate color
-getColor <- function(plotData)
-{
-  plotData$color <- ifelse(plotData$exp.type == 'treatment', 'blue', 'grey')
-  return(plotData)
-}
-
-
 plotDrugResponse_old <- function(expSlot, expList, diff.colors, patient.id = "X-1004")
 {
 
@@ -369,13 +218,3 @@ plotDrugResponse_old <- function(expSlot, expList, diff.colors, patient.id = "X-
 
   return(plotObject)
 }
-
-# plot once with different colors, once with same colors, using pch to differentiate.
-plotDrugResponse_old(diff.colors = T)
-plotDrugResponse_old(diff.colors = F)
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 processRawData <- function()
 {
-source("../PT/src/cxpMeta_mysql_functions.R")
+source("~/CXP/PT/src/cxpMeta_mysql_functions.R")
 DBcon = getCXPMetaDB_Conn()
 qtxt = "SELECT * FROM PDX_Gao2015_NatureMed_RAW;"
 rs <- dbSendQuery(DBcon, qtxt)
@@ -120,8 +120,7 @@ geoExp$expDesign = expDesign
 ##------------------------------------------------------
 #library(Biobase)
 rseq = readRDS("DATA-raw/Geo_RNAseq_fpkm.rdata")
-assaydata = as.matrix(rseq[1:50,]) ##only 50 genes
-
+assaydata = as.matrix(rseq)#[1:50,]) ##only 50 genes
 sampleID = colnames(assaydata)
 rnaseqMeta = data.frame(sampleID=sampleID)
 rownames(rnaseqMeta) = rnaseqMeta$sampleID
@@ -137,13 +136,59 @@ featuredata <- Biobase::AnnotatedDataFrame(data = featureDF)
 rnaseq <- Biobase::ExpressionSet(assayData=assaydata,
                                  phenoData=phenodata,
                                  featureData=featuredata)
-
-
-
 geoExp$RNASeq = rnaseq
 
-saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
+##---------------------------------------------------------
 
+##--- do once ---------------------------------------------
+if(1==2){
+mutX = readRDS("DATA-raw/Geo_Mut.rdata")
+rNam = unique(mutX$Gene); cNam = unique(mutX$Sample)
+mut = data.frame(matrix(0, nrow = length(rNam), ncol = length(cNam)))
+rownames(mut) = rNam ; colnames(mut)= cNam
+
+for(I in 1:nrow(mutX))
+{
+  vx = mutX[I, ]
+  if(mut[vx$Gene, vx$Sample]==0){ px = vx$Category}
+  if(mut[vx$Gene, vx$Sample]!=0)
+  {
+    pOld = mut[vx$Gene, vx$Sample]
+    pNew = vx$Category
+    p1 = c(pNew, unlist(strsplit(pOld, ";")))
+    px = paste(unique(p1), collapse = ";")
+  }
+  mut[vx$Gene, vx$Sample] = px
+}
+
+geneMap = unique( mutX[, c("Gene", "Entrez")] )
+##rownames(geneMap) = geneMap$Gene
+saveRDS(list(mut=mut, geneMap=geneMap), file="DATA-raw/Geo_Mut_matrix.rdata")
+}
+
+mutLst = readRDS("DATA-raw/Geo_Mut_matrix.rdata")
+assaydata = as.matrix(mutLst$mut)
+sampleID = colnames(assaydata)
+mutMeta = data.frame(sampleID=sampleID)
+rownames(mutMeta) = mutMeta$sampleID
+phenodata   <- Biobase::AnnotatedDataFrame(data = mutMeta)
+
+
+featureDF = data.frame(geneName = rownames(assaydata), Entrez=NA)
+rownames(featureDF) = featureDF$geneName
+#featuredata <- new("AnnotatedDataFrame", data = featureDF)
+featuredata <- Biobase::AnnotatedDataFrame(data = featureDF)
+
+
+mutSeq <- Biobase::ExpressionSet(assayData=assaydata,
+                                 phenoData=phenodata,
+                                 featureData=featuredata)
+geoExp$mutation = mutSeq
+
+##---------------------------------------------------------
+
+
+saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 
 }
 
@@ -189,7 +234,7 @@ creatXevaObject <- function()
   geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
   library(Xeva)
   pdxe = creatXevaSet(name = "PDXE",
-               molecularProfiles = list(RNASeq = geoExp$RNASeq),
+               molecularProfiles = list(RNASeq = geoExp$RNASeq, mutation=geoExp$mutation ),
                experiment = geoExp$experiment,
                expDesign  = geoExp$expDesign,
                model = geoExp$model,

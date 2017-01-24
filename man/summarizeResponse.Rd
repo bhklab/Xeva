@@ -12,7 +12,7 @@ summarizeResponse(object, response.measure = "mRECIST_recomputed",
 
 \item{response.measure}{\code{character} . Which response measure to use? Use the responseMeasures function to find out what measures are available for each Xeva set.}
 
-\item{group.by}{default \code{patient.id}. How the models should be grouped togather.}
+\item{group.by}{default \code{patient.id}. How the models should be grouped togather. See details}
 
 \item{summary.stat}{which summary method to use if more then multipal model.id response is found}
 }
@@ -29,7 +29,7 @@ There can be two types of response measure
 \item{per batch response : One response value for each Batch, e.g. angle between treatment and control groups}
 }
 In case of \code{per model response} output columns will be \code{model.id} (or group.by).
-For \code{per batch response} output columns will be \code{batch.name}.
+For \code{per batch response} \code{group.by} value can be \code{"batch.name"} .
 }
 \examples{
 data(pdxe)
