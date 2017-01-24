@@ -31,19 +31,26 @@ getIndex <- function(inVec, indxOf)
     for(c in colnames(dfx))
     {
       v = df[df[,row.var]==r & df[,col.var]==c, value]
+      if(length(v)==0){v=NA}
 
       if(collapse =="mean") {
          vz = mean(as.numeric(v[!is.na(v)]))
       } else if (collapse =="median"){
         vz = median(as.numeric(v[!is.na(v)]))
       } else {
-        vz= pasteWithoutNA(v, collapse = collapse)
-        if(vz==""){vz=NA}
+        if(length(v)>1)
+        {
+          vz= pasteWithoutNA(v, collapse = collapse)
+        } else{ vz=v }
+
+        if(!is.na(vz) & vz==""){vz=NA}
       }
+
       if(is.nan(vz)){vz = NA}
       dfx[r,c]=vz
     }
   }
+
   return(dfx)
 }
 
@@ -94,6 +101,19 @@ getIndex <- function(inVec, indxOf)
   newCN = append(OtherCN, columnName, after= (newIndx-1) )
   return(df[,newCN])
 }
+
+##------------------------------------------------------------------------------------------
+##---------------Convert data.frame columns from factors to characters ---------------------
+## This will convert all factor type columns to character columns
+.factor2char <- function(df)
+{
+  i <- sapply(df, is.factor)
+  df[i] <- lapply(df[i], as.character)
+  return(df)
+}
+
+
+
 
 ##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------

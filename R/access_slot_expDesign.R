@@ -36,6 +36,7 @@ setMethod( f="expDesignInfo<-",
 
 
 
+
 ##-------------------------------------------------------------------------------------
 #' Get all batch names
 #'
@@ -52,7 +53,8 @@ setMethod( f="batchNames",
            signature=c(object = "XevaSet"),
            definition=function(object)
            {
-             rtx = unlist(sapply(object@expDesign, "[[", "batch.name"))
+             #rtx = unlist(sapply(object@expDesign, "[[", "batch.name"))
+             rtx = names(expDesignInfo(object))
              return(rtx)
            } )
 
@@ -72,19 +74,27 @@ setMethod( f="expDesign",
            signature=c(object = "XevaSet"),
            definition=function(object, batch.name)
            {
-             sapply(object@expDesign, function(x){x$batch.name == batch.name})
-             for(x in object@expDesign)
+             #sapply(object@expDesign, function(x){x$batch.name == batch.name})
+             #for(x in object@expDesign)
+             #{
+             # if(x$batch.name == batch.name)return(x)
+             #}
+             bt <- expDesignInfo(object)[[batch.name]]
+             if(is.null(bt))
              {
-               if(x$batch.name == batch.name)return(x)
+               msg = sprintf("batch name %s not present\nuse batchNames(object) to see all batch names", batch.name)
+               stop(msg)
              }
-             #return(NULL) ##by default will return NULL
+             if(!is.null(bt) & bt$batch.name!= batch.name)
+             {
+               msg = sprintf("Batch slot name are different then batch.name")
+               stop(msg)
+             }
+             return(bt)
            } )
 
 ##-------------------------------------------------------------------------------------
 ##-------------------------------expDesign sanity check -------------------------------
-
-
-
 .sanityCheckExpDesign <- function(object, expDesign)
 {
   if(length(expDesign$control)==0 & length(expDesign$treatment)==0)
@@ -142,10 +152,6 @@ setMethod( f="expDesign",
   }
 
 }
-
-
-
-
 
 ##-------------------------------------------------------------------------------------
 ##-------------------------------------------------------------------------------------

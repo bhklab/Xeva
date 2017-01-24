@@ -39,8 +39,8 @@ angl = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRU
 #print angle
 print(angl$angle)
 #print plot
-print(angl$plot)
+print(angl$myBatch$plot)
 #print without legend
-print(angl$plot+ + theme(legend.position='none'))
+print(angl$myBatch$plot+ theme(legend.position='none'))
 }
 
