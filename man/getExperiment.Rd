@@ -5,7 +5,8 @@
 \title{For a given  model.id, it will return a data.fram
 containing all data stored in experiment slot}
 \usage{
-getExperiment(object, model.id, treatment.only = FALSE)
+getExperiment(object, model.id = NULL, batch.name = NULL,
+  treatment.only = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}

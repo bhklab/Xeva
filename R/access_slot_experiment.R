@@ -139,6 +139,35 @@ setMethod( f=selectModelIds, signature="XevaSet",
   return(mod.data)
 }
 
+
+.getCombinedDFforMultipalIDs <- function(object, model.ids, treatment.only)
+{
+  rv <- lapply(c(model.ids), function(modID)
+  {.getExperimentDataFromAExpID(object=object, modID, treatment.only=treatment.only)})
+  rv = .rbindListOfDataframs(rv)
+}
+
+
+.getExperimentForBatchName <- function(object, batch.name, treatment.only)
+{
+  rtxTr = NULL; rtxCn=NULL
+  expDesign <- expDesign(object, batch.name)
+  if(length(expDesign$treatment)>0)
+  {
+    rtxTr <- .getCombinedDFforMultipalIDs(object, expDesign$treatment, treatment.only)
+    rtxTr$exp.type = "treatment"
+  }
+
+  if(length(expDesign$control)>0)
+  {
+    rtxCn <- .getCombinedDFforMultipalIDs(object, expDesign$control, treatment.only)
+    rtxCn$exp.type = "control"
+  }
+
+  rv = rbind(rtxTr, rtxCn)
+  return(rv)
+}
+
 ##--------------------------------------------------------------------------------------------------
 ##----- get experiment data in flat data.fram ------------------------------------------------------
 #' For a given  model.id, it will return a data.fram
@@ -151,19 +180,35 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #' @param model.id The \code{model.id} for which data is required
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @return a \code{data.fram} will all the the values stored in experiment slot
-setGeneric(name = "getExperiment", def = function(object, model.id,treatment.only=FALSE)
+setGeneric(name = "getExperiment", def = function(object, model.id=NULL, batch.name=NULL, treatment.only=FALSE)
   {standardGeneric("getExperiment")} )
 
 #' @export
 setMethod( f=getExperiment,
            signature="XevaSet",
-           definition=function(object, model.id, treatment.only=FALSE)
+           definition=function(object, model.id=NULL, batch.name=NULL, treatment.only=FALSE)
            {
-             model.ids = unique(c(model.id))
-             rtx = lapply(model.ids, function(modID)
-               {.getExperimentDataFromAExpID(object=object,
-                                             modID, treatment.only=treatment.only)})
-             rtz = .rbindListOfDataframs(rtx)
+             if(is.null(model.id) & is.null(batch.name))
+             {
+               msg = sprintf("model.id and batch.name both NULL")
+               stop(msg)
+             }
+
+             if(!is.null(model.id))
+             {
+               model.ids = unique(c(model.id))
+               #rtx = lapply(model.ids, function(modID)
+               #{.getExperimentDataFromAExpID(object=object,
+               #                               modID, treatment.only=treatment.only)})
+               #rtz = .rbindListOfDataframs(rtx)
+               rtz = .getCombinedDFforMultipalIDs(object, model.ids, treatment.only)
+
+             }
+
+             if(is.null(model.id) & !is.null(batch.name))
+             {
+               rtz <- .getExperimentForBatchName(object, batch.name, treatment.only)
+             }
              return(rtz)
            })
 

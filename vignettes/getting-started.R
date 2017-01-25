@@ -15,23 +15,25 @@ df = getExperiment(lpdx, model.id = modId)
 head(df)
 
 ## ---- echo=TRUE----------------------------------------------------------
-df = getExperiment(lpdx, model.id = modId, treatment.only = TRUE)
+df = getExperiment(lpdx, modId, treatment.only = TRUE)
 head(df)
 
 ## ---- echo=TRUE----------------------------------------------------------
-print(batchNames(lpdx)) 
+print(batchNames(lpdx))
+df = getExperiment(lpdx, batch.name = batchNames(lpdx)[1], treatment.only = TRUE)
+head(df)
 
 ## ---- echo=TRUE,fig.width = 12, fig.height = 12--------------------------
 batchNames <- batchNames(lpdx)
 expDesign  <- expDesign(lpdx, batchNames[1])
-ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
-print(ang)
+#ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
+#print(ang)
 
 #par(mfrow=c(5,3))
 for(I in batchNames)
 {
   expDesign  <- expDesign(lpdx, I)
-  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
+  #ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
 #  print(ang)
 }
 
@@ -58,8 +60,8 @@ smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id"
 head(smap)
 
 ## ---- echo=TRUE----------------------------------------------------------
-df = getExperiment(lpdx,"PHLC119_P5.506.B1")
-print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
+df = getExperiment(lpdx, "PHLC119_P5.506.B1")
+#print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
 
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
