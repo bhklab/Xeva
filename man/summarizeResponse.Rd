@@ -14,7 +14,7 @@ summarizeResponse(object, response.measure = "mRECIST_recomputed",
 
 \item{group.by}{default \code{patient.id}. How the models should be grouped togather. See details}
 
-\item{summary.stat}{which summary method to use if more then multipal model.id response is found}
+\item{summary.stat}{which summary method to use if multipal ids were found}
 }
 \value{
 a \code{matrix} with rows as drug names, coulmn as \code{group.by} and each cell contains \code{response.measure} for the pair.

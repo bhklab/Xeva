@@ -1,11 +1,5 @@
 ##to for datafram to Exp slot
 
-
-
-
-
-
-
 creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 {
   rtx = list()
@@ -25,24 +19,19 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 
   rtx$drug = drug
 
-  ##--- elements with unique function ----------------------------------------------
-  ## except formula we do not need this infromation so remove it
-  eleUnq = c("formula", "tumor.type", "batch", "exp.type")
-  for (u in eleUnq)
+  ##------------ set extra col -----------------------------------------------------
+  if(!is.null(extraCol))
   {
-    if(is.element(u, colnames(exp.mod.dg)))
+    for(ec in c(extraCol))
     {
-      rtx[[u]] = unique(exp.mod.dg[,u])
-      if(length(rtx[[u]])>1)
-      {
-        msg = sprintf("For model.id==%s and drug==%s, %s is not unique",
-                      rtx$model.id, rtx$drug$join.name, u)
-        stop(msg)
-      }
+      vx = exp.mod.dg[, ec]
+      if(length(unique(vx))==1)
+      { vx = unique(vx) }
+      rtx[[ec]] = vx
     }
   }
-  ##---------------------------------------------------------------------------------
 
+  ##-------------------------------------------------------------------------
   doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
   dataColName = c("time", "volume", "width","length",
                   doseColsNames, "body.weight", "date", "comment")
@@ -55,7 +44,6 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   }
 
   ##---- should we add dose.1 + dose.2 .... to dose
-
   rtxData = data.frame(lapply(exp.mod.dg[,dataColName], as.character), stringsAsFactors=FALSE)
   ##------ change column type for each column -----------------------------------------------
   rtxData$time  = as.numeric(rtxData$time)
@@ -69,18 +57,17 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 
   rtxData = BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
-  rtx$data= rtxData
+  ##------ remove all cols which are NA -----------
+  rtxData = rtxData[, colSums(is.na(rtxData)) != nrow(rtxData)]
 
-  ###--------- add extra information --------------------------------------------------------
-  #if(!is.null(extraCol))
-  #{  }
+  rtx$data= rtxData
 
   return(rtx)
 }
 
 
 ###----- define standard column names -----------
-getColumnsDF <- function()
+.getColumnsDF <- function()
 {
   standCol = c("model.id", "drug", "time", "volume", "width","length",
                "date", "body.weight","formula")
@@ -94,7 +81,7 @@ getColumnsDF <- function()
 ## @export
 experimentSlotfromDf <- function(experiment)
 {
-  clnm = getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
+  clnm = .getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
 
   drugColsName = colnames(experiment)[grep("drug",colnames(experiment))]
 
@@ -106,7 +93,6 @@ experimentSlotfromDf <- function(experiment)
     stop(msg)
   }
 
-
   if(length(drugColsName)==0)
   {
     msg = sprintf("Column with drug information requred\nDrug infromation column should be named drug, drug.1 ...\n")
@@ -117,8 +103,14 @@ experimentSlotfromDf <- function(experiment)
   }
 
   doseColsName = colnames(experiment)[grep("dose",colnames(experiment))]
+  if(length(doseColsName)==0)
+  {
+    msg = sprintf("No dose column found\n")
+    warning(msg)
+  }
+
   standardCols = c(requredCols, doseColsName, "width","length", "date", "time",
-                   "formula", "body.weight", "comment" )
+                   "body.weight", "comment" )
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
@@ -151,8 +143,6 @@ experimentSlotfromDf <- function(experiment)
     stop(msg)
   }
 
-  #if(any(is.na(u.modDrg.id$drug)))
-  #{ stop("drug is NA") }
 
   expSlot = list()
   for (i in 1:dim(u.modDrg.id)[1])

@@ -90,7 +90,7 @@ computemRECIST <- function(best.response, best.average.response)
 }
 
 
-
+## returns updated model ------------------------------
 mRECISTForModel <- function(modx)
 {
   if(is.null(modx$best.response$value))
