@@ -4,7 +4,19 @@ knitr::opts_chunk$set(echo = TRUE)
 ## ----load, echo=TRUE-----------------------------------------------------
 library(Xeva)
 data(lpdx)
-head(modelInfo(lpdx))
+
+## ---- echo=TRUE----------------------------------------------------------
+lpdx.mod = modelInfo(lpdx)
+head(lpdx.mod$model.id)
+
+## ---- echo=TRUE----------------------------------------------------------
+modId = lpdx.mod$model.id[82]
+df = getExperiment(lpdx, model.id = modId)
+head(df)
+
+## ---- echo=TRUE----------------------------------------------------------
+df = getExperiment(lpdx, model.id = modId, treatment.only = TRUE)
+head(df)
 
 ## ---- echo=TRUE----------------------------------------------------------
 print(batchNames(lpdx)) 
@@ -46,7 +58,7 @@ smap <- mapModelSlotIds(lpdx, id=sn, id.name = "biobase.id", map.to = "model.id"
 head(smap)
 
 ## ---- echo=TRUE----------------------------------------------------------
-df = getExperiment(lpdx,"PHLC119_P5.506.B1.3")
+df = getExperiment(lpdx,"PHLC119_P5.506.B1")
 print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
 
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------

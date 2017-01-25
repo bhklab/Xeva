@@ -4,7 +4,7 @@
 \alias{computemRECIST}
 \title{Computes the mRECIST}
 \usage{
-computemRECIST(best.response, best.average.response)
+computemRECIST(time, volume, min.time = 10, return.detail = FALSE)
 }
 \arguments{
 \item{best.response}{Value of best response}

@@ -36,9 +36,6 @@ read_curveMetrics <- function()
 
 
 
-
-
-
 processRawData <- function()
 {
 source("~/CXP/PT/src/cxpMeta_mysql_functions.R")
@@ -113,12 +110,12 @@ experiment = data.frame(model.id = experimentX$model.id,
                         body.weight= experimentX$`body.weight.(g)`,
                         treatment.target = experimentX$Treatment.target,
                         treatment.type = experimentX$Treatment.type,
-                        bestResponse_published = experimentX$BestResponse,
-                        day.bestResponse_published = experimentX$Day_BestResponse,
-                        bestAvgResponse_published = experimentX$BestAvgResponse,
-                        day.bestAvgResponse_published = experimentX$Day_BestAvgResponse,
+                        best.response_published = experimentX$BestResponse,
+                        time.best.response_published = experimentX$Day_BestResponse,
+                        best.avg.response_published = experimentX$BestAvgResponse,
+                        time.best.avg.response_published = experimentX$Day_BestAvgResponse,
                         timeToDouble_published = experimentX$TimeToDouble,
-                        day.last_published = experimentX$Day_Last,
+                        time.last_published = experimentX$Day_Last,
                         mRECIST_published = experimentX$ResponseCategory,
                         stringsAsFactors = FALSE)
 
@@ -264,12 +261,6 @@ saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 }
 
 
-
-
-
-
-
-
 creatXevaObject <- function()
 {
   processRawData()
@@ -282,9 +273,9 @@ creatXevaObject <- function()
                model = geoExp$model,
                drug  = geoExp$drug)
 
-  #setmRECIST(pdxe)<- setmRECIST(pdxe)
-  #setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
-  #setAngle(pdxe) <- setAngle(pdxe)
+  setmRECIST(pdxe)<- setmRECIST(pdxe)
+  setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
+  setAngle(pdxe) <- setAngle(pdxe)
 
   save(pdxe, file = "data/pdxe.rda")
 

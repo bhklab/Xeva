@@ -12,7 +12,7 @@ setGeneric(name = "modelInfo", def = function(object) {standardGeneric("modelInf
 #' @export
 setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object)
-           { object@model } )
+           { slot(object,name="model") } )
 
 
 #' modelInfo<- Generic
