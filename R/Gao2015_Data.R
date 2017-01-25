@@ -1,3 +1,44 @@
+read_curveMetrics <- function()
+{
+
+  rd = readRDS("~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_raw_data.Rda")
+  rdv = unique(rd[, c("Model","Tumor.Type")])
+  #naModID = dzv[is.na(dzv$Tumor.Type), "Model"]
+  #dzv[dzv$Model%in%naModID,]
+  ##--- remove NA
+  rdv = rdv[!is.na(rdv$Tumor.Type),]
+  ##--- read and merge the curve matrix ---------------------------------------
+  fl = "~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_curve_metrics.Rda"
+  cvm = readRDS(fl)
+
+  cvm = merge(cvm, rdv, by.x = "Model", by.y = "Model")
+  pubLung = unique(cvm[cvm$Tumor.Type=="NSCLC", c("Model","Treatment")])
+  table(pubLung$Treatment)
+
+  data(pdxe)
+  dfx = getmRECIST(pdxe)
+  dfMap = mapModelSlotIds(object=pdxe, id=dfx$model.id, id.name="model.id",
+                          map.to="tumor.type", unique=TRUE)
+
+  dfx = merge(dfx, dfMap, by.x = "model.id", by.y = "model.id")
+  lungDf = dfx[dfx$tumor.type=="NSCLC",]
+
+  pubLung[!(pubLung$Model %in% lungDf$biobase.id),]
+
+  lungDf[!(lungDf$biobase.id %in% pubLung$Model), "biobase.id"]
+
+
+
+
+
+
+}
+
+
+
+
+
+
 processRawData <- function()
 {
 source("~/CXP/PT/src/cxpMeta_mysql_functions.R")
@@ -8,8 +49,29 @@ rs <- dbSendQuery(DBcon, qtxt)
 experimentX <- fetch(rs, n=-1)
 closeAllDBconn()
 
+##-----------------------------------------------------------------------
 
+curMFile <- "~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_curve_metrics.Rda"
+curM <- readRDS(curMFile)
+curM$Treatment = gsub('figitumumab\"', 'figitumumab', curM$Treatment)
 
+curM$mod.treat = paste(curM$Model, curM$Treatment, sep = "_")
+experimentX$mod.treat = paste(experimentX$Model, experimentX$Treatment, sep = "_")
+
+expMerge = merge(experimentX, curM, by.x = "mod.treat", by.y = "mod.treat")
+
+colNm <- c("mod.treat", "Model.x", "Tumor.Type", "Treatment.x", "Volume.(mm3)",
+           "body.weight.(g)", "Days.Post.T0", "percent.TVol.Difference",
+           "percent.BW.Difference", "N.Treatment", "Treatment.1", "Treatment.2",
+           "Treatment.3", "Treatment.target", "Treatment.type", "BestResponse",
+           "Day_BestResponse", "BestAvgResponse", "Day_BestAvgResponse",
+           "TimeToDouble", "Day_Last", "ResponseCategory")
+
+expMerge = expMerge[, colNm]
+colnames(expMerge) = gsub("Model.x", "Model", colnames(expMerge))
+colnames(expMerge) = gsub("Treatment.x", "Treatment", colnames(expMerge))
+
+experimentX = expMerge
 ##------------------------------------------------
 modTr = unique(experimentX[, c("Model", "Treatment.1", "Treatment.2", "Treatment.3", "Treatment")])
 
@@ -49,6 +111,15 @@ experiment = data.frame(model.id = experimentX$model.id,
                         time  = experimentX$Days.Post.T0,
                         volume= experimentX$`Volume.(mm3)`,
                         body.weight= experimentX$`body.weight.(g)`,
+                        treatment.target = experimentX$Treatment.target,
+                        treatment.type = experimentX$Treatment.type,
+                        bestResponse_published = experimentX$BestResponse,
+                        day.bestResponse_published = experimentX$Day_BestResponse,
+                        bestAvgResponse_published = experimentX$BestAvgResponse,
+                        day.bestAvgResponse_published = experimentX$Day_BestAvgResponse,
+                        timeToDouble_published = experimentX$TimeToDouble,
+                        day.last_published = experimentX$Day_Last,
+                        mRECIST_published = experimentX$ResponseCategory,
                         stringsAsFactors = FALSE)
 
 experimentMin = experiment
@@ -193,36 +264,7 @@ saveRDS(geoExp, file = "DATA-raw/Geo_Exp.Rda")
 }
 
 
-read_curveMetrics <- function()
-{
 
-  rd = readRDS("~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_raw_data.Rda")
-  rdv = unique(rd[, c("Model","Tumor.Type")])
-  #naModID = dzv[is.na(dzv$Tumor.Type), "Model"]
-  #dzv[dzv$Model%in%naModID,]
-  ##--- remove NA
-  rdv = rdv[!is.na(rdv$Tumor.Type),]
-  ##--- read and merge the curve matrix ---------------------------------------
-  fl = "~/CXP/XG/Data/Gao_2015_NatureMed/nm.3954-S2_PCT_curve_metrics.Rda"
-  cvm = readRDS(fl)
-
-  cvm = merge(cvm, rdv, by.x = "Model", by.y = "Model")
-  pubLung = unique(cvm[cvm$Tumor.Type=="NSCLC", c("Model","Treatment")])
-  table(pubLung$Treatment)
-
-  data(pdxe)
-  dfx = getmRECIST(pdxe)
-  dfMap = mapModelSlotIds(object=pdxe, id=dfx$model.id, id.name="model.id",
-                          map.to="tumor.type", unique=TRUE)
-
-  dfx = merge(dfx, dfMap, by.x = "model.id", by.y = "model.id")
-  lungDf = dfx[dfx$tumor.type=="NSCLC",]
-
-  pubLung[!(pubLung$Model %in% lungDf$biobase.id),]
-
-  lungDf[!(lungDf$biobase.id %in% pubLung$Model), "biobase.id"]
-
-}
 
 
 
@@ -240,9 +282,9 @@ creatXevaObject <- function()
                model = geoExp$model,
                drug  = geoExp$drug)
 
-  setmRECIST(pdxe)<- setmRECIST(pdxe)
-  setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
-  setAngle(pdxe) <- setAngle(pdxe)
+  #setmRECIST(pdxe)<- setmRECIST(pdxe)
+  #setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
+  #setAngle(pdxe) <- setAngle(pdxe)
 
   save(pdxe, file = "data/pdxe.rda")
 
