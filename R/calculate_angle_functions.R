@@ -175,7 +175,7 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
   {
     for(ti in expDegI$treatment)
     {
-      dt = getExperiment(object, ti, treatment.only = TRUE)
+      dt = getExperiment(object, model.id=ti, treatment.only = TRUE)
 
       dt.fit[[ti]] = .computSlopFun(dt$time, dt[,var], log.y=log.y)
     }
@@ -186,7 +186,7 @@ computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.on
   {
     for(ci in expDegI$control)
     {
-      dc = getExperiment(object, ci, treatment.only = TRUE)
+      dc = getExperiment(object, model.id=ci, treatment.only = TRUE)
       dc.fit[[ci]] = .computSlopFun(dc$time, dc[,var], log.y=log.y)
     }
   }
@@ -357,7 +357,7 @@ extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 ##------- Compute slop for one model ------------
 computeSlope <- function(object, model.id, treatment.only=TRUE)
 {
-  mod = getExperiment(object, model.id)
+  mod = getExperiment(object, model.id=model.id)
   time = mod$time; volume = mod$volume
   if(treatment.only==TRUE)
   {
