@@ -13,13 +13,33 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Load Xeva
-Load Xeva library and data.
+Load Xeva library and KRAS/P53 PDX data
 ```{r load, echo=TRUE}
 library(Xeva)
 data(lpdx)
-head(modelInfo(lpdx))
 ```
+
+
+To see all the model.id
+```{r, echo=TRUE}
+lpdx.mod = modelInfo(lpdx)
+head(lpdx.mod$model.id)
+```
+
+To get the data for one model.id
+```{r, echo=TRUE}
+modId = lpdx.mod$model.id[82]
+df = getExperiment(lpdx, model.id = modId)
+head(df)
+```
+
+In the data.fram df you will see that for first 3 time points dose is 0, which indicate no treatment is given during this time. If you want the data only during the treatment periode specify treatment.only = TRUE
+
+```{r, echo=TRUE}
+df = getExperiment(lpdx, model.id = modId, treatment.only = TRUE)
+head(df)
+```
+
 
 Models which belongs to same batch are in one list which is stored in expDesign slot. For example
 ```{r, echo=TRUE}
@@ -80,7 +100,7 @@ head(smap)
 
 What should we do here 
 ```{r, echo=TRUE}
-df = getExperiment(lpdx,"PHLC119_P5.506.B1.3")
+df = getExperiment(lpdx,"PHLC119_P5.506.B1")
 print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
 ```
 

@@ -4,7 +4,7 @@
 \alias{setmRECIST}
 \title{setmRECIST<- Generic for setmRECIST replace method}
 \usage{
-setmRECIST(object)
+setmRECIST(object, min.time = 10)
 }
 \arguments{
 \item{object}{The \code{XevaSet} object}
