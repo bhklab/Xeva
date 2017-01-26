@@ -1,21 +1,4 @@
 
-
-###----sensitivity/response ----------
-#
-# make_response_slot <- function(object)
-# {
-#   allDrg = unique(unlist(sapply(object@experiment, "[[", c("drug", "join.name"))))
-#   allMod = unique(unlist(sapply(object@experiment, "[[", "model.id")))
-#   modRes = matrix(NA, nrow = length(allDrg), ncol = length(allMod))
-#
-#   for(I in object@experiment)
-#   {
-#
-#
-#   }
-#
-# }
-
 .getDrugsForABatch <- function(object, batch)
 {
   getDrugForMod <- function(x){ object@experiment[[x]]$drug$join.name}
@@ -92,18 +75,46 @@
 
 
 
-getValueFromModel <- function(object, model.id, values)
+.getValueFrom1Model <- function(object, model.id, values)
 {
-  mod = object@experiment[[model.id]]
-  vz = c()
+  mod = slot(object, "experiment")[[model.id]]
+  vz = list() #c()
   for(v in c(values))
   {
     if(v=="drug.join.name")
     {
-      vz[v] = mod$drug$join.name
-    } else{ vz[v] = mod[[v]] }
+      vl = mod$drug$join.name
+    } else
+    {
+      vl = mod[[v]]
+    }
+
+    if(is.null(vl)) {vl = NA}
+    vz[[v]] = vl
   }
   return(vz)
+}
+
+.getValueFromAllModel <- function(object, values, tumor.type)
+{
+  mInfo <- modelInfo(object)
+  allModNames = mInfo[, "model.id"]
+  if(!is.null(tumor.type))
+  {
+    allModNames = mInfo[mInfo$tumor.type==tumor.type, "model.id"]
+    if(length(allModNames)<1)
+    {
+      tx <- paste(unique(mInfo$tumor.type), collapse = "\n")
+      msg <- sprintf("No model found for tumor.type %s\ntumor.type are %s", tumor.type, tx)
+      stop(msg)
+    }
+  }
+
+  #allModNames = names(slot(object, "experiment"))
+  dfL = lapply(allModNames, function(model.id)
+              { .getValueFrom1Model(object, model.id, values)})
+  df = .convertListToDataFram(dfL)
+  return(df)
 }
 
 .mapAndAttachColumn <- function(object, df, id.name, map.to)
@@ -116,24 +127,42 @@ getValueFromModel <- function(object, model.id, values)
   return(df)
 }
 
-.summarizePerModelResponse <- function(object, response.measure = "mRECIST_recomputed",
-                                       group.by="patient.id", summary.stat="mean")
+.summarizePerModelResponse <- function(object, response.measure, group.by, summary.stat, tumor.type)
 {
-  if(response.measure =="mRECIST_recomputed")
+  values <- c("model.id","drug.join.name")
+  valueColName <- NULL
+  if(response.measure =="mRECIST_recomputed" | response.measure =="mRECIST")
   {
-    df = getmRECIST(object)
-    valueColName = "mRECIST"
+    valueColName <- "mRECIST"
+    summary.stat=";"
+  }
+
+  if(response.measure =="mRECIST_published")
+  {
+    valueColName = "mRECIST_published"
     summary.stat=";"
   }
 
   if(response.measure =="slop")
   {
-    allModNames = names(object@experiment)
-    df = lapply(allModNames, function(model.id){
-                values=c("model.id","drug.join.name", "slop")
-                getValueFromModel(object, model.id, values)} )
-    df = .convertListToDataFram(df)
-    valueColName = "slop"
+    valueColName <- "slop"
+  }
+
+  ##------------------------------------------------------
+  if(is.null(valueColName))
+  {
+    varPresTest <- checkExperimentSlotVariable(object, response.measure)
+    if(varPresTest==TRUE)
+    { valueColName <- response.measure }
+  }
+
+  values <- c("model.id","drug.join.name", valueColName)
+  df <- .getValueFromAllModel(object, values, tumor.type)
+
+  if(all(is.na(df[, valueColName]))==TRUE)
+  {
+    msg = sprintf("all values for %s are NA", valueColName)
+    warning(msg)
   }
 
   if(group.by!="model.id")
@@ -148,11 +177,6 @@ getValueFromModel <- function(object, model.id, values)
 }
 
 
-
-#.checkGroupByValue <- function(object, group.by, response.measure)
-#{
-#  if(group.by=="batch.name" & )
-#}
 
 #####================= summarizeResponse ==================
 #' Summarize Response of PDXs
@@ -177,9 +201,13 @@ getValueFromModel <- function(object, model.id, values)
 #' @examples
 #' data(pdxe)
 #' pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed", group.by="patient.id")
+#' #to get only lung PDXE
+#' pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+#'                              group.by="patient.id", tumor.type="NSCLC")
 #' @export
 summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
-                              group.by="patient.id", summary.stat=c("mean", "median", ";"))
+                              group.by="patient.id", summary.stat=c("mean", "median", ";"),
+                              tumor.type=NULL)
 {
 
   summary.stat = c(summary.stat)[1]
@@ -193,24 +221,27 @@ summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
     }
   }
 
-  if(response.measure =="mRECIST_recomputed")
-  {
-    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-                               group.by=group.by)
-  }
-
-  if(response.measure =="slop")
-  {
-    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-                               group.by=group.by, summary.stat=summary.stat)
-  }
-
   if(response.measure =="angle")
   {
     mat <- .summarizePerBatchResponse(object, response.measure = "angle",
-                               group.by=group.by, summary.stat=summary.stat)
+                                      group.by=group.by, summary.stat=summary.stat)
 
+  } else
+  {
+    #if(response.measure =="mRECIST_recomputed")
+    #{
+    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
+                                      group.by=group.by, summary.stat=summary.stat,
+                                      tumor.type=tumor.type)
+    #}
+    #if(response.measure =="slop")
+    #{
+    #  mat <- .summarizePerModelResponse(object, response.measure=response.measure,
+    #                                    group.by=group.by, summary.stat=summary.stat,
+    #                                    tumor.type=tumor.type)
+    #}
   }
+
 
   return(mat)
 }
