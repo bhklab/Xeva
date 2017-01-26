@@ -5,7 +5,9 @@
 \title{Plot mRECIST for models and drugs
 \code{plot.mRECIST} plots the mRECIST}
 \usage{
-plotmRECIST(df, groupBy = "biobase.id", control.name = "untreated")
+plotmRECIST(mat, control.name = NA, control.col = "green",
+  drug.col = "black", colPalette = list(CR = "#377eb8", PR = "#4daf4a", SD =
+  "#fec44f", PD = "#e41a1c"), name = "Drug & Models")
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -21,13 +23,9 @@ Plot mRECIST for models and drugs
 }
 \examples{
 data(pdxe)
-df = getmRECIST(pdxe)
-## add tumor.type information
-dfMap = mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id",
-                                map.to="tumor.type", unique=FALSE)
-df$tumor.type = dfMap$tumor.type
-## select only lung cancer models
-lungDf = df[df$tumor.type=="NSCLC",]
-plotmRECIST(lungDf, groupBy = "biobase.id", control.name = "untreated")
+## select lung cancer pdxe data
+pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+                               group.by="patient.id", tumor.type="NSCLC")
+plotmRECIST(pdxe.lung, control.name = "untreated")
 }
 

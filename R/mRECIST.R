@@ -43,20 +43,20 @@ getBestResponse <- function(time, response, min.time=NULL)
   return(rtz)
 }
 
-calculateResponses <- function(time, volume, min.time=NULL)
-{
-  if(length(time)!= length(volume))
-  {stop("time and volume should be of equeal lenght")}
-
-  exdf = list(time=time, volume=volume)
-  exdf$volume.change = tumorVolumeChange(exdf$volume)
-  exdf$average.response= avgResponse(exdf$volume.change)
-
-  exdf$best.response = getBestResponse(exdf$time, exdf$volume.change, min.time=min.time)
-  exdf$best.average.response = getBestResponse(exdf$time, exdf$average.response, min.time=min.time)
-
-  return(exdf)
-}
+# calculateResponses <- function(time, volume, min.time=NULL)
+# {
+#   if(length(time)!= length(volume))
+#   {stop("time and volume should be of equeal lenght")}
+#
+#   exdf = list(time=time, volume=volume)
+#   exdf$volume.change = tumorVolumeChange(exdf$volume)
+#   exdf$average.response= avgResponse(exdf$volume.change)
+#
+#   exdf$best.response = getBestResponse(exdf$time, exdf$volume.change, min.time=min.time)
+#   exdf$best.average.response = getBestResponse(exdf$time, exdf$average.response, min.time=min.time)
+#
+#   return(exdf)
+# }
 
 ######################################################################
 #' Computes the mRECIST
@@ -237,9 +237,4 @@ setMethod( f=getmRECIST,
              return(rtx[,dataColName])
            }
            )
-
-
-
-
-
 
