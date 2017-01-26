@@ -197,10 +197,6 @@ setMethod( f=getExperiment,
              if(!is.null(model.id))
              {
                model.ids = unique(c(model.id))
-               #rtx = lapply(model.ids, function(modID)
-               #{.getExperimentDataFromAExpID(object=object,
-               #                               modID, treatment.only=treatment.only)})
-               #rtz = .rbindListOfDataframs(rtx)
                rtz = .getCombinedDFforMultipalIDs(object, model.ids, treatment.only)
 
              }
@@ -215,5 +211,67 @@ setMethod( f=getExperiment,
 
 
 
+##-----------------------------------------------------------------------
 
+## checks if a variable exist in Experiment slot
+
+checkExperimentSlotVariable <- function(object, value)
+{
+  vars = lapply(slot(object, "experiment"), names)
+  obj.vars = unique(unlist(vars))
+  if(is.element(value, obj.vars)==FALSE)
+  {
+    msg = sprintf("%s is not part of experiment slot.
+                  Avalible variables are\n%s", value, paste(obj.vars, collapse="\n"))
+    stop(msg)
+  }
+  return(TRUE)
+}
+
+
+##---------------------------------------------------------------------------------------
+#' print Xeva object
+#'
+#' \code{print} displays Xeva object information or model or batch information
+#'
+#' @param object \code{Xeva} object
+#' @param id default \code{NULL}, id can be \code{model.id} or \code{batch.name}
+#'
+#' @return  Prints object, model or batch information.
+#'
+#' @examples
+#' data(pdxe)
+#' # to print object information
+#' print(pdxe)
+#'
+#' # to print a model
+#' model.id = modelInfo(pdxe)$model.id[1]
+#' print(pdxe, id = model.id)
+#'
+#' # to print a batch
+#' batch.id = batchNames(pdxe)[1]
+#' print(pdxe, id = batch.id)
+#' @export
+print.XevaSet <- function(object, id=NULL)
+{
+  if(is.null(id))
+  {
+    show(object)
+  } else
+  {
+    if(is.character(id)==FALSE)
+    {
+      msg <- sprintf("id should be character type")
+      stop(msg)
+    }
+    mod <- slot(object, "experiment")[[id]]
+    if(is.null(mod))
+    {
+      mod <- slot(object, "expDesign")[[id]]
+    }
+    print(mod)
+  }
+}
+
+##--------------------------------------------------------------------------------
 
