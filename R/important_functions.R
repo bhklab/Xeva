@@ -1,12 +1,30 @@
 #' @export
 .convertListToDataFram <- function(inLst)
 {
+  name.Rows = names(inLst)
+  if(is.null(name.Rows))
+  { name.Rows= 1:length(inLst)}
+
+  name.Cols = unique(unlist(lapply(inLst, names)))
+  if(is.null(name.Cols))
+  { name.Cols = 1:max(unlist(lapply(inLst, length))) }
+
+  rd = data.frame(matrix(NA, nrow = length(name.Rows), ncol = length(name.Cols)))
+  rownames(rd) = name.Rows
+  colnames(rd) = name.Cols
+  for(rx in name.Rows)
+  {
+    v = inLst[[rx]]
+    if(is.null(names(v))){names(v) = 1:length(v)}
+    rd[rx, names(v)] = unlist(v, use.names = TRUE)[names(v)]
+  }
   ##-- this will convert list to data.fram
-  mxInd = max(sapply(inLst, length))
-  rlst  = as.data.frame(do.call(rbind,lapply(inLst, `length<-`, mxInd )), stringsAsFactors = FALSE)
-  #rlst  = data.frame(as.matrix(rlst), stringsAsFactors = FALSE)
-  #colnames(rlst) <- names(lst[[which.max(indx)]])
-  return(rlst)
+  #mxInd = max(sapply(inLst, length))
+  #rlst  = as.data.frame(do.call(rbind,lapply(inLst, `length<-`, mxInd )), stringsAsFactors = FALSE)
+  ##rlst  = data.frame(as.matrix(rlst), stringsAsFactors = FALSE)
+  ##colnames(rlst) <- names(lst[[which.max(indx)]])
+  #return(rlst)
+  return(rd)
 }
 
 
@@ -32,16 +50,20 @@ getIndex <- function(inVec, indxOf)
     {
       v = df[df[,row.var]==r & df[,col.var]==c, value]
       if(length(v)==0){v=NA}
-
-      if(collapse =="mean") {
-         vz = mean(as.numeric(v[!is.na(v)]))
-      } else if (collapse =="median"){
+      vz=NULL
+      if(collapse =="mean")
+      {
+        vz = mean(as.numeric(v[!is.na(v)]))
+      } else if (collapse =="median")
+      {
         vz = median(as.numeric(v[!is.na(v)]))
-      } else {
+      } else
+      {
         if(length(v)>1)
         {
           vz= pasteWithoutNA(v, collapse = collapse)
-        } else{ vz=v }
+        } else
+        { vz=v }
 
         if(!is.na(vz) & vz==""){vz=NA}
       }
