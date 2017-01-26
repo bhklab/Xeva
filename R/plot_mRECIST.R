@@ -115,7 +115,7 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
   return(list(colPlt= column_ha, rowPlt= row_ha))
 }
 
-.sortPlotMat <- function(mat, controlD =NA, control.col="green", drug.col="black")
+.sortPlotMat <- function(mat, controlD, control.col, drug.col)
 {
   ##-------first sort by NA -----------------------------------
   rowNa = apply(mat, 1, function(x)sum(is.na(x)))
@@ -157,27 +157,26 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @return plot
 #' @examples
 #' data(pdxe)
-#' df = getmRECIST(pdxe)
-#' ## add tumor.type information
-#' dfMap = mapModelSlotIds(object=pdxe, id=df$model.id, id.name="model.id",
-#'                                 map.to="tumor.type", unique=FALSE)
-#' df$tumor.type = dfMap$tumor.type
-#' ## select only lung cancer models
-#' lungDf = df[df$tumor.type=="NSCLC",]
-#' plotmRECIST(lungDf, groupBy = "biobase.id", control.name = "untreated")
+#' ## select lung cancer pdxe data
+#' pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+#'                                group.by="patient.id", tumor.type="NSCLC")
+#' plotmRECIST(pdxe.lung, control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
 #' @import grid
-plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
+plotmRECIST <- function(mat, control.name = NA, control.col="green", drug.col="black",
+                        colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c"),
+                        name = "Drug & Models")
 {
-
   control.name = c(control.name)
-  mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")
-  matRC = .sortPlotMat(mat, controlD=control.name, control.col="green", drug.col="black")
+  #mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")
+  matRC = .sortPlotMat(mat, controlD=control.name, control.col=control.col, drug.col=drug.col)
   mat = as.matrix(matRC$mat)
 
   #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
-  colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
+  if(is.null(colPalette))
+  { colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c") }
+
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
   bgCol = rep(backgroundCol, length(nameSpc))
@@ -185,7 +184,7 @@ plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
   sortCellValue = TRUE #FALSE
 
   sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=FALSE, scaleCol=FALSE)
-  pltX = ComplexHeatmap::Heatmap(mat, name = "Drug & Models", col=bgCol,
+  pltX = ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
                  cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
                  show_row_names = TRUE, row_names_side = "left",
@@ -203,5 +202,11 @@ plotmRECIST <- function(df, groupBy = "biobase.id", control.name = "untreated")
                     gp=gpar(col = colVec, fill = colVec))
   draw(pltX, heatmap_legend_list = list(HLeg), padding = unit(c(10, 10, 10, 10), "mm"))
 }
+
+
+
+
+
+
 
 
