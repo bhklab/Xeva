@@ -192,49 +192,49 @@ setMethod( f="setmRECIST<-",
            } )
 
 
-###===============================================================================================
-###===============================================================================================
-#' getmRECIST Generic
-#' Generic for getmRECIST method
+#' ###===============================================================================================
+#' ###===============================================================================================
+#' #' getmRECIST Generic
+#' #' Generic for getmRECIST method
+#' #'
+#' #' @examples
+#' #' data(pdxe)
+#' #' # calculate mRECIST for each experiment
+#' #' setmRECIST(pdxe)<- setmRECIST(pdxe)
+#' #' getmRECIST(pdxe, group.by="biobase.id")
+#' #' @param object The \code{XevaSet} to retrieve mRECIST from
+#' #' @param group.by The name of column which will be mapped to model.id
+#' #' @return a \code{data.frame} with the mRECIST values, rows are drugs and columns are model.id
+#' setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {standardGeneric("getmRECIST")} )
 #'
-#' @examples
-#' data(pdxe)
-#' # calculate mRECIST for each experiment
-#' setmRECIST(pdxe)<- setmRECIST(pdxe)
-#' getmRECIST(pdxe, group.by="biobase.id")
-#' @param object The \code{XevaSet} to retrieve mRECIST from
-#' @param group.by The name of column which will be mapped to model.id
-#' @return a \code{data.frame} with the mRECIST values, rows are drugs and columns are model.id
-setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {standardGeneric("getmRECIST")} )
-
-
-#' @export
-setMethod( f=getmRECIST,
-           signature="XevaSet",
-           definition= function(object, group.by)
-           {
-             rtx = data.frame(matrix(NA, nrow = length(object@experiment), ncol = 3))
-             colnames(rtx) = c("drug.join.name", "model.id", "mRECIST")
-             dfI = 1
-             for(I in object@experiment)
-             {
-               if(is.null(I$mRECIST))
-                 {
-                 msg = sprintf("mRECIST not present for model %s\nRun setmRECIST(object)<- setmRECIST(object) first\n", I$model.id)
-                 stop(msg)
-                 }
-              rtx[dfI, ] <- c(I$drug$join.name, I$model.id, I$mRECIST)
-              dfI = dfI+1
-             }
-             rownames(rtx)= NULL
-
-             ##----map to patient id -----------------
-             #rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
-             rtx = merge(rtx, object@model[, c("model.id", group.by)], by.x = "model.id", by.y = "model.id")
-
-             dataColName = c(group.by, "model.id", "drug.join.name", "mRECIST")
-             rtx = BBmisc::sortByCol(rtx , dataColName, asc = rep(TRUE, length(dataColName)))
-             return(rtx[,dataColName])
-           }
-           )
+#'
+#' #' @export
+#' setMethod( f=getmRECIST,
+#'            signature="XevaSet",
+#'            definition= function(object, group.by)
+#'            {
+#'              rtx = data.frame(matrix(NA, nrow = length(object@experiment), ncol = 3))
+#'              colnames(rtx) = c("drug.join.name", "model.id", "mRECIST")
+#'              dfI = 1
+#'              for(I in object@experiment)
+#'              {
+#'                if(is.null(I$mRECIST))
+#'                  {
+#'                  msg = sprintf("mRECIST not present for model %s\nRun setmRECIST(object)<- setmRECIST(object) first\n", I$model.id)
+#'                  stop(msg)
+#'                  }
+#'               rtx[dfI, ] <- c(I$drug$join.name, I$model.id, I$mRECIST)
+#'               dfI = dfI+1
+#'              }
+#'              rownames(rtx)= NULL
+#'
+#'              ##----map to patient id -----------------
+#'              #rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
+#'              rtx = merge(rtx, object@model[, c("model.id", group.by)], by.x = "model.id", by.y = "model.id")
+#'
+#'              dataColName = c(group.by, "model.id", "drug.join.name", "mRECIST")
+#'              rtx = BBmisc::sortByCol(rtx , dataColName, asc = rep(TRUE, length(dataColName)))
+#'              return(rtx[,dataColName])
+#'            }
+#'            )
 

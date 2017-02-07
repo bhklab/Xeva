@@ -2,12 +2,10 @@
 % Please edit documentation in R/plot_mRECIST.R
 \name{plotmRECIST}
 \alias{plotmRECIST}
-\title{Plot mRECIST for models and drugs
-\code{plot.mRECIST} plots the mRECIST}
+\title{To plot mRECIST values}
 \usage{
 plotmRECIST(mat, control.name = NA, control.col = "green",
-  drug.col = "black", colPalette = list(CR = "#377eb8", PR = "#4daf4a", SD =
-  "#fec44f", PD = "#e41a1c"), name = "Drug & Models")
+  drug.col = "black", colPalette = NULL, name = "Drug & Models")
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -18,8 +16,7 @@ plotmRECIST(mat, control.name = NA, control.col = "green",
 plot
 }
 \description{
-Plot mRECIST for models and drugs
-\code{plot.mRECIST} plots the mRECIST
+\code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
 }
 \examples{
 data(pdxe)
