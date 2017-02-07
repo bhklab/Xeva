@@ -8,11 +8,25 @@
 }
 
 
-.getAngleSummary <- function(object)
+.getAngleSummary <- function(object, tumor.type)
 {
   rdf = data.frame()
   for(batch in expDesignInfo(object))
   {
+    if(!is.null(tumor.type))
+    {
+      tt <- modelInfo(object)[modelInfo(object)$model.id %in% c(batch$treatment,batch$control),"tumor.type"]
+
+      if(is.element(tumor.type, tt)==FALSE)
+      { next }
+
+      if(length(unique(tt))>1)
+      {
+        msg <- sprintf("batch %s contains models with different tumor type", batch$batch.name)
+        warning(msg)
+      }
+    }
+
     drugX = .getDrugsForABatch(object, batch)
     drug = unique(drugX$treatment)
     rdf = rbind(rdf, data.frame(batch.name = batch$batch.name,
@@ -24,12 +38,13 @@
   return(rdf)
 }
 
-.summarizePerBatchResponse <- function(object, response.measure = "angle", group.by=NULL, summary.stat ="mean")
+.summarizePerBatchResponse <- function(object, response.measure = "angle", group.by=NULL,
+                                       summary.stat, tumor.type)
 {
 
   if(response.measure == "angle")
   {
-    df = .getAngleSummary(object)
+    df = .getAngleSummary(object, tumor.type=tumor.type)
   }
 
   if(!is.null(group.by) & group.by != "batch.name")
@@ -224,22 +239,14 @@ summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
   if(response.measure =="angle")
   {
     mat <- .summarizePerBatchResponse(object, response.measure = "angle",
-                                      group.by=group.by, summary.stat=summary.stat)
+                                      group.by=group.by, summary.stat=summary.stat,
+                                      tumor.type=tumor.type)
 
   } else
   {
-    #if(response.measure =="mRECIST_recomputed")
-    #{
     mat <- .summarizePerModelResponse(object, response.measure=response.measure,
                                       group.by=group.by, summary.stat=summary.stat,
                                       tumor.type=tumor.type)
-    #}
-    #if(response.measure =="slop")
-    #{
-    #  mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-    #                                    group.by=group.by, summary.stat=summary.stat,
-    #                                    tumor.type=tumor.type)
-    #}
   }
 
 
