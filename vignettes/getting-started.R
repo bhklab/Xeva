@@ -71,15 +71,8 @@ plotmRECIST(pdxe.lung, control.name = "untreated")
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
 #select lung cancer PDXE data
-pdxe.brca <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+pdxe.brca <- summarizeResponse(pdxe, response.measure = "mRECIST",
                                 group.by="patient.id", tumor.type="BRCA")
-
-pdxe.brca <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
-                                group.by="patient.id", tumor.type="BRCA")
-
-
-pdxe.time.last_published <- summarizeResponse(pdxe, response.measure = "time.last_published",
-                                              group.by="patient.id", tumor.type="BRCA")
 
 ## plot matrix
 plotmRECIST(pdxe.brca, control.name = "untreated", control.col = "#238b45")

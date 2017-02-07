@@ -147,10 +147,28 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 }
 
+.mRcolPalette <- function(mr)
+{
+  # cp <- list("CR" = "#eff3ff", "CR-->PD" = "#9ecae1", "CR-->-->PD" = "#3182bd",
+  #            "PR" = "#d9ef8b", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#1a9850",
+  #            "SD" = "#fed976", "SD-->PD" = "#ffeda0", "SD-->-->PD" = "#fed976",
+  #            "PD"= "#e41a1c")
+
+  #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
+  #colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
+  cp <- list("CR" = "#0033CC", "CR-->PD" = "#3182bd", "CR-->-->PD" = "#bf8ef2",
+             "PR" = "#1a9850", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#BFB35A",
+             "SD" = "#fed976", "SD-->PD" = "#ffeda0", "SD-->-->PD" = "#fed976",
+             "PD"= "#e41a1c")
+
+  colPal <- cp[mr]
+  return(colPal)
+}
 
 ##============================================================================
-#' Plot mRECIST for models and drugs
-#' \code{plot.mRECIST} plots the mRECIST
+#' To plot mRECIST values
+#'
+#' \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
 #'
 #' @param object The \code{Xeva} dataset
 #' @param model.id The \code{model.id}
@@ -165,17 +183,30 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @import ComplexHeatmap
 #' @import grid
 plotmRECIST <- function(mat, control.name = NA, control.col="green", drug.col="black",
-                        colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c"),
-                        name = "Drug & Models")
+                        colPalette = NULL, name = "Drug & Models")
 {
   control.name = c(control.name)
-  #mat = .castDataFram(df, row.var="drug.join.name", col.var = groupBy, value="mRECIST")
+
+  unqMat <- unique(unlist(lapply(colnames(mat), function(x) unique(mat[,x]) )))
+  unqMat <- unqMat[!is.na(unqMat)]
+
+  if(is.null(colPalette))
+  {
+    colPalette <- .mRcolPalette(unqMat)
+  } else
+  {
+    colPre <- sapply(unqMat, function(x) is.null(colPalette[[x]]))
+    if(any(colPre)==TRUE)
+    {
+      colAbName <- names(colPre[colPre==TRUE])
+      colAb <- paste(colAbName,collapse = "\n")
+      msg1 = sprintf("color for these values are not present in colPalette\n%s", colAb)
+      stop(msg1)
+    }
+  }
+
   matRC = .sortPlotMat(mat, controlD=control.name, control.col=control.col, drug.col=drug.col)
   mat = as.matrix(matRC$mat)
-
-  #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
-  if(is.null(colPalette))
-  { colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c") }
 
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
