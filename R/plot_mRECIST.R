@@ -157,11 +157,13 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
   #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
   #colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
   cp <- list("CR" = "#0033CC", "CR-->PD" = "#3182bd", "CR-->-->PD" = "#bf8ef2",
-             "PR" = "#1a9850", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#BFB35A",
+             "PR" = "#1a9850", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#bfb35a",
              "SD" = "#fed976", "SD-->PD" = "#ffeda0", "SD-->-->PD" = "#fed976",
              "PD"= "#e41a1c")
 
   colPal <- cp[mr]
+  colPal <- colPal[names(cp)]
+  colPal <- colPal[!is.na(names(colPal))]
   return(colPal)
 }
 

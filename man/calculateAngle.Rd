@@ -34,10 +34,9 @@ If plot==TRUE, this will return a list with angle and plot. The plot is made usi
 \examples{
 data(pdxe)
 # creat a experiment desing
-ExpDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
-angl = calculateAngle(object=pdxe, ExpDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
-#print angle
-print(angl$angle)
+myDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
+angl = calculateAngle(object=pdxe, myDesign, var = "volume", treatment.only=TRUE, plot=TRUE)
+print(angl$myBatch$angle)
 #print plot
 print(angl$myBatch$plot)
 #print without legend

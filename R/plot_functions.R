@@ -1,113 +1,47 @@
-library(ggplot2)
-
-#' To plot drug response curve
-#' @examples
-#' data(pdxe)
-#' plotDrugResponse(pdxe, drug="LEE011 + binimetinib")
-#' plotDrugResponse(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
-#' @param object The \code{XevaSet} to replace drug info in
-#' @param drug Name of the drug
-#' @return Updated \code{XevaSet}
-setGeneric(name= "plotDrugResponse",
-           def = function(object,
-                          drug, drug.match.exact=TRUE,
-                          tumor.type=NULL,
-                          control=TRUE)
-             {standardGeneric("plotDrugResponse")} )
-
-#' @export
-setMethod( f=plotDrugResponse,
-           signature=c(object = "XevaSet"),
-           definition=function(object,
-                               drug, drug.match.exact=TRUE,
-                               tumor.type=NULL,
-                               control=TRUE)
-           {
-
-             allExpIds = selectModelIds(object, drug=drug, drug.match.exact=drug.match.exact,
-                                     tumor.type=tumor.type)
-
-             if(length(allExpIds)==0)
-             {stop("No experiment present")}
-
-             #allExpIds = allExpIds[1:3]
-
-             #allExpModIds = mapModelSlotIds(object, id=allExpIds, id.name="experiment.id", map.to="model.id")
-             #allBatchIds = c(unlist(sapply(allExpModIds$model.id, function(x) getBatchName(object, x))))
-
-             allBatchIds = unlist(sapply(allExpIds, function(x) getBatchName(object, x)))
-
-             expDesign2plt = lapply(allBatchIds, function(x) expDesignInfo(object)[[x]])
-
-             batchNames = names(expDesign2plt)
-             ##------ get color for each list element -----------
-             colVec = grDevices::rainbow(length(batchNames))
-             names(colVec) = batchNames
-
-             DFlstx = list()
-             for(en in batchNames)
-             {
-
-               dx = getTimeVarData(object, expDesign2plt[[en]], var = "volume")
-
-               DFlstx[[en]] = .addColorPchLty(dx, colVec[en], treatment.lty="solid", control.lty="dashed")
-             }
-
-             DF = do.call(rbind, DFlstx)
-             return(DF)
-           } )
-
-
-
-.addColorPchLty <- function(DFx, col, treatment.lty="solid", control.lty="dashed")
-{
-  lty = as.character(DFx$exp.type)
-  lty[lty=="treatment"] = treatment.lty
-  lty[lty=="control"] = control.lty
-  DFx$lty = lty
-  DFx$color = col
-  return(DFx)
-}
-
-##----------------------------------------------------------------
-.takeLogOfDF <- function(DF, colN, removeNan=TRUE)
-{
-  DF[, colN] = log(DF[, colN])
-  if(removeNan==TRUE){
-  DF = DF[is.finite(DF[, colN]), ] }
-  return(DF)
-}
-
-
-
+#' ##df = readRDS("DATA-raw/toPlot_DF.Rda")
+#' ##plotModelErrorBar(df)
 #' @export
 #' @import ggplot2
-NewPlotFunction <- function(DF, control.col = "#6baed6", treatment.col="#fc8d59",
-                            title="", xlab = "Time", ylab = "Volume", SE.plot = "errorbar")
+plotModelErrorBar <- function(df, control.col = "#6baed6", treatment.col="#fc8d59",
+                              title="", xlab = "Time", ylab = "Volume", log.y=TRUE,
+                              SE.plot = c("errorbar", "ribbon"), aspect.ratio=c(1, NULL))
 {
+  SE.plot <- SE.plot[1]
+  aspect.ratio <- aspect.ratio[1]
 
-  #SE.plot = "errorbar"; #SE.plot = "ribbon"
+  df <- df[!is.na(df$mean), ]
 
-  library(ggplot2)
-  #saveRDS(DFx, file = "DATA-raw/toPlot_DF.Rda")
-  DF = readRDS("DATA-raw/toPlot_DF.Rda")
+  if(!is.null(df$upper) & !is.null(df$lower))
+  {
+    if(all(is.na(df$upper))==TRUE){ df$upper=NULL}
+    if(all(is.na(df$lower))==TRUE){ df$lower=NULL}
+  }
 
-  #if(log.y==TRUE & ylab=="Volume"){ylab = "Volume (in log)"}
-  #if(log.y==TRUE)
-  #{
-  #DF = .takeLogOfDF(DF, "mean")
-  #DF = .takeLogOfDF(DF, "upper")
-  #DF = .takeLogOfDF(DF, "lower")
-  #
-  #  DF = DF[is.finite(DF$mean), ]
-  #}
+  if(!is.null(df$upper) & !is.null(df$lower))
+  #if( all(is.na(df$upper))==FALSE & all(is.na(df$lower))==FALSE)
+  {
+    df <- df[!is.na(df$upper), ]
+    df <- df[!is.na(df$lower), ]
+  }
 
-  plt <- ggplot(DF, aes_string(x="time", y="mean", color= "exp.type"))#, group="model.id"))
+  if(nrow(df)==0)
+  {
+    stop("No data left after removing NA")
+  }
+
+  if(log.y==TRUE)
+  {
+    df$mean = log(df$mean)
+    if(!is.null(df$upper)) {df$upper <- log(df$upper)}
+    if(!is.null(df$upper)) {df$lower <- log(df$lower)}
+  }
+
+  plt <- ggplot(df, aes_string(x="time", y="mean", color= "exp.type"))
   plt <- plt + geom_line(linetype = 1)+ geom_point()
 
-  if(!is.null(DF$upper) & !is.null(DF$upper))
+  if(!is.null(df$upper) & !is.null(df$lower))
   {
-    if(all(is.na(DF$upper))==FALSE & all(is.na(DF$lower))==FALSE)
+    if(all(is.na(df$upper))==FALSE & all(is.na(df$lower))==FALSE)
     {
       if(SE.plot == "errorbar")
       {
@@ -118,103 +52,47 @@ NewPlotFunction <- function(DF, control.col = "#6baed6", treatment.col="#fc8d59"
         plt <- plt + geom_ribbon(aes_string(ymin ="lower", ymax ="upper"), linetype=0, fill = "grey80")
         plt <- plt + geom_line(aes_string(y = "mean"))+ geom_point()
       }
-
     }
   }
-
   tcCol <- c("control" = control.col, "treatment" = treatment.col)
   plt <- plt + scale_color_manual(values=tcCol)
-  #plt <- plt + theme(aspect.ratio=1)
   plt <- .ggplotEmptyTheme(plt)
-  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = "")
+
+  drgName <- df[df$exp.type=="treatment", "drug.name"][1]
+
+  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = drgName)
   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
   plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
+  if(!is.null(aspect.ratio))
+  {
+    plt <- plt + theme(aspect.ratio=aspect.ratio)
+  }
 
+
+  ###----- to do ---------
+  ###----- add line showing Dose at the bottam ---------
+  ###----- look at the packege library(ggExtra) --------
   return(plt)
 }
 
 
-##===============================================
-.creatPlotDF <- function(object, DFx)
-{
-  rtx = list()
-  for(I in 1:nrow(DFx))
-  {
-    expData = getExperiment(object, model.id= DFx[I, "model.id"])
-    expData$batch.name= DFx[I, "batch.name"]
-    expData$exp.type  = DFx[I, "exp.type"]
-    rtx = .appendToList(rtx, expData)
-  }
-  rtz = do.call(rbind, rtx)
 
-  return(rtz)
+#batchName = "PHLC153_P6"
+##
+#' data(lpdx)
+#' plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
+#' @export
+plotBatch <- function(object, batchName, treatment.only=FALSE, ...)
+{
+  expDig <- expDesign(object, batchName)
+  df <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
+                       drug.name = TRUE)
+  plotModelErrorBar(df=df, ...)
 }
 
-##================================================
-plotDrugResponse_old <- function(expSlot, expList, diff.colors, patient.id = "X-1004")
-{
-
-  ##---- plot the df in ggplot and return plot --------
-  dataX = .get_Data()
-
-  ##---- get error bar information -------
-  err.bars <- append(dataX$upper, dataX$lower)
-
-  ##this seems a bug ----------------------------
-  dataX = dataX[dataX$patient.id==patient.id,] ##select data for one patient
-  ### The plot should give 2 lines: one control and one treatment
-  ### but this gives only one line
-  drug_name <- unique(dataX$drug.join.name[dataX$drug.join.name != 'untreated'])
-  title <- paste(length(dataX$drug.join.name), 'Experiments for', drug_name)
-
-  # create basic plot object
-  plot.1 <- ggplot2::ggplot(dataX, ggplot2::aes(time, mean, group = exp.type)) +
-  xlab('Time') +
-  ylab('Volume') +
-  ggtitle(title)
-  # recode color for dataX (different color for treatment and control)
-  if (diff.colors) {
-
-    dataX <- getColor(dataX)
-
-    if (!all(is.na(err.bars))) {
-      # add error bars if not all of the error bar columns are NA
-      plot.1 <- plot.1 + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper))
-
-    }
-
-    # plot add legend to plot.1 and points
-    plot.final <- plot.1 + ggplot2::geom_line(ggplot2::aes(time, mean, colour = color), data = dataX, size = 0.7, alpha = 0.6) +
-      ggplot2::scale_colour_manual(name = "", values=c("blue", "grey"), labels=c("Treatment", "Control")) +
-      ggplot2::geom_point()
 
 
-  } else {
 
-    if (!all(is.na(err.bars))) {
 
-      # add error bars if not all of the error bar columns are NA
-      plot.1 <- plot.1 + ggplot2::geom_errorbar(aes(ymin = lower, ymax = upper))
 
-    }
 
-    # plot add legend to plot.1 and points - on this one the no color distinction and
-    # legend reflects pch, not color.
-    plot.final <- plot.1 + ggplot2::geom_line(aes(time, mean, colour = color), data = dataX, size = 0.7, alpha = 0.6) +
-      guides(color=FALSE) + ggplot2::geom_point(aes(shape = factor(lty))) +
-      scale_shape_discrete(name = "", breaks=c("solid", "dashed"), labels=c("Treatment", "Control"))
-
-  }
-
-  # add final theme to plot.final
-  plotObject <- plot.final + theme(panel.background=element_rect(fill="#F0F0F0"),
-                                 plot.background=element_rect(fill="#F0F0F0"),
-                                 panel.grid.major=element_line(colour="#D0D0D0",size=.75), axis.ticks=element_blank(),
-                                 legend.position="bottom",  plot.title=element_text(face="bold",colour="Black",size=10),
-                                 axis.text.x=element_text(size=11,colour="#535353",face="bold"),
-                                 axis.text.y=element_text(size=11,colour="#535353",face="bold"),
-                                 axis.title.y=element_text(size=11,colour="#535353",face="bold",vjust=1.5),
-                                 axis.title.x=element_text(size=11,colour="#535353",face="bold",vjust=-.5))
-
-  return(plotObject)
-}

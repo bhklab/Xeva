@@ -372,14 +372,18 @@ setMethod( f=getExpDesignDF,
 #' @param object The \code{Xeva} dataset
 #' @param ExpDesign A list with batch.name, treatment and control
 #' @param var Name of the variable, default \code{volume}
+#' @param drug.name \code{FALSE}. If \code{TRUE} will return drug name also
 #' @return a \code{data.fram} with treatment, control and batch.name
-setGeneric(name = "getTimeVarData", def = function(object, ExpDesign, var = "volume", treatment.only=FALSE)
+setGeneric(name = "getTimeVarData",
+           def = function(object, ExpDesign, var = "volume",
+                          treatment.only=FALSE, drug.name=FALSE)
   {standardGeneric("getTimeVarData")} )
 
 #' @export
 setMethod( f=getTimeVarData,
            signature=c(object="XevaSet"),
-           definition= function(object, ExpDesign, var = "volume", treatment.only=FALSE)
+           definition= function(object, ExpDesign, var = "volume",
+                                treatment.only=FALSE, drug.name=FALSE)
            {
              if(is.null(ExpDesign$treatment) & is.null(ExpDesign$control))
              {stop("treatment and control both NULL")}
@@ -392,6 +396,16 @@ setMethod( f=getTimeVarData,
              trDF = .collapseRplicate(trLs, var = var)
              trDF$exp.type = "treatment"
              trDF$batch.name = ExpDesign$batch.name
+             if(drug.name==TRUE)
+             {
+               drugAll = sort(unique(unlist(lapply(trLs, "[[", "drug.join.name" ))))
+               if(length(drugAll)>1)
+               {
+                 msg <- sprintf("multipal drugs for batch, will colleps by ;")
+                 warning(msg)
+               }
+               trDF$drug.name <- paste(drugAll, collapse = ";")
+             }
              }
 
              if(!is.null(ExpDesign$control))
@@ -400,6 +414,18 @@ setMethod( f=getTimeVarData,
              cnDF = .collapseRplicate(cnLs, var = var)
              cnDF$exp.type = "control"
              cnDF$batch.name = ExpDesign$batch.name
+
+             if(drug.name==TRUE)
+             {
+               drugAll = sort(unique(unlist(lapply(cnLs, "[[", "drug.join.name" ))))
+               if(length(drugAll)>1)
+               {
+                 msg <- sprintf("multipal drugs for batch, will colleps by ;")
+                 warning(msg)
+               }
+               cnDF$drug.name <- paste(drugAll, collapse = ";")
+             }
+
              }
 
              rdf = rbind(trDF, cnDF)
