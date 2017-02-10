@@ -27,5 +27,7 @@ For example map a model.id to biobase.id
 \examples{
 data(pdxe)
 mapModelSlotIds(object=pdxe, id="X-007", id.name="biobase.id", map.to="model.id")
+##map batch ids
+mapModelSlotIds(pdxe, id= "X-011.INC280", id.name = "batch.name", map.to = "tumor.type")
 }
 
