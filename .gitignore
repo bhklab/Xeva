@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# temporary files for GPs
+python/temp*
+
+# Python
+__pycache__
