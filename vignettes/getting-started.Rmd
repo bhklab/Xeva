@@ -68,9 +68,9 @@ for(I in batchNames)
 ```
 
 Summarize Response of PDXs
-Get slop of each model and combine summarize all model slop which belongs to same patient by "mean"
+Get slope of each model and combine summarize all model slope which belongs to same patient by "mean"
 ```{r, echo=TRUE}
-lpdx_slop <- summarizeResponse(lpdx, response.measure = "slop", 
+lpdx_slope <- summarizeResponse(lpdx, response.measure = "slope", 
                                group.by="patient.id", summary.stat = "mean")
 ```
 
@@ -133,11 +133,11 @@ plotmRECIST(pdxe.brca, control.name = "untreated", control.col = "#238b45")
 
 
 
-Creat mR vs slop bar-plot
+Creat mR vs slope bar-plot
 ```{r, echo=TRUE, fig.width = 12, fig.height = 10}
 data(pdxe)
 
-lung_pdxe_slope <- summarizeResponse(pdxe, response.measure = "slop", group.by="patient.id", 
+lung_pdxe_slope <- summarizeResponse(pdxe, response.measure = "slope", group.by="patient.id", 
                                      summary.stat = "mean", tumor.type = "NSCLC")
 
 lung_pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
