@@ -47,6 +47,10 @@ waterfallPlot <- function(vx, col="#cc4c02", title="", yname = "volume")
 #' drugWaterfall(pdxe, drug="binimetinib", value="best.avg.response_published",
 #'               col="#E69F00", tumor.type = "CRC", title="Binimetinib",
 #'               yname = "Change in tumor volume (%)")
+#' @param object The \code{XevaSet}
+#' @param drug Name of the drug
+#' @param value Which value should be ploted
+#'
 #' @export
 drugWaterfall <- function(object, drug, value, col="#cc4c02", group.by="patient.id",
                           tumor.type=NULL, title="", yname = "Response")
