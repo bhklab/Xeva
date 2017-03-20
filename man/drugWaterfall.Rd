@@ -7,6 +7,13 @@
 drugWaterfall(object, drug, value, col = "#cc4c02", group.by = "patient.id",
   tumor.type = NULL, title = "", yname = "Response")
 }
+\arguments{
+\item{object}{The \code{XevaSet}}
+
+\item{drug}{Name of the drug}
+
+\item{value}{Which value should be ploted}
+}
 \description{
 Plot drug response waterfall
 }

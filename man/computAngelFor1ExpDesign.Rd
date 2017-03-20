@@ -6,7 +6,7 @@
 expDegI  <- expDesign(lpdx, "PHLC111_P7")}
 \usage{
 computAngelFor1ExpDesign(object, expDegI, var = "volume",
-  treatment.only = TRUE, plot = FALSE, log.y = TRUE)
+  treatment.only = TRUE, plot = FALSE, log.y = FALSE)
 }
 \description{
 data(lpdx); object=lpdx
