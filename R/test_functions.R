@@ -185,3 +185,51 @@
 #'   }
 #'
 #' }
+#'
+#'
+#'
+#'
+#'
+if(1==2){
+
+getLine <- function(m)
+{y= ((0:100)*m)+1
+y}
+
+library(ggplot2)
+library(grid)
+library(gridExtra)
+plotL <- function(m)
+{
+  dx <- data.frame(x=0:100, y=getLine(m))
+  plt <- ggplot(dx, aes_string(x="x", y="y"))
+  plt <- plt + geom_line(linetype = 1) #+ geom_point()
+  #plt <- plt+ coord_fixed(ratio = (max(dx$x)-min(dx$x)) / (max(dx$y)-min(dx$y)))
+  plt <- plt + ylim(-10,100)+xlim(-10,100)+ coord_fixed(ratio =1)
+  plt
+  #ang <- atan(m) *180/base::pi
+  #list(plt, ang)
+}
+
+
+p1 = plotL(5); p2 = plotL(1);p3 = plotL(-1);p4 = plotL(-5)
+grid.arrange(p1, p2,p3,p4, ncol = 2)
+
+sapply(c(5,1,-1,-5), function(m) {atan(m) *180/base::pi })
+
+
+
+
+.computAngle <- function(A,B){
+  #a =A; b=B
+  a= c(0,A[1], 100, A[101]); b= c(0,B[1], 100, B[101])
+  theta <- acos( sum(a*b) / ( sqrt(sum(a * a)) * sqrt(sum(b * b)) ) )
+  as.numeric(theta)*180/base::pi
+}
+
+A = getLine(5); B=getLine(-5)
+#A = getLine(1); B=getLine(-1)
+.computAngle(A,B)
+
+
+}
