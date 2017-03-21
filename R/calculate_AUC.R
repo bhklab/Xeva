@@ -1,5 +1,5 @@
 ##copied from 'pracma' package trapz function
-trapz <- function (x, y)
+.trapz <- function (x, y)
 {
   if (missing(y)) {
     if (length(x) == 0)
@@ -23,3 +23,106 @@ trapz <- function (x, y)
   p2 <- sum(xp[2:n] * yp[1:(n - 1)]) + xp[1] * yp[n]
   return(0.5 * (p1 - p2))
 }
+
+.normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
+
+##-------- aac for 1 model ------------------------------
+.getAAC <- function(x, y)
+{
+  x <- .normalize01(x)
+  y <- .normalize01(y)
+  aac <- 1- ( .trapz(x, y) )
+  #aac <- .trapz(x, y)
+  return(aac)
+}
+
+##-----------------------------
+
+## compute area above the curve (1-auc)
+#'
+#' compute area above the curve (1-auc)
+#' @description
+#' Given a model.id or batch it will return
+#' aac (area above the curve)
+#'
+#' @examples
+#' data(pdxe)
+#' aac(pdxe, model.id = "X.015.BY19")
+#' # creat a experiment desing
+#' myDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.015.uned"))
+#' aac(pdxe, batch = myDesign)
+#'
+#' @param object The \code{Xeva} dataset
+#' @param model.id A model id
+#' @param batch A list with treatment and control
+#' @param average For batch. Either "curve" or "area". See details
+#' @param treatment.only default {TRUE}. If TRUE only treatment periode will be considered
+#'
+#' @details If average = "curve", aac of average curve will be calculated. If average = "area", aac value for each curve will be calculated seperately and values will be average after.
+#'
+#' @return aac values for model.id or treatment and control aac for batch
+setGeneric(name = "aac",
+           def = function(object, model.id=NULL, batch=NULL, average = c("curve", "area"), treatment.only=TRUE)
+           {standardGeneric("aac")} )
+
+#' @export
+setMethod( f=aac,
+           signature=c(object="XevaSet"),
+           definition= function(object, model.id=NULL, batch=NULL,
+                                average = c("curve", "area"),
+                                treatment.only=TRUE)
+           {
+             if(is.null(model.id) & is.null(batch))
+             {stop("please specify 'model.id' or 'batch'")}
+
+             average = average[1]
+
+             ###---------------------------------------------------------------------------------------
+             .aacFor1ModelId <- function(object, model.id, treatment.only)
+             {
+               DFx <- getExperiment(object, model.id=model.id, treatment.only = treatment.only)
+               aac <- .getAAC(DFx$time, DFx$volume)
+               return(aac)
+             }
+             ###---------------------------------------------------------------------------------------
+
+             if(!is.null(model.id))
+             {
+               if(!is.null(batch))
+               { warning("ignoring 'batch'")}
+               aac <- .aacFor1ModelId(object, model.id, treatment.only)
+               return(aac)
+             }
+
+             if(!is.null(batch))
+             {
+               rtx <- list(treatment=NA, control=NA)
+
+               if(average=="curve")
+               {
+                 bx <- getTimeVarData(object, batch, treatment.only = treatment.only)
+                 tr <- bx[bx$exp.type=="treatment",]
+                 cr <- bx[bx$exp.type=="control",  ]
+                 if(nrow(tr)>0){ rtx$treatment <- .getAAC(tr[ ,"time"], tr[ ,"mean"])}
+                 if(nrow(cr)>0){ rtx$control   <- .getAAC(cr[ ,"time"], cr[ ,"mean"])}
+                 return(rtx)
+               }
+
+               if(average=="area")
+               {
+                 tr <- sapply(batch$treatment, .aacFor1ModelId, object=object, treatment.only=treatment.only)
+                 cn <- sapply(batch$control, .aacFor1ModelId, object=object, treatment.only=treatment.only)
+                 if(length(tr)>0) {rtx$treatment <- mean(tr)}
+                 if(length(cr)>0) {rtx$control   <- mean(cr)}
+                 return(rtx)
+               }
+             }
+           })
+
+
+
+
+
+
+
+
