@@ -93,7 +93,7 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
 ####-----------------------------------------------------------
 #' data(lpdx); object=lpdx
 #' expDegI  <- expDesign(lpdx, "PHLC111_P7")
-computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE,
+.computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE,
                                      plot=FALSE, log.y=FALSE)
 {
 
@@ -214,7 +214,7 @@ setMethod( f=calculateAngle,
              for(I in 1:length(ExpDesign))
              {
                expDegI = ExpDesign[[I]]
-               angDiffX[[expDegI$batch.name]] = computAngelFor1ExpDesign(object, expDegI, var=var, treatment.only=treatment.only,
+               angDiffX[[expDegI$batch.name]] = .computAngelFor1ExpDesign(object, expDegI, var=var, treatment.only=treatment.only,
                                                                          plot=plot, log.y=log.y)
              }
              return(angDiffX)

@@ -27,13 +27,13 @@ head(df)
 batchNames <- batchNames(lpdx)
 expDesign  <- expDesign(lpdx, batchNames[1])
 ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
-#print(ang)
+print(ang)
 
 for(I in batchNames)
 {
   expDesign  <- expDesign(lpdx, I)
   ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
-  #print(ang)
+  print(ang)
 }
 
 
