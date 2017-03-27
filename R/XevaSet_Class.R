@@ -4,18 +4,21 @@
 #' An S4 class for XevaSet
 #'
 XevaSet <- setClass( "XevaSet",
-                          slots = list(annotation = "list",
-                                       molecularProfiles = "list",
-                                       model = "data.frame",
-                                       drug = "data.frame",
-                                       experiment = "list",
-                                       expDesign = "list")
-                          )
+                     slots = list(annotation = "list",
+                                  model = "data.frame",
+                                  drug = "data.frame",
+                                  sensitivity="list",
+                                  expDesign = "list",
+                                  experiment = "list",
+                                  molecularProfiles = "list",
+                                  modToBiobaseMap = "data.frame"
+                                  )
+                     )
 
 ######################################################################
 #' Creat Xeva class object
 #'
-#' \code{creatPharmacoPxSet} returns Xeva class object
+#' \code{creatXevaSet} returns Xeva class object
 #'
 #' @param name A \code{character} string detailing the name of the dataset
 #' @param molecularProfiles A \code{list} of ExpressionSet objects containing molecular profiles
@@ -36,31 +39,33 @@ XevaSet <- setClass( "XevaSet",
 #' data("pdxe")
 #' @export
 creatXevaSet <- function(name,
-                         molecularProfiles = list(),
+                         model = data.frame(),
+                         drug  = data.frame(),
                          experiment = data.frame(),
                          expDesign  = list(),
-                         model = data.frame(),
-                         drug  = data.frame())
+                         modelSensitivity= data.frame(),
+                         batchSensitivity= data.frame(),
+                         molecularProfiles = list(),
+                         modToBiobaseMap = data.frame())
 {
-
   annotation <- list( name = as.character(name),
                       dateCreated = date(),
                       sessionInfo = sessionInfo())
 
-  expSlot = experimentSlotfromDf(experiment)
-
-  model = .checkModel(model, expSlot)
-
-  expDesign = .checkExperimentDesign(expDesign)
-
+  expSlot <- experimentSlotfromDf(experiment)
+  model <- .checkModel(model, expSlot)
+  expDesign <- .checkExperimentDesign(expDesign)
+  sensitivity<- .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
   ##----check if drug present in both drug slot and expSlot
 
-  pxset = XevaSet(annotation=annotation,
-                       molecularProfiles = molecularProfiles,
-                       model = model,
-                       drug  = drug,
-                       experiment= expSlot,
-                       expDesign = expDesign )
+  pxset = XevaSet(annotation = annotation,
+                  model = model,
+                  drug  = drug,
+                  sensitivity = sensitivity,
+                  expDesign = expDesign,
+                  experiment= expSlot,
+                  molecularProfiles = molecularProfiles,
+                  modToBiobaseMap= modToBiobaseMap)
   return(pxset)
 }
 
@@ -74,8 +79,12 @@ setMethod(f="show",
           signature="XevaSet",
           definition= function(object)
           {
-            slotsName = paste(slotNames(object), collapse = "\n")
-            cat(sprintf("Slots are:\n%s\n", slotsName))
+            msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d",
+                           object@annotation$name, object@annotation$dateCreated,
+                           length(object@experiment), dim(object@drug)[1])
+            cat(msg)
+            #slotsName <- paste(slotNames(object), collapse = "\n")
+            #cat(sprintf("Slots are:\n%s\n", slotsName))
           }
-          )
+)
 

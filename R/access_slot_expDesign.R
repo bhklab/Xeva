@@ -53,7 +53,6 @@ setMethod( f="batchNames",
            signature=c(object = "XevaSet"),
            definition=function(object)
            {
-             #rtx = unlist(sapply(object@expDesign, "[[", "batch.name"))
              rtx = names(expDesignInfo(object))
              return(rtx)
            } )

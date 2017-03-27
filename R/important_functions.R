@@ -117,6 +117,7 @@ getIndex <- function(inVec, indxOf)
 
 ##------------------------------------------------------------------------------------------
 ##---------------reorder column ------------------------------------------------------------
+
 .reorderCol <- function(df, columnName, newIndx)
 {
   OtherCN = colnames(df)[colnames(df)!=columnName]
@@ -186,3 +187,20 @@ pasteColTogather <- function(df, collapse = " + ")
                         axis.line = ggplot2::element_line(colour = "black"))
 }
 
+
+
+#' Symmetric set differences
+#'
+#' \code{symmetricSetDiff} give symmetric set differences. Symmetric set difference (disjunctive union), of two sets is the set of elements which are not in their intersection.
+#'
+#' @param a vector
+#' @param b vector
+#'
+#' @return  Returns a vector
+#'
+#' @examples
+#' a <- c(1, 2, 3)
+#' b <- c(2, 3, 4)
+#' symmetricSetDiff(a, b)
+#' @export
+symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }

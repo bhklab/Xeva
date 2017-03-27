@@ -63,15 +63,16 @@ getBestResponse <- function(time, response, min.time=NULL)
 #'
 #' \code{computemRECIST} returns the mRECIST for given volume response
 #'
-#' @param best.response Value of best response
-#' @param best.average.response Value of best average response
-#'
-#' @return  Returns the mRECIST for given volume response
-#'
+#' @param time Value of best response
+#' @param volume Value of best average response
+#' @param min.time minimum time after which tumore volume will be considered
+#' @param return.detail default \code{FALSE}. If \code{TRUE} will return all intermediate values
+#' @return  Returns the mRECIST
 #' @examples
-#' computemRECIST(best.response=8.722, best.average.response=8.722)
+#' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
+#' computemRECIST(time, volume, min.time=10, return.detail=FALSE)
 #' @export
-#computemRECIST <- function(best.response, best.average.response)
 computemRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 {
   exdf = list(time=time, volume=volume)
@@ -111,44 +112,24 @@ computemRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 }
 
 
-## returns updated model ------------------------------
-mRECISTForModel <- function(modx, min.time=10)
-{
-  mrd = computemRECIST(modx$data$time, modx$data$volume, min.time=min.time, return.detail=TRUE)
-
-  modx$data$volume.change = mrd$volume.change
-  modx$data$average.response = mrd$average.response
-
-  modx$best.response = mrd$best.response$value
-  modx$time.best.response = mrd$best.response$time
-
-  modx$best.avg.response = mrd$best.average.response$value
-  modx$time.best.avg.response = mrd$best.average.response$time
-
-  modx$mRECIST = mrd$mRecist
-
-  # #if(is.null(modx$best.response$value))
-  # #{
-  #   #modxDataMat = calculateResponses(modx$data, responseName = "volume")
-  #   modxDataMat = calculateResponses(modx$data$time, modx$data$volume, min.time=10)
-  #   modx$data = modxDataMat$data
-  #   modx$best.response = modxDataMat$best.response
-  #   modx$best.average.response = modxDataMat$best.average.response
-  # #}
-  #
-  # if(is.null(modx$data$body.weight.change))
-  # {
-  #   modx$data$body.weight.change = tumorVolumeChange(modx$data$body.weight)
-  # }
-  #
-  # modx$mRECIST = computemRECIST(best.response = modx$best.response$value,
-  #                               best.average.response= modx$best.average.response$value)
-
-
-
-  return(modx)
-
-}
+# ## returns updated model ------------------------------
+# mRECISTForModel <- function(modx, min.time=10)
+# {
+#   mrd = computemRECIST(modx$data$time, modx$data$volume, min.time=min.time, return.detail=TRUE)
+#
+#   modx$data$volume.change = mrd$volume.change
+#   modx$data$average.response = mrd$average.response
+#
+#   modx$best.response = mrd$best.response$value
+#   modx$time.best.response = mrd$best.response$time
+#
+#   modx$best.avg.response = mrd$best.average.response$value
+#   modx$time.best.avg.response = mrd$best.average.response$time
+#
+#   modx$mRECIST = mrd$mRecist
+#   return(modx)
+#
+# }
 
 
 ###===============================================================================================
@@ -171,9 +152,25 @@ setMethod( f="setmRECIST",
            {
              if(is(object, "XevaSet"))
              {
-               for(I in 1:length(object@experiment))
+               # for(I in 1:length(object@experiment))
+               # {
+               #   object@experiment[[I]] = mRECISTForModel(object@experiment[[I]], min.time=min.time)
+               # }
+
+               ##----- add column in sensitivity ----------------
+               object@sensitivity$model$mRECIST <- NA
+               object@sensitivity$model$best.response.time <- NA
+               object@sensitivity$model$best.response.value<- NA
+               object@sensitivity$model$best.average.response.time <- NA
+               object@sensitivity$model$best.average.response.value<- NA
+               for(modx in object@experiment)
                {
-                 object@experiment[[I]] = mRECISTForModel(object@experiment[[I]], min.time=min.time)
+                 mrd = computemRECIST(modx$data$time, modx$data$volume, min.time=min.time, return.detail=TRUE)
+                 object@sensitivity$model[modx$model.id, "mRECIST"] <- mrd$mRecist
+                 object@sensitivity$model[modx$model.id, "best.response.time"] <- mrd$best.response$time
+                 object@sensitivity$model[modx$model.id, "best.response.value"]<- mrd$best.response$value
+                 object@sensitivity$model[modx$model.id, "best.average.response.time"] <- mrd$best.average.response$time
+                 object@sensitivity$model[modx$model.id, "best.average.response.value"]<- mrd$best.average.response$value
                }
              }
              return(object)
@@ -188,7 +185,6 @@ setMethod( f="setmRECIST<-",
            {
              object = value
              object
-
            } )
 
 

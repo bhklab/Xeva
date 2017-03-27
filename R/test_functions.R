@@ -185,11 +185,8 @@
 #'   }
 #'
 #' }
-#'
-#'
-#'
-#'
-#'
+
+foo <- function(){
 if(1==2){
 
 getLine <- function(m)
@@ -231,5 +228,7 @@ A = getLine(5); B=getLine(-5)
 #A = getLine(1); B=getLine(-1)
 .computAngle(A,B)
 
+
+}
 
 }
