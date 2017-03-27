@@ -126,13 +126,15 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
   if(nrow(dfC)==0)
   {
     warning("Control have no data!")
-    return(NA)
+    #return(NA)
+    return(list(angle= NA, plot=NULL))
   }
 
   if(nrow(dfT)==0)
   {
     warning("treatment have no data!")
-    return(NA)
+    #return(NA)
+    return(list(angle= NA, plot=NULL))
   }
   fitC = .computSlopFun(dfC$time, dfC$mean)
   fitT = .computSlopFun(dfT$time, dfT$mean)
@@ -257,18 +259,22 @@ setMethod( f="setAngle<-",
            signature=c(object = "XevaSet"),
            definition=function(object, value)
            {
-             #object@model = value
-             for(I in 1:length(expDesignInfo(object)))
+             #for(I in 1:length(expDesignInfo(object)))
+             #{
+              # object@expDesign[[I]]$angle = value[[object@expDesign[[I]]$batch.name]]
+             #}
+
+             object@sensitivity$batch[ , "angle"] <- NA
+             for(bn in names(value))
              {
-               object@expDesign[[I]]$angle = value[[object@expDesign[[I]]$batch.name]]
+               object@sensitivity$batch[bn, "angle"] <- value[[bn]][["angle"]]
              }
              return(object)
            } )
 
 
-
-
-
+#####======================================================================================================
+#####======================================================================================================
 #####================= setSlop ==================
 extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 {
@@ -290,7 +296,7 @@ extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 
 
 
-##------- Compute slop for one model ------------
+##------- Compute slop for one model ----------------------------
 computeSlope <- function(object, model.id, treatment.only=TRUE)
 {
   mod = getExperiment(object, model.id=model.id)
@@ -332,6 +338,7 @@ setMethod( f="setSlop", signature="XevaSet",
                fa = computeSlope(object, model.id, treatment.only=treatment.only)
                rtz[[model.id]] = fa$angel
              }
+             rtz <- unlist(rtz) ##create flate list
              return(rtz)
            })
 
@@ -351,10 +358,17 @@ setMethod( f="setSlop<-",
            signature=c(object = "XevaSet"),
            definition=function(object, value)
            {
-             for(model.id in names(object@experiment))
+             #for(model.id in names(object@experiment))
+             #{
+             #   object@experiment[[model.id]]$slop = value[[model.id]]
+             #}
+             object@sensitivity$model$slop <- NA
+             ck1 <- symmetricSetDiff(rownames(object@sensitivity$model), names(value))
+             if(length(ck1)!=0)
              {
-               object@experiment[[model.id]]$slop = value[[model.id]]
+               stop("Error model.id are not same in sensitivity and experiment slot\n%s", paste(ck1, collapse = "\n"))
              }
+             object@sensitivity$model$slop <- unlist(value)[rownames(object@sensitivity$model)]
              return(object)
            })
 

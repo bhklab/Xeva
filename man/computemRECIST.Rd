@@ -7,17 +7,23 @@
 computemRECIST(time, volume, min.time = 10, return.detail = FALSE)
 }
 \arguments{
-\item{best.response}{Value of best response}
+\item{time}{Value of best response}
 
-\item{best.average.response}{Value of best average response}
+\item{volume}{Value of best average response}
+
+\item{min.time}{minimum time after which tumore volume will be considered}
+
+\item{return.detail}{default \code{FALSE}. If \code{TRUE} will return all intermediate values}
 }
 \value{
-Returns the mRECIST for given volume response
+Returns the mRECIST
 }
 \description{
 \code{computemRECIST} returns the mRECIST for given volume response
 }
 \examples{
-computemRECIST(best.response=8.722, best.average.response=8.722)
+time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
+computemRECIST(time, volume, min.time=10, return.detail=FALSE)
 }
 

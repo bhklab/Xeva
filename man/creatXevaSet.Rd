@@ -4,25 +4,27 @@
 \alias{creatXevaSet}
 \title{Creat Xeva class object}
 \usage{
-creatXevaSet(name, molecularProfiles = list(), experiment = data.frame(),
-  expDesign = list(), model = data.frame(), drug = data.frame())
+creatXevaSet(name, model = data.frame(), drug = data.frame(),
+  experiment = data.frame(), expDesign = list(),
+  modelSensitivity = data.frame(), batchSensitivity = data.frame(),
+  molecularProfiles = list(), modToBiobaseMap = data.frame())
 }
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset}
 
-\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing molecular profiles}
-
-\item{experiment}{A \code{data.frame} containg all experiment information}
-
 \item{model}{A \code{data.frame} containg the annotations for all models used in the experiment}
 
 \item{drug}{A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types}
+
+\item{experiment}{A \code{data.frame} containg all experiment information}
+
+\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing molecular profiles}
 }
 \value{
 Returns Xeva object
 }
 \description{
-\code{creatPharmacoPxSet} returns Xeva class object
+\code{creatXevaSet} returns Xeva class object
 }
 \examples{
 geoExp = readRDS("DATA-raw/Geo_Exp.Rda")

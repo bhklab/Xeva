@@ -236,9 +236,9 @@ creatXevaObject <- function()
                model = geoExp$model,
                drug  = geoExp$drug)
 
-  setmRECIST(pdxe)<- setmRECIST(pdxe)
-  setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
-  setAngle(pdxe) <- setAngle(pdxe)
+  #setmRECIST(pdxe)<- setmRECIST(pdxe)
+  #setSlop(pdxe) <- setSlop(pdxe, treatment.only=FALSE)
+  #setAngle(pdxe) <- setAngle(pdxe)
 
   save(pdxe, file = "data/pdxe.rda")
 
