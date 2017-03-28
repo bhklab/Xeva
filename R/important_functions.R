@@ -204,3 +204,33 @@ pasteColTogather <- function(df, collapse = " + ")
 #' symmetricSetDiff(a, b)
 #' @export
 symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }
+
+
+
+##-------------------
+#' Function to print
+#'
+#' \code{printf} is shortcut for cat(sprintf())
+#' @examples
+#' printf("Hello %s\n", "world" )
+#' @export
+printf <- function(...) cat(sprintf(...))
+
+
+
+
+##-------------------
+#' Function to print data.frame in massage
+#'
+#' \code{printAndCapture} prints data.frame in stop or warning functions
+#' @examples
+#' df <- data.frame(a=1:5, b=11:15)
+#' msg <- sprintf("data frame is:\n%s", printAndCapture(df))
+#' warning(msg)
+#' @export
+printAndCapture <- function(x)
+{
+  paste(capture.output(print(x)), collapse = "\n")
+}
+
+
