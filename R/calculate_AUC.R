@@ -24,7 +24,7 @@
   return(0.5 * (p1 - p2))
 }
 
-.normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
+##.normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
 
 ##-------- aac for 1 model ------------------------------
 .getAAC <- function(x, y)
@@ -120,3 +120,59 @@ setMethod( f=aac,
            })
 
 
+
+
+
+###########################################
+
+#####================= setAAC ==================
+#' setAAC generic
+#'
+#' Generic for setAAC method
+#'
+#' @examples
+#' data(cm.pdxe)
+#' setAAC(cm.pdxe) <- setAAC(object = cm.pdxe)
+#' @param object The \code{XevaSet}
+#' @return a \code{list} with model and batch AAC
+setGeneric(name = "setAAC", def = function(object) {standardGeneric("setAAC")} )
+
+#' @export
+setMethod( f=setAAC, signature="XevaSet",
+           definition=function(object)
+           {
+             value <- list()
+             value$model <- sapply(modelInfo(object)$model.id,function(mid) {aac(object, model.id = mid)})
+
+             value$batch <- lapply(names(object@expDesign),
+                                   function(bid) {aac(object, batch = expDesign(object,bid))})
+             names(value$batch) <- names(object@expDesign)
+
+             return(value)
+           } )
+
+
+#' setAAC<- Generic
+#'
+#' Generic for setAAC replace method
+#'
+#' @examples
+#' data(cm.pdxe)
+#' setAAC(cm.pdxe) <- setAAC(object = cm.pdxe)
+#' @param object The \code{XevaSet} to replace drug info in
+#' @return Updated \code{XevaSet}
+setGeneric(name= "setAAC<-", def = function(object, value) {standardGeneric("setAAC<-")} )
+
+#' @export
+setMethod( f="setAAC<-",
+           signature=c(object = "XevaSet"),
+           definition=function(object, value)
+           {
+             object@sensitivity$model[ , "AAC"] <- value$model[object@sensitivity$model$model.id]
+
+             object@sensitivity$batch[, "AAC.treatment"]<- sapply(object@sensitivity$batch$batch.name,
+                                                                  function(bid){value$batch[[bid]][["treatment"]]})
+             object@sensitivity$batch[, "AAC.control"]  <- sapply(object@sensitivity$batch$batch.name,
+                                                                  function(bid){value$batch[[bid]][["control"]]})
+             return(object)
+           } )

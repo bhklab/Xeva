@@ -91,8 +91,8 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
 }
 
 ####-----------------------------------------------------------
-#' data(lpdx); object=lpdx
-#' expDegI  <- expDesign(lpdx, "PHLC111_P7")
+### data(lpdx); object=lpdx
+### expDegI  <- expDesign(lpdx, "PHLC111_P7")
 .computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE,
                                      plot=FALSE, log.y=FALSE)
 {
