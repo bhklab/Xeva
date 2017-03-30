@@ -57,6 +57,14 @@
 
 
 
+.getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure, collapse.by="mean" )
+{
+  mdf <- .getModDrugBid(object, drug)
+  mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(Biobase::exprs(molData)),]
+  mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug, collapse.by=collapse.by)
+  return(mdfI)
+}
+
 ##====== drugSensitivitySig for one drug ==========================
 #' drugSensitivitySig
 #'
@@ -66,47 +74,234 @@
 #' Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
 #'
 #' @param object The \code{Xeva} dataset
-#' @param mDataType
+#' @param mDataType molecular data type
 #' @param drug Name of the drug
 #' @param features Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.
+#' @param sensitivity.measure Name of the sensitivity measure
+#' @param fit Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"
+#' @param type Tissue type. Default is NULL which will use \code{'tumor.type'} from \code{object}
 #' @return A datafram with fetures and values
 #'
 #' @examples
 #' data(cm.pdxe)
 #' drugSensitivitySig(object=cm.pdxe, mDataType="RNASeq", drug="binimetinib", features=1:5,
-#' sensitivity.measure="slop")
+#' sensitivity.measure="slop", fit = c("lm", "maxCor", "gam"))
 #'
 #' @export
 drugSensitivitySig <- function(object, mDataType, drug, features=NULL,
                                sensitivity.measure="slop",
-                               #molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"),
-                               #sensitivity.summary.stat=c("mean", "median", "first", "last"),
-                               #returnValues=c("estimate", "pvalue", "fdr"),
-                               #sensitivity.cutoff,
+                               fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
-                               nthread=1, verbose=TRUE, ...)
+                               nthread=1, type=NULL, verbose=TRUE)
 {
-  #mDataType = "RNASeq"
-  mdf <- .getModDrugBid(object, drug)
-  molD <- getMolecularProfiles(object, mDataType)
+  #molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"),
+  #sensitivity.summary.stat=c("mean", "median", "first", "last"),
+  #returnValues=c("estimate", "pvalue", "fdr"),
+  #sensitivity.cutoff,
+  molData <- getMolecularProfiles(object, mDataType)
 
-  mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(Biobase::exprs(molD)),]
-
-  if(is.null(features))
-  { features = rownames(Biobase::exprs(molD))}
+  mdfI <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
 
   if(verbose==TRUE){printf("Running for drug %s\n\n", drug)}
-  mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug, collapse.by="mean")
+  if(is.null(features))
+  { features = rownames(Biobase::exprs(molData))}
 
-  rr <- PharmacoGx:::rankGeneDrugSensitivity(data= t(Biobase::exprs(molD)[features, mdfI$biobase.id]),
-                                             drugpheno= mdfI[,sensitivity.measure],
-                                             #type=type, #batch=batch,
-                                             single.type=FALSE,
-                                             standardize=standardize,
-                                             nthread=nthread,
-                                             verbose=verbose)
-  return(rr[[1]])
+  ##---------------------------------------------------------------
+  if(!is.null(type))
+  {
+    if(length(type)< nrow(mdfI))
+    {stop("length of type should be equeal to length of models")}
+  } else
+  {
+    if("tumor.type" %in% colnames(modelInfo(object)))
+    {
+      typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id", map.to = "tumor.type", unique = FALSE)
+      type <- typeDF[, "tumor.type"]
+    } else
+    {
+      warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
+      type <- "tumor"
+    }
+  }
+  mdfI[, "tumor.type"] <- type
+  ##--------------------------------------------------------------
+  # rr <- PharmacoGx:::rankGeneDrugSensitivity(data= t(Biobase::exprs(molData)[features, mdfI$biobase.id]),
+  #                                            drugpheno= mdfI[,sensitivity.measure],
+  #                                            type= mdfI[, "tumor.type"], #batch=batch,
+  #                                            single.type=FALSE,
+  #                                            standardize=standardize[1],
+  #                                            nthread=nthread,
+  #                                            verbose=verbose)
+  # return(rr[[1]])
+
+  rtx <- .runFit(x = t(Biobase::exprs(molData)[features, mdfI$biobase.id]),
+                 y = mdfI[,sensitivity.measure],
+                 fit = fit[1],
+                 nthread= nthread, type=mdfI[, "tumor.type"],
+                 standardize=standardize[1], verbose=verbose)
+  return(rtx)
 }
+
+
+####-------------------------------------------------------------------------
+
+#' @import parallel
+#' @import doSNOW
+#' @import foreach
+# @import snow
+.runFit <- function(x, y, fit = c("lm", "maxCor", "gam"), nthread=1,
+                    type=NULL, standardize='SD', verbose=TRUE)
+{
+  fit = fit[1]
+  if(class(x)!= "matrix")
+  {
+    stop("x must be a matrix")
+  }
+
+  if(standardize=="SD"){ x <- scale(x)[,]}
+  if(standardize=="rescale"){ x <- as.matrix(apply(x,2, .normalize01))}
+
+  ##----------------------------------------------------------------------
+  if(fit=="lm")
+  {
+    rr <- PharmacoGx:::rankGeneDrugSensitivity(data= x,
+                                               drugpheno= y,
+                                               type= type, #batch=batch,
+                                               single.type=FALSE,
+                                               standardize=standardize,
+                                               nthread=nthread,
+                                               verbose=verbose)
+    return(rr[[1]])
+  }
+
+  ##---------------------------------------------------------------------
+  if(class(x)== "matrix")
+  {
+    if(is.null(colnames(x)))
+    { colnames(x) <- 1:ncol(x) }
+
+    #library(doSNOW)
+    cl <- makeCluster(nthread)
+    registerDoSNOW(cl)
+
+    #result <- foreach (i=colnames(x), .final = function(i) setNames(i, colnames(x))) %dopar%
+    #{ .nonLinerFits(x[,i], y, fit = fit )}
+
+    result <- foreach (i=colnames(x),
+                       .final = function(i) {setNames(i, colnames(x))},
+                       .export=c(".nonLinerFits")) %dopar%
+    { .nonLinerFits(x[,i], y, fit = fit )}
+
+
+    stopCluster(cl)
+
+    if(fit == "maxCor")
+    {
+      rtx <- data.frame(feature= colnames(x),
+                        maxCor = sapply(result, function(i) i[1,1]))
+    }
+
+    if(fit == "gam")
+    {
+      rtx <- .convertListToDataFram(result)
+      rtx$feature <- rownames(rtx)
+      rtx <- .reorderCol(rtx, "feature", 1)
+    }
+    return(rtx)
+  }
+}
+
+
+.nonLinerFits <- function(x, y, fit)
+{
+  switch(fit,
+         ##--------- Maximal correlation ---------
+         "maxCor" = { argmax <- acepack::ace(x, y)
+                      value <- stats::cor(argmax$tx, argmax$ty)},
+         ##------- generalized additive model  -------------
+         "gam" = { g <- mgcv::gam(y ~ s(x))
+                   val <- mgcv::summary.gam(g)
+                   value <- sapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
+         value <- NA
+         )
+
+  return(value)
+}
+
+
+
+nonLinerFitExample <- function()
+{
+  x = -100 : 100
+  y = (100^2 - x^2)^0.5    # let's make a circle
+
+  cor(x, y) # a circular line has zero linear correlation
+  cor(x, y, method='spearman') ## and zero rank correlation
+
+  ##--------- Maximal correlation ---------
+  library(acepack)
+  argmax = ace(x, y)
+  cor(argmax$tx, argmax$ty)
+
+  ##------- generalized additive model  -------------
+  library(mgcv)
+  g <- gam(y ~ s(x))
+  summary(g)
+  plot(g,scheme=2)
+
+}
+
+
+
+
+
+
+########-----------------------------------------------------
+########-----------------------------------------------------
+##====== geneSensitivityPlot for one drug ==========================
+#' geneSensitivityPlot
+#'
+#' Plot a gene expression against sensitivity signatures for a drug
+#' @description
+#' Given a Xeva object, feture name and drug name it will plot feture values against sensitivity value
+#'
+#' @examples
+#' data(cm.pdxe)
+#' geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
+#' sensitivity.measure="slop", standardize="log")
+#'
+#' @export
+#' @import ggplot2
+geneSensitivityPlot <- function(object, mDataType, feature, drug,
+                                sensitivity.measure="slop",
+                                standardize=c("SD", "rescale", "log", "none"))
+{
+  molData <- getMolecularProfiles(object, mDataType)
+  sdf <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
+  ##---plot gene vs  sensitivity.measure---------------------
+  #feature = rownames(exprs(molData))[1]#:5]
+
+  sdf[, feature] <- exprs(molData)[feature, sdf$biobase.id]
+  if(standardize[1]=="SD"){sdf[, feature] <- as.vector(scale(sdf[, feature]))}
+  if(standardize[1]=="rescale"){sdf[, feature] <- .normalize01(sdf[, feature])}
+  if(standardize[1]=="log")
+  {
+    if(min(sdf[, feature])<= 0)
+    {
+      sdf[, feature] <- sdf[, feature] + abs(min(sdf[, feature]))+0.0001
+    }
+    sdf[, feature] <- log(sdf[, feature])
+  }
+
+  plt <- ggplot(sdf, aes_string(x=sensitivity.measure, y=feature))#, color= "type", group="model.id"))
+  plt <- plt + geom_line(linetype = 1)+ geom_point()
+  plt
+}
+
+
+
+
+
 
 
 

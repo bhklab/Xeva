@@ -1,4 +1,8 @@
-#' @export
+##-- this will convert list to data.fram -------
+#' v <- 1:3; names(v) <- LETTERS[1:3]
+#' inLst <- list(x=v, y=v*10)
+#' .convertListToDataFram(inLst)
+## @export
 .convertListToDataFram <- function(inLst)
 {
   name.Rows = names(inLst)
@@ -18,15 +22,44 @@
     if(is.null(names(v))){names(v) = 1:length(v)}
     rd[rx, names(v)] = unlist(v, use.names = TRUE)[names(v)]
   }
-  ##-- this will convert list to data.fram
-  #mxInd = max(sapply(inLst, length))
-  #rlst  = as.data.frame(do.call(rbind,lapply(inLst, `length<-`, mxInd )), stringsAsFactors = FALSE)
-  ##rlst  = data.frame(as.matrix(rlst), stringsAsFactors = FALSE)
-  ##colnames(rlst) <- names(lst[[which.max(indx)]])
-  #return(rlst)
   return(rd)
 }
 
+###-------------------------------------------------------------------------------------
+###-------------------------------------------------------------------------------------
+##------ given a list of datafram it will give a new datafram --------------------------
+#' x <- data.frame(a=1:3, b= LETTERS[1:3])
+#' y <- data.frame(a=(1:3)*10, b= letters[1:3])
+#' inLst <- list(x=x, y=y)
+#' .rbindListOfDataframs(inLst)
+## @export
+.rbindListOfDataframs<- function(inList)
+{
+  allColNames = lapply(inList, colnames)
+  allColNames = unique(unlist(allColNames))
+  rtx = data.frame(); ncolX=0;
+  for(dfi in inList)
+  {
+    if( length(colnames(dfi)) > ncolX)
+    { ncolX= length(colnames(dfi))
+    maxCols =colnames(dfi)}
+
+    for(cx in allColNames)
+    {
+      if(is.element(cx, colnames(dfi))==FALSE)
+      {dfi[, cx]=NA}
+    }
+    rtx = rbind(rtx, dfi[, allColNames])
+  }
+
+  rtx1 = rtx[, maxCols]
+  rtx2 = rtx[, setdiff(colnames(rtx), maxCols)]
+  RTz = cbind(rtx1, rtx2)
+  return(RTz)
+}
+
+###-------------------------------------------------------------------------------------
+###-------------------------------------------------------------------------------------
 
 ##---- gives index of element in vector
 ##---- also works for NA
@@ -81,33 +114,6 @@ getIndex <- function(inVec, indxOf)
 {
   in.list[[length(in.list)+1]]=value
   return(in.list)
-}
-
-
-#' @export
-.rbindListOfDataframs<- function(inList)
-{
-  allColNames = lapply(inList, colnames)
-  allColNames = unique(unlist(allColNames))
-  rtx = data.frame(); ncolX=0;
-  for(dfi in inList)
-  {
-    if( length(colnames(dfi)) > ncolX)
-    { ncolX= length(colnames(dfi))
-      maxCols =colnames(dfi)}
-
-    for(cx in allColNames)
-    {
-      if(is.element(cx, colnames(dfi))==FALSE)
-      {dfi[, cx]=NA}
-    }
-    rtx = rbind(rtx, dfi[, allColNames])
-  }
-
-  rtx1 = rtx[, maxCols]
-  rtx2 = rtx[, setdiff(colnames(rtx), maxCols)]
-  RTz = cbind(rtx1, rtx2)
-  return(RTz)
 }
 
 ##------------------------------------------------------------------------------------------
@@ -233,4 +239,8 @@ printAndCapture <- function(x)
   paste(capture.output(print(x)), collapse = "\n")
 }
 
+
+###----------------------------
+##Normalize a vector between 0 and 1
+.normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
 

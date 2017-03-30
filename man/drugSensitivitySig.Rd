@@ -5,15 +5,24 @@
 \title{drugSensitivitySig}
 \usage{
 drugSensitivitySig(object, mDataType, drug, features = NULL,
-  sensitivity.measure = "slop", standardize = c("SD", "rescale", "none"),
-  nthread = 1, verbose = TRUE, ...)
+  sensitivity.measure = "slop", fit = c("lm", "maxCor", "gam"),
+  standardize = c("SD", "rescale", "none"), nthread = 1, type = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
+\item{mDataType}{molecular data type}
+
 \item{drug}{Name of the drug}
 
 \item{features}{Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.}
+
+\item{sensitivity.measure}{Name of the sensitivity measure}
+
+\item{fit}{Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"}
+
+\item{type}{Tissue type. Default is NULL which will use \code{'tumor.type'} from \code{object}}
 }
 \value{
 A datafram with fetures and values
@@ -27,7 +36,7 @@ Get sensitivity signatures for a drug
 \examples{
 data(cm.pdxe)
 drugSensitivitySig(object=cm.pdxe, mDataType="RNASeq", drug="binimetinib", features=1:5,
-sensitivity.measure="slop")
+sensitivity.measure="slop", fit = c("lm", "maxCor", "gam"))
 
 }
 

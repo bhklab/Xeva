@@ -19,4 +19,13 @@ Imports:
   ggplot2,
   ComplexHeatmap,
   reshape2,
-  grDevices
+  grDevices,
+  foreach,
+  parallel,
+  doParallel,
+  doSNOW,
+  acepack,
+  mgcv
+
+
+
