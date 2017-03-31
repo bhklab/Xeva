@@ -244,3 +244,25 @@ printAndCapture <- function(x)
 ##Normalize a vector between 0 and 1
 .normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
 
+###------------------------------
+##-------------------
+#' Function to remove low variance features
+#'
+#' Function to remove low variance features
+#' @examples
+#' data(cars)
+#' removeZeroVar(cars, varCutoff=0)
+#' @export
+removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
+{
+  dfR <- apply(df,2, var)
+  dfR <- dfR[dfR>varCutoff]
+
+  if(sort==TRUE)
+  {
+    dfR <- sort(dfR, decreasing = TRUE)
+  }
+  return(df[, names(dfR), drop=FALSE])
+}
+
+

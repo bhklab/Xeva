@@ -4,17 +4,19 @@
 \alias{drugSensitivitySig}
 \title{drugSensitivitySig}
 \usage{
-drugSensitivitySig(object, mDataType, drug, features = NULL,
-  sensitivity.measure = "slop", fit = c("lm", "maxCor", "gam"),
-  standardize = c("SD", "rescale", "none"), nthread = 1, type = NULL,
-  verbose = TRUE)
+drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
+  features = NULL, sensitivity.measure = "slop", fit = c("lm", "maxCor",
+  "gam"), standardize = c("SD", "rescale", "none"), nthread = 1,
+  type = NULL, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
+\item{drug}{Name of the drug}
+
 \item{mDataType}{molecular data type}
 
-\item{drug}{Name of the drug}
+\item{molData}{External data matrix. Rows as features and columns as samples}
 
 \item{features}{Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.}
 
@@ -29,14 +31,16 @@ A datafram with fetures and values
 }
 \description{
 Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
+
+A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
 }
 \details{
 Get sensitivity signatures for a drug
 }
 \examples{
-data(cm.pdxe)
-drugSensitivitySig(object=cm.pdxe, mDataType="RNASeq", drug="binimetinib", features=1:5,
-sensitivity.measure="slop", fit = c("lm", "maxCor", "gam"))
+data(pdac.pdxe)
+drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
+sensitivity.measure="slop", fit = "lm")
 
 }
 

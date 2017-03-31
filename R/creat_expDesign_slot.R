@@ -17,7 +17,7 @@
 
   if(!is.null(modNoControl))
   {
-    txt = sprintf("These models have no Controls\n%s", paste(unique(modNoControl), collapse = "\n"))
+    txt = sprintf("These models have no Controls\n%s\n", paste(unique(modNoControl), collapse = "\n"))
     cat(txt)
   }
 
@@ -26,14 +26,13 @@
   bnamDup = bnam[duplicated(bnam)]
   if(length(bnamDup)>0)
   {
-    txt = sprintf("These batch names are duplicated\n%s", paste(bnamDup, collapse = "\n"))
+    txt = sprintf("These batch names are duplicated\n%s\n", paste(bnamDup, collapse = "\n"))
     stop(txt)
   }
   names(expDesign) = bnam
 
   return(expDesign)
 }
-
 
 
 
