@@ -60,7 +60,7 @@
 .getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure, collapse.by="mean" )
 {
   mdf <- .getModDrugBid(object, drug)
-  mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(Biobase::exprs(molData)),]
+  mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(molData),]
   mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug, collapse.by=collapse.by)
   return(mdfI)
 }
@@ -74,8 +74,9 @@
 #' Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
 #'
 #' @param object The \code{Xeva} dataset
-#' @param mDataType molecular data type
 #' @param drug Name of the drug
+#' @param mDataType molecular data type
+#' @param molData External data matrix. Rows as features and columns as samples
 #' @param features Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.
 #' @param sensitivity.measure Name of the sensitivity measure
 #' @param fit Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"
@@ -83,12 +84,14 @@
 #' @return A datafram with fetures and values
 #'
 #' @examples
-#' data(cm.pdxe)
-#' drugSensitivitySig(object=cm.pdxe, mDataType="RNASeq", drug="binimetinib", features=1:5,
-#' sensitivity.measure="slop", fit = c("lm", "maxCor", "gam"))
+#' data(pdac.pdxe)
+#' drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
+#' sensitivity.measure="slop", fit = "lm")
 #'
+#' @description A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
 #' @export
-drugSensitivitySig <- function(object, mDataType, drug, features=NULL,
+drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
+                               features=NULL,
                                sensitivity.measure="slop",
                                fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
@@ -98,13 +101,23 @@ drugSensitivitySig <- function(object, mDataType, drug, features=NULL,
   #sensitivity.summary.stat=c("mean", "median", "first", "last"),
   #returnValues=c("estimate", "pvalue", "fdr"),
   #sensitivity.cutoff,
-  molData <- getMolecularProfiles(object, mDataType)
+
+  if(is.null(mDataType)& is.null(molData))
+  {
+    stop("'mDataType' and 'molData' both can't be NULL ")
+  }
+
+  if(is.null(molData))
+  {
+    molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
+  }
+  molData <- as.matrix(molData)
 
   mdfI <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
 
   if(verbose==TRUE){printf("Running for drug %s\n\n", drug)}
   if(is.null(features))
-  { features = rownames(Biobase::exprs(molData))}
+  { features = rownames(molData)}
 
   ##---------------------------------------------------------------
   if(!is.null(type))
@@ -124,17 +137,16 @@ drugSensitivitySig <- function(object, mDataType, drug, features=NULL,
     }
   }
   mdfI[, "tumor.type"] <- type
-  ##--------------------------------------------------------------
-  # rr <- PharmacoGx:::rankGeneDrugSensitivity(data= t(Biobase::exprs(molData)[features, mdfI$biobase.id]),
-  #                                            drugpheno= mdfI[,sensitivity.measure],
-  #                                            type= mdfI[, "tumor.type"], #batch=batch,
-  #                                            single.type=FALSE,
-  #                                            standardize=standardize[1],
-  #                                            nthread=nthread,
-  #                                            verbose=verbose)
-  # return(rr[[1]])
+  ## -------------------------------------------------------------------------
+  x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
+  fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
+  if(fetDiff>0)
+  {
+    msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
+    warning(msg1)
+  }
 
-  rtx <- .runFit(x = t(Biobase::exprs(molData)[features, mdfI$biobase.id]),
+  rtx <- .runFit(x = x,
                  y = mdfI[,sensitivity.measure],
                  fit = fit[1],
                  nthread= nthread, type=mdfI[, "tumor.type"],
@@ -148,7 +160,6 @@ drugSensitivitySig <- function(object, mDataType, drug, features=NULL,
 #' @import parallel
 #' @import doSNOW
 #' @import foreach
-# @import snow
 .runFit <- function(x, y, fit = c("lm", "maxCor", "gam"), nthread=1,
                     type=NULL, standardize='SD', verbose=TRUE)
 {
@@ -276,12 +287,12 @@ geneSensitivityPlot <- function(object, mDataType, feature, drug,
                                 sensitivity.measure="slop",
                                 standardize=c("SD", "rescale", "log", "none"))
 {
-  molData <- getMolecularProfiles(object, mDataType)
+  molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
   sdf <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
   ##---plot gene vs  sensitivity.measure---------------------
   #feature = rownames(exprs(molData))[1]#:5]
 
-  sdf[, feature] <- exprs(molData)[feature, sdf$biobase.id]
+  sdf[, feature] <- molData[feature, sdf$biobase.id]
   if(standardize[1]=="SD"){sdf[, feature] <- as.vector(scale(sdf[, feature]))}
   if(standardize[1]=="rescale"){sdf[, feature] <- .normalize01(sdf[, feature])}
   if(standardize[1]=="log")
