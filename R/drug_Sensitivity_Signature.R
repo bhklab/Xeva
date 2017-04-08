@@ -86,13 +86,13 @@
 #' @examples
 #' data(pdac.pdxe)
 #' drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
-#' sensitivity.measure="slop", fit = "lm")
+#' sensitivity.measure="slope", fit = "lm")
 #'
 #' @description A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
 #' @export
 drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
                                features=NULL,
-                               sensitivity.measure="slop",
+                               sensitivity.measure="slope",
                                fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
                                nthread=1, type=NULL, verbose=TRUE)
@@ -113,45 +113,61 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
   }
   molData <- as.matrix(molData)
 
-  mdfI <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
-
-  if(verbose==TRUE){printf("Running for drug %s\n\n", drug)}
-  if(is.null(features))
-  { features = rownames(molData)}
-
-  ##---------------------------------------------------------------
-  if(!is.null(type))
+  rtLx <- list()
+  for(drugIx in c(drug))
   {
-    if(length(type)< nrow(mdfI))
-    {stop("length of type should be equeal to length of models")}
-  } else
-  {
-    if("tumor.type" %in% colnames(modelInfo(object)))
+
+    mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure, collapse.by="mean" )
+
+    if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
+    if(is.null(features))
+    { features = rownames(molData)}
+
+    ##---------------------------------------------------------------
+    if(!is.null(type))
     {
-      typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id", map.to = "tumor.type", unique = FALSE)
-      type <- typeDF[, "tumor.type"]
+      if(length(type)!= nrow(mdfI))
+      {stop("length of type should be equeal to length of models")}
+
+      if(length(type)== nrow(mdfI))
+      {tt <- type}
     } else
     {
-      warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
-      type <- "tumor"
+      if("tumor.type" %in% colnames(modelInfo(object)))
+      {
+        typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id", map.to = "tumor.type", unique = FALSE)
+        tt <- typeDF[, "tumor.type"]
+      } else
+      {
+        warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
+        tt <- "tumor"
+      }
     }
-  }
-  mdfI[, "tumor.type"] <- type
-  ## -------------------------------------------------------------------------
-  x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
-  fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
-  if(fetDiff>0)
-  {
-    msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
-    warning(msg1)
+    mdfI[, "tumor.type"] <- tt
+    ## -------------------------------------------------------------------------
+    x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
+    fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
+    if(fetDiff>0)
+    {
+      msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
+      warning(msg1)
+    }
+
+    rtx <- .runFit(x = x,
+                   y = mdfI[,sensitivity.measure],
+                   fit = fit[1],
+                   nthread= nthread, type=mdfI[, "tumor.type"],
+                   standardize=standardize[1], verbose=verbose)
+
+    rownames(rtx) <- NULL
+    rtx$drug <- drugIx
+    rtx <- .reorderCol(rtx, "drug", 2)
+    rtLx<- .appendToList(rtLx, rtx)
   }
 
-  rtx <- .runFit(x = x,
-                 y = mdfI[,sensitivity.measure],
-                 fit = fit[1],
-                 nthread= nthread, type=mdfI[, "tumor.type"],
-                 standardize=standardize[1], verbose=verbose)
-  return(rtx)
+  rtDF <- do.call("rbind", rtLx)
+  rownames(rtDF) <- NULL
+  return(rtDF)
 }
 
 
@@ -169,6 +185,9 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
     stop("x must be a matrix")
   }
 
+  if(is.null(colnames(x)))
+  { colnames(x) <- 1:ncol(x) }
+
   if(standardize=="SD"){ x <- scale(x)[,]}
   if(standardize=="rescale"){ x <- as.matrix(apply(x,2, .normalize01))}
 
@@ -182,15 +201,13 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
                                                standardize=standardize,
                                                nthread=nthread,
                                                verbose=verbose)
-    return(rr[[1]])
+    rr <- data.frame(rr[[1]], stringsAsFactors = FALSE)
+    rr$feature <- colnames(x)
+    rr <- .reorderCol(rr, "feature", 1)
+    return(rr)
   }
 
   ##---------------------------------------------------------------------
-  if(class(x)== "matrix")
-  {
-    if(is.null(colnames(x)))
-    { colnames(x) <- 1:ncol(x) }
-
     #library(doSNOW)
     cl <- makeCluster(nthread)
     registerDoSNOW(cl)
@@ -219,7 +236,6 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
       rtx <- .reorderCol(rtx, "feature", 1)
     }
     return(rtx)
-  }
 }
 
 
@@ -279,12 +295,12 @@ nonLinerFitExample <- function()
 #' @examples
 #' data(cm.pdxe)
 #' geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
-#' sensitivity.measure="slop", standardize="log")
+#' sensitivity.measure="slope", standardize="log")
 #'
 #' @export
 #' @import ggplot2
 geneSensitivityPlot <- function(object, mDataType, feature, drug,
-                                sensitivity.measure="slop",
+                                sensitivity.measure="slope",
                                 standardize=c("SD", "rescale", "log", "none"))
 {
   molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
@@ -306,7 +322,7 @@ geneSensitivityPlot <- function(object, mDataType, feature, drug,
 
   plt <- ggplot(sdf, aes_string(x=sensitivity.measure, y=feature))#, color= "type", group="model.id"))
   plt <- plt + geom_line(linetype = 1)+ geom_point()
-  plt
+  .ggplotEmptyTheme(plt)
 }
 
 

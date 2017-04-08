@@ -56,6 +56,8 @@ creatXevaSet <- function(name,
   model <- .checkModel(model, expSlot)
   expDesign <- .checkExperimentDesign(expDesign)
   sensitivity<- .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
+  drug <- .checkDrugSlot(drug)
+
   ##----check if drug present in both drug slot and expSlot
 
   pxset = XevaSet(annotation = annotation,

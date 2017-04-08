@@ -5,7 +5,7 @@
 \title{drugSensitivitySig}
 \usage{
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
-  features = NULL, sensitivity.measure = "slop", fit = c("lm", "maxCor",
+  features = NULL, sensitivity.measure = "slope", fit = c("lm", "maxCor",
   "gam"), standardize = c("SD", "rescale", "none"), nthread = 1,
   type = NULL, verbose = TRUE)
 }
@@ -40,7 +40,7 @@ Get sensitivity signatures for a drug
 \examples{
 data(pdac.pdxe)
 drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
-sensitivity.measure="slop", fit = "lm")
+sensitivity.measure="slope", fit = "lm")
 
 }
 

@@ -12,7 +12,7 @@
 }
 
 
-.computSlopFun <- function(x,y)
+.computSlopeFun <- function(x,y)
 {
   data = data.frame(x=x, y=y)
   ##---- remove all non finite (Inf, NA, NaN) data --------------
@@ -105,7 +105,7 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
     {
       dt = getExperiment(object, model.id=ti, treatment.only = TRUE)
 
-      dt.fit[[ti]] = .computSlopFun(dt$time, dt[,var])
+      dt.fit[[ti]] = .computSlopeFun(dt$time, dt[,var])
     }
   }
   ###-------------
@@ -115,7 +115,7 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
     for(ci in expDegI$control)
     {
       dc = getExperiment(object, model.id=ci, treatment.only = TRUE)
-      dc.fit[[ci]] = .computSlopFun(dc$time, dc[,var])
+      dc.fit[[ci]] = .computSlopeFun(dc$time, dc[,var])
     }
   }
 
@@ -136,8 +136,8 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
     #return(NA)
     return(list(angle= NA, plot=NULL))
   }
-  fitC = .computSlopFun(dfC$time, dfC$mean)
-  fitT = .computSlopFun(dfT$time, dfT$mean)
+  fitC = .computSlopeFun(dfC$time, dfC$mean)
+  fitT = .computSlopeFun(dfT$time, dfT$mean)
 
   ##--------------------------------------------------------------------
   .getLMfitLine <- function(fit, data)
@@ -275,7 +275,7 @@ setMethod( f="setAngle<-",
 
 #####======================================================================================================
 #####======================================================================================================
-#####================= setSlop ==================
+#####================= setSlope ==================
 extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 {
   inVIndx= 1:length(inVec)
@@ -296,7 +296,7 @@ extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 
 
 
-##------- Compute slop for one model ----------------------------
+##------- Compute slope for one model ----------------------------
 computeSlope <- function(object, model.id, treatment.only=TRUE)
 {
   mod = getExperiment(object, model.id=model.id)
@@ -309,26 +309,26 @@ computeSlope <- function(object, model.id, treatment.only=TRUE)
       time = time[tretIndx] ; volume=volume[tretIndx]
     }
   }
-  rtx = .computSlopFun(time, volume)
+  rtx = .computSlopeFun(time, volume)
   return(rtx)
 }
 
 
-#' setSlop generic
+#' setSlope generic
 #'
-#' Generic for setSlop method
+#' Generic for setSlope method
 #'
 #' @examples
 #' data(pdxe)
-#' slops <- setSlop(object = pdxe, treatment.only=FALSE)
+#' slope <- setSlope(object = pdxe, treatment.only=FALSE)
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @param treatment.only Default \code{TRUE}, take only first periode of treatment where dose is not zero
 #' @details If dose column is not present treatment.only will be considered FALSE
-#' @return a \code{list} with slop of each model.id
-setGeneric(name = "setSlop", def = function(object, treatment.only=TRUE, verbose=TRUE) {standardGeneric("setSlop")} )
+#' @return a \code{list} with slope of each model.id
+setGeneric(name = "setSlope", def = function(object, treatment.only=TRUE, verbose=TRUE) {standardGeneric("setSlope")} )
 
 #' @export
-setMethod( f="setSlop", signature="XevaSet",
+setMethod( f="setSlope", signature="XevaSet",
            definition=function(object, treatment.only=TRUE, verbose=TRUE)
            {
              rtz = list()
@@ -342,33 +342,33 @@ setMethod( f="setSlop", signature="XevaSet",
              return(rtz)
            })
 
-#' setSlop<- Generic
+#' setSlope<- Generic
 #'
-#' Generic for setSlop replace method
+#' Generic for setSlope replace method
 #'
 #' @examples
 #' data(pdxe)
-#' setSlop(pdxe) <- setSlop(object = pdxe)
+#' setSlope(pdxe) <- setSlope(object = pdxe)
 #' @param object The \code{XevaSet} to replace drug info in
 #' @return Updated \code{XevaSet}
-setGeneric(name= "setSlop<-", def = function(object, value) {standardGeneric("setSlop<-")} )
+setGeneric(name= "setSlope<-", def = function(object, value) {standardGeneric("setSlope<-")} )
 
 #' @export
-setMethod( f="setSlop<-",
+setMethod( f="setSlope<-",
            signature=c(object = "XevaSet"),
            definition=function(object, value)
            {
              #for(model.id in names(object@experiment))
              #{
-             #   object@experiment[[model.id]]$slop = value[[model.id]]
+             #   object@experiment[[model.id]]$slope = value[[model.id]]
              #}
-             object@sensitivity$model$slop <- NA
+             object@sensitivity$model$slope <- NA
              ck1 <- symmetricSetDiff(rownames(object@sensitivity$model), names(value))
              if(length(ck1)!=0)
              {
                stop("Error model.id are not same in sensitivity and experiment slot\n%s", paste(ck1, collapse = "\n"))
              }
-             object@sensitivity$model$slop <- unlist(value)[rownames(object@sensitivity$model)]
+             object@sensitivity$model$slope <- unlist(value)[rownames(object@sensitivity$model)]
              return(object)
            })
 

@@ -158,9 +158,9 @@
     summary.stat=";"
   }
 
-  if(response.measure =="slop")
+  if(response.measure =="slope")
   {
-    valueColName <- "slop"
+    valueColName <- "slope"
   }
 
   ##------------------------------------------------------

@@ -5,7 +5,7 @@
 \title{Summarize Response of PDXs}
 \usage{
 summarizeResponse(object, response.measure = "mRECIST_recomputed",
-  group.by = "patient.id", summary.stat = c("mean", "median", ";"),
+  group.by = "patient.id", summary.stat = c(";", "mean", "median"),
   tumor.type = NULL)
 }
 \arguments{
