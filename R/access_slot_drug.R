@@ -31,8 +31,7 @@ setMethod( f="drugInfo<-",
            signature=c(object = "XevaSet", value="data.frame"),
            definition=function(object, value)
            {
-             #object@annotation$drugInfo = value
-             object@drugInfo = value
+             object@drug <- value
              return(object)
            } )
 

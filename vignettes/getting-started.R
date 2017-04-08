@@ -38,11 +38,11 @@ for(I in batchNames)
 
 
 ## ---- echo=TRUE----------------------------------------------------------
-lpdx_slop <- summarizeResponse(lpdx, response.measure = "slop", 
-                               group.by="patient.id", summary.stat = "mean")
+#lpdx_slop <- summarizeResponse(lpdx, response.measure = "slop", 
+#                               group.by="patient.id", summary.stat = "mean")
 
 ## ---- echo=TRUE----------------------------------------------------------
-lpdx_angle <- summarizeResponse(lpdx, response.measure = "angle")
+#lpdx_angle <- summarizeResponse(lpdx, response.measure = "angle")
 
 
 ## ---- echo=TRUE----------------------------------------------------------
@@ -63,7 +63,7 @@ df = getExperiment(lpdx, "PHLC119_P5.506.B1")
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
 #select lung cancer PDXE data
-pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
                                 group.by="patient.id", tumor.type="NSCLC")
 ## plot matrix
 plotmRECIST(pdxe.lung, control.name = "untreated")
@@ -80,10 +80,10 @@ plotmRECIST(pdxe.brca, control.name = "untreated", control.col = "#238b45")
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
 data(pdxe)
 
-lung_pdxe_slope <- summarizeResponse(pdxe, response.measure = "slop", group.by="patient.id", 
+lung_pdxe_slope <- summarizeResponse(pdxe, response.measure = "slope", group.by="patient.id", 
                                      summary.stat = "mean", tumor.type = "NSCLC")
 
-lung_pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+lung_pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST",
                              group.by="patient.id", tumor.type="NSCLC")
 
 slope=c(); mR=c()

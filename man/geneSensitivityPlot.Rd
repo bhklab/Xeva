@@ -5,7 +5,7 @@
 \title{geneSensitivityPlot}
 \usage{
 geneSensitivityPlot(object, mDataType, feature, drug,
-  sensitivity.measure = "slop", standardize = c("SD", "rescale", "log",
+  sensitivity.measure = "slope", standardize = c("SD", "rescale", "log",
   "none"))
 }
 \description{
@@ -17,7 +17,7 @@ Plot a gene expression against sensitivity signatures for a drug
 \examples{
 data(cm.pdxe)
 geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
-sensitivity.measure="slop", standardize="log")
+sensitivity.measure="slope", standardize="log")
 
 }
 

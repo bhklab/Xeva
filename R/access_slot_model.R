@@ -12,7 +12,12 @@ setGeneric(name = "modelInfo", def = function(object) {standardGeneric("modelInf
 #' @export
 setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object)
-           { slot(object,name="model") } )
+           {
+             modI <- slot(object,name="model")
+             drgMod <- sapply(slot(object,name="experiment"), "[[", c("drug", "join.name"))
+             modI$drug <- drgMod[ modI$model.id ]
+             return(modI)
+           } )
 
 
 #' modelInfo<- Generic
@@ -31,6 +36,7 @@ setMethod( f="modelInfo<-",
            definition=function(object, value)
            {
              object@model = value
+             warning("This will not update drug information in experiment slot\n write the code to do so...")
              return(object)
            } )
 
@@ -39,7 +45,7 @@ setMethod( f="modelInfo<-",
 
 .checkIfColPresentinModel <- function(object, nameCol)
 {
-  if(is.element(nameCol, colnames(object@model)) ==FALSE)
+  if(is.element(nameCol, colnames(modelInfo(object))) ==FALSE)
   {
     msg = sprintf("%s is not a valid id.name\nValid id.names are:\n\n%s",
                   nameCol, paste(colnames(object@model), collapse = "\n"))
@@ -75,6 +81,7 @@ setMethod( f=mapModelSlotIds,
            {
              id = c(as.character(id))
 
+             ##------------------------------------
              if(id.name=="batch.name")
              {
                rtd = .mapBatchName2Id(object, id, map.to)
