@@ -30,11 +30,10 @@
     drugX = .getDrugsForABatch(object, batch)
     drug = unique(drugX$treatment)
     rdf = rbind(rdf, data.frame(batch.name = batch$batch.name,
-                                drug.join.name=drug,
-                                angle= batch$angle))
+                                drug.join.name=drug))
   }
-
   rdf <- .factor2char(rdf)
+  rdf$angle <- slot(object, "sensitivity")[["batch"]][rdf$batch.name, ]
   return(rdf)
 }
 
@@ -84,7 +83,6 @@
 
   mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
                       value=response.measure, collapse = summary.stat)
-
   return(mat)
 }
 
@@ -144,49 +142,82 @@
 
 .summarizePerModelResponse <- function(object, response.measure, group.by, summary.stat, tumor.type)
 {
-  values <- c("model.id","drug.join.name")
-  valueColName <- NULL
-  if(response.measure =="mRECIST_recomputed" | response.measure =="mRECIST")
+  if(is.element(response.measure,  colnames(slot(object, "sensitivity")[["model"]]) )==FALSE)
   {
-    valueColName <- "mRECIST"
-    summary.stat=";"
+    msg <- sprintf("'%s' is not present in sensitivity slot\n", response.measure)
+    stop(msg)
   }
 
-  if(response.measure =="mRECIST_published")
+  dfVal <- slot(object, "sensitivity")[["model"]] [,c("model.id", response.measure)]
+
+  df <- modelInfo(object)
+  df[, response.measure] <- dfVal[df$model.id, response.measure]
+
+  if(!is.null(tumor.type))
   {
-    valueColName = "mRECIST_published"
-    summary.stat=";"
+    df <- df[df$tumor.type==tumor.type,]
   }
 
-  if(response.measure =="slope")
+  if(is.element(group.by, colnames(df))==FALSE)
   {
-    valueColName <- "slope"
+    msg <- sprintf("'group.by' %s not present in model\n", group.by)
+    stop(msg)
   }
 
-  ##------------------------------------------------------
-  if(is.null(valueColName))
-  {
-    varPresTest <- checkExperimentSlotVariable(object, response.measure)
-    if(varPresTest==TRUE)
-    { valueColName <- response.measure }
-  }
+  mat = .castDataFram(df, row.var="drug", col.var = group.by,
+                      value=response.measure, collapse = summary.stat)
 
-  values <- c("model.id","drug.join.name", valueColName)
-  df <- .getValueFromAllModel(object, values, tumor.type)
+  ###------------------------------------------------
+  #values <- c("model.id","drug.join.name")
+  #valueColName <- NULL
 
-  if(all(is.na(df[, valueColName]))==TRUE)
-  {
-    msg = sprintf("all values for %s are NA", valueColName)
-    warning(msg)
-  }
+  #if(response.measure =="mRECIST_recomputed")
+  #{
+  #  valueColName =="mRECIST"
+  #  summary.stat=";"
+  #}
+  #
+  # if(response.measure =="mRECIST_recomputed" | response.measure =="mRECIST")
+  # {
+  #   valueColName <- "mRECIST"
+  #   summary.stat=";"
+  # }
+  #
+  # if(response.measure =="mRECIST_published")
+  # {
+  #   valueColName = "mRECIST_published"
+  #   summary.stat=";"
+  # }
+  #
+  # if(response.measure =="slope")
+  # {
+  #   valueColName <- "slope"
+  # }
+  #
+  # ##------------------------------------------------------
+  # if(is.null(valueColName))
+  # {
+  #   varPresTest <- checkExperimentSlotVariable(object, response.measure)
+  #   if(varPresTest==TRUE)
+  #   { valueColName <- response.measure }
+  # }
+  #
+  # values <- c("model.id","drug.join.name", valueColName)
+  # df <- .getValueFromAllModel(object, values, tumor.type)
+  #
+  # if(all(is.na(df[, valueColName]))==TRUE)
+  # {
+  #   msg = sprintf("all values for %s are NA", valueColName)
+  #   warning(msg)
+  # }
+  #
+  # if(group.by!="model.id")
+  # {
+  #   df = .mapAndAttachColumn(object, df, id.name="model.id", map.to=group.by)
+  # }
 
-  if(group.by!="model.id")
-  {
-    df = .mapAndAttachColumn(object, df, id.name="model.id", map.to=group.by)
-  }
-
-  mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
-                      value=valueColName, collapse = summary.stat)
+  #mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
+  #                    value=valueColName, collapse = summary.stat)
 
   return(mat)
 }
@@ -221,7 +252,7 @@
 #'                              group.by="patient.id", tumor.type="NSCLC")
 #' @export
 summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
-                              group.by="patient.id", summary.stat=c("mean", "median", ";"),
+                              group.by="patient.id", summary.stat=c(";", "mean", "median"),
                               tumor.type=NULL)
 {
 

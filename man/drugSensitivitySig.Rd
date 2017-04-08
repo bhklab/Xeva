@@ -5,9 +5,9 @@
 \title{drugSensitivitySig}
 \usage{
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
-  features = NULL, sensitivity.measure = "slope", fit = c("lm", "maxCor",
-  "gam"), standardize = c("SD", "rescale", "none"), nthread = 1,
-  type = NULL, verbose = TRUE)
+  features = NULL, model.ids = NULL, sensitivity.measure = "slope",
+  fit = c("lm", "maxCor", "gam"), standardize = c("SD", "rescale", "none"),
+  nthread = 1, tumor.type = NULL, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -38,9 +38,12 @@ A matrix of values can be directly passed to molData. \code{fit} can be "lm", "m
 Get sensitivity signatures for a drug
 }
 \examples{
-data(pdac.pdxe)
-drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
-sensitivity.measure="slope", fit = "lm")
-
+data(pdxe)
+## select BRCA samples
+mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
+drugSensitivitySig(object=pdxe, drug=c("paclitaxel","tamoxifen"),
+                   mDataType="RNASeq", features=1:5,
+                   model.ids = mid$model.id,
+                   sensitivity.measure="slope", fit = "lm")
 }
 

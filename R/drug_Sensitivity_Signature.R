@@ -1,23 +1,23 @@
-.getModDrugBid <- function(object, drugs=NULL)
-{
-  midDr <- sapply(object@experiment, "[[", c("drug", "join.name"))
-  midDr <- data.frame(model.id= names(midDr), drug= midDr, stringsAsFactors = FALSE)
-  if(!is.null(drugs))
-  {
-    midDr <- midDr[midDr$drug %in% drugs, ]
-  }
-
-  if(nrow(midDr)==0)
-  {
-    msg1 <- sprintf("drug %s not present in Xeva dataset", paste(drugs, collapse = "\n"))
-    stop(msg1)
-  }
-
-  bid <- mapModelSlotIds(object, id=midDr$model.id, id.name = "model.id",
-                         map.to = "biobase.id", unique = FALSE)
-  midDr[, "biobase.id"] <- bid[, "biobase.id"]
-  return(midDr)
-}
+# .getModDrugBid <- function(object, drugs=NULL)
+# {
+#   midDr <- sapply(object@experiment, "[[", c("drug", "join.name"))
+#   midDr <- data.frame(model.id= names(midDr), drug= midDr, stringsAsFactors = FALSE)
+#   if(!is.null(drugs))
+#   {
+#     midDr <- midDr[midDr$drug %in% drugs, ]
+#   }
+#
+#   if(nrow(midDr)==0)
+#   {
+#     msg1 <- sprintf("drug %s not present in Xeva dataset", paste(drugs, collapse = "\n"))
+#     stop(msg1)
+#   }
+#
+#   bid <- mapModelSlotIds(object, id=midDr$model.id, id.name = "model.id",
+#                          map.to = "biobase.id", unique = FALSE)
+#   midDr[, "biobase.id"] <- bid[, "biobase.id"]
+#   return(midDr)
+# }
 
 
 .getSensitivityVal <- function(object, sensitivity.measure, mdf, drug, collapse.by="mean")
@@ -57,10 +57,27 @@
 
 
 
-.getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure, collapse.by="mean" )
+.getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure,
+                                   collapse.by="mean", model.ids=NULL)
 {
-  mdf <- .getModDrugBid(object, drug)
+  mdf <- modelInfo(object)
+  if(!is.null(model.ids))
+  {
+    mdf <- mdf[mdf$model.id %in% model.ids, ]
+    if(nrow(mdf)==0)
+    {
+      msg <- sprintf("'model.ids' are not present in Xeva object")
+      stop(msg)
+    }
+  }
+
   mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(molData),]
+  if(nrow(mdf)==0)
+  {
+    msg <- sprintf("No 'biobase.id' is comman in molecular data and experimental data ")
+    stop(msg)
+  }
+
   mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug, collapse.by=collapse.by)
   return(mdfI)
 }
@@ -84,19 +101,37 @@
 #' @return A datafram with fetures and values
 #'
 #' @examples
-#' data(pdac.pdxe)
-#' drugSensitivitySig(object=pdac.pdxe, drug="binimetinib", mDataType="RNASeq", features=1:5,
-#' sensitivity.measure="slope", fit = "lm")
-#'
+#' data(pdxe)
+#' ## select BRCA samples
+#' mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
+#' drugSensitivitySig(object=pdxe, drug=c("paclitaxel","tamoxifen"),
+#'                    mDataType="RNASeq", features=1:5,
+#'                    model.ids = mid$model.id,
+#'                    sensitivity.measure="slope", fit = "lm")
 #' @description A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
+#'
+setGeneric(name = "drugSensitivitySig",
+           def = function(object, drug,
+                          mDataType=NULL, molData=NULL, features=NULL,
+                          model.ids=NULL,
+                          sensitivity.measure="slope",
+                          fit = c("lm", "maxCor", "gam"),
+                          standardize=c("SD", "rescale", "none"),
+                          nthread=1, tumor.type=NULL, verbose=TRUE)
+            {standardGeneric("drugSensitivitySig")}
+          )
+
 #' @export
-drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
-                               features=NULL,
+setMethod(f= "drugSensitivitySig",
+          signature=c("XevaSet"),
+          definition=function(object, drug,
+                               mDataType=NULL, molData=NULL, features=NULL,
+                               model.ids=NULL,
                                sensitivity.measure="slope",
                                fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
-                               nthread=1, type=NULL, verbose=TRUE)
-{
+                               nthread=1, tumor.type=NULL, verbose=TRUE)
+  {
   #molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"),
   #sensitivity.summary.stat=c("mean", "median", "first", "last"),
   #returnValues=c("estimate", "pvalue", "fdr"),
@@ -116,36 +151,65 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
   rtLx <- list()
   for(drugIx in c(drug))
   {
-
-    mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure, collapse.by="mean" )
-
     if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
+
+    mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
+                                   collapse.by="mean", model.ids)
+
+    if(nrow(mdfI)<2)
+    {
+      msg <- sprintf("Too few samples for drug %s\nNumber of samples %d", drugIx, nrow(mdfI))
+      stop(msg)
+    }
     if(is.null(features))
     { features = rownames(molData)}
 
     ##---------------------------------------------------------------
-    if(!is.null(type))
+    if(!is.null(tumor.type))
     {
-      if(length(type)!= nrow(mdfI))
-      {stop("length of type should be equeal to length of models")}
+      #
+      if(length(tumor.type) == 1)
+      {
+        printf("setting 'tumor.type' = %s for all models", tumor.type[1])
+        tt <- rep(tumor.type[1], nrow(mdfI))
+        names(tt) <- mdfI$model.id
+      }
 
-      if(length(type)== nrow(mdfI))
-      {tt <- type}
+      if(length(tumor.type) > 1)
+      {
+        if(length(tumor.type)!= nrow(mdfI))
+        {stop("length of type should be equeal to length of models")}
+
+        if(is.null(names(tumor.type)))
+        {
+          msg <- sprintf("'tumor.type' have no names. Plese provide a named list")
+          stop(msg)
+        }
+
+        tt <- tumor.type
+      }
+
     } else
     {
       if("tumor.type" %in% colnames(modelInfo(object)))
       {
-        typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id", map.to = "tumor.type", unique = FALSE)
+        typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
+                                  map.to = "tumor.type", unique = FALSE)
         tt <- typeDF[, "tumor.type"]
+        names(tt) <- typeDF$model.id
+
       } else
       {
         warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
-        tt <- "tumor"
+        tt <- rep("tumor", nrow(mdfI))
+        names(tt) <- mdfI$model.id
       }
     }
-    mdfI[, "tumor.type"] <- tt
+    mdfI[, "tumor.type"] <- tt[mdfI$model.id]
     ## -------------------------------------------------------------------------
+    rownames(molData) <- toupper(rownames(molData))
     x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
+
     fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
     if(fetDiff>0)
     {
@@ -159,8 +223,8 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
                    nthread= nthread, type=mdfI[, "tumor.type"],
                    standardize=standardize[1], verbose=verbose)
 
-    rownames(rtx) <- NULL
     rtx$drug <- drugIx
+    rownames(rtx) <- NULL
     rtx <- .reorderCol(rtx, "drug", 2)
     rtLx<- .appendToList(rtLx, rtx)
   }
@@ -168,7 +232,7 @@ drugSensitivitySig <- function(object, drug, mDataType=NULL, molData=NULL,
   rtDF <- do.call("rbind", rtLx)
   rownames(rtDF) <- NULL
   return(rtDF)
-}
+  })
 
 
 ####-------------------------------------------------------------------------
