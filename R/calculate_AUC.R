@@ -32,7 +32,6 @@
   x <- .normalize01(x)
   #y <- .normalize01(y)
   #aac <- 1- ( .trapz(x, y) )
-  #x <- x-x[1]
   aac <- .trapz(x, y)
   return(aac)
 }
