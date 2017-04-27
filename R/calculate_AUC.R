@@ -170,3 +170,9 @@ setMethod( f="setAAC<-",
                                                                   function(bid){value$batch[[bid]][["control"]]})
              return(object)
            } )
+
+
+
+
+
+##===== calculate AUC between treatment and control ==============
