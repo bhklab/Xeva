@@ -29,12 +29,12 @@
 ##-------- aac for 1 model ------------------------------
 .getAAC <- function(x, y)
 {
-  x <- .normalize01(x)
+  #x <- .normalize01(x)
   #y <- .normalize01(y)
   #aac <- 1- ( .trapz(x, y) )
+
+  x <- x/x[1]
   aac <- .trapz(x, y)
-  #aacFull <- .trapz(c(x[1], x[length(x)]), c(y[1], y[length(y)]))
-  #aac <- (2*aacFull) - aac
   return(aac)
 }
 
