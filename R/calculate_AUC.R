@@ -33,9 +33,8 @@
   #y <- .normalize01(y)
   #aac <- 1- ( .trapz(x, y) )
   aac <- .trapz(x, y)
-
-  aacFull <- .trapz(c(x[1], x[length(x)]), c(y[1], y[length(y)]))
-  aac <- (2*aacFull) - aac
+  #aacFull <- .trapz(c(x[1], x[length(x)]), c(y[1], y[length(y)]))
+  #aac <- (2*aacFull) - aac
   return(aac)
 }
 
