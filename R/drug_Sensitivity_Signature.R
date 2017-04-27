@@ -1,23 +1,3 @@
-# .getModDrugBid <- function(object, drugs=NULL)
-# {
-#   midDr <- sapply(object@experiment, "[[", c("drug", "join.name"))
-#   midDr <- data.frame(model.id= names(midDr), drug= midDr, stringsAsFactors = FALSE)
-#   if(!is.null(drugs))
-#   {
-#     midDr <- midDr[midDr$drug %in% drugs, ]
-#   }
-#
-#   if(nrow(midDr)==0)
-#   {
-#     msg1 <- sprintf("drug %s not present in Xeva dataset", paste(drugs, collapse = "\n"))
-#     stop(msg1)
-#   }
-#
-#   bid <- mapModelSlotIds(object, id=midDr$model.id, id.name = "model.id",
-#                          map.to = "biobase.id", unique = FALSE)
-#   midDr[, "biobase.id"] <- bid[, "biobase.id"]
-#   return(midDr)
-# }
 
 
 .getSensitivityVal <- function(object, sensitivity.measure, mdf, drug, collapse.by="mean")
@@ -58,7 +38,8 @@
 
 
 .getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure,
-                                   collapse.by="mean", model.ids=NULL)
+                                   collapse.by="mean", model.ids, mDataType,
+                                   model2bidMap)
 {
   mdf <- modelInfo(object)
   if(!is.null(model.ids))
@@ -71,10 +52,18 @@
     }
   }
 
-  mdf <- mdf[ as.character(mdf$biobase.id) %in% colnames(molData),]
+  mdf[,"biobase.id"] <- NA
+  for(I in 1:nrow(mdf))
+  {
+    bid <- model2bidMap[model2bidMap$model.id==mdf[I, "model.id"], "biobase.id"]
+    if(length(bid)==0){ bid <- NA }
+    mdf[I,"biobase.id"] <- bid[1]
+  }
+  mdf <- mdf[ !is.na(mdf[,"biobase.id"]), ]
+  mdf <- mdf[ as.character(mdf[,"biobase.id"]) %in% colnames(molData),]
   if(nrow(mdf)==0)
   {
-    msg <- sprintf("No 'biobase.id' is comman in molecular data and experimental data ")
+    msg <- sprintf("No '%s' ids are comman in molecular data and experimental data", mDataType)
     stop(msg)
   }
 
@@ -85,8 +74,6 @@
 ##====== drugSensitivitySig for one drug ==========================
 #' drugSensitivitySig
 #'
-#' Get sensitivity signatures for a drug
-#'
 #' @description
 #' Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
 #'
@@ -94,7 +81,9 @@
 #' @param drug Name of the drug
 #' @param mDataType molecular data type
 #' @param molData External data matrix. Rows as features and columns as samples
-#' @param features Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.
+#' @param features which  molecular data fetures to use. Default \code{NULL} will use all fetures
+#' @param model.ids which model.id to use from the dataset. Default \code{NULL} will use all model.id
+#' @param model2bidMap a datafram with model.id and biobase.id. Default \code{NULL} will use internal mapping
 #' @param sensitivity.measure Name of the sensitivity measure
 #' @param fit Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"
 #' @param type Tissue type. Default is NULL which will use \code{'tumor.type'} from \code{object}
@@ -108,12 +97,13 @@
 #'                    mDataType="RNASeq", features=1:5,
 #'                    model.ids = mid$model.id,
 #'                    sensitivity.measure="slope", fit = "lm")
-#' @description A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
+#' @details A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam".
+#' In case where a model.id map to multipal biobase.id the first biobase.id in the datafram will be used.
 #'
 setGeneric(name = "drugSensitivitySig",
            def = function(object, drug,
                           mDataType=NULL, molData=NULL, features=NULL,
-                          model.ids=NULL,
+                          model.ids=NULL, model2bidMap = NULL,
                           sensitivity.measure="slope",
                           fit = c("lm", "maxCor", "gam"),
                           standardize=c("SD", "rescale", "none"),
@@ -126,7 +116,7 @@ setMethod(f= "drugSensitivitySig",
           signature=c("XevaSet"),
           definition=function(object, drug,
                                mDataType=NULL, molData=NULL, features=NULL,
-                               model.ids=NULL,
+                               model.ids=NULL, model2bidMap = NULL,
                                sensitivity.measure="slope",
                                fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
@@ -148,13 +138,16 @@ setMethod(f= "drugSensitivitySig",
   }
   molData <- as.matrix(molData)
 
+  if(is.null(model2bidMap))
+  {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
+
   rtLx <- list()
   for(drugIx in c(drug))
   {
     if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
-
     mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
-                                   collapse.by="mean", model.ids)
+                                   collapse.by="mean", model.ids, mDataType,
+                                   model2bidMap)
 
     if(nrow(mdfI)<2)
     {
@@ -207,7 +200,7 @@ setMethod(f= "drugSensitivitySig",
     }
     mdfI[, "tumor.type"] <- tt[mdfI$model.id]
     ## -------------------------------------------------------------------------
-    rownames(molData) <- toupper(rownames(molData))
+    #rownames(molData) <- toupper(rownames(molData))
     x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
 
     fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)

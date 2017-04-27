@@ -23,7 +23,7 @@ a \code{data.fram} with treatment, control and batch.name
 Given a batch (treatment and control model ids)
 it will return a data.fram with time vs volume (or any other variable)
 with standard error calculated. Note that this function do not check if
-model.id in given batch belongs to same patient or biobase id
+model.id in given batch belongs to same patient
 Note: Write a function to check integrity of a batch
 }
 \examples{
@@ -33,4 +33,3 @@ ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98", "X.010.BG98"), 
 df = getTimeVarData(object=pdxe, ExpDesign, var = "volume")
 
 }
-

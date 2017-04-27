@@ -1,11 +1,23 @@
-.createModToBiobaseMap <- function(modToBiobaseMap, molecularProfiles, model)
+.checkmodToBiobaseMapSlot <- function(modToBiobaseMap, molecularProfiles)
 {
-  w <- names(molecularProfiles)[!(names(molecularProfiles) %in% colnames(modToBiobaseMap))]
+  rqdCol <- c("model.id", "biobase.id", "mDataType")
+  for(cx in rqdCol)
+  {
+    if(is.element(cx, colnames(modToBiobaseMap))==FALSE)
+    {
+      msg <- sprintf("column %s not present is modToBiobaseMap\nmodToBiobaseMap must have the columns\n%s\n",
+                     cx, paste(rqdCol, collapse = "\n"))
+      stop(msg)
+    }
+  }
+
+  mbDataTypes <- unique(as.character(modToBiobaseMap$mDataType))
+  w <- names(molecularProfiles)[!(names(molecularProfiles) %in% mbDataTypes)]
   if(length(w)>0)
   {
-    msg <- sprintf("Molecular data type %s not present in modToBiobaseMap", paste(w, collapse = "\n"))
-    stop(msg)
+    msg <- sprintf("Id mapping for molecular data type %s not present in modToBiobaseMap", paste(w, collapse = "\n"))
+    warning(msg)
   }
+
   return(modToBiobaseMap)
 }
-

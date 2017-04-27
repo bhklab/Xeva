@@ -19,4 +19,3 @@ Generic for setAAC replace method
 data(cm.pdxe)
 setAAC(cm.pdxe) <- setAAC(object = cm.pdxe)
 }
-

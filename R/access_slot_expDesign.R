@@ -359,7 +359,7 @@ setMethod( f=getExpDesignDF,
 #' Given a batch (treatment and control model ids)
 #' it will return a data.fram with time vs volume (or any other variable)
 #' with standard error calculated. Note that this function do not check if
-#' model.id in given batch belongs to same patient or biobase id
+#' model.id in given batch belongs to same patient
 #' Note: Write a function to check integrity of a batch
 #'
 #' @examples
@@ -443,54 +443,6 @@ setMethod( f=getTimeVarData,
 }
 
 
-###-------------------------------------------------------------------------------------
-##--------------------------------------------------------------------------------------
-#' @export
-plotTreatmentControl <- function(object, type="compact")
-{
-
-  ##----------------- GET STAT ---------------------------------------------------------------------
-  groupBy = "biobase.id"
-  tret = unlist(sapply(object@expDesign, "[[", "treatment"))
-  cont = unlist(sapply(object@expDesign, "[[", "control"))
-  exp.type = c(rep("treatment",length(tret)), rep("control", length(cont)))
-  df = data.frame(model.id = c(tret, cont),
-                  exp.type = exp.type, stringsAsFactors = FALSE)
-
-  dfz = merge(df, object@model[, c("model.id", groupBy)], by.x = "model.id", by.y = "model.id")
-  if(type=="compact"){dfz = unique(dfz)}
-  dfx = as.data.frame.matrix(table(dfz[, c(groupBy,"exp.type")]))
-  dfx[,groupBy] = rownames(dfx)
-
-  modelsWithoutCntr =  dfx[dfx$control==0,groupBy]
-  ##----------------------------------------------------------------------------------------------
-
-  dfx$sortOrd = dfx$control*dfx$treatment
-
-  dfx = BBmisc::sortByCol(dfx, c("sortOrd","treatment", "control"), asc = c(FALSE, FALSE, FALSE))
-  tx = dfx[, c(groupBy, "treatment")]
-  colnames(tx) = c(groupBy, "value")
-  tx$variable = "treatment"
-
-  cx = dfx[, c(groupBy, "control")]
-  colnames(cx) = c(groupBy, "value")
-  cx$variable = "control"
-
-  dfp = rbind(tx,cx)
-  dfp[, groupBy] = factor(dfp[, groupBy], levels = tx[, groupBy])
-  dfp[dfp$variable=="control", "value"] = -(dfp[dfp$variable=="control", "value"])
-
-  plt = ggplot2::ggplot(dfp, ggplot2::aes_string(x=groupBy, y="value", fill="variable")) +
-    ggplot2::geom_bar(stat="identity", position="identity")
-  plt = plt + ggplot2::scale_fill_manual(values=c('#91cf60','#fc8d59'))
-  plt = .ggplotEmptyTheme(plt)# +  ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = element_blank(),
-               #panel.background = element_blank(), axis.line = ggplot2::element_line(colour = "black"))
-
-  plt = plt + ggplot2::theme( axis.text.x = ggplot2::element_blank())
-  #pdf("DATA-raw/treatmentContr.pdf", width = 11, height = 5)
-  print(plt)
-  #dev.off()
-}
 
 #' @export
 experimentDesignSummary <- function(object)

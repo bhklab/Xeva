@@ -20,4 +20,3 @@ geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="bi
 sensitivity.measure="slope", standardize="log")
 
 }
-

@@ -36,4 +36,3 @@ pdxe = creatPharmacoPxSet(name = "PDXE",
 save(pdxe, file = "data/pdxe.rda")
 data("pdxe")
 }
-

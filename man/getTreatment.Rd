@@ -23,4 +23,3 @@ data(pdxe)
 # extract treatment model.id for a given model.id
 getTreatment(object=pdxe, model.id="X.1655.uned")
 }
-

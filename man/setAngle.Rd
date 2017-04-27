@@ -19,4 +19,3 @@ Generic for setAngle method
 data(pdxe)
 angles <- setAngle(object = pdxe)
 }
-

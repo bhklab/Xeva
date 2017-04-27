@@ -23,4 +23,3 @@ drugWaterfall(pdxe, drug="binimetinib", value="best.avg.response_published",
               col="#E69F00", tumor.type = "CRC", title="Binimetinib",
               yname = "Change in tumor volume (\%)")
 }
-

@@ -21,4 +21,3 @@ Generic for expDesignInfo method
 data(pdxe)
 expDesignInfo(pdxe)
 }
-

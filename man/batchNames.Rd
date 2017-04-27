@@ -19,4 +19,3 @@ Get all batch.name from a Xeva dataset
 data(pdxe)
 batchNames(pdxe)
 }
-

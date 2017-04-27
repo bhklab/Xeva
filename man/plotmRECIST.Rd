@@ -4,7 +4,7 @@
 \alias{plotmRECIST}
 \title{To plot mRECIST values}
 \usage{
-plotmRECIST(mat, control.name = NA, control.col = "green",
+plotmRECIST(mat, control.name = NA, control.col = "#238b45",
   drug.col = "black", colPalette = NULL, name = "Drug & Models")
 }
 \arguments{
@@ -25,4 +25,3 @@ pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
                                group.by="patient.id", tumor.type="NSCLC")
 plotmRECIST(pdxe.lung, control.name = "untreated")
 }
-

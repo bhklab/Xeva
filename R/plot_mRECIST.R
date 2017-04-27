@@ -184,7 +184,7 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @export
 #' @import ComplexHeatmap
 #' @import grid
-plotmRECIST <- function(mat, control.name = NA, control.col="green", drug.col="black",
+plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col="black",
                         colPalette = NULL, name = "Drug & Models")
 {
   control.name = c(control.name)
@@ -223,6 +223,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="green", drug.col="b
                  show_row_names = TRUE, row_names_side = "left",
                  row_names_gp = gpar(col = matRC$row.name.col),
                  show_column_names = TRUE, column_names_side = "top",
+                 column_title = name,
                  rect_gp = gpar(col = "white", lty = 1, lwd = 1),
                  show_heatmap_legend = FALSE,
                  cell_fun =function(j, i, x, y, width, height, fill)

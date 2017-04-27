@@ -42,4 +42,3 @@ print(angl$myBatch$plot)
 #print without legend
 print(angl$myBatch$plot+ theme(legend.position='none'))
 }
-

@@ -24,4 +24,3 @@ If dose column is not present treatment.only will be considered FALSE
 data(pdxe)
 slope <- setSlope(object = pdxe, treatment.only=FALSE)
 }
-

@@ -11,4 +11,3 @@ plotBatch(object, batchName, treatment.only = FALSE, ...)
 data(lpdx)
 plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
 }
-

@@ -1,21 +1,50 @@
+.addBioBaseIDCol <- function(object, bid, modI)
+{
+  orgColNames <- colnames(modI)
+  mapX <- model2BiobaseIdMap(object, bid)
+  rtx <- merge(modI, mapX, by.x=c("model.id"), by.y=c("model.id"))
+  newCol <- setdiff(colnames(rtx), colnames(modI))
+  modI[, newCol] <- NA
+  modNotPres <- setdiff(modI$model.id, rtx$model.id)
+  rtx <- rbind(rtx, modI[modNotPres, ])
+
+  colnames(rtx) <- sapply(colnames(rtx), function(x)
+                          {
+                            if(is.element(x, orgColNames)==FALSE)
+                            { x <- sprintf("%s.%s", x,bid)}
+                            return(x)
+                          })
+  return(rtx)
+}
+
+
 ##----- get modelInfo -------------
 #' modelInfo Generic
 #' Generic for modelInfo method
 #'
 #' @examples
 #' data(pdxe)
-#' modelInfo(pdxe)
+#' mid <- modelInfo(pdxe)
+#' head(mid)
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{data.frame} with the model annotations
-setGeneric(name = "modelInfo", def = function(object) {standardGeneric("modelInfo")} )
+setGeneric(name = "modelInfo", def = function(object, mDataType=NULL) {standardGeneric("modelInfo")} )
 
 #' @export
 setMethod( f=modelInfo, signature="XevaSet",
-           definition=function(object)
+           definition=function(object, mDataType=NULL)
            {
              modI <- slot(object,name="model")
              drgMod <- sapply(slot(object,name="experiment"), "[[", c("drug", "join.name"))
              modI$drug <- drgMod[ modI$model.id ]
+
+             if(!is.null(mDataType))
+             {
+               for(bid in c(mDataType))
+               {
+                 modI <- .addBioBaseIDCol(object, bid, modI)
+               }
+             }
              return(modI)
            } )
 
@@ -59,11 +88,11 @@ setMethod( f="modelInfo<-",
 #'
 #'
 #' Map one id type to another in model slot.
-#' For example map a model.id to biobase.id
+#' For example map a model.id to patient.id
 #'
 #' @examples
 #' data(pdxe)
-#' mapModelSlotIds(object=pdxe, id="X-007", id.name="biobase.id", map.to="model.id")
+#' mapModelSlotIds(object=pdxe, id="X-007", id.name="patient.id", map.to="model.id")
 #' ##map batch ids
 #' mapModelSlotIds(pdxe, id= "X-011.INC280", id.name = "batch.name", map.to = "tumor.type")
 #' @param object The \code{Xeva} dataset
@@ -88,7 +117,7 @@ setMethod( f=mapModelSlotIds,
              } else{
 
                .checkIfColPresentinModel(object, id.name)
-               rtd = object@model[object@model[,id.name] %in% id, ]
+               rtd <- object@model[object@model[,id.name] %in% id, ]
                if(map.to!="all")
                {
                  .checkIfColPresentinModel(object, map.to)

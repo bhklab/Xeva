@@ -23,4 +23,3 @@ Generic for modelInfo replace method
 data(pdxe)
 modelInfo(pdxe) <- modelInfo(pdxe)
 }
-

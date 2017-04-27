@@ -22,4 +22,3 @@ a <- c(1, 2, 3)
 b <- c(2, 3, 4)
 symmetricSetDiff(a, b)
 }
-

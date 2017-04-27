@@ -23,4 +23,3 @@ Generic for expDesignInfo replace method
 data(pdxe)
 expDesignInfo(pdxe) <- expDesignInfo(pdxe)
 }
-

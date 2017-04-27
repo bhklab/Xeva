@@ -26,4 +26,3 @@ containing all data stored in experiment slot
 data(pdxe)
 getExperiment(pdxe, model.id="X.1004.pael")
 }
-

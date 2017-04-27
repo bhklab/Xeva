@@ -21,4 +21,3 @@ Given a batch.name get batch from a Xeva dataset
 data(pdxe)
 expDesign(pdxe, batch.name = "X-6047.paclitaxel")
 }
-

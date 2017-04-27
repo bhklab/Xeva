@@ -39,4 +39,3 @@ pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed", grou
 pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
                              group.by="patient.id", tumor.type="NSCLC")
 }
-

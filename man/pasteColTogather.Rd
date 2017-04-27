@@ -21,4 +21,3 @@ Returns an vector of strings where column values paste togather
 df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
 pasteColTogather(df, collapse = " + ")
 }
-

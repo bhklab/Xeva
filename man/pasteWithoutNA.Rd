@@ -21,4 +21,3 @@ Returns an string with vector values paste togather
 L = c("A", NA, "B", NA, NA, "C")
 pasteWithoutNA(L, collapse = " + ")
 }
-

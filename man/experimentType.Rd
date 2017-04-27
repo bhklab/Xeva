@@ -23,4 +23,3 @@ data(pdxe)
 experimentType(object=pdxe, model.id="X.1655.LE11.biib")
 experimentType(object=pdxe, model.id="X.1655.uned")
 }
-

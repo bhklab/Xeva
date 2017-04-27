@@ -12,12 +12,12 @@
 #' @export
 getMolecularProfiles <- function(object, data.type)
 {
-  if(is.element(data.type, names(object@molecularProfiles))==FALSE)
+  if(is.element(data.type, names(slot(object, "molecularProfiles")))==FALSE)
   {
     msg = sprintf("available molecular data are\n%s\n",
                   paste(names(object@molecularProfiles), collapse ="\n"))
     stop(msg)
   }
-  expset = object@molecularProfiles[[data.type]]
+  expset <- slot(object, "molecularProfiles")[[data.type]]
   return(expset)
 }

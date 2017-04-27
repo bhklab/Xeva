@@ -13,4 +13,3 @@ plotModelErrorBar(df, control.col = "#6baed6", treatment.col = "#fc8d59",
 ##df = readRDS("DATA-raw/toPlot_DF.Rda")
 ##plotModelErrorBar(df)
 }
-

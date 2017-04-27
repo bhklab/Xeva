@@ -19,4 +19,3 @@ Generic for setSlope replace method
 data(pdxe)
 setSlope(pdxe) <- setSlope(object = pdxe)
 }
-

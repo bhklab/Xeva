@@ -1,8 +1,5 @@
-
-
-##=====================================================================
-#' An S4 class for XevaSet
-#'
+##An S4 class for XevaSet
+##
 XevaSet <- setClass( "XevaSet",
                      slots = list(annotation = "list",
                                   model = "data.frame",
@@ -38,6 +35,7 @@ XevaSet <- setClass( "XevaSet",
 #' save(pdxe, file = "data/pdxe.rda")
 #' data("pdxe")
 #' @export
+#' @import methods
 creatXevaSet <- function(name,
                          model = data.frame(),
                          drug  = data.frame(),
@@ -57,8 +55,7 @@ creatXevaSet <- function(name,
   expDesign <- .checkExperimentDesign(expDesign)
   sensitivity<- .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
   drug <- .checkDrugSlot(drug)
-
-  ##----check if drug present in both drug slot and expSlot
+  modToBiobaseMap <- .checkmodToBiobaseMapSlot(modToBiobaseMap, molecularProfiles)
 
   pxset = XevaSet(annotation = annotation,
                   model = model,
@@ -77,16 +74,24 @@ creatXevaSet <- function(name,
 #' A method to display object
 #' for "show" setGeneric is already defined
 #' @export
+#' @import methods
 setMethod(f="show",
           signature="XevaSet",
           definition= function(object)
           {
-            msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d",
-                           object@annotation$name, object@annotation$dateCreated,
-                           length(object@experiment), dim(object@drug)[1])
+            msg <- sprintf(
+"Xeva-set name: %s
+Creation date: %s
+Number of models: %d
+Number of drugs: %d
+Moleculer dataset: %s\n",
+object@annotation$name, object@annotation$dateCreated,
+length(object@experiment), dim(object@drug)[1],
+paste(names(object@molecularProfiles), collapse = ", ")
+)
             cat(msg)
-            #slotsName <- paste(slotNames(object), collapse = "\n")
-            #cat(sprintf("Slots are:\n%s\n", slotsName))
           }
 )
+
+
 

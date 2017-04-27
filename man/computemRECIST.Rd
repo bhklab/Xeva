@@ -26,4 +26,3 @@ time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
 computemRECIST(time, volume, min.time=10, return.detail=FALSE)
 }
-

@@ -24,4 +24,3 @@ data(pdxe)
 getBatchName(object=pdxe, model.id="X.1655.uned")
 getBatchName(object=pdxe, model.id="X.010.fiab")
 }
-

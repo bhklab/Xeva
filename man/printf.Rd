@@ -12,4 +12,3 @@ printf(...)
 \examples{
 printf("Hello \%s\\n", "world" )
 }
-

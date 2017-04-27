@@ -21,4 +21,3 @@ Generic for drugInfo method
 data(pdxe)
 drugInfo(pdxe)
 }
-

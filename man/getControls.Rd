@@ -25,4 +25,3 @@ getControls(object=pdxe, model.id="X.1655.LE11.biib")
 # if no control found it will return NULL
 getControls(object=pdxe, model.id="X.1655.uned")
 }
-

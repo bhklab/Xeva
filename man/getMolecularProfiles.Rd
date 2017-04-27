@@ -21,4 +21,3 @@ Get Molecular Profiles
 data(pdxe)
 pdxe_RNA <- getMolecularProfiles(pdxe, data.type="RNASeq")
 }
-
