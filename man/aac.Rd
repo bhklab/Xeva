@@ -36,3 +36,7 @@ myDesign = list(batch.name="myBatch", treatment=c("X.015.BY19"), control=c("X.01
 aac(pdxe, batch = myDesign)
 
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

@@ -22,6 +22,7 @@ a \code{data.fram} with id and mapped id
 }
 \description{
 Map one id type to another in model slot.
+<<<<<<< HEAD
 For example map a model.id to patient.id
 }
 \examples{
@@ -30,3 +31,14 @@ mapModelSlotIds(object=pdxe, id="X-007", id.name="patient.id", map.to="model.id"
 ##map batch ids
 mapModelSlotIds(pdxe, id= "X-011.INC280", id.name = "batch.name", map.to = "tumor.type")
 }
+=======
+For example map a model.id to biobase.id
+}
+\examples{
+data(pdxe)
+mapModelSlotIds(object=pdxe, id="X-007", id.name="biobase.id", map.to="model.id")
+##map batch ids
+mapModelSlotIds(pdxe, id= "X-011.INC280", id.name = "batch.name", map.to = "tumor.type")
+}
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

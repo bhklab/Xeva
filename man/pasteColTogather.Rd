@@ -21,3 +21,7 @@ Returns an vector of strings where column values paste togather
 df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
 pasteColTogather(df, collapse = " + ")
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

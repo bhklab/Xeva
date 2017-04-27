@@ -30,3 +30,7 @@ print(pdxe, id = model.id)
 batch.id = batchNames(pdxe)[1]
 print(pdxe, id = batch.id)
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

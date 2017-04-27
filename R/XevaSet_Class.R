@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 ##An S4 class for XevaSet
 ##
+=======
+
+
+##=====================================================================
+#' An S4 class for XevaSet
+#'
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 XevaSet <- setClass( "XevaSet",
                      slots = list(annotation = "list",
                                   model = "data.frame",
@@ -35,7 +43,10 @@ XevaSet <- setClass( "XevaSet",
 #' save(pdxe, file = "data/pdxe.rda")
 #' data("pdxe")
 #' @export
+<<<<<<< HEAD
 #' @import methods
+=======
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 creatXevaSet <- function(name,
                          model = data.frame(),
                          drug  = data.frame(),
@@ -55,7 +66,12 @@ creatXevaSet <- function(name,
   expDesign <- .checkExperimentDesign(expDesign)
   sensitivity<- .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
   drug <- .checkDrugSlot(drug)
+<<<<<<< HEAD
   modToBiobaseMap <- .checkmodToBiobaseMapSlot(modToBiobaseMap, molecularProfiles)
+=======
+
+  ##----check if drug present in both drug slot and expSlot
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 
   pxset = XevaSet(annotation = annotation,
                   model = model,
@@ -74,11 +90,15 @@ creatXevaSet <- function(name,
 #' A method to display object
 #' for "show" setGeneric is already defined
 #' @export
+<<<<<<< HEAD
 #' @import methods
+=======
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 setMethod(f="show",
           signature="XevaSet",
           definition= function(object)
           {
+<<<<<<< HEAD
             msg <- sprintf(
 "Xeva-set name: %s
 Creation date: %s
@@ -95,3 +115,14 @@ paste(names(object@molecularProfiles), collapse = ", ")
 
 
 
+=======
+            msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d",
+                           object@annotation$name, object@annotation$dateCreated,
+                           length(object@experiment), dim(object@drug)[1])
+            cat(msg)
+            #slotsName <- paste(slotNames(object), collapse = "\n")
+            #cat(sprintf("Slots are:\n%s\n", slotsName))
+          }
+)
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

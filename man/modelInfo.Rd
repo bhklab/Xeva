@@ -5,7 +5,11 @@
 \title{modelInfo Generic
 Generic for modelInfo method}
 \usage{
+<<<<<<< HEAD
 modelInfo(object, mDataType = NULL)
+=======
+modelInfo(object)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 }
 \arguments{
 \item{object}{The \code{XevaSet} to retrieve drug info from}
@@ -19,6 +23,12 @@ Generic for modelInfo method
 }
 \examples{
 data(pdxe)
+<<<<<<< HEAD
 mid <- modelInfo(pdxe)
 head(mid)
 }
+=======
+modelInfo(pdxe)
+}
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

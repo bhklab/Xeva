@@ -1,7 +1,13 @@
 ##-- this will convert list to data.fram -------
+<<<<<<< HEAD
 # v <- 1:3; names(v) <- LETTERS[1:3]
 # inLst <- list(x=v, y=v*10)
 # .convertListToDataFram(inLst)
+=======
+#' v <- 1:3; names(v) <- LETTERS[1:3]
+#' inLst <- list(x=v, y=v*10)
+#' .convertListToDataFram(inLst)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 ## @export
 .convertListToDataFram <- function(inLst)
 {
@@ -28,10 +34,17 @@
 ###-------------------------------------------------------------------------------------
 ###-------------------------------------------------------------------------------------
 ##------ given a list of datafram it will give a new datafram --------------------------
+<<<<<<< HEAD
 # x <- data.frame(a=1:3, b= LETTERS[1:3])
 # y <- data.frame(a=(1:3)*10, b= letters[1:3])
 # inLst <- list(x=x, y=y)
 # .rbindListOfDataframs(inLst)
+=======
+#' x <- data.frame(a=1:3, b= LETTERS[1:3])
+#' y <- data.frame(a=(1:3)*10, b= letters[1:3])
+#' inLst <- list(x=x, y=y)
+#' .rbindListOfDataframs(inLst)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 ## @export
 .rbindListOfDataframs<- function(inList)
 {

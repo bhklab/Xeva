@@ -23,3 +23,7 @@ Generic for drugInfo replace method
 data(pdxe)
 drugInfo(pdxe) <- drugInfo(pdxe)
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

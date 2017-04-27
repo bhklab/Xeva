@@ -5,10 +5,16 @@
 \title{drugSensitivitySig}
 \usage{
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
+<<<<<<< HEAD
   features = NULL, model.ids = NULL, model2bidMap = NULL,
   sensitivity.measure = "slope", fit = c("lm", "maxCor", "gam"),
   standardize = c("SD", "rescale", "none"), nthread = 1,
   tumor.type = NULL, verbose = TRUE)
+=======
+  features = NULL, model.ids = NULL, sensitivity.measure = "slope",
+  fit = c("lm", "maxCor", "gam"), standardize = c("SD", "rescale", "none"),
+  nthread = 1, tumor.type = NULL, verbose = TRUE)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -19,11 +25,15 @@ drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
 
 \item{molData}{External data matrix. Rows as features and columns as samples}
 
+<<<<<<< HEAD
 \item{features}{which  molecular data fetures to use. Default \code{NULL} will use all fetures}
 
 \item{model.ids}{which model.id to use from the dataset. Default \code{NULL} will use all model.id}
 
 \item{model2bidMap}{a datafram with model.id and biobase.id. Default \code{NULL} will use internal mapping}
+=======
+\item{features}{Which fetures to use from Biobase object. Default \code{NULL} will use all fetures.}
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 
 \item{sensitivity.measure}{Name of the sensitivity measure}
 
@@ -36,10 +46,18 @@ A datafram with fetures and values
 }
 \description{
 Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
+<<<<<<< HEAD
 }
 \details{
 A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam".
 In case where a model.id map to multipal biobase.id the first biobase.id in the datafram will be used.
+=======
+
+A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam"
+}
+\details{
+Get sensitivity signatures for a drug
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 }
 \examples{
 data(pdxe)
@@ -50,3 +68,7 @@ drugSensitivitySig(object=pdxe, drug=c("paclitaxel","tamoxifen"),
                    model.ids = mid$model.id,
                    sensitivity.measure="slope", fit = "lm")
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

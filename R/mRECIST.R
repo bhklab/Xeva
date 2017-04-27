@@ -112,6 +112,29 @@ computemRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 }
 
 
+<<<<<<< HEAD
+=======
+# ## returns updated model ------------------------------
+# mRECISTForModel <- function(modx, min.time=10)
+# {
+#   mrd = computemRECIST(modx$data$time, modx$data$volume, min.time=min.time, return.detail=TRUE)
+#
+#   modx$data$volume.change = mrd$volume.change
+#   modx$data$average.response = mrd$average.response
+#
+#   modx$best.response = mrd$best.response$value
+#   modx$time.best.response = mrd$best.response$time
+#
+#   modx$best.avg.response = mrd$best.average.response$value
+#   modx$time.best.avg.response = mrd$best.average.response$time
+#
+#   modx$mRECIST = mrd$mRecist
+#   return(modx)
+#
+# }
+
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 ###===============================================================================================
 ###===============================================================================================
 
@@ -132,6 +155,14 @@ setMethod( f="setmRECIST",
            {
              if(is(object, "XevaSet"))
              {
+<<<<<<< HEAD
+=======
+               # for(I in 1:length(object@experiment))
+               # {
+               #   object@experiment[[I]] = mRECISTForModel(object@experiment[[I]], min.time=min.time)
+               # }
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
                ##----- add column in sensitivity ----------------
                object@sensitivity$model$mRECIST <- NA
                object@sensitivity$model$best.response.time <- NA
@@ -158,6 +189,60 @@ setMethod( f="setmRECIST<-",
            signature= signature(object="XevaSet"),
            definition=function(object, value)
            {
+<<<<<<< HEAD
              object <- value
              object
            } )
+=======
+             object = value
+             object
+           } )
+
+
+#' ###===============================================================================================
+#' ###===============================================================================================
+#' #' getmRECIST Generic
+#' #' Generic for getmRECIST method
+#' #'
+#' #' @examples
+#' #' data(pdxe)
+#' #' # calculate mRECIST for each experiment
+#' #' setmRECIST(pdxe)<- setmRECIST(pdxe)
+#' #' getmRECIST(pdxe, group.by="biobase.id")
+#' #' @param object The \code{XevaSet} to retrieve mRECIST from
+#' #' @param group.by The name of column which will be mapped to model.id
+#' #' @return a \code{data.frame} with the mRECIST values, rows are drugs and columns are model.id
+#' setGeneric(name = "getmRECIST", def = function(object, group.by="biobase.id") {standardGeneric("getmRECIST")} )
+#'
+#'
+#' #' @export
+#' setMethod( f=getmRECIST,
+#'            signature="XevaSet",
+#'            definition= function(object, group.by)
+#'            {
+#'              rtx = data.frame(matrix(NA, nrow = length(object@experiment), ncol = 3))
+#'              colnames(rtx) = c("drug.join.name", "model.id", "mRECIST")
+#'              dfI = 1
+#'              for(I in object@experiment)
+#'              {
+#'                if(is.null(I$mRECIST))
+#'                  {
+#'                  msg = sprintf("mRECIST not present for model %s\nRun setmRECIST(object)<- setmRECIST(object) first\n", I$model.id)
+#'                  stop(msg)
+#'                  }
+#'               rtx[dfI, ] <- c(I$drug$join.name, I$model.id, I$mRECIST)
+#'               dfI = dfI+1
+#'              }
+#'              rownames(rtx)= NULL
+#'
+#'              ##----map to patient id -----------------
+#'              #rtx[, group.by] = subset(object@model, object@model$model.id %in% rtx$model.id)[,group.by]
+#'              rtx = merge(rtx, object@model[, c("model.id", group.by)], by.x = "model.id", by.y = "model.id")
+#'
+#'              dataColName = c(group.by, "model.id", "drug.join.name", "mRECIST")
+#'              rtx = BBmisc::sortByCol(rtx , dataColName, asc = rep(TRUE, length(dataColName)))
+#'              return(rtx[,dataColName])
+#'            }
+#'            )
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

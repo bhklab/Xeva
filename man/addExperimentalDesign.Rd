@@ -29,3 +29,7 @@ data(pdxe)
 pdxe = addExperimentalDesign(object=pdxe, treatment= c("X.010.BG98"), control=c("X.010.uned"),
                              batch.name="new.batch", replace=FALSE)
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

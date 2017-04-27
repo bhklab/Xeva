@@ -7,7 +7,11 @@ Maintainer: Who to complain to <amer@uhnresearch.ca>
 Description: More about what it does (maybe more than one line)
 License: Give me Beer, I will fix it license
 LazyData: TRUE
+<<<<<<< HEAD
 RoxygenNote: 6.0.1
+=======
+RoxygenNote: 5.0.1
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 VignetteBuilder: knitr
 Suggests: knitr
 Imports:
@@ -27,3 +31,9 @@ Imports:
   doSNOW,
   acepack,
   mgcv
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

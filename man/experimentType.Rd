@@ -23,3 +23,7 @@ data(pdxe)
 experimentType(object=pdxe, model.id="X.1655.LE11.biib")
 experimentType(object=pdxe, model.id="X.1655.uned")
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

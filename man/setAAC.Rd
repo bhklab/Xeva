@@ -19,3 +19,7 @@ Generic for setAAC method
 data(cm.pdxe)
 setAAC(cm.pdxe) <- setAAC(object = cm.pdxe)
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

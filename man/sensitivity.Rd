@@ -22,3 +22,7 @@ data(cm.pdxe)
 head(sensitivity(cm.pdxe, type="batch"))
 head(sensitivity(cm.pdxe, type="model"))
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

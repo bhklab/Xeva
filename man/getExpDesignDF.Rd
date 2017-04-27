@@ -24,3 +24,7 @@ data(pdxe)
 # This will give a data.fram with columns as "treatment", "control", "batch.name"
 getExpDesignDF(object=pdxe, model.id="X.1655.LE11.biib")
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

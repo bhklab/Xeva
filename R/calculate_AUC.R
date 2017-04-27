@@ -30,10 +30,16 @@
 .getAAC <- function(x, y)
 {
   x <- .normalize01(x)
+<<<<<<< HEAD
   #y <- .normalize01(y)
   #aac <- 1- ( .trapz(x, y) )
   #x <- x-x[1]
   aac <- .trapz(x, y)
+=======
+  y <- .normalize01(y)
+  aac <- 1- ( .trapz(x, y) )
+  #aac <- .trapz(x, y)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
   return(aac)
 }
 

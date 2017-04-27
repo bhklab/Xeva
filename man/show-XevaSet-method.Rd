@@ -12,3 +12,7 @@ for "show" setGeneric is already defined}
 A method to display object
 for "show" setGeneric is already defined
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

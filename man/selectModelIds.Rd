@@ -26,3 +26,7 @@ To select model ids based on drug name and/or tumor type
 data(pdxe)
 selectModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4

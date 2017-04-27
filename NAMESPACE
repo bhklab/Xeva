@@ -10,11 +10,18 @@ export(geneSensitivityPlot)
 export(getExpDesign)
 export(getModels)
 export(getMolecularProfiles)
+<<<<<<< HEAD
 export(model2BiobaseIdMap)
+=======
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 export(pasteColTogather)
 export(pasteWithoutNA)
 export(plotBatch)
 export(plotModelErrorBar)
+<<<<<<< HEAD
+=======
+export(plotTreatmentControl)
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 export(plotmRECIST)
 export(printAndCapture)
 export(printf)
@@ -57,5 +64,8 @@ import(doSNOW)
 import(foreach)
 import(ggplot2)
 import(grid)
+<<<<<<< HEAD
 import(methods)
+=======
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 import(parallel)

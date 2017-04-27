@@ -1,7 +1,11 @@
 
 .checkModel <- function(model, expSlot)
 {
+<<<<<<< HEAD
   reqColName = c("model.id", "patient.id")
+=======
+  reqColName = c("model.id", "biobase.id")
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
   if(all(reqColName %in% colnames(model))==FALSE)
   {
     msg = sprintf("The required colmns for model are\n%s", paste(reqColName, collapse = ', '))
@@ -17,6 +21,11 @@
       stop(msg)
     }
   }
+<<<<<<< HEAD
+=======
+  if(("patient.id" %in% colnames(model)) ==FALSE)
+  {model$patient.id = model$biobase.id}
+>>>>>>> 9f9947748d00443b9546698266dd7eb78c636ce4
 
   #rownames(model) = NULL
 
