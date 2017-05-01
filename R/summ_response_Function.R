@@ -166,59 +166,6 @@
 
   mat = .castDataFram(df, row.var="drug", col.var = group.by,
                       value=response.measure, collapse = summary.stat)
-
-  ###------------------------------------------------
-  #values <- c("model.id","drug.join.name")
-  #valueColName <- NULL
-
-  #if(response.measure =="mRECIST_recomputed")
-  #{
-  #  valueColName =="mRECIST"
-  #  summary.stat=";"
-  #}
-  #
-  # if(response.measure =="mRECIST_recomputed" | response.measure =="mRECIST")
-  # {
-  #   valueColName <- "mRECIST"
-  #   summary.stat=";"
-  # }
-  #
-  # if(response.measure =="mRECIST_published")
-  # {
-  #   valueColName = "mRECIST_published"
-  #   summary.stat=";"
-  # }
-  #
-  # if(response.measure =="slope")
-  # {
-  #   valueColName <- "slope"
-  # }
-  #
-  # ##------------------------------------------------------
-  # if(is.null(valueColName))
-  # {
-  #   varPresTest <- checkExperimentSlotVariable(object, response.measure)
-  #   if(varPresTest==TRUE)
-  #   { valueColName <- response.measure }
-  # }
-  #
-  # values <- c("model.id","drug.join.name", valueColName)
-  # df <- .getValueFromAllModel(object, values, tumor.type)
-  #
-  # if(all(is.na(df[, valueColName]))==TRUE)
-  # {
-  #   msg = sprintf("all values for %s are NA", valueColName)
-  #   warning(msg)
-  # }
-  #
-  # if(group.by!="model.id")
-  # {
-  #   df = .mapAndAttachColumn(object, df, id.name="model.id", map.to=group.by)
-  # }
-
-  #mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
-  #                    value=valueColName, collapse = summary.stat)
-
   return(mat)
 }
 

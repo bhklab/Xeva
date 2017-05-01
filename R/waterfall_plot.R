@@ -1,62 +1,23 @@
-##-----
-library(BBmisc)
-waterfallPlot <- function(vx, col="#cc4c02", title="", yname = "volume")
-{
-  vx <- data.frame(t(as.matrix(vx)))
-  vx$id <- rownames(vx)
-  vx$col<- col
-  colnames(vx) <- c("value", "id", "col")
-  vx <- vx[!is.na(vx$value), ]
-
-  vx <- BBmisc::sortByCol(vx, c("value", "id"), asc = FALSE)
-  vx$id <- factor(vx$id, levels = vx$id)
-
-  plt <- ggplot(vx, aes_string("id", "value") ) +
-         geom_bar(stat = "identity", aes_string(fill = "col"))
-
-  plt <- plt+scale_fill_manual(values=c(vx$col))
-
-  plt <- plt +theme(axis.title.x=element_blank(),
-                    axis.text.x=element_blank(),
-                    axis.ticks.x=element_blank())
-
-  ## abb x axis line
-  plt <- plt + geom_hline(yintercept=0)
-
-  plt <- .ggplotEmptyTheme(plt)
-  plt <- plt + labs(title = title, y = yname, colour = "")
-  plt <- plt + theme(plot.title = element_text(hjust = 0.5))
-
-  ry <- c(min(vx$value), max(vx$value)+1)
-
-  #bry<- floor( seq(0, ry[2], length.out = 5) )
-  bry<- floor( seq(0, ry[2], 25) )
-  bry<- c(-bry, bry)
-  bry<- bry[ bry> (ry[1]-25) ]
-
-  #bry<- floor( seq(ry[1], ry[2], length.out = 10) )
-  #bry<- sort(unique(c(bry, 0)))
-  plt <- plt + scale_y_continuous(breaks=bry, limits = ry)
-  plt + theme(legend.position="none")
-}
-
 #' Plot drug response waterfall
 #'
 #' @examples
 #' data(pdxe)
 #' drugWaterfall(pdxe, drug="binimetinib", value="best.avg.response_published",
-#'               col="#E69F00", tumor.type = "CRC", title="Binimetinib",
-#'               yname = "Change in tumor volume (%)")
-#' @param object The \code{XevaSet}
-#' @param drug Name of the drug
-#' @param value Which value should be ploted
-#'
+#'               title="Binimetinib", yname = "Change in tumor volume (%)",
+#'               tumor.type = "CRC")
+#' @param object the \code{XevaSet}
+#' @param drug name of the drug
+#' @param value which value should be ploted
+#' @param model.id which model.ids to plot. Default is \code{NULL} will plot all models
+#' @param model.col color for model.ids. A data.frame with two colomns "color" and "type" can be provided
 #' @export
-drugWaterfall <- function(object, drug, value, col="#cc4c02", group.by="patient.id",
-                          tumor.type=NULL, title="", yname = "Response")
+#' @import ggplot2
+drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c02",
+                          title="Waterfall plot", yname = "Response",
+                          tumor.type=NULL) #, group.by="patient.id")
 {
-
-  df = summarizeResponse(pdxe, response.measure=value, group.by=group.by,
+  if(is.null(tumor.type)){ warning("might take long time as tumor.type is NULL")}
+  df = summarizeResponse(pdxe, response.measure=value, group.by="model.id",
                          tumor.type=tumor.type)
 
   if((drug %in% rownames(df))==FALSE)
@@ -64,6 +25,67 @@ drugWaterfall <- function(object, drug, value, col="#cc4c02", group.by="patient.
     msg <- sprintf("Drug %s not present\n", drug)
     stop(msg)
   }
-  vx = df[drug,]
-  waterfallPlot(vx, col=col, title=title, yname = yname)
+
+  vl <- df[drug,]
+  if(!is.null(model.ids)){ vl <- vl[, model.ids]}
+  #plt <- .waterfallPlot(vx, model.col=model.col, title=title, yname = yname)
+
+  ##----------------------------------------------------------------------------
+  vx <- data.frame(t(as.matrix(vl)))
+  vx$id <- rownames(vx)
+
+  if( class(model.col) == "data.frame")
+  {
+    if(is.element("color", colnames(model.col))==FALSE)
+    {
+      msg <- sprintf("Column 'color' is missing in 'model.col'")
+      stop(msg)
+    }
+    if(is.element("type" , colnames(model.col))==FALSE )
+    {
+      msg <- sprintf("Column 'type' is missing in 'model.col'")
+      stop(msg)
+    }
+    vx$col <- model.col[rownames(vx), "color"]
+    vx$type <- model.col[rownames(vx), "type"]
+  }else
+  {
+    vx$col<- model.col
+    vx$legends <- "model"
+    #if(length(model.col)>1)
+    #{ vx$col<- model.col[vx$id] } else
+    #{ vx$col<- model.col }
+  }
+
+  colnames(vx) <- c("value", "id", "col", "type")
+  vx <- vx[!is.na(vx$value), ]
+  if(nrow(vx)==0)
+  {stop("No data present for the drug")}
+
+  vx <- BBmisc::sortByCol(vx, c("value", "id"), asc = FALSE)
+  vx$id <- factor(vx$id, levels = vx$id)
+
+  #plt <- ggplot(vx, aes_string(x="id", y= "value", fill="id") ) +
+  #  geom_bar(stat = "identity")
+  #plt <- plt + scale_fill_manual(values=c(vx$col))
+
+  plt <- ggplot(vx, aes_string(x="id", y= "value", fill="type") ) +
+    geom_bar(stat = "identity")
+
+  colValX <- unique(vx[, c("col", "type")])
+  colVal <- as.character(colValX[, "col"])
+  names(colVal)  <- colValX$type
+  plt <- plt + scale_fill_manual(values=colVal)
+
+  plt <- plt +theme(axis.title.x=element_blank(),
+                    axis.text.x=element_blank(),
+                    axis.ticks.x=element_blank())
+
+  ##--------- add x axis line ----------------------------
+  plt <- plt + geom_hline(yintercept=0, size =0.25)
+  plt <- .ggplotEmptyTheme(plt)
+  plt <- plt + labs(title = title, y = yname, colour = "")
+  plt <- plt + theme(plot.title = element_text(hjust = 0.5))
+  #plt <- plt + theme(legend.position="none")
+  return(plt)
 }

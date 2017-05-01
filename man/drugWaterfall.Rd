@@ -4,15 +4,19 @@
 \alias{drugWaterfall}
 \title{Plot drug response waterfall}
 \usage{
-drugWaterfall(object, drug, value, col = "#cc4c02", group.by = "patient.id",
-  tumor.type = NULL, title = "", yname = "Response")
+drugWaterfall(object, drug, value, model.ids = NULL, model.col = "#cc4c02",
+  title = "Waterfall plot", yname = "Response", tumor.type = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{the \code{XevaSet}}
 
-\item{drug}{Name of the drug}
+\item{drug}{name of the drug}
 
-\item{value}{Which value should be ploted}
+\item{value}{which value should be ploted}
+
+\item{model.col}{color for model.ids. A data.frame with two colomns "color" and "type" can be provided}
+
+\item{model.id}{which model.ids to plot. Default is \code{NULL} will plot all models}
 }
 \description{
 Plot drug response waterfall
@@ -20,6 +24,6 @@ Plot drug response waterfall
 \examples{
 data(pdxe)
 drugWaterfall(pdxe, drug="binimetinib", value="best.avg.response_published",
-              col="#E69F00", tumor.type = "CRC", title="Binimetinib",
-              yname = "Change in tumor volume (\%)")
+              title="Binimetinib", yname = "Change in tumor volume (\%)",
+              tumor.type = "CRC")
 }

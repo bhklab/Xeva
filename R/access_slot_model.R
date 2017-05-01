@@ -45,6 +45,7 @@ setMethod( f=modelInfo, signature="XevaSet",
                  modI <- .addBioBaseIDCol(object, bid, modI)
                }
              }
+             rownames(modI) <- make.names(modI$model.id, unique = TRUE)
              return(modI)
            } )
 
