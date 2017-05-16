@@ -72,40 +72,84 @@ getIndex <- function(inVec, indxOf)
 
 .castDataFram <- function(df, row.var, col.var, value, collapse = ";")
 {
-  uqR = unique(as.character(df[,row.var]))
-  uqC = unique(as.character(df[,col.var]))
-  dfx = data.frame( matrix(NA, nrow = length(uqR), ncol = length(uqC) ))
-  rownames(dfx) = uqR ; colnames(dfx) = uqC
+  uqR <- unique(as.character(df[,row.var]))
+  uqC <- unique(as.character(df[,col.var]))
+  #dfx <- data.frame( matrix(NA, nrow = length(uqR), ncol = length(uqC) ))
+  dfx <- matrix(NA, nrow = length(uqR), ncol = length(uqC) )
+  rownames(dfx) <- uqR ; colnames(dfx) <- uqC
+
+  ml <- list()
+  for(r in uqR)
+  {
+    cl <- list()
+    for(c in uqC)
+    { cl[[c]] <- c() }
+    ml[[r]] <- cl
+  }
+
+  for(I in 1:nrow(df))
+  {
+    v <- ml[[df[I, row.var]]][[df[I, col.var]]]
+    #vx <- c(v, df[I, value])
+    ml[[df[I, row.var]]][[df[I, col.var]]] <- c(v, df[I, value]) #vx
+  }
 
   for(r in rownames(dfx))
   {
     for(c in colnames(dfx))
     {
-      v = df[df[,row.var]==r & df[,col.var]==c, value]
-      if(length(v)==0){v=NA}
-      vz=NULL
+      v <- ml[[r]][[c]]
+      if(length(v)==0){v <- NA}
+      vz <- NULL
       if(collapse =="mean")
       {
-        vz = mean(as.numeric(v[!is.na(v)]))
+        vz <- mean(as.numeric(v[!is.na(v)]))
       } else if (collapse =="median")
       {
-        vz = median(as.numeric(v[!is.na(v)]))
+        vz <- median(as.numeric(v[!is.na(v)]))
       } else
       {
         if(length(v)>1)
         {
-          vz= pasteWithoutNA(v, collapse = collapse)
+          vz <- pasteWithoutNA(v, collapse = collapse)
         } else
-        { vz=v }
-
-        if(!is.na(vz) & vz==""){vz=NA}
+        { vz <- v }
+        if(!is.na(vz) & vz==""){vz <- NA}
       }
-
-      if(is.nan(vz)){vz = NA}
-      dfx[r,c]=vz
+      if(is.nan(vz)){vz <- NA}
+      dfx[r,c] <- vz
     }
   }
 
+  ##----------------------------------------
+  # for(r in rownames(dfx))
+  # {
+  #   for(c in colnames(dfx))
+  #   {
+  #     v <- df[df[,row.var]==r & df[,col.var]==c, value]
+  #     if(length(v)==0){v=NA}
+  #     vz=NULL
+  #     if(collapse =="mean")
+  #     {
+  #       vz = mean(as.numeric(v[!is.na(v)]))
+  #     } else if (collapse =="median")
+  #     {
+  #       vz = median(as.numeric(v[!is.na(v)]))
+  #     } else
+  #     {
+  #       if(length(v)>1)
+  #       {
+  #         vz= pasteWithoutNA(v, collapse = collapse)
+  #       } else
+  #       { vz=v }
+  #
+  #       if(!is.na(vz) & vz==""){vz=NA}
+  #     }
+  #     if(is.nan(vz)){vz = NA}
+  #     dfx[r,c]=vz
+  #   }
+  # }
+  dfx <- data.frame(dfx, stringsAsFactors = FALSE, check.names = FALSE)
   return(dfx)
 }
 
@@ -266,3 +310,22 @@ removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 }
 
 
+
+##------------------------------------------------------------------------------
+extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
+{
+  inVIndx= 1:length(inVec)
+  stIndx = min(inVIndx[inVec!=start.tag])
+
+  V2 = inVec[stIndx:length(inVec)]
+  v2end = which(V2==end.tag)
+  if(length(v2end)>0)
+  {
+    enIndx = min(v2end) -1
+    enIndxR= enIndx + stIndx -1
+  } else
+  {enIndxR = length(inVec)}
+
+  Vi = stIndx:enIndxR
+  return(Vi)
+}

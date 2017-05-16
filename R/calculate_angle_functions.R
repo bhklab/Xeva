@@ -1,30 +1,49 @@
 
+# This will comput angle from base line aka (0,0) (1,0)
+#.computAngle_New(c(0,0), c(1,1))
+#.computAngle_New(c(0,0), c(1,-1))
+.computAngleOfLine <- function(startCod, endCod)
+{
+  theta <- atan2(endCod[2], endCod[1]) - atan2(startCod[2], startCod[1])
+  thetaD <- as.numeric(theta)*180/base::pi
+  return(thetaD)
+}
 
-.computAngle <- function(a,b){
-  if(length(a)>4 | length(b)>4)
-  {
-    msg <- sprintf("Only give start and end points of the lines. For example
-                   a = c(start.point.x, start.point.y, end.point.x, end.point.y)")
-    stop(msg)
-  }
-  theta <- acos( sum(a*b) / ( sqrt(sum(a * a)) * sqrt(sum(b * b)) ) )
-  as.numeric(theta)*180/base::pi
+
+
+## .computAngle(c(0,0), c(1,0), c(0,0), c(1,1))
+## .computAngle(c(0,0), c(1,-1),c(0,0), c(1,1))
+## anticlock wise angles are positive and clockwise are -ve
+.computAngle <- function(l1StCo, l1EndCo, l2StCo, l2EndCo)
+{
+  # if(length(a)>4 | length(b)>4)
+  # {
+  #   msg <- sprintf("Only give start and end points of the lines. For example
+  #                  a = c(start.point.x, start.point.y, end.point.x, end.point.y)")
+  #   stop(msg)
+  # }
+  #theta <- acos( sum(a*b) / ( sqrt(sum(a * a)) * sqrt(sum(b * b)) ) )
+  #thetaD <- as.numeric(theta)*180/base::pi
+  l1Ang <- .computAngleOfLine(l1StCo, l1EndCo)
+  l2Ang <- .computAngleOfLine(l2StCo, l2EndCo)
+  angDiff <- l2Ang - l1Ang
+  return(angDiff)
 }
 
 
 .computSlopeFun <- function(x,y)
 {
-  data = data.frame(x=x, y=y)
+  data <- data.frame(x=x, y=y)
   ##---- remove all non finite (Inf, NA, NaN) data --------------
-  data = data[is.finite(data$x), ]
-  data = data[is.finite(data$y), ]
+  data <- data[is.finite(data$x), ]
+  data <- data[is.finite(data$y), ]
 
   p= data$x[1]; q = data$y[1]
   fit <- (lm(I(y-q)~I(x-p) +0, data))
   ang <- atan(coef(fit)[["I(x - p)"]]) *180/base::pi
-
   return(list(fit=fit, angel=ang, data=data))
 }
+
 
 #' @import ggplot2
 plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
@@ -41,26 +60,6 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
 
   DF = rbind(dft, dfc)
 
-  ##-----normalize data to 0 and 1 --------------------------------
-  if(1==2){
-  dfXmin <- min(DF$x); dfXmax <- max(DF$x)
-  dfYmin <- min(DF$y); dfYmax <- max(DF$y)
-  normalize01 <- function(v, vmin, vmax) { (v-vmin)/(vmax-vmin) }
-
-  DF$x <- normalize01(DF$x, dfXmin, dfXmax)
-  DF$y <- normalize01(DF$y, dfYmin, dfYmax)
-
-  liC$x1 <- normalize01(liC$x1, dfXmin, dfXmax)
-  liC$x2 <- normalize01(liC$x2, dfXmin, dfXmax)
-  liC$y1 <- normalize01(liC$y1, dfYmin, dfYmax)
-  liC$y2 <- normalize01(liC$y2, dfYmin, dfYmax)
-
-  liT$x1 <- normalize01(liT$x1, dfXmin, dfXmax)
-  liT$x2 <- normalize01(liT$x2, dfXmin, dfXmax)
-  liT$y1 <- normalize01(liT$y1, dfYmin, dfYmax)
-  liT$y2 <- normalize01(liT$y2, dfYmin, dfYmax)
-  }
-  ##----------------------------------------------------------------
   tcCol <- c("control" = "#6baed6", "treatment" = "#fc8d59")
   plt <- ggplot(DF, aes_string(x="x", y="y", color= "type", group="model.id"))
   plt <- plt + geom_line(linetype = 2)+ geom_point()
@@ -154,7 +153,8 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
   liT <- .getLMfitLine(fit = fitT$fit, data=fitT$data)
   ##--------------------------------------------------------------------
 
-  angDiff <- .computAngle(c(liC$x1, liC$y1, liC$x2, liC$y2), c(liT$x1, liT$y1, liT$x2, liT$y2))
+  #angDiff <- .computAngle(c(liC$x1, liC$y1, liC$x2, liC$y2), c(liT$x1, liT$y1, liT$x2, liT$y2))
+  angDiff <- .computAngle(c(liC$x1, liC$y1), c(liC$x2, liC$y2), c(liT$x1, liT$y1), c(liT$x2, liT$y2))
 
   plt <- NULL
   if(plot==TRUE)
@@ -273,43 +273,14 @@ setMethod( f="setAngle<-",
            } )
 
 
-#####======================================================================================================
-#####======================================================================================================
-#####================= setSlope ==================
-extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
-{
-  inVIndx= 1:length(inVec)
-  stIndx = min(inVIndx[inVec!=start.tag])
-
-  V2 = inVec[stIndx:length(inVec)]
-  v2end = which(V2==end.tag)
-  if(length(v2end)>0)
-  {
-    enIndx = min(v2end) -1
-    enIndxR= enIndx + stIndx -1
-  } else
-    {enIndxR = length(inVec)}
-
-  Vi = stIndx:enIndxR
-  return(Vi)
-}
-
-
+#####===========================================================================
+#####=============================== setSlope ==================================
 
 ##------- Compute slope for one model ----------------------------
 computeSlope <- function(object, model.id, treatment.only=TRUE)
 {
-  mod = getExperiment(object, model.id=model.id)
-  time = mod$time; volume = mod$volume
-  if(treatment.only==TRUE)
-  {
-    if(!is.null(mod$dose))
-    {
-      tretIndx = extractBetweenTags(mod$dose, start.tag=0, end.tag=0)
-      time = time[tretIndx] ; volume=volume[tretIndx]
-    }
-  }
-  rtx = .computSlopeFun(time, volume)
+  mod <- getExperiment(object, model.id=model.id, treatment.only=treatment.only)
+  rtx <- .computSlopeFun(mod$time, mod$volume.normal)
   return(rtx)
 }
 

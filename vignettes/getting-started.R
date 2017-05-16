@@ -61,7 +61,8 @@ df = getExperiment(lpdx, "PHLC119_P5.506.B1")
 #print(df[df$time>85 & df$time<109, c("time", "width", "length", "volume", "comment", "dose")])
 
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
-data(pdxe)
+#data(pdxe)
+load("~/CXP/XG/Gao2015_Xeva_DataProcess/pdxe.rda")
 #select lung cancer PDXE data
 pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
                                 group.by="patient.id", tumor.type="NSCLC")
@@ -69,7 +70,7 @@ pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
 plotmRECIST(pdxe.lung, control.name = "untreated")
 
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
-data(pdxe)
+#data(pdxe)
 #select lung cancer PDXE data
 pdxe.brca <- summarizeResponse(pdxe, response.measure = "mRECIST",
                                 group.by="patient.id", tumor.type="BRCA")
@@ -78,7 +79,7 @@ pdxe.brca <- summarizeResponse(pdxe, response.measure = "mRECIST",
 plotmRECIST(pdxe.brca, control.name = "untreated", control.col = "#238b45")
 
 ## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
-data(pdxe)
+#data(pdxe)
 
 lung_pdxe_slope <- summarizeResponse(pdxe, response.measure = "slope", group.by="patient.id", 
                                      summary.stat = "mean", tumor.type = "NSCLC")
@@ -104,4 +105,9 @@ colPalette = c("#377eb8", "#4daf4a", "#fec44f", "#e41a1c")
 boxplot(slope~mR, data=df, col=colPalette, main="mRECIST vs slope", 
         xlab="mRECIST", ylab="slope")
 
+
+## ---- echo=TRUE, fig.width = 12, fig.height = 10-------------------------
+pacRNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
+                                     tumor.type= "BRCA", sensitivity.measure="mRECIST")
+print(pacRNA)
 

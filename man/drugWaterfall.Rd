@@ -5,7 +5,8 @@
 \title{Plot drug response waterfall}
 \usage{
 drugWaterfall(object, drug, value, model.ids = NULL, model.col = "#cc4c02",
-  title = "Waterfall plot", yname = "Response", tumor.type = NULL)
+  sortByType = FALSE, title = "Waterfall plot", yname = "Response",
+  tumor.type = NULL)
 }
 \arguments{
 \item{object}{the \code{XevaSet}}

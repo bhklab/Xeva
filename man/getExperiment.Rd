@@ -24,5 +24,5 @@ containing all data stored in experiment slot
 }
 \examples{
 data(pdxe)
-getExperiment(pdxe, model.id="X.1004.pael")
+getExperiment(pdxe, model.id="X.1004.pael", treatment.only=TRUE)
 }

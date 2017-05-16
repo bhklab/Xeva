@@ -5,7 +5,8 @@
 \title{To plot mRECIST values}
 \usage{
 plotmRECIST(mat, control.name = NA, control.col = "#238b45",
-  drug.col = "black", colPalette = NULL, name = "Drug & Models")
+  drug.col = "black", colPalette = NULL, name = "Drug & Models",
+  sort = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -21,7 +22,7 @@ plot
 \examples{
 data(pdxe)
 ## select lung cancer pdxe data
-pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
                                group.by="patient.id", tumor.type="NSCLC")
 plotmRECIST(pdxe.lung, control.name = "untreated")
 }

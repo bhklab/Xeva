@@ -117,29 +117,33 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 .sortPlotMat <- function(mat, controlD, control.col, drug.col)
 {
-  ##-------first sort by NA -----------------------------------
-  rowNa = apply(mat, 1, function(x)sum(is.na(x)))
-  colNa = apply(mat, 2, function(x)sum(is.na(x)))
-  mat = mat[names(sort(rowNa)), names(sort(colNa))]
+  ##-------first sort by number of NA -----------------------------------
+  rowNa <- apply(mat, 1, function(x)sum(is.na(x)))
+  colNa <- apply(mat, 2, function(x)sum(is.na(x)))
+  mat <- mat[names(sort(rowNa)), names(sort(colNa))]
   ##------------------------------------------------------------
-  rwNM = rownames(mat); clNm = colnames(mat)
-  #rwNM = sort(rwNM); clNm = sort(clNm)
-
+  rwNM <- rownames(mat); clNm <- colnames(mat)
   ##---------for row ------------------------------------------
   controlD =c(controlD)
   if(length(controlD[!is.na(controlD)])>0)
   {
-    nonCntr = rwNM[!(rwNM %in% controlD)]
-    rwNMx = c(controlD, nonCntr)
-    rwNameCol = c(rep(control.col, length(controlD)),
+    nonCntr <- rwNM[!(rwNM %in% controlD)]
+    rwNMx <- c(controlD, nonCntr)
+    rwNameCol <- c(rep(control.col, length(controlD)),
                   rep(drug.col, length(nonCntr) ))
   } else{
-    rwNMx = rwNM
-    rwNameCol = rep(drug.col, length(rwNM))
+    rwNMx <- rwNM
+    rwNameCol <- rep(drug.col, length(rwNM))
   }
-
   ##--------for column ------------------------------------------
-  clNameCol = rep("black", length(clNm))
+
+  if(length(controlD[!is.na(controlD)])>0)
+  {
+    contMat <- mat[controlD[1], clNm]
+    clNm <- names(sort(contMat, na.last = TRUE))
+  }
+  clNameCol <- rep("black", length(clNm))
+
   rtx = list(mat= mat[rwNMx, clNm],
              row.name.col = rwNameCol,
              col.name.col = clNameCol)
@@ -149,18 +153,10 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 
 .mRcolPalette <- function(mr)
 {
-  # cp <- list("CR" = "#eff3ff", "CR-->PD" = "#9ecae1", "CR-->-->PD" = "#3182bd",
-  #            "PR" = "#d9ef8b", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#1a9850",
-  #            "SD" = "#fed976", "SD-->PD" = "#ffeda0", "SD-->-->PD" = "#fed976",
-  #            "PD"= "#e41a1c")
-
-  #colPalette = list("CR" = "#4daf4a", "PR" = "#377eb8", "SD"= "#e41a1c", "PD"= "#984ea3")
-  #colPalette = list("CR" = "#377eb8", "PR" = "#4daf4a", "SD"= "#fec44f", "PD"= "#e41a1c")
   cp <- list("CR" = "#0033CC", "CR-->PD" = "#3182bd", "CR-->-->PD" = "#bf8ef2",
              "PR" = "#1a9850", "PR-->PD" = "#91cf60", "PR-->-->PD" = "#bfb35a",
              "SD" = "#fed976", "SD-->PD" = "#ffeda0", "SD-->-->PD" = "#fed976",
              "PD"= "#e41a1c")
-
   colPal <- cp[mr]
   colPal <- colPal[names(cp)]
   colPal <- colPal[!is.na(names(colPal))]
@@ -178,18 +174,18 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @examples
 #' data(pdxe)
 #' ## select lung cancer pdxe data
-#' pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
+#' pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
 #'                                group.by="patient.id", tumor.type="NSCLC")
 #' plotmRECIST(pdxe.lung, control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
 #' @import grid
 plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col="black",
-                        colPalette = NULL, name = "Drug & Models")
+                        colPalette = NULL, name = "Drug & Models", sort=TRUE)
 {
   control.name = c(control.name)
 
-  unqMat <- unique(unlist(lapply(colnames(mat), function(x) unique(mat[,x]) )))
+  unqMat <- as.character(unique(unlist(lapply(colnames(mat), function(x) unique(mat[,x]) ))))
   unqMat <- unqMat[!is.na(unqMat)]
 
   if(is.null(colPalette))
@@ -207,8 +203,14 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     }
   }
 
-  matRC = .sortPlotMat(mat, controlD=control.name, control.col=control.col, drug.col=drug.col)
-  mat = as.matrix(matRC$mat)
+  #if(sort==TRUE)
+  #{
+    matRC<-.sortPlotMat(mat, controlD=control.name, control.col=control.col, drug.col=drug.col)
+    mat<-as.matrix(matRC$mat)
+  #} else
+  #{
+  #  mat <- as.matrix(mat)
+  #}
 
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"

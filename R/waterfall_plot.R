@@ -13,9 +13,19 @@
 #' @export
 #' @import ggplot2
 drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c02",
+                          sortByType=FALSE,
                           title="Waterfall plot", yname = "Response",
                           tumor.type=NULL) #, group.by="patient.id")
 {
+
+  possibleValues <- colnames(slot(object, "sensitivity")[["model"]])
+  if(is.element(value, possibleValues)==FALSE)
+  {
+    msg <- sprintf("Sensitivity value=%s not present in dataset. Possible sensitivity value are:\n%s",
+                   value, paste(possibleValues, collapse=", "))
+    stop(msg)
+  }
+
   if(is.null(tumor.type)){ warning("might take long time as tumor.type is NULL")}
   df = summarizeResponse(pdxe, response.measure=value, group.by="model.id",
                          tumor.type=tumor.type)
@@ -51,7 +61,7 @@ drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c0
   }else
   {
     vx$col<- model.col
-    vx$legends <- "model"
+    vx$type <- "model"
     #if(length(model.col)>1)
     #{ vx$col<- model.col[vx$id] } else
     #{ vx$col<- model.col }
@@ -62,7 +72,14 @@ drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c0
   if(nrow(vx)==0)
   {stop("No data present for the drug")}
 
-  vx <- BBmisc::sortByCol(vx, c("value", "id"), asc = FALSE)
+  if(sortByType==TRUE)
+  {
+    vx <- BBmisc::sortByCol(vx, c("type", "value", "id"), asc = FALSE)
+  } else
+  {
+    vx <- BBmisc::sortByCol(vx, c("value", "id"), asc = FALSE)
+  }
+
   vx$id <- factor(vx$id, levels = vx$id)
 
   #plt <- ggplot(vx, aes_string(x="id", y= "value", fill="id") ) +

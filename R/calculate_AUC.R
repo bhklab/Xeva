@@ -2,20 +2,22 @@
 .trapz <- function (x, y)
 {
   if (missing(y)) {
-    if (length(x) == 0)
-      return(0)
+    if (length(x) == 0){return(0)}
     y <- x
     x <- seq(along = x)
   }
   if (length(x) == 0 && length(y) == 0)
-    return(0)
+  {return(0)}
   if (!(is.numeric(x) || is.complex(x)) || !(is.numeric(y) || is.complex(y)))
-    stop("Arguments 'x' and 'y' must be real or complex vectors.")
+  { stop("Arguments 'x' and 'y' must be real or complex vectors.") }
+
   m <- length(x)
+
   if (length(y) != m)
-    stop("Arguments 'x', 'y' must be vectors of the same length.")
-  if (m <= 1)
-    return(0)
+  {stop("Arguments 'x', 'y' must be vectors of the same length.")}
+
+  if (m <= 1){return(0)}
+
   xp <- c(x, x[m:1])
   yp <- c(numeric(m), y[m:1])
   n <- 2 * m
@@ -24,12 +26,11 @@
   return(0.5 * (p1 - p2))
 }
 
-##.normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
 
 ##-------- aac for 1 model ------------------------------
 .getAAC <- function(x, y)
 {
-  x <- .normalize01(x)
+  #x <- .normalize01(x)
   #y <- .normalize01(y)
   #aac <- 1- ( .trapz(x, y) )
   aac <- .trapz(x, y)
@@ -75,13 +76,14 @@ setMethod( f=aac,
              if(is.null(model.id) & is.null(batch))
              {stop("please specify 'model.id' or 'batch'")}
 
-             average = average[1]
+             average <- average[1]
 
              ###---------------------------------------------------------------------------------------
              .aacFor1ModelId <- function(object, model.id, treatment.only)
              {
                DFx <- getExperiment(object, model.id=model.id, treatment.only = treatment.only)
-               aac <- .getAAC(DFx$time, DFx$volume)
+               #vnor <- (DFx$volume- DFx$volume[1])/(DFx$volume[1])
+               aac <- .getAAC(DFx$time, DFx$volume.normal)
                return(aac)
              }
              ###---------------------------------------------------------------------------------------
@@ -174,5 +176,3 @@ setMethod( f="setAAC<-",
 
 
 
-
-##===== calculate AUC between treatment and control ==============

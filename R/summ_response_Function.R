@@ -164,7 +164,7 @@
     stop(msg)
   }
 
-  mat = .castDataFram(df, row.var="drug", col.var = group.by,
+  mat <- .castDataFram(df, row.var="drug", col.var = group.by,
                       value=response.measure, collapse = summary.stat)
   return(mat)
 }

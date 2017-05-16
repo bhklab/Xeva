@@ -155,7 +155,7 @@ setMethod(f= "drugSensitivitySig",
       stop(msg)
     }
     if(is.null(features))
-    { features = rownames(molData)}
+    { features <- rownames(molData)}
 
     ##---------------------------------------------------------------
     if(!is.null(tumor.type))

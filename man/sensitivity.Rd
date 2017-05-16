@@ -4,12 +4,14 @@
 \alias{sensitivity}
 \title{Get sensitivity for an Xeva object}
 \usage{
-sensitivity(object, type)
+sensitivity(object, type, sensitivity.measure = NULL)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
 
 \item{type}{sensitivity type (either model or batch)}
+
+\item{sensitivity.measure}{Name of the sensitivity.measure. Default \code{NULL}, will return all}
 }
 \value{
 a \code{data.fram} with model or batch id and sensitivity values

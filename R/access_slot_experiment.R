@@ -107,25 +107,17 @@ setMethod( f=selectModelIds, signature="XevaSet",
 ###########################################################################
 ###-----------------------------------------------------------------------------------------------------
 ###-----------------------------------------------------------------------------------------------------
-.getExperimentDataFromAExpID <- function(object, model.id, treatment.only=FALSE)
+.getExperimentDataFromAExpID <- function(object, model.id, treatment.only)
 {
   modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
   if(length(modX)==1)
   { mod = modX[[1]] }else
   {return(NULL)}
 
-  mod.data = mod$data
+  mod.data <- mod$data
 
-  #mod$data = NULL
-  #modDf = reshape2::melt(mod)
-  #collpsCol = sort(colnames(modDf)[colnames(modDf)!="value"])
-  #collpsVal = apply(modDf[,collpsCol], 1, pasteWithoutNA, collapse="." )
-  #modDf[,"value.name"] = collpsVal
-  #for(I in 1:nrow(modDf))
-  #{ mod.data[, modDf[I, "value.name"]] = as.character(modDf[I, "value"]) }
-
-  mod.data$model.id = mod$model.id
-  mod.data$drug.join.name = mod$drug$join.name
+  mod.data$model.id <- mod$model.id
+  mod.data$drug.join.name <- mod$drug$join.name
 
   mod.data = .removeNAcol(mod.data)
   mod.data = .reorderCol(mod.data, "model.id", 1)
@@ -136,6 +128,7 @@ setMethod( f=selectModelIds, signature="XevaSet",
     tretIndx = extractBetweenTags(mod.data$dose, start.tag=0, end.tag=0)
     mod.data = mod.data[tretIndx, ]
   }
+  mod.data$volume.normal <- (mod.data$volume - mod.data$volume[1])/mod.data$volume[1]
   return(mod.data)
 }
 
@@ -175,12 +168,13 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #'
 #' @examples
 #' data(pdxe)
-#' getExperiment(pdxe, model.id="X.1004.pael")
+#' getExperiment(pdxe, model.id="X.1004.pael", treatment.only=TRUE)
 #' @param object The \code{XevaSet}
 #' @param model.id The \code{model.id} for which data is required
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @return a \code{data.fram} will all the the values stored in experiment slot
-setGeneric(name = "getExperiment", def = function(object, model.id=NULL, batch.name=NULL, treatment.only=FALSE)
+setGeneric(name = "getExperiment", def = function(object, model.id=NULL, batch.name=NULL,
+                                                  treatment.only=FALSE)
   {standardGeneric("getExperiment")} )
 
 #' @export
@@ -196,9 +190,8 @@ setMethod( f=getExperiment,
 
              if(!is.null(model.id))
              {
-               model.ids = unique(c(model.id))
-               rtz = .getCombinedDFforMultipalIDs(object, model.ids, treatment.only)
-
+               model.ids <- unique(c(model.id))
+               rtz <- .getCombinedDFforMultipalIDs(object, model.ids, treatment.only)
              }
 
              if(is.null(model.id) & !is.null(batch.name))
