@@ -5,7 +5,7 @@
 \title{summarizeMolecularProfiles}
 \usage{
 summarizeMolecularProfiles(object, drug, mDataType, tumor.type = NULL,
-  sensitivity.measure = NULL)
+  sensitivity.measure = NULL, unique.model = TRUE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
@@ -17,6 +17,8 @@ summarizeMolecularProfiles(object, drug, mDataType, tumor.type = NULL,
 \item{tumor.type}{default \code{NULL} will return all across all tumor.type}
 
 \item{sensitivity.measure}{default \code{NULL} will return all sensitivity measure}
+
+\item{unique.model}{default TRUE will return only one sequncing id, in case where one model id mapes to several sequencing ids}
 }
 \value{
 A \code{ExpressionSet} where sample names are model.id and sensitivity measure will be present in pData
@@ -33,7 +35,7 @@ will creat saperate column for each model. }
 }
 \examples{
 data(pdxe)
-pdxe_RNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
-                                       tumor.type= "BRCA", sensitivity.measure="mRECIST")
-
+pacRNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
+                                     tumor.type= "BRCA", sensitivity.measure="mRECIST")
+print(pacRNA)
 }

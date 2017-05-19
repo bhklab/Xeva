@@ -36,12 +36,13 @@ getMolecularProfiles <- function(object, data.type)
 #' @param mDataType \code{character}, which one of the molecular data types is needed
 #' @param tumor.type default \code{NULL} will return all across all tumor.type
 #' @param sensitivity.measure default \code{NULL} will return all sensitivity measure
+#' @param unique.model default TRUE will return only one sequncing id, in case where one model id mapes to several sequencing ids
 #' @return A \code{ExpressionSet} where sample names are model.id and sensitivity measure will be present in pData
 #' @examples
 #' data(pdxe)
-#' pdxe_RNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
-#'                                        tumor.type= "BRCA", sensitivity.measure="mRECIST")
-#'
+#' pacRNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
+#'                                      tumor.type= "BRCA", sensitivity.measure="mRECIST")
+#' print(pacRNA)
 #' @details
 #' \itemize{
 #' \item {If a sequencing sample belong to multipal models, summarizeMolecularProfiles
@@ -50,9 +51,13 @@ getMolecularProfiles <- function(object, data.type)
 #' }
 #' @export
 summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
-                                       sensitivity.measure=NULL)
+                                       sensitivity.measure=NULL, unique.model=TRUE)
 {
   modIn <- modelInfo(object, mDataType = mDataType)
+  if(unique.model==TRUE)
+  {
+    modIn <- modIn[unique(modIn$model.id), ]
+  }
   modIn <- modIn[modIn$drug %in% c(drug), ]
   if(nrow(modIn)==0)
   {

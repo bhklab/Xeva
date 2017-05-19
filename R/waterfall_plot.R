@@ -62,9 +62,6 @@ drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c0
   {
     vx$col<- model.col
     vx$type <- "model"
-    #if(length(model.col)>1)
-    #{ vx$col<- model.col[vx$id] } else
-    #{ vx$col<- model.col }
   }
 
   colnames(vx) <- c("value", "id", "col", "type")
@@ -106,3 +103,34 @@ drugWaterfall <- function(object, drug, value, model.ids=NULL, model.col="#cc4c0
   #plt <- plt + theme(legend.position="none")
   return(plt)
 }
+
+
+
+
+
+
+###--------------------
+##--- add oncoplot at the bottam of waterfall plot ---------
+.add_OncoplotAt_bottam <- function()
+{
+  library(ggplot2)
+  library(gridExtra)
+  pMain <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point()
+  pTop <- ggplot(mtcars, aes(x = wt)) +
+    geom_histogram()
+  pRight <- ggplot(mtcars, aes(x = mpg)) +
+    geom_histogram() + coord_flip()
+  pEmpty <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_blank() +
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          line = element_blank(),
+          panel.background = element_blank())
+
+  grid.arrange(pMain, pRight,pTop, pEmpty,
+               ncol = 2, nrow = 2, widths = c(3, 1), heights = c(3, 1))
+
+}
+
+
