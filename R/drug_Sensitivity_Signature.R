@@ -200,9 +200,9 @@ setMethod(f= "drugSensitivitySig",
     }
     mdfI[, "tumor.type"] <- tt[mdfI$model.id]
     ## -------------------------------------------------------------------------
-    #rownames(molData) <- toupper(rownames(molData))
-    x <- removeZeroVar(t(molData[features, mdfI$biobase.id]), varCutoff=0, sort=FALSE)
 
+    x <- t(molData[features, mdfI$biobase.id])
+    x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
     fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
     if(fetDiff>0)
     {
