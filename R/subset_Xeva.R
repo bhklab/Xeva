@@ -53,8 +53,8 @@ subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
                    id.name, paste(colnames(md), collapse = "\n"))
     stop(msg)
   }
-
-  mdn <- md[md[, id.name] %in% c(ids), ]
+  ids <- unique(c(ids))
+  mdn <- md[md[, id.name] %in% ids, ]
   if(nrow(mdn)==0)
   {
     warning("No model for input ids present, returning NULL")
