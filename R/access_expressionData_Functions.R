@@ -88,21 +88,28 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
     stop(msg)
   }
 
-  if(!is.null(sensitivity.measure))
-  {
-    sm <- sensitivity(object, type = "model", sensitivity.measure = sensitivity.measure)
-    sm <- sm[modIn$model.id, ]
-    if(nrow(sm)==0)
-    {
-      msg <- sprintf("No model persent in sensitivity")
-      stop(msg)
-    }
+  sm <- sensitivity(object, type = "model", sensitivity.measure = sensitivity.measure)
 
-    for(s in c(sensitivity.measure))
-    {
-      modIn[,s] <- sm[modIn$model.id, s]
-    }
+  if(is.null(sensitivity.measure))
+  {
+    sensitivity.measure <- colnames(sm)[colnames(sm)!="model.id"]
   }
+
+  modIn[,c(sensitivity.measure)] <- sm[modIn$model.id, c(sensitivity.measure)]
+  # if(!is.null(sensitivity.measure))
+  # {
+  #   sm <- sm[modIn$model.id, ]
+  #   if(nrow(sm)==0)
+  #   {
+  #     msg <- sprintf("No model persent in sensitivity")
+  #     stop(msg)
+  #   }
+  #
+  #   for(s in c(sensitivity.measure))
+  #   {
+  #     modIn[,s] <- sm[modIn$model.id, s]
+  #   }
+  # }
 
   molP <- getMolecularProfiles(object, mDataType)
   molP <- molP[, modIn[, bioName]]
