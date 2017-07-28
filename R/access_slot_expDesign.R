@@ -386,12 +386,15 @@ setMethod( f=getTimeVarData,
            {
              if(is.null(ExpDesign$treatment) & is.null(ExpDesign$control))
              {stop("treatment and control both NULL")}
+             if(length(ExpDesign$treatment)==0 & length(ExpDesign$control)==0)
+             {stop("treatment and control both NULL")}
 
              trDF = data.frame()
              cnDF = data.frame()
-             if(!is.null(ExpDesign$treatment))
+             if(!is.null(ExpDesign$treatment) & length(ExpDesign$treatment)>0 )
              {
-             trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment, treatment.only=treatment.only)
+             trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment,
+                                              treatment.only=treatment.only)
              trDF = .collapseRplicate(trLs, var = var)
              trDF$exp.type = "treatment"
              trDF$batch.name = ExpDesign$batch.name
@@ -407,7 +410,7 @@ setMethod( f=getTimeVarData,
              }
              }
 
-             if(!is.null(ExpDesign$control))
+             if(!is.null(ExpDesign$control) & length(ExpDesign$control)>0)
              {
              cnLs = .getExperimentMultipalIDs(object, ExpDesign$control, treatment.only=treatment.only)
              cnDF = .collapseRplicate(cnLs, var = var)

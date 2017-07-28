@@ -13,6 +13,8 @@ getExperiment(object, model.id = NULL, batch.name = NULL,
 
 \item{model.id}{The \code{model.id} for which data is required}
 
+\item{batch.name}{The \code{batch.name} for which data is required}
+
 \item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
 }
 \value{

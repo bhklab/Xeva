@@ -5,9 +5,10 @@
 \title{##df = readRDS("DATA-raw/toPlot_DF.Rda")
 ##plotModelErrorBar(df)}
 \usage{
-plotModelErrorBar(df, control.col = "#6baed6", treatment.col = "#fc8d59",
-  title = "", xlab = "Time", ylab = "Volume", log.y = TRUE,
-  SE.plot = c("errorbar", "ribbon"), aspect.ratio = c(1, NULL))
+plotModelErrorBar(dfp, control.col = "#6baed6", treatment.col = "#fc8d59",
+  title = "", xlab = "Time", ylab = "Volume", log.y = FALSE,
+  drgName = "", SE.plot = c("all", "errorbar", "ribbon"),
+  modelLyt = "dotted", aspect.ratio = c(1, NULL))
 }
 \description{
 ##df = readRDS("DATA-raw/toPlot_DF.Rda")

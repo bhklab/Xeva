@@ -1,23 +1,23 @@
-.subsetExperimentSlot <- function(object, id, id.type)
-{
-  rtx = list()
-  if(id.type=="model.id")
-  {
-    for(mid in c(id))
-    {
-      rtx = .appendToList(rtx, object@experiment[[mid]])
-    }
-  } else
-  {
-    for(Ix in object@experiment)
-    {
-      if(is.element(id, Ix[[id.type]])==TRUE)
-      {rtx = .appendToList(rtx, Ix) }
-    }
-  }
-
-  return(rtx)
-}
+# .subsetExperimentSlot <- function(object, id, id.type)
+# {
+#   rtx = list()
+#   if(id.type=="model.id")
+#   {
+#     for(mid in c(id))
+#     {
+#       rtx = .appendToList(rtx, object@experiment[[mid]])
+#     }
+#   } else
+#   {
+#     for(Ix in object@experiment)
+#     {
+#       if(is.element(id, Ix[[id.type]])==TRUE)
+#       {rtx = .appendToList(rtx, Ix) }
+#     }
+#   }
+#
+#   return(rtx)
+# }
 
 .subsetExperimentSlotForDrug <- function(object, drugName, exact.match=TRUE)
 {
@@ -109,13 +109,19 @@ setMethod( f=selectModelIds, signature="XevaSet",
 ###-----------------------------------------------------------------------------------------------------
 .getExperimentDataFromAExpID <- function(object, model.id, treatment.only)
 {
-  modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
-  if(length(modX)==1)
-  { mod = modX[[1]] }else
-  {return(NULL)}
+  #modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
+  #if(length(modX)==1)
+  #{ mod = modX[[1]] }else
+  #{return(NULL)}
+
+  mod <- slot(object, "experiment")[[model.id]]
+  if(is.null(mod))
+  {
+    msg <- sprintf("model.id '%s' not present in object", model.id)
+    stop(msg)
+  }
 
   mod.data <- mod$data
-
   mod.data$model.id <- mod$model.id
   mod.data$drug.join.name <- mod$drug$join.name
 
@@ -128,7 +134,10 @@ setMethod( f=selectModelIds, signature="XevaSet",
     tretIndx = extractBetweenTags(mod.data$dose, start.tag=0, end.tag=0)
     mod.data = mod.data[tretIndx, ]
   }
-  mod.data$volume.normal <- (mod.data$volume - mod.data$volume[1])/mod.data$volume[1]
+
+  mod.data$volume.normal <- NA
+  if(mod.data$volume[1] > 0)
+  { mod.data$volume.normal <- (mod.data$volume - mod.data$volume[1])/mod.data$volume[1]}
   return(mod.data)
 }
 
@@ -171,6 +180,7 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #' getExperiment(pdxe, model.id="X.1004.pael", treatment.only=TRUE)
 #' @param object The \code{XevaSet}
 #' @param model.id The \code{model.id} for which data is required
+#' @param batch.name The \code{batch.name} for which data is required
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(name = "getExperiment", def = function(object, model.id=NULL, batch.name=NULL,
@@ -187,7 +197,6 @@ setMethod( f=getExperiment,
                msg = sprintf("model.id and batch.name both NULL")
                stop(msg)
              }
-
              if(!is.null(model.id))
              {
                model.ids <- unique(c(model.id))
