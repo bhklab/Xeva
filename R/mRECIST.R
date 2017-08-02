@@ -123,7 +123,8 @@ computemRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 #' getmRECIST(pdxe)
 #' @param object The \code{XevaSet} object
 #' @return Updated \code{XevaSet}
-setGeneric(name= "setmRECIST", def = function(object, min.time=10) {standardGeneric("setmRECIST")} )
+setGeneric(name= "setmRECIST", def = function(object, min.time=10)
+  {standardGeneric("setmRECIST")} )
 
 #' @export
 setMethod( f="setmRECIST",
