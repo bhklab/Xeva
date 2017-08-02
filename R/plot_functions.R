@@ -223,7 +223,9 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
                       log.y=FALSE, drgName=NULL,
-                      SE.plot = c("all","errorbar", "ribbon"), aspect.ratio=c(1, NULL))
+                      SE.plot = c("all","errorbar", "ribbon"),
+                      aspect.ratio=c(1, NULL),
+                      max.time=NULL)
 {
   if(is.null(batchName) & is.null(expDig))
   {
@@ -240,30 +242,47 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   {
     dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
                                              treatment.only=treatment.only)
-    controlMean <- .collapseRplicate(dfp$control, var = "volume")
-    controlMean$type <- "control"
-    #dfp$mean <- controlMean
+
+    if(!is.null(max.time))
+    {
+      dfp$control <- lapply(dfp$control, function(mi)
+                            { mi[mi$time <= max.time , ] })
+    }
+
+    #controlMean <- .collapseRplicate(dfp$control, var = "volume")
+    #controlMean$type <- "control"
   }
 
   if(!is.null(expDig$treatment) & length(expDig$treatment)>0)
   {
     dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
                                              treatment.only=treatment.only)
-    treatmentMean <- .collapseRplicate(dfp$treatment, var = "volume")
-    treatmentMean$type <-  "treatment"
-    #dfp$mean <- rbind(dfp$mean, treatmentMean)
+
+    if(!is.null(max.time))
+    {
+        dfp$treatment <- lapply(dfp$treatment, function(mi)
+                                { mi[mi$time <= max.time , ] })
+    }
+
+    #treatmentMean <- .collapseRplicate(dfp$treatment, var = "volume")
+    #treatmentMean$type <-  "treatment"
   }
 
   dfp$mean <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
                              drug.name = TRUE)
+
+  if(!is.null(max.time))
+  {
+    dfp$mean <- dfp$mean[dfp$mean$time<= max.time ,]
+  }
+
   if(is.null(drgName))
   {drgName <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
 
   plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
                     title=title, xlab = xlab, ylab = ylab,
                     log.y=log.y, drgName=drgName,
-                    SE.plot = SE.plot, aspect.ratio=aspect.ratio
-                    )
+                    SE.plot = SE.plot, aspect.ratio=aspect.ratio)
 }
 
 
