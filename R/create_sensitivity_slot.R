@@ -25,7 +25,7 @@
   if( .checkUnqLength(modelSensitivity$model.id)==FALSE)
   {stop("model.ids are not unique")}
   rownames(modelSensitivity) <- as.character(modelSensitivity$model.id)
-  modelSensitivity <- modelSensitivity[names(expSlot), ]
+  modelSensitivity <- modelSensitivity[names(expSlot), ,drop=FALSE]
   ##-----------------------------------------------------------------------------
   ##------------ for Batch Sensitivity -------------------------------------------
 
@@ -58,6 +58,9 @@
   batchSensitivity <- batchSensitivity[names(expDesign), ,drop=F]
 
   ##--------------------------------------------------------------------------------
+  if(class(modelSensitivity)!="data.frame" | class(batchSensitivity)!="data.frame")
+  {stop("slot class error")}
+
   rtx <- list(model = modelSensitivity,
               batch = batchSensitivity)
   return(rtx)
