@@ -102,7 +102,7 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
   {
     for(ti in expDegI$treatment)
     {
-      dt = getExperiment(object, model.id=ti, treatment.only = TRUE)
+      dt = getExperiment(object, model.id=ti, treatment.only = treatment.only)
 
       dt.fit[[ti]] = .computSlopeFun(dt$time, dt[,var])
     }
@@ -113,7 +113,7 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
   {
     for(ci in expDegI$control)
     {
-      dc = getExperiment(object, model.id=ci, treatment.only = TRUE)
+      dc = getExperiment(object, model.id=ci, treatment.only = treatment.only)
       dc.fit[[ci]] = .computSlopeFun(dc$time, dc[,var])
     }
   }
@@ -235,12 +235,12 @@ setMethod( f=calculateAngle,
 #' angles <- setAngle(object = pdxe)
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{list} with angle between treatment and control for each batch
-setGeneric(name = "setAngle", def = function(object) {standardGeneric("setAngle")} )
+setGeneric(name = "setAngle", def = function(object, treatment.only=FALSE) {standardGeneric("setAngle")} )
 
 #' @export
 setMethod( f=setAngle, signature="XevaSet",
-           definition=function(object)
-           { calculateAngle(object, var = "volume", treatment.only=TRUE, plot=FALSE) } )
+           definition=function(object, treatment.only=FALSE)
+           { calculateAngle(object, var = "volume", treatment.only=treatment.only, plot=FALSE) } )
 
 
 #' setAngle<- Generic
