@@ -203,14 +203,19 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     }
   }
 
-  #if(sort==TRUE)
-  #{
-    matRC<-.sortPlotMat(mat, controlD=control.name, control.col=control.col, drug.col=drug.col)
+  if(sort==TRUE)
+  {
+    matRC <-.sortPlotMat(mat, controlD=control.name, control.col=control.col,
+                        drug.col=drug.col)
     mat<-as.matrix(matRC$mat)
-  #} else
-  #{
-  #  mat <- as.matrix(mat)
-  #}
+  } else
+  {
+    mat <- as.matrix(mat)
+  }
+
+  rowColors <- rep(drug.col, nrow(mat))
+  names(rowColors) <- rownames(mat)
+  if(!is.na(control.name)){ rowColors[control.name] <- control.col}
 
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
@@ -223,7 +228,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
                  cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
                  show_row_names = TRUE, row_names_side = "left",
-                 row_names_gp = gpar(col = matRC$row.name.col),
+                 row_names_gp = gpar(col = rowColors),
                  show_column_names = TRUE, column_names_side = "top",
                  column_title = name,
                  rect_gp = gpar(col = "white", lty = 1, lwd = 1),

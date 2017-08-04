@@ -4,7 +4,7 @@
 \alias{setAAC}
 \title{setAAC generic}
 \usage{
-setAAC(object)
+setAAC(object, treatment.only = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}

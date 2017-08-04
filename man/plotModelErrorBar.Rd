@@ -8,7 +8,8 @@
 plotModelErrorBar(dfp, control.col = "#6baed6", treatment.col = "#fc8d59",
   title = "", xlab = "Time", ylab = "Volume", log.y = FALSE,
   drgName = "", SE.plot = c("all", "errorbar", "ribbon"),
-  modelLyt = "dotted", aspect.ratio = c(1, NULL))
+  modelLyt = "dotted", aspect.ratio = c(1, NULL), minor.line.size = 0.5,
+  major.line.size = 0.7)
 }
 \description{
 ##df = readRDS("DATA-raw/toPlot_DF.Rda")

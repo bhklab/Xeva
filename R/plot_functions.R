@@ -1,7 +1,7 @@
-.addlinetoplot <- function(dt, x, y, col='red', lty="dotted", alpha=1)
+.addlinetoplot <- function(dt, x, y, col='red', lty="dotted", alpha=1, size=0.5)
 {
   list(
-    geom_line( data=dt, aes_string(x=x, y=y), color=col, linetype=lty, alpha=alpha),
+    geom_line( data=dt, aes_string(x=x, y=y), color=col, linetype=lty, alpha=alpha, size=size),
     #geom_point(data=dt, aes_string(x=x, y=y), color=col,size=0.5, shape=21, fill="white")
     geom_point(data=dt, aes_string(x=x, y=y), color=col, shape=20, alpha=alpha)
   )
@@ -16,7 +16,8 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
                               log.y=FALSE, drgName="",
                               SE.plot = c("all","errorbar", "ribbon"),
                               modelLyt= "dotted",
-                              aspect.ratio=c(1, NULL))
+                              aspect.ratio=c(1, NULL), minor.line.size=0.5,
+                              major.line.size=0.7)
 {
   SE.plot <- SE.plot[1]
   aspect.ratio <- aspect.ratio[1]
@@ -46,7 +47,7 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
   }
 
   plt <- ggplot(df, aes_string(x="time", y="mean", color= "exp.type"))
-  plt <- plt + geom_line(linetype = 1)+ geom_point()
+  plt <- plt + geom_line(linetype = 1, size=major.line.size)+ geom_point()
 
   if(SE.plot %in% c("errorbar", "ribbon"))
   {
@@ -73,13 +74,13 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
     {
       for(ct in dfp$control)
       { plt <- plt + .addlinetoplot(ct, x="time", y="volume", col=control.col,
-                                   lty=modelLyt, alpha=0.5) }
+                                   lty=modelLyt, alpha=0.5, size = minor.line.size) }
     }
     if(!is.null(dfp$treatment))
     {
       for(tr in dfp$treatment)
       { plt <- plt + .addlinetoplot(tr, "time", "volume", col=treatment.col,
-                                   lty=modelLyt, alpha=0.5) }
+                                   lty=modelLyt, alpha=0.5,size = minor.line.size) }
     }
   }
 
@@ -225,6 +226,7 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
                       log.y=FALSE, drgName=NULL,
                       SE.plot = c("all","errorbar", "ribbon"),
                       aspect.ratio=c(1, NULL),
+                      minor.line.size=0.5, major.line.size=0.7,
                       max.time=NULL)
 {
   if(is.null(batchName) & is.null(expDig))
@@ -282,7 +284,9 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
                     title=title, xlab = xlab, ylab = ylab,
                     log.y=log.y, drgName=drgName,
-                    SE.plot = SE.plot, aspect.ratio=aspect.ratio)
+                    SE.plot = SE.plot, aspect.ratio=aspect.ratio,
+                    minor.line.size=minor.line.size,
+                    major.line.size=major.line.size)
 }
 
 

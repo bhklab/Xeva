@@ -4,7 +4,7 @@
 \alias{setAngle}
 \title{setAngle generic}
 \usage{
-setAngle(object)
+setAngle(object, treatment.only = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet} to retrieve drug info from}
