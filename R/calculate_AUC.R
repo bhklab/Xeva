@@ -131,17 +131,19 @@ setMethod( f=aac,
 #' setAAC(cm.pdxe) <- setAAC(object = cm.pdxe)
 #' @param object The \code{XevaSet}
 #' @return a \code{list} with model and batch AAC
-setGeneric(name = "setAAC", def = function(object) {standardGeneric("setAAC")} )
+setGeneric(name = "setAAC", def = function(object, treatment.only=FALSE) {standardGeneric("setAAC")} )
 
 #' @export
 setMethod( f=setAAC, signature="XevaSet",
-           definition=function(object)
+           definition=function(object, treatment.only=FALSE)
            {
              value <- list()
-             value$model <- sapply(modelInfo(object)$model.id,function(mid) {aac(object, model.id = mid)})
+             value$model <- sapply(modelInfo(object)$model.id,function(mid)
+               {aac(object, model.id = mid, treatment.only=treatment.only)})
 
              value$batch <- lapply(names(object@expDesign),
-                                   function(bid) {aac(object, batch = expDesign(object,bid))})
+                                   function(bid) {aac(object, batch = expDesign(object,bid),
+                                                      treatment.only=treatment.only)})
              names(value$batch) <- names(object@expDesign)
 
              return(value)
