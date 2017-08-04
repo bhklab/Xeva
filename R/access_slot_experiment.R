@@ -1,23 +1,3 @@
-# .subsetExperimentSlot <- function(object, id, id.type)
-# {
-#   rtx = list()
-#   if(id.type=="model.id")
-#   {
-#     for(mid in c(id))
-#     {
-#       rtx = .appendToList(rtx, object@experiment[[mid]])
-#     }
-#   } else
-#   {
-#     for(Ix in object@experiment)
-#     {
-#       if(is.element(id, Ix[[id.type]])==TRUE)
-#       {rtx = .appendToList(rtx, Ix) }
-#     }
-#   }
-#
-#   return(rtx)
-# }
 
 .subsetExperimentSlotForDrug <- function(object, drugName, exact.match=TRUE)
 {
