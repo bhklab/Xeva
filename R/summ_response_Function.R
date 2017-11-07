@@ -7,84 +7,84 @@
   return(list(treatment=treatment, control=control))
 }
 
-
-.getAngleSummary <- function(object, tumor.type)
-{
-  rdf = data.frame()
-  for(batch in expDesignInfo(object))
-  {
-    if(!is.null(tumor.type))
-    {
-      tt <- modelInfo(object)[modelInfo(object)$model.id %in% c(batch$treatment,batch$control),"tumor.type"]
-
-      if(is.element(tumor.type, tt)==FALSE)
-      { next }
-
-      if(length(unique(tt))>1)
-      {
-        msg <- sprintf("batch %s contains models with different tumor type", batch$batch.name)
-        warning(msg)
-      }
-    }
-
-    drugX = .getDrugsForABatch(object, batch)
-    drug = unique(drugX$treatment)
-    rdf = rbind(rdf, data.frame(batch.name = batch$batch.name,
-                                drug.join.name=drug))
-  }
-  rdf <- .factor2char(rdf)
-  rdf$angle <- slot(object, "sensitivity")[["batch"]][rdf$batch.name, ]
-  return(rdf)
-}
-
-.summarizePerBatchResponse <- function(object, response.measure = "angle", group.by=NULL,
-                                       summary.stat, tumor.type)
-{
-
-  if(response.measure == "angle")
-  {
-    df = .getAngleSummary(object, tumor.type=tumor.type)
-  }
-
-  if(!is.null(group.by) & group.by != "batch.name")
-  {
-    mapId = mapModelSlotIds(object, id=df$batch.name, id.name="batch.name",
-                            map.to=group.by, unique = TRUE)
-
-    for(I in unique(mapId$batch.name))
-    {
-      di = unique(mapId[mapId$batch.name==I, group.by])
-      if(length(di)>1)
-      {
-        msg1 = sprintf("batch.name mapped to multipal %s therefore all such %s will contain same information", group.by, group.by)
-        msg2 = sprintf("\nbatch.name = %s %s = %s\n", I, group.by, paste(di, collapse =","))
-        warning(msg1, msg2)
-      }
-    }
-
-    df = merge(df, mapId, by.x = "batch.name", by.y="batch.name")
-
-    for(I in unique(df[, group.by]))
-    {
-      di = df[df[, group.by]==I, ]
-      if(nrow(di)>1)
-      {
-        drg <- di$drug.join.name
-        if(length(drg) > length(unique(drg)))
-        {
-          msg1 <- sprintf("'%s' mapped to multipal batch.name, values will be collapsed using '%s'\n", group.by, summary.stat)
-          df2Pr<- unique(di[, c("batch.name", group.by)]); rownames(df2Pr)<- NULL
-          msg2 <- paste(capture.output(print(df2Pr)), collapse = "\n")
-          warning(msg1, msg2)
-        }
-      }
-    }
-  }
-
-  mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
-                      value=response.measure, collapse = summary.stat)
-  return(mat)
-}
+#
+# .getAngleSummary <- function(object, tumor.type)
+# {
+#   rdf = data.frame()
+#   for(batch in expDesignInfo(object))
+#   {
+#     if(!is.null(tumor.type))
+#     {
+#       tt <- modelInfo(object)[modelInfo(object)$model.id %in% c(batch$treatment,batch$control),"tumor.type"]
+#
+#       if(is.element(tumor.type, tt)==FALSE)
+#       { next }
+#
+#       if(length(unique(tt))>1)
+#       {
+#         msg <- sprintf("batch %s contains models with different tumor type", batch$batch.name)
+#         warning(msg)
+#       }
+#     }
+#
+#     drugX = .getDrugsForABatch(object, batch)
+#     drug = unique(drugX$treatment)
+#     rdf = rbind(rdf, data.frame(batch.name = batch$batch.name,
+#                                 drug.join.name=drug))
+#   }
+#   rdf <- .factor2char(rdf)
+#   rdf$angle <- slot(object, "sensitivity")[["batch"]][rdf$batch.name, ]
+#   return(rdf)
+# }
+#
+# .summarizePerBatchResponse <- function(object, response.measure = "angle", group.by=NULL,
+#                                        summary.stat, tumor.type)
+# {
+#
+#   if(response.measure == "angle")
+#   {
+#     df = .getAngleSummary(object, tumor.type=tumor.type)
+#   }
+#
+#   if(!is.null(group.by) & group.by != "batch.name")
+#   {
+#     mapId = mapModelSlotIds(object, id=df$batch.name, id.name="batch.name",
+#                             map.to=group.by, unique = TRUE)
+#
+#     for(I in unique(mapId$batch.name))
+#     {
+#       di = unique(mapId[mapId$batch.name==I, group.by])
+#       if(length(di)>1)
+#       {
+#         msg1 = sprintf("batch.name mapped to multipal %s therefore all such %s will contain same information", group.by, group.by)
+#         msg2 = sprintf("\nbatch.name = %s %s = %s\n", I, group.by, paste(di, collapse =","))
+#         warning(msg1, msg2)
+#       }
+#     }
+#
+#     df = merge(df, mapId, by.x = "batch.name", by.y="batch.name")
+#
+#     for(I in unique(df[, group.by]))
+#     {
+#       di = df[df[, group.by]==I, ]
+#       if(nrow(di)>1)
+#       {
+#         drg <- di$drug.join.name
+#         if(length(drg) > length(unique(drg)))
+#         {
+#           msg1 <- sprintf("'%s' mapped to multipal batch.name, values will be collapsed using '%s'\n", group.by, summary.stat)
+#           df2Pr<- unique(di[, c("batch.name", group.by)]); rownames(df2Pr)<- NULL
+#           msg2 <- paste(capture.output(print(df2Pr)), collapse = "\n")
+#           warning(msg1, msg2)
+#         }
+#       }
+#     }
+#   }
+#
+#   mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
+#                       value=response.measure, collapse = summary.stat)
+#   return(mat)
+# }
 
 
 
@@ -170,6 +170,26 @@
 }
 
 
+.summarizePerBatchResponse <- function(object, response.measure = NULL, batch.name=NULL)
+{
+  rtx <- object@sensitivity$batch
+  if(!is.null(response.measure))
+  {
+    rtx <- rtx[, c("batch.name", response.measure)]
+  }
+
+  if(!is.null(batch.name))
+  {
+    bn2take <- batch.name[batch.name %in% rtx$batch.name]
+    if(length(bn2take)==0)
+    {
+      msg <- sprintf("No batch.name present in dataset. Please check the batch.name")
+      stop(msg)
+    }
+    rtx <- rtx[rtx$batch.name %in% bn2take, ]
+  }
+  return(rtx)
+}
 
 #####================= summarizeResponse ==================
 #' Summarize Response of PDXs
@@ -180,6 +200,7 @@
 #' @param response.measure \code{character} . Which response measure to use? Use the responseMeasures function to find out what measures are available for each Xeva set.
 #' @param group.by default \code{patient.id}. How the models should be grouped togather. See details
 #' @param summary.stat which summary method to use if multipal ids were found
+#' @param batch.name a vector of batch names. Default NULL will return all batchs
 #' @return a \code{matrix} with rows as drug names, coulmn as \code{group.by} and each cell contains \code{response.measure} for the pair.
 #'
 #' @details
@@ -200,7 +221,7 @@
 #' @export
 summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
                               group.by="patient.id", summary.stat=c(";", "mean", "median"),
-                              tumor.type=NULL)
+                              batch.name=NULL, tumor.type=NULL)
 {
 
   summary.stat = c(summary.stat)[1]
@@ -214,21 +235,46 @@ summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
     }
   }
 
-  if(response.measure =="angle")
-  {
-    mat <- .summarizePerBatchResponse(object, response.measure = "angle",
-                                      group.by=group.by, summary.stat=summary.stat,
-                                      tumor.type=tumor.type)
 
-  } else
+  if(!(response.measure %in% c(colnames(object@sensitivity$model),
+                               colnames(object@sensitivity$batch))))
   {
-    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-                                      group.by=group.by, summary.stat=summary.stat,
-                                      tumor.type=tumor.type)
+    msg <- sprintf("valid response.measure values are\nFor model: %s\nFor batch: %s\n",
+                   paste0(colnames(object@sensitivity$model), collapse = ", "),
+                   paste0(colnames(object@sensitivity$batch), collapse = ", ")
+                   )
+    stop(msg)
   }
 
+  if(response.measure %in% colnames(object@sensitivity$model))
+  {
+    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
+                                        group.by=group.by, summary.stat=summary.stat,
+                                        tumor.type=tumor.type)
+    return(mat)
+  }
 
-  return(mat)
+  if(response.measure %in% colnames(object@sensitivity$batch))
+  {
+    mat <- .summarizePerBatchResponse(object, response.measure = response.measure,
+                                      batch.name=batch.name)
+                                      #group.by=group.by, summary.stat=summary.stat,
+                                      #tumor.type=tumor.type)
+    return(mat)
+  }
+
+  #if(response.measure =="angle")
+  #{
+  #  mat <- .summarizePerBatchResponse(object, response.measure = "angle",
+  #                                    group.by=group.by, summary.stat=summary.stat,
+  #                                    tumor.type=tumor.type)
+  #} #else
+  #{
+  #  mat <- .summarizePerModelResponse(object, response.measure=response.measure,
+  #                                    group.by=group.by, summary.stat=summary.stat,
+  #                                    tumor.type=tumor.type)
+  #}
+  #return(mat)
 }
 
 

@@ -5,7 +5,7 @@
 \title{Get time vs volume data with standard error}
 \usage{
 getTimeVarData(object, ExpDesign, var = "volume", treatment.only = FALSE,
-  drug.name = FALSE)
+  drug.name = FALSE, vol.normal = FALSE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}

@@ -37,7 +37,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
 .custom_cell_fun <- function(x, y, w, h, value, colPalette, backgroundCol, splitBy=";", sort=TRUE)
 {
-  factR = 0.95
+  factR = 01.0#950 #0.95
   wr=w*0.5*factR;   hr=h*0.5*factR
   x0=x-wr; x1=x+wr; y0=y-hr; y1=y+hr
   x0=convertX(x0, "npc", valueOnly = TRUE)
@@ -51,7 +51,10 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   cordXY$x = unit(cordXY$x,"npc"); cordXY$y = unit(cordXY$y,"npc")
   grid.polygon(x = cordXY$x, y = cordXY$y,
                id = rep(1:(N+1), each = 4),
-               gp = gpar(fill = c(NA, filCol), col = NA))
+               gp = gpar(fill = c(NA, filCol),
+                         col = "#f0f0f0")
+                         #col = backgroundCol) #NA)
+               )
 }
 
 
@@ -103,14 +106,13 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
   rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
 
   colorX = unlist(colPalette[colnames(rcDF$colSt)])
-  colBar = anno_barplot(rcDF$colSt, which = "column", axis = TRUE, gp = gpar(fill = colorX))
+  colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column", axis = TRUE,
+                                        gp = gpar(fill = colorX))
   column_ha = HeatmapAnnotation(barplot = colBar)
-  #foo1 = rcDF$colSt
-  #column_ha = HeatmapAnnotation(foo1 = anno_barplot(foo1, axis = TRUE))
-
 
   colorX = unlist(colPalette[colnames(rcDF$rowSt)])
-  rowbar = anno_barplot(rcDF$rowSt, which = "row", axis = TRUE, axis_side = "top", gp = gpar(fill = colorX))
+  rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
+                                        axis_side = "top", gp = gpar(fill = colorX))
   row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"))
   return(list(colPlt= column_ha, rowPlt= row_ha))
 }
@@ -209,9 +211,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
                         drug.col=drug.col)
     mat<-as.matrix(matRC$mat)
   } else
-  {
-    mat <- as.matrix(mat)
-  }
+  { mat <- as.matrix(mat) }
 
   rowColors <- rep(drug.col, nrow(mat))
   names(rowColors) <- rownames(mat)
@@ -222,26 +222,33 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   bgCol = rep(backgroundCol, length(nameSpc))
   splitBy=";"
   sortCellValue = TRUE #FALSE
+  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=splitBy, scaleRow=FALSE, scaleCol=FALSE)
 
-  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=";", scaleRow=FALSE, scaleCol=FALSE)
+  maxRWN <- rownames(mat)[nchar(rownames(mat))==max(nchar(rownames(mat)))][1]
+  rwSide <- grobWidth(textGrob(maxRWN)) + unit(0, "mm")
   pltX = ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
-                 cluster_rows = FALSE, cluster_columns = FALSE, show_row_dend = FALSE,
-                 show_row_names = TRUE, row_names_side = "left",
+                 cluster_rows = FALSE, cluster_columns = FALSE,
+                 show_row_dend = FALSE, show_row_names = TRUE,
+                 row_names_side = "left", row_names_max_width = rwSide,
                  row_names_gp = gpar(col = rowColors),
                  show_column_names = TRUE, column_names_side = "top",
                  column_title = name,
                  rect_gp = gpar(col = "white", lty = 1, lwd = 1),
                  show_heatmap_legend = FALSE,
                  cell_fun =function(j, i, x, y, width, height, fill)
-                 {.custom_cell_fun(x, y, width, height, mat[i,j], colPalette, fill, splitBy, sortCellValue)
+                 {.custom_cell_fun(x, y, width, height, mat[i,j], colPalette, fill, splitBy,
+                                   sortCellValue)
                  }) + sidePlt$rowPlt
 
 
   colVec = unlist(colPalette)[names(colPalette)]
   HLeg = legendGrob(names(colPalette), pch=22,
                     gp=gpar(col = colVec, fill = colVec))
-  draw(pltX, heatmap_legend_list = list(HLeg), padding = unit(c(10, 10, 10, 10), "mm"))
+  #padding = unit(c(0.01, 0.01, 0.01, 0.01), "npc")
+  padding = unit(c(2,2,2,2), "mm")
+  draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
+
 }
 
 
