@@ -14,12 +14,13 @@
 plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d59",
                               title="", xlab = "Time", ylab = "Volume",
                               log.y=FALSE, drgName="",
-                              SE.plot = c("all","errorbar", "ribbon"),
+                              SE.plot = c("all","none","errorbar", "ribbon"),
                               modelLyt= "dotted",
                               aspect.ratio=c(1, NULL), minor.line.size=0.5,
                               major.line.size=0.7)
 {
-  SE.plot <- SE.plot[1]
+  #SE.plot <- SE.plot[1];
+  SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
   df <- dfp$mean
@@ -110,109 +111,6 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 }
 
 
-#' #' @export
-#' #' @import ggplot2
-#' plotDottedPDXCurves <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d59",
-#'                                 title="", xlab = "Time", ylab = "Volume",
-#'                                 modelLyt= "dotted", meanLty="solid",
-#'                                 log.y=FALSE,
-#'                                 SE.plot = c("errorbar", "ribbon"), aspect.ratio=c(1, NULL))
-#' {
-#'
-#'   plt <- ggplot()
-#'   plt <- .ggplotEmptyTheme(plt)
-#'   ##---add mean lines ----------------------------------------------------------
-#'   plt <- plt + geom_line( data=dfp$mean, aes_string(x="time", y="mean", color= "type"))
-#'   plt <- plt + geom_point(data=dfp$mean, aes_string(x="time", y="mean", color= "type"),
-#'                           size=4, shape=21, fill="white")
-#'
-#'   tcCol <- c("control" = control.col, "treatment" = treatment.col)
-#'   plt <- plt + scale_color_manual(values=tcCol)
-#'
-#'   ##-------------------------------------------------------------
-#'   if(SE.plot == "errorbar")
-#'   {
-#'     #if(!is.null(dfp$controlMean))
-#'     #{
-#'       plt <- plt + geom_errorbar(data=dfp$mean,
-#'                                  aes_string(x="time", ymin = "lower", ymax = "upper"),
-#'                                  color=control.col, width=0.25)
-#'
-#'       plt <- plt + addlinetoplot(dfp$controlMean, x="time", y="mean",
-#'                                  col=control.col, lty=meanLty)
-#'     #}
-#'     if(!is.null(dfp$treatmentMean))
-#'     {
-#'       plt <- plt + geom_errorbar(data=dfp$treatmentMean,
-#'                                  aes_string(x="time", ymin = "lower", ymax = "upper"),
-#'                                  color=treatment.col, width=0.25)
-#'       plt <- plt + addlinetoplot(dfp$treatmentMean, x="time", y="mean",
-#'                                  col=treatment.col, lty=meanLty)
-#'     }
-#'   }
-#'
-#'   ###---------------------------------------------------------------------------
-#'   if(SE.plot =="ribbon")
-#'   {
-#'     if(!is.null(dfp$controlMean))
-#'     {
-#'       plt <- plt + geom_ribbon(data=dfp$controlMean,
-#'                                aes_string(x="time", ymin ="lower", ymax ="upper"),
-#'                                linetype=0, fill = "grey80", alpha = 0.4)
-#'       plt <- plt + addlinetoplot(dfp$controlMean, x="time", y="mean",
-#'                                  col=control.col, lty=meanLty)
-#'     }
-#'
-#'     if(!is.null(dfp$treatmentMean))
-#'     {
-#'       plt <- plt + geom_ribbon(data=dfp$treatmentMean,
-#'                                aes_string(x="time", ymin ="lower", ymax ="upper"),
-#'                                linetype=0, fill = "grey80", alpha = 0.4)
-#'       plt <- plt + addlinetoplot(dfp$treatmentMean, x="time", y="mean",
-#'                                  col=treatment.col, lty=meanLty)
-#'     }
-#'   }
-#'
-#'   if(SE.plot =="all")
-#'   {
-#'     if(!is.null(dfp$control))
-#'     {
-#'       for(ct in dfp$control)
-#'       { plt <- plt + addlinetoplot(ct, x="time", y="volume", col=control.col,
-#'                                    lty=modelLyt, alpha=0.75) }
-#'
-#'       plt <- plt + addlinetoplot(dfp$controlMean, x="time", y="mean",
-#'                                  col=control.col, lty=meanLty)
-#'
-#'     }
-#'
-#'     if(!is.null(dfp$treatment))
-#'     {
-#'       for(tr in dfp$treatment)
-#'       { plt <- plt + addlinetoplot(tr, "time", "volume", col=treatment.col,
-#'                                    lty=modelLyt, alpha=0.75) }
-#'
-#'       plt <- plt + addlinetoplot(dfp$treatmentMean, x="time", y="mean",
-#'                                  col=treatment.col, lty=meanLty)
-#'     }
-#'   }
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'   plt <- plt + labs(title = title, x = xlab, y = ylab)
-#'   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
-#'   plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
-#'   if(!is.null(aspect.ratio))
-#'   {
-#'     plt <- plt + theme(aspect.ratio=aspect.ratio)
-#'   }
-#'
-#'
-#' }
 
 
 #batchName = "PHLC153_P6"
@@ -224,10 +122,10 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
                       log.y=FALSE, drgName=NULL,
-                      SE.plot = c("all","errorbar", "ribbon"),
+                      SE.plot = c("all", "none", "errorbar", "ribbon"),
                       aspect.ratio=c(1, NULL),
                       minor.line.size=0.5, major.line.size=0.7,
-                      max.time=NULL)
+                      max.time=NULL, vol.normal=FALSE)
 {
   if(is.null(batchName) & is.null(expDig))
   {
@@ -243,7 +141,8 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   if(!is.null(expDig$control) & length(expDig$control)>0)
   {
     dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
-                                             treatment.only=treatment.only)
+                                             treatment.only=treatment.only,
+                                             vol.normal=vol.normal)
 
     if(!is.null(max.time))
     {
@@ -258,7 +157,7 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   if(!is.null(expDig$treatment) & length(expDig$treatment)>0)
   {
     dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
-                                             treatment.only=treatment.only)
+                                             treatment.only=treatment.only, vol.normal=vol.normal)
 
     if(!is.null(max.time))
     {
@@ -271,7 +170,7 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   }
 
   dfp$mean <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
-                             drug.name = TRUE)
+                             drug.name = TRUE, vol.normal=vol.normal)
 
   if(!is.null(max.time))
   {

@@ -375,14 +375,14 @@ setMethod( f=getExpDesignDF,
 #' @return a \code{data.fram} with treatment, control and batch.name
 setGeneric(name = "getTimeVarData",
            def = function(object, ExpDesign, var = "volume",
-                          treatment.only=FALSE, drug.name=FALSE)
+                          treatment.only=FALSE, drug.name=FALSE, vol.normal=FALSE)
   {standardGeneric("getTimeVarData")} )
 
 #' @export
 setMethod( f=getTimeVarData,
            signature=c(object="XevaSet"),
            definition= function(object, ExpDesign, var = "volume",
-                                treatment.only=FALSE, drug.name=FALSE)
+                                treatment.only=FALSE, drug.name=FALSE, vol.normal=FALSE)
            {
              if(is.null(ExpDesign$treatment) & is.null(ExpDesign$control))
              {stop("treatment and control both NULL")}
@@ -394,7 +394,8 @@ setMethod( f=getTimeVarData,
              if(!is.null(ExpDesign$treatment) & length(ExpDesign$treatment)>0 )
              {
              trLs = .getExperimentMultipalIDs(object, ExpDesign$treatment,
-                                              treatment.only=treatment.only)
+                                              treatment.only=treatment.only,
+                                              vol.normal=vol.normal)
              trDF = .collapseRplicate(trLs, var = var)
              trDF$exp.type = "treatment"
              trDF$batch.name = ExpDesign$batch.name
@@ -412,7 +413,9 @@ setMethod( f=getTimeVarData,
 
              if(!is.null(ExpDesign$control) & length(ExpDesign$control)>0)
              {
-             cnLs = .getExperimentMultipalIDs(object, ExpDesign$control, treatment.only=treatment.only)
+             cnLs = .getExperimentMultipalIDs(object, ExpDesign$control,
+                                              treatment.only=treatment.only,
+                                              vol.normal=vol.normal)
              cnDF = .collapseRplicate(cnLs, var = var)
              cnDF$exp.type = "control"
              cnDF$batch.name = ExpDesign$batch.name
@@ -434,12 +437,17 @@ setMethod( f=getTimeVarData,
              return(rdf)
            })
 
-.getExperimentMultipalIDs <- function(object, mids, treatment.only=TRUE)
+.getExperimentMultipalIDs <- function(object, mids, treatment.only=TRUE, vol.normal=FALSE)
 {
   rtx = list()
   for(i in mids)
   {
     miD = getExperiment(object, model.id= i,treatment.only=treatment.only)
+    if(vol.normal==TRUE)
+    {
+      miD$volume.raw <- miD$volume
+      miD$volume <- miD$volume.normal
+    }
     rtx = .appendToList(rtx, miD)
   }
   return(rtx)
