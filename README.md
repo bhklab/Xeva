@@ -1,4 +1,4 @@
-Xeva
+Xeva: XEnograft Visualization & Analysis
 
 Integration of molecular and pharmacological profiles of patient-derived models
 
