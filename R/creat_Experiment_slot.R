@@ -89,13 +89,13 @@ experimentSlotfromDf <- function(experiment)
   colAbsent = setdiff(requredCols, colnames(experiment))
   if(length(colAbsent)>0)
   {
-    msg <- sprintf("These colums are required\n%s", paste(colAbsent, collapse = ', '))
+    msg = sprintf("These colums are required\n%s", paste(colAbsent, collapse = ', '))
     stop(msg)
   }
 
   if(length(drugColsName)==0)
   {
-    msg <- sprintf("Column with drug information requred\nDrug infromation column should be named drug, drug.1 ...\n")
+    msg = sprintf("Column with drug information requred\nDrug infromation column should be named drug, drug.1 ...\n")
     stop(msg)
   } else{
     msg = sprintf("Drug columns are\n%s\n", paste(drugColsName, collapse = ', '))
@@ -114,7 +114,7 @@ experimentSlotfromDf <- function(experiment)
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
-    msg <- sprintf("These colums are not part of standard information, therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
+    msg = sprintf("These colums are not part of standard information, therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
     warning(msg)
   }
 
@@ -122,13 +122,14 @@ experimentSlotfromDf <- function(experiment)
   drgColName.No = colnames(experiment)[grep("drug\\.",colnames(experiment))]
   if(length(drgColName.No)>0)
   {
-    msg <- sprintf("drug column will be replaced by %s\n", paste(drgColName.No, collapse = " + "))
+    msg = sprintf("drug column will be replaced by %s\n", paste(drgColName.No, collapse = " + "))
     cat(msg)
     pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
-    experiment[, "drug"] <- apply(experiment[,drgColName.No], 1, pasteWithoutNA)
+    experiment[, "drug"] = apply(experiment[,drgColName.No], 1, pasteWithoutNA)
   }
 
   ##------- if drug names are already in drug1 + drug2 split them ----------
+
 
   u.modDrg.id = unique(experiment[, c("model.id", "drug")])
   if(any(is.na(u.modDrg.id$model.id)))
@@ -142,25 +143,29 @@ experimentSlotfromDf <- function(experiment)
   }
 
 
-  expSlot <- list()
-  for (i in nrow(u.modDrg.id))
+  expSlot = list()
+  for (i in 1:dim(u.modDrg.id)[1])
   {
-    exp.mod.dg <- subset(experiment,
+    exp.mod.dg = subset(experiment,
                      experiment$model.id== u.modDrg.id[i, "model.id"] &
                      experiment$drug == u.modDrg.id[i, "drug"] )
 
-    expSlot[[i]] <- creatListFromDF(exp.mod.dg, extraCol=extraCol)
+    expSlot[[i]] = creatListFromDF(exp.mod.dg, extraCol=extraCol)
   }
 
-  mod.ids <- unlist(sapply(expSlot , "[[" , "model.id" ))
+  mod.ids = unlist(sapply(expSlot , "[[" , "model.id" ))
   if(any(table(mod.ids)!=1))
   {
-    msg <- sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
+    msg = sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
     stop(msg)
   }
 
-  expNames <- unlist(sapply(expSlot, "[[", "model.id"))
-  names(expSlot) <- expNames
+  #expNames = make.unique(unlist(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} )), sep="_")
+  #for(i in 1:length(expSlot))
+  #{ expSlot[[i]][["experiment.id"]] = expNames[i] }
+
+  expNames = unlist(sapply(expSlot, "[[", "model.id"))
+  names(expSlot) = expNames
 
   return(expSlot)
 }
