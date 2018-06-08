@@ -9,8 +9,9 @@ plotBatch(object, batchName = NULL, expDig = NULL, treatment.only = FALSE,
   control.col = "#6baed6", treatment.col = "#fc8d59", title = "",
   xlab = "Time", ylab = "Volume", log.y = FALSE, drgName = NULL,
   SE.plot = c("all", "none", "errorbar", "ribbon"), aspect.ratio = c(1,
-  NULL), minor.line.size = 0.5, major.line.size = 0.7, max.time = NULL,
-  vol.normal = FALSE)
+  NULL), modelLyt = "dotted", minor.line.size = 0.5,
+  major.line.size = 0.7, max.time = NULL, vol.normal = FALSE,
+  impute.value = TRUE)
 }
 \description{
 data(lpdx)

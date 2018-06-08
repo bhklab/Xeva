@@ -6,7 +6,7 @@
 \usage{
 plotmRECIST(mat, control.name = NA, control.col = "#238b45",
   drug.col = "black", colPalette = NULL, name = "Drug & Models",
-  sort = TRUE)
+  sort = TRUE, row_fontsize = 12, col_fontsize = 12, draw_plot = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}

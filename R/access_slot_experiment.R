@@ -85,15 +85,26 @@ setMethod( f=selectModelIds, signature="XevaSet",
 
 
 ###########################################################################
-###-----------------------------------------------------------------------------------------------------
-###-----------------------------------------------------------------------------------------------------
+###-----------------------------------------------------------------------------
+###-----------------------------------------------------------------------------
+.normalizeVolume <- function(X)
+{
+  if(is.na(X[1])==TRUE)
+  {
+    warning("First value not numeric.")
+    return(rep(NA, length(X)))
+  }
+  if(X[1]==0)
+  {
+    warning("start volume zero, adding 1 to compute volume.normal")
+    X <- X+1
+  }
+  rtx <- (X- X[1])/X[1]
+  return(rtx)
+}
+
 .getExperimentDataFromAExpID <- function(object, model.id, treatment.only)
 {
-  #modX = .subsetExperimentSlot(object, id=model.id, id.type="model.id")
-  #if(length(modX)==1)
-  #{ mod = modX[[1]] }else
-  #{return(NULL)}
-
   mod <- slot(object, "experiment")[[model.id]]
   if(is.null(mod))
   {
@@ -116,8 +127,10 @@ setMethod( f=selectModelIds, signature="XevaSet",
   }
 
   mod.data$volume.normal <- NA
-  if(mod.data$volume[1] > 0)
-  { mod.data$volume.normal <- (mod.data$volume - mod.data$volume[1])/mod.data$volume[1]}
+  #if(mod.data$volume[1] > 0)
+  #{ mod.data$volume.normal <- (mod.data$volume - mod.data$volume[1])/mod.data$volume[1]}
+  mod.data$volume.normal <- .normalizeVolume(mod.data$volume)
+
   return(mod.data)
 }
 
@@ -170,7 +183,8 @@ setGeneric(name = "getExperiment", def = function(object, model.id=NULL, batch.n
 #' @export
 setMethod( f=getExperiment,
            signature="XevaSet",
-           definition=function(object, model.id=NULL, batch.name=NULL, treatment.only=FALSE)
+           definition=function(object, model.id=NULL, batch.name=NULL,
+                               treatment.only=FALSE)
            {
              if(is.null(model.id) & is.null(batch.name))
              {
@@ -189,8 +203,6 @@ setMethod( f=getExperiment,
              }
              return(rtz)
            })
-
-
 
 
 ##-----------------------------------------------------------------------

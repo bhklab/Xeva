@@ -19,7 +19,7 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
                               aspect.ratio=c(1, NULL), minor.line.size=0.5,
                               major.line.size=0.7)
 {
-  #SE.plot <- SE.plot[1];
+  #SE.plot <- SE.plot[1]
   SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
@@ -123,9 +123,9 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
                       title="", xlab = "Time", ylab = "Volume",
                       log.y=FALSE, drgName=NULL,
                       SE.plot = c("all", "none", "errorbar", "ribbon"),
-                      aspect.ratio=c(1, NULL),
+                      aspect.ratio=c(1, NULL), modelLyt= "dotted",
                       minor.line.size=0.5, major.line.size=0.7,
-                      max.time=NULL, vol.normal=FALSE)
+                      max.time=NULL, vol.normal=FALSE, impute.value=TRUE)
 {
   if(is.null(batchName) & is.null(expDig))
   {
@@ -141,36 +141,54 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   if(!is.null(expDig$control) & length(expDig$control)>0)
   {
     dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
-                                             treatment.only=treatment.only,
-                                             vol.normal=vol.normal)
+                                             treatment.only=treatment.only
+                                             ,vol.normal=vol.normal
+                                             )
 
     if(!is.null(max.time))
     {
       dfp$control <- lapply(dfp$control, function(mi)
                             { mi[mi$time <= max.time , ] })
     }
-
-    #controlMean <- .collapseRplicate(dfp$control, var = "volume")
-    #controlMean$type <- "control"
   }
 
   if(!is.null(expDig$treatment) & length(expDig$treatment)>0)
   {
     dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
-                                             treatment.only=treatment.only, vol.normal=vol.normal)
+                                             treatment.only=treatment.only
+                                             , vol.normal=vol.normal
+                                             )
 
     if(!is.null(max.time))
     {
         dfp$treatment <- lapply(dfp$treatment, function(mi)
                                 { mi[mi$time <= max.time , ] })
     }
-
-    #treatmentMean <- .collapseRplicate(dfp$treatment, var = "volume")
-    #treatmentMean$type <-  "treatment"
   }
 
   dfp$mean <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
-                             drug.name = TRUE, vol.normal=vol.normal)
+                             drug.name = TRUE, vol.normal=vol.normal,
+                             impute.value=impute.value)
+
+  ##----------------------------------------------------------------------------
+  ##---------------------Normalize volume --------------------------------------
+  if(vol.normal=="nooo")
+  {
+    if(!is.null(dfp$treatment))
+    {
+      dfp$treatment$volume.raw <- dfp$treatment$volume
+      dfp$treatment$volume <- dfp$treatment$volume.normal
+    }
+
+    if(!is.null(dfp$control))
+    {
+      dfp$control$volume.raw <- dfp$control$volume
+      dfp$control$volume <- dfp$control$volume.normal
+    }
+  }
+
+  ##----------------------------------------------------------------------------
+  ##----------------------------------------------------------------------------
 
   if(!is.null(max.time))
   {

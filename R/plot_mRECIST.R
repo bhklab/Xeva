@@ -183,7 +183,8 @@ creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleC
 #' @import ComplexHeatmap
 #' @import grid
 plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col="black",
-                        colPalette = NULL, name = "Drug & Models", sort=TRUE)
+                        colPalette = NULL, name = "Drug & Models", sort=TRUE,
+                        row_fontsize=12, col_fontsize=12, draw_plot=TRUE)
 {
   control.name = c(control.name)
 
@@ -226,13 +227,14 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
 
   maxRWN <- rownames(mat)[nchar(rownames(mat))==max(nchar(rownames(mat)))][1]
   rwSide <- grobWidth(textGrob(maxRWN)) + unit(0, "mm")
-  pltX = ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
+  pltX <- ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
                  top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
                  cluster_rows = FALSE, cluster_columns = FALSE,
                  show_row_dend = FALSE, show_row_names = TRUE,
                  row_names_side = "left", row_names_max_width = rwSide,
-                 row_names_gp = gpar(col = rowColors),
+                 row_names_gp = gpar(col = rowColors, fontsize = row_fontsize),
                  show_column_names = TRUE, column_names_side = "top",
+                 column_names_gp = gpar(fontsize = col_fontsize),
                  column_title = name,
                  rect_gp = gpar(col = "white", lty = 1, lwd = 1),
                  show_heatmap_legend = FALSE,
@@ -242,12 +244,15 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
                  }) + sidePlt$rowPlt
 
 
-  colVec = unlist(colPalette)[names(colPalette)]
-  HLeg = legendGrob(names(colPalette), pch=22,
+  if(draw_plot==TRUE)
+  {
+    colVec <- unlist(colPalette)[names(colPalette)]
+    HLeg <- legendGrob(names(colPalette), pch=22,
                     gp=gpar(col = colVec, fill = colVec))
-  #padding = unit(c(0.01, 0.01, 0.01, 0.01), "npc")
-  padding = unit(c(2,2,2,2), "mm")
-  draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
+    #padding = unit(c(0.01, 0.01, 0.01, 0.01), "npc")
+    padding = unit(c(2,2,2,2), "mm")
+    draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
+  } else{ return(pltX)}
 
 }
 

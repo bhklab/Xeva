@@ -114,8 +114,7 @@ experimentSlotfromDf <- function(experiment)
   extraCol = setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
-    msg = sprintf("These colums are not part of standard information,
-                  therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
+    msg = sprintf("These colums are not part of standard information, therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
     warning(msg)
   }
 
