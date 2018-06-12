@@ -93,10 +93,10 @@
 #' data(pdxe)
 #' ## select BRCA samples
 #' mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
-#' drugSensitivitySig(object=pdxe, drug=c("paclitaxel","tamoxifen"),
-#'                    mDataType="RNASeq", features=1:5,
-#'                    model.ids = mid$model.id,
-#'                    sensitivity.measure="slope", fit = "lm")
+#' senSig <- drugSensitivitySig(object=pdxe, drug="tamoxifen",
+#'                              mDataType="RNASeq", features=1:5,
+#'                              model.ids = mid$model.id,
+#'                              sensitivity.measure="slope", fit = "lm")
 #' @details A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam".
 #' In case where a model.id map to multipal biobase.id the first biobase.id in the datafram will be used.
 #'
@@ -122,11 +122,6 @@ setMethod(f= "drugSensitivitySig",
                                standardize=c("SD", "rescale", "none"),
                                nthread=1, tumor.type=NULL, verbose=TRUE)
   {
-  #molecular.summary.stat=c("mean", "median", "first", "last", "or", "and"),
-  #sensitivity.summary.stat=c("mean", "median", "first", "last"),
-  #returnValues=c("estimate", "pvalue", "fdr"),
-  #sensitivity.cutoff,
-
   if(is.null(mDataType)& is.null(molData))
   {
     stop("'mDataType' and 'molData' both can't be NULL ")
@@ -136,92 +131,92 @@ setMethod(f= "drugSensitivitySig",
   {
     molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
   }
+
   molData <- as.matrix(molData)
 
   if(is.null(model2bidMap))
   {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
 
   rtLx <- list()
-  for(drugIx in c(drug))
-  {
-    if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
-    mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
+  #for(drugIx in c(drug))
+  drugIx <- c(drug)[1]
+
+  if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
+  mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
                                    collapse.by="mean", model.ids, mDataType,
                                    model2bidMap)
 
-    if(nrow(mdfI)<2)
-    {
+  if(nrow(mdfI)<2)
+  {
       msg <- sprintf("Too few samples for drug %s\nNumber of samples %d", drugIx, nrow(mdfI))
       stop(msg)
-    }
-    if(is.null(features))
-    { features <- rownames(molData)}
-
-    ##---------------------------------------------------------------
-    if(!is.null(tumor.type))
-    {
-      #
-      if(length(tumor.type) == 1)
-      {
-        printf("setting 'tumor.type' = %s for all models", tumor.type[1])
-        tt <- rep(tumor.type[1], nrow(mdfI))
-        names(tt) <- mdfI$model.id
-      }
-
-      if(length(tumor.type) > 1)
-      {
-        if(length(tumor.type)!= nrow(mdfI))
-        {stop("length of type should be equeal to length of models")}
-
-        if(is.null(names(tumor.type)))
-        {
-          msg <- sprintf("'tumor.type' have no names. Plese provide a named list")
-          stop(msg)
-        }
-
-        tt <- tumor.type
-      }
-
-    } else
-    {
-      if("tumor.type" %in% colnames(modelInfo(object)))
-      {
-        typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
-                                  map.to = "tumor.type", unique = FALSE)
-        tt <- typeDF[, "tumor.type"]
-        names(tt) <- typeDF$model.id
-
-      } else
-      {
-        warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
-        tt <- rep("tumor", nrow(mdfI))
-        names(tt) <- mdfI$model.id
-      }
-    }
-    mdfI[, "tumor.type"] <- tt[mdfI$model.id]
-    ## -------------------------------------------------------------------------
-
-    x <- t(molData[features, mdfI$biobase.id])
-    x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
-    fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
-    if(fetDiff>0)
-    {
-      msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
-      warning(msg1)
-    }
-
-    rtx <- .runFit(x = x,
-                   y = mdfI[,sensitivity.measure],
-                   fit = fit[1],
-                   nthread= nthread, type=mdfI[, "tumor.type"],
-                   standardize=standardize[1], verbose=verbose)
-
-    rtx$drug <- drugIx
-    rownames(rtx) <- NULL
-    rtx <- .reorderCol(rtx, "drug", 2)
-    rtLx<- .appendToList(rtLx, rtx)
   }
 
+  if(is.null(features))
+  { features <- rownames(molData)}
+
+  ##---------------------------------------------------------------
+  if(!is.null(tumor.type))
+  {
+    if(length(tumor.type) == 1)
+    {
+      printf("setting 'tumor.type' = %s for all models", tumor.type[1])
+      tt <- rep(tumor.type[1], nrow(mdfI))
+      names(tt) <- mdfI$model.id
+    }
+
+  if(length(tumor.type) > 1)
+  {
+      if(length(tumor.type)!= nrow(mdfI))
+      {stop("length of type should be equeal to length of models")}
+
+      if(is.null(names(tumor.type)))
+      {
+        msg <- sprintf("'tumor.type' have no names. Plese provide a named list")
+        stop(msg)
+      }
+
+    tt <- tumor.type
+    }
+  } else
+  {
+    if("tumor.type" %in% colnames(modelInfo(object)))
+    {
+      typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
+                                map.to = "tumor.type", unique = FALSE)
+      tt <- typeDF[, "tumor.type"]
+      names(tt) <- typeDF$model.id
+    } else
+    {
+      warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
+      tt <- rep("tumor", nrow(mdfI))
+      names(tt) <- mdfI$model.id
+    }
+  }
+
+  mdfI[, "tumor.type"] <- tt[mdfI$model.id]
+  ## -------------------------------------------------------------------------
+
+  x <- t(molData[features, mdfI$biobase.id])
+  x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
+
+  fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
+  if(fetDiff>0)
+  {
+    msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
+    warning(msg1)
+  }
+
+  rtx <- .runFit(x = x,
+                 y = mdfI[,sensitivity.measure],
+                 fit = fit[1],
+                 nthread= nthread, type=mdfI[, "tumor.type"],
+                 standardize=standardize[1], verbose=verbose)
+
+  rtx$drug <- drugIx
+  rownames(rtx) <- NULL
+  rtx <- .reorderCol(rtx, "drug", 2)
+  rtLx<- .appendToList(rtLx, rtx)
   rtDF <- do.call("rbind", rtLx)
   rownames(rtDF) <- NULL
   return(rtDF)

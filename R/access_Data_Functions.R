@@ -23,8 +23,6 @@ tumorTypeMatchFun<- function(tumor.type, objPDX)
   return(FALSE)
 }
 
-
-#' @export
 getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tumor.type=NULL)
 {
   objIndx = list()
@@ -101,7 +99,6 @@ getTreatmentControlX <- function(expSlot, objNames, model)
 }
 
 
-#' @export
 getExpDesign <- function(objNames, expDesign)
 {
   expDesIndx = sapply(expDesign, function(x){

@@ -101,7 +101,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   return(list(rowSt=cldf, colSt=rwdf))
 }
 
-creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+.creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
   rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
 
@@ -221,9 +221,9 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   nameSpc = unique(as.vector(as.matrix(mat)))
   backgroundCol = "gray"
   bgCol = rep(backgroundCol, length(nameSpc))
-  splitBy=";"
+  splitBy <- ";"
   sortCellValue = TRUE #FALSE
-  sidePlt = creatSideBarPlot(mat, colPalette, splitBy=splitBy, scaleRow=FALSE, scaleCol=FALSE)
+  sidePlt <- .creatSideBarPlot(mat, colPalette, splitBy=splitBy, scaleRow=FALSE, scaleCol=FALSE)
 
   maxRWN <- rownames(mat)[nchar(rownames(mat))==max(nchar(rownames(mat)))][1]
   rwSide <- grobWidth(textGrob(maxRWN)) + unit(0, "mm")

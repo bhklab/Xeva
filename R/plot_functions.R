@@ -30,9 +30,6 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
   {
     if(all(is.na(df$upper))==TRUE){ df$upper=NULL}
     if(all(is.na(df$lower))==TRUE){ df$lower=NULL}
-
-    #df <- df[!is.na(df$upper), ]
-    #df <- df[!is.na(df$lower), ]
   }
 
   if(nrow(df)==0)
@@ -113,19 +110,42 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 
 
 
+
+
+
+######--------------------------------------------------------------------------
+######--------------------------------------------------------------------------
 #batchName = "PHLC153_P6"
 ##
-#' data(lpdx)
-#' plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
+# data(lpdx)
+# plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
+
+#' Plot batch data
+#'
+#' Plot data for a batch id or experiment design
+#'
+#' @param object Xeva object
+#' @param batchName batch name
+#' @param expDig Experiment design list
+#' @param treatment.only \code{FALSE}. If TRUE only in treatment data will be considered
+#' @param vol.normal \code{FALSE} . If TRUE volume will ne normalised
+#' @param impute.value \code{TRUE}, will impute values where missing
+#'
+#' @return A list with dataframs of control, treatment and control.mean, treatment.mean
+#'
+#' @examples
+#' #data(pdxe)
+#' #btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+#'
 #' @export
-plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE,
+plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
                       log.y=FALSE, drgName=NULL,
                       SE.plot = c("all", "none", "errorbar", "ribbon"),
                       aspect.ratio=c(1, NULL), modelLyt= "dotted",
                       minor.line.size=0.5, major.line.size=0.7,
-                      max.time=NULL, vol.normal=FALSE, impute.value=TRUE)
+                      treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE)
 {
   if(is.null(batchName) & is.null(expDig))
   {
@@ -141,9 +161,8 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   if(!is.null(expDig$control) & length(expDig$control)>0)
   {
     dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
-                                             treatment.only=treatment.only
-                                             ,vol.normal=vol.normal
-                                             )
+                                             treatment.only=treatment.only,
+                                             vol.normal=vol.normal)
 
     if(!is.null(max.time))
     {
@@ -155,9 +174,8 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   if(!is.null(expDig$treatment) & length(expDig$treatment)>0)
   {
     dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
-                                             treatment.only=treatment.only
-                                             , vol.normal=vol.normal
-                                             )
+                                             treatment.only=treatment.only,
+                                             vol.normal=vol.normal)
 
     if(!is.null(max.time))
     {
@@ -169,26 +187,6 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE
   dfp$mean <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
                              drug.name = TRUE, vol.normal=vol.normal,
                              impute.value=impute.value)
-
-  ##----------------------------------------------------------------------------
-  ##---------------------Normalize volume --------------------------------------
-  if(vol.normal=="nooo")
-  {
-    if(!is.null(dfp$treatment))
-    {
-      dfp$treatment$volume.raw <- dfp$treatment$volume
-      dfp$treatment$volume <- dfp$treatment$volume.normal
-    }
-
-    if(!is.null(dfp$control))
-    {
-      dfp$control$volume.raw <- dfp$control$volume
-      dfp$control$volume <- dfp$control$volume.normal
-    }
-  }
-
-  ##----------------------------------------------------------------------------
-  ##----------------------------------------------------------------------------
 
   if(!is.null(max.time))
   {

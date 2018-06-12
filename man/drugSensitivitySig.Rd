@@ -45,8 +45,8 @@ In case where a model.id map to multipal biobase.id the first biobase.id in the 
 data(pdxe)
 ## select BRCA samples
 mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
-drugSensitivitySig(object=pdxe, drug=c("paclitaxel","tamoxifen"),
-                   mDataType="RNASeq", features=1:5,
-                   model.ids = mid$model.id,
-                   sensitivity.measure="slope", fit = "lm")
+senSig <- drugSensitivitySig(object=pdxe, drug="tamoxifen",
+                             mDataType="RNASeq", features=1:5,
+                             model.ids = mid$model.id,
+                             sensitivity.measure="slope", fit = "lm")
 }

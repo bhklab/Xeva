@@ -2,18 +2,37 @@
 % Please edit documentation in R/plot_functions.R
 \name{plotBatch}
 \alias{plotBatch}
-\title{data(lpdx)
-plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)}
+\title{Plot batch data}
 \usage{
-plotBatch(object, batchName = NULL, expDig = NULL, treatment.only = FALSE,
+plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
   control.col = "#6baed6", treatment.col = "#fc8d59", title = "",
   xlab = "Time", ylab = "Volume", log.y = FALSE, drgName = NULL,
   SE.plot = c("all", "none", "errorbar", "ribbon"), aspect.ratio = c(1,
   NULL), modelLyt = "dotted", minor.line.size = 0.5,
-  major.line.size = 0.7, max.time = NULL, vol.normal = FALSE,
+  major.line.size = 0.7, treatment.only = FALSE, vol.normal = FALSE,
   impute.value = TRUE)
 }
+\arguments{
+\item{object}{Xeva object}
+
+\item{batchName}{batch name}
+
+\item{expDig}{Experiment design list}
+
+\item{treatment.only}{\code{FALSE}. If TRUE only in treatment data will be considered}
+
+\item{vol.normal}{\code{FALSE} . If TRUE volume will ne normalised}
+
+\item{impute.value}{\code{TRUE}, will impute values where missing}
+}
+\value{
+A list with dataframs of control, treatment and control.mean, treatment.mean
+}
 \description{
-data(lpdx)
-plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
+Plot data for a batch id or experiment design
+}
+\examples{
+#data(pdxe)
+#btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+
 }

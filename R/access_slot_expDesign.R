@@ -355,17 +355,27 @@ setMethod( f=getExpDesignDF,
   return(dt)
 }
 
-.smoothCurve <- function(trDF, tsDF, x, y)
+.smoothCurve <- function(trDF, tsDF, x, y, approx.method="approx")
 {
   ##lo <- loess(y~x)
   #lo <- loess(trDF[,y]~trDF[,x])
   #tsDF[,y] <- predict(lo, newdata = tsDF[,x])
   #
-
   lmdf <- data.frame(X=trDF[,x], Y=trDF[,y])
-  lmod <- lm(Y~X, data = lmdf)
   prdf <- data.frame(X=tsDF[,x])
-  tsDF[,y] <- predict(lmod, prdf, se.fit = F)
+
+  if(approx.method=="lm")
+  {
+    lmod <- lm(Y~X, data = lmdf)
+    tsDF[,y] <- predict(lmod, prdf, se.fit = F)
+  }
+
+  if(approx.method=="approx")
+  {
+    prdValue <- approx(lmdf$X, lmdf$Y, xout = prdf$X)
+    tsDF[,y] <- prdValue$y
+  }
+
   return(tsDF)
 }
 
@@ -392,9 +402,8 @@ setMethod( f=getExpDesignDF,
 
     dt <- rbind(dw, nwRws)
     dt <- BBmisc::sortByCol(dt, c("time"))
-
     #ds <- .smoothCurve(dt, x="time", y=var)
-    dt$volume.normal <- .normalizeVolume(dt$volume)
+    #dt$volume.normal <- .normalizeVolume(dt$volume)
     return(dt)
   }
 
@@ -406,8 +415,6 @@ setMethod( f=getExpDesignDF,
 .collapseRplicate <- function(inLst, var = "volume", impute.value=TRUE)
 {
   if(is.null(names(inLst))){names(inLst) <- sapply(inLst, function(x){ x$model.id[1]})}
-
-
   if(impute.value==TRUE)
   {
     inLst2 <- list()
@@ -419,9 +426,6 @@ setMethod( f=getExpDesignDF,
     }
     inLst <- inLst2
   }
-
-  #dw<- reshape2::dcast(dq, as.formula(paste("time", "model.id", sep="~")),
-  #                     value.var = var)
 
   timeAll <- sort(unique(unlist(lapply(inLst, "[[", "time" ))))
   rd = data.frame()
@@ -492,8 +496,8 @@ setMethod( f=getTimeVarData,
              if(!is.null(ExpDesign$treatment) & length(ExpDesign$treatment)>0 )
              {
                trLs <- .getExperimentMultipalIDs(object, ExpDesign$treatment,
-                                                treatment.only=treatment.only
-                                                ,vol.normal=vol.normal
+                                                treatment.only=treatment.only,
+                                                vol.normal=vol.normal
                                                 )
                trDF <- .collapseRplicate(trLs, var = var, impute.value=impute.value)
                trDF$exp.type = "treatment"
@@ -513,8 +517,8 @@ setMethod( f=getTimeVarData,
              if(!is.null(ExpDesign$control) & length(ExpDesign$control)>0)
               {
                cnLs = .getExperimentMultipalIDs(object, ExpDesign$control,
-                                                treatment.only=treatment.only
-                                                ,vol.normal=vol.normal
+                                                treatment.only=treatment.only,
+                                                vol.normal=vol.normal
                                                 )
                cnDF = .collapseRplicate(cnLs, var = var, impute.value=impute.value)
                cnDF$exp.type = "control"
@@ -532,22 +536,6 @@ setMethod( f=getTimeVarData,
                }
 
              }
-
-             # if(vol.normal==TRUE)
-             # {
-             #   if(nrow(trDF)>0)
-             #   {
-             #     trDF$mean.raw <- trDF$mean
-             #     trDF$mean <- .normalizeVolume(trDF$mean.raw)
-             #   }
-             #
-             #   if(nrow(cnDF)>0)
-             #   {
-             #     cnDF$mean.raw <- cnDF$mean
-             #     cnDF$mean <- .normalizeVolume(cnDF$mean.raw)
-             #   }
-             # }
-
              rdf <- rbind(trDF, cnDF)
              return(rdf)
            })
