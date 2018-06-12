@@ -185,9 +185,6 @@ getIndex <- function(inVec, indxOf)
   return(df)
 }
 
-
-
-
 ##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------
 #' paste a vector elements togather while removing NA
@@ -283,7 +280,6 @@ printAndCapture <- function(x)
   paste(capture.output(print(x)), collapse = "\n")
 }
 
-
 ###----------------------------
 ##Normalize a vector between 0 and 1
 .normalize01 <- function(x) { (x-min(x))/(max(x)-min(x)) }
@@ -299,7 +295,7 @@ printAndCapture <- function(x)
 #' @export
 removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 {
-  dfR <- apply(df,2, var)
+  dfR <- apply(df,2, stats::var)
   dfR <- dfR[dfR>varCutoff]
 
   if(sort==TRUE)
