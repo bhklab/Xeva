@@ -27,12 +27,6 @@
 
 
 
-####
-#load("~/CXP/XG/Gao2015_Xeva_DataProcess/pdxe.rda")
-#object <- pdxe
-#id <- c("X-1683")
-#id.name <- "patient.id"
-
 #' Subset Xeva object
 #'
 #' @examples
@@ -104,8 +98,12 @@ subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
   for(mold in names(slot(object, "molecularProfiles")) )
   {
     ids2take <- unique(m2b[m2b$mDataType== mold, "biobase.id"])
-    mol <- slot(object, "molecularProfiles")[[mold]]
-    slot(object, "molecularProfiles")[[mold]] <- mol[, ids2take]
+    ids2take <- ids2take[!is.na(ids2take)]
+    if(length(ids2take)>0)
+    {
+      mol <- slot(object, "molecularProfiles")[[mold]]
+      slot(object, "molecularProfiles")[[mold]] <- mol[, ids2take]
+    }
   }
   return(object)
 }
