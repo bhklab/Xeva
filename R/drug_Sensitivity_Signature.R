@@ -51,8 +51,8 @@
       stop(msg)
     }
   }
-
   mdf[,"biobase.id"] <- NA
+
   for(I in 1:nrow(mdf))
   {
     bid <- model2bidMap[model2bidMap$model.id==mdf[I, "model.id"], "biobase.id"]
@@ -138,7 +138,6 @@ setMethod(f= "drugSensitivitySig",
   {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
 
   rtLx <- list()
-  #for(drugIx in c(drug))
   drugIx <- c(drug)[1]
 
   if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
@@ -345,8 +344,8 @@ nonLinerFitExample <- function()
 #' Given a Xeva object, feture name and drug name it will plot feture values against sensitivity value
 #'
 #' @examples
-#' data(cm.pdxe)
-#' geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
+#' data(pdxe)
+#' geneSensitivityPlot(object=pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
 #' sensitivity.measure="slope", standardize="log")
 #'
 #' @export

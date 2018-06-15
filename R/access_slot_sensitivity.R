@@ -14,8 +14,10 @@
 #'
 #' @return a \code{data.fram} with model or batch id and sensitivity values
 #' @export
-sensitivity <- function(object, type, sensitivity.measure=NULL)
+sensitivity <- function(object, type=c("model", "batch"), sensitivity.measure=NULL)
 {
+  type <- match.arg(type)
+
   if(is.element(type, names(object@sensitivity))==FALSE)
   {
     msg <- sprintf("sensitivity 'type' can be:\n%s", paste(names(object@sensitivity), collapse = "\n"))
@@ -25,17 +27,36 @@ sensitivity <- function(object, type, sensitivity.measure=NULL)
   sm <- slot(object, "sensitivity")[[type]]
   if(!is.null(sensitivity.measure))
   {
-    sensitivity.measure <- c(sensitivity.measure)
-    sm2take <- sapply(sensitivity.measure, function(i) is.element(i, colnames(sm)))
-    if(any(sm2take==FALSE))
+    sm2take <- intersect(sensitivity.measure, colnames(sm))
+    if(length(sm2take)>0)
+    {
+      if(length(sensitivity.measure)!=length(sm2take))
+      {
+        notPresent <- setdiff(sensitivity.measure, sm2take)
+        msg <- sprintf("some sensitivity.measure are not present in sensitivity slot and will be ignored\n%s\n",
+                       paste(notPresent, collapse="\n") )
+        warning(msg)
+      }
+      if(type=="model"){ sm <- sm[,c("model.id", sm2take)] }
+      if(type=="batch"){ sm <- sm[,c("batch.name", sm2take)]}
+
+    } else
     {
       msg <- sprintf("sensitivity.measure are not present in sensitivity slot\n%s\n",
-                     paste(sensitivity.measure[!sm2take],collapse="\n") )
+                     paste(sensitivity.measure,collapse="\n") )
       stop(msg)
     }
+    #sensitivity.measure <- c(sensitivity.measure)
+    #sm2take <- sapply(sensitivity.measure, function(i) is.element(i, colnames(sm)))
+    #if(any(sm2take==FALSE))
+    #{
+    #  msg <- sprintf("sensitivity.measure are not present in sensitivity slot\n%s\n",
+    #                 paste(sensitivity.measure[!sm2take],collapse="\n") )
+    #  stop(msg)
+    #}
 
-    cols2take <- c("model.id", sensitivity.measure[sm2take])
-    sm <- sm[,cols2take]
+    #cols2take <- c("model.id", sensitivity.measure[sm2take])
+    #sm <- sm[,cols2take]
   }
   return(sm)
 }

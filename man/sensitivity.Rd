@@ -4,7 +4,7 @@
 \alias{sensitivity}
 \title{Get sensitivity for an Xeva object}
 \usage{
-sensitivity(object, type, sensitivity.measure = NULL)
+sensitivity(object, type = c("model", "batch"), sensitivity.measure = NULL)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}

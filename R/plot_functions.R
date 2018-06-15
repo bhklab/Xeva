@@ -120,6 +120,7 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 # data(lpdx)
 # plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
 
+
 #' Plot batch data
 #'
 #' Plot data for a batch id or experiment design
@@ -127,71 +128,46 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 #' @param object Xeva object
 #' @param batchName batch name
 #' @param expDig Experiment design list
-#' @param treatment.only \code{FALSE}. If TRUE only in treatment data will be considered
-#' @param vol.normal \code{FALSE} . If TRUE volume will ne normalised
-#' @param impute.value \code{TRUE}, will impute values where missing
+#' @param max.time maximum time point of the plot, default \code{NULL} will plot complete data
+#' @param treatment.only default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment
+#' @param vol.normal default \code{FALSE} . If TRUE volume will ne normalised
+#' @param impute.value default \code{TRUE}, will impute values where missing
+#' @param control.col color for control plots
+#' @param treatment.col color for treatment plots
+#' @param title title of the plot
+#' @param xlab title of x axis
+#' @param ylab title of y axis
+#' @param log.y default \code{FALSE}, if \code{TRUE} y axis will be in log
+#' @param drgName default \code{NULL} will extract drug name from data
+#' @param SE.plot plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}
+#' @param aspect.ratio default \code{1} will create equeal width and height plot
+#' @param minor.line.size line size for minor lines default \code{0.5}
+#' @param major.line.size line size for major lines default \code{0.7}
 #'
-#' @return A list with dataframs of control, treatment and control.mean, treatment.mean
+#' @return A ggplot2 plot with control and treatment
 #'
 #' @examples
-#' #data(pdxe)
-#' #btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+#' data(pdxe)
+#' btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
 #'
 #' @export
 plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
+                      treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE,
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
                       log.y=FALSE, drgName=NULL,
                       SE.plot = c("all", "none", "errorbar", "ribbon"),
-                      aspect.ratio=c(1, NULL), modelLyt= "dotted",
-                      minor.line.size=0.5, major.line.size=0.7,
-                      treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE)
+                      aspect.ratio=c(1, NULL),
+                      minor.line.size=0.5, major.line.size=0.7)
 {
-  if(is.null(batchName) & is.null(expDig))
-  {
-    stop("please provide 'batchName' or 'expDig'")
-  }
+  dfp <- getExperiment(object, batchName=batchName, expDig=expDig,
+                       treatment.only=treatment.only, max.time=max.time,
+                       return.list = TRUE)
 
-  if(!is.null(batchName))
-  {
-    expDig <- expDesign(object, batchName)
-  }
-
-  dfp <- list()
-  if(!is.null(expDig$control) & length(expDig$control)>0)
-  {
-    dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
-                                             treatment.only=treatment.only,
-                                             vol.normal=vol.normal)
-
-    if(!is.null(max.time))
-    {
-      dfp$control <- lapply(dfp$control, function(mi)
-                            { mi[mi$time <= max.time , ] })
-    }
-  }
-
-  if(!is.null(expDig$treatment) & length(expDig$treatment)>0)
-  {
-    dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
-                                             treatment.only=treatment.only,
-                                             vol.normal=vol.normal)
-
-    if(!is.null(max.time))
-    {
-        dfp$treatment <- lapply(dfp$treatment, function(mi)
-                                { mi[mi$time <= max.time , ] })
-    }
-  }
-
-  dfp$mean <- getTimeVarData(object, ExpDesign = expDig, treatment.only = treatment.only,
+  dfp$mean <- getTimeVarData(object, batchName=batchName, expDig=expDig,
+                             treatment.only = treatment.only,
                              drug.name = TRUE, vol.normal=vol.normal,
-                             impute.value=impute.value)
-
-  if(!is.null(max.time))
-  {
-    dfp$mean <- dfp$mean[dfp$mean$time<= max.time ,]
-  }
+                             impute.value=impute.value, max.time=max.time)
 
   if(is.null(drgName))
   {drgName <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
@@ -203,11 +179,5 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
                     minor.line.size=minor.line.size,
                     major.line.size=major.line.size)
 }
-
-
-
-
-
-
 
 

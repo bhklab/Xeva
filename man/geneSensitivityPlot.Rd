@@ -15,8 +15,8 @@ Given a Xeva object, feture name and drug name it will plot feture values agains
 Plot a gene expression against sensitivity signatures for a drug
 }
 \examples{
-data(cm.pdxe)
-geneSensitivityPlot(object=cm.pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
+data(pdxe)
+geneSensitivityPlot(object=pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
 sensitivity.measure="slope", standardize="log")
 
 }

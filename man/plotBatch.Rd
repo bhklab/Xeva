@@ -5,12 +5,11 @@
 \title{Plot batch data}
 \usage{
 plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
+  treatment.only = FALSE, vol.normal = FALSE, impute.value = TRUE,
   control.col = "#6baed6", treatment.col = "#fc8d59", title = "",
   xlab = "Time", ylab = "Volume", log.y = FALSE, drgName = NULL,
   SE.plot = c("all", "none", "errorbar", "ribbon"), aspect.ratio = c(1,
-  NULL), modelLyt = "dotted", minor.line.size = 0.5,
-  major.line.size = 0.7, treatment.only = FALSE, vol.normal = FALSE,
-  impute.value = TRUE)
+  NULL), minor.line.size = 0.5, major.line.size = 0.7)
 }
 \arguments{
 \item{object}{Xeva object}
@@ -19,20 +18,44 @@ plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
 
 \item{expDig}{Experiment design list}
 
-\item{treatment.only}{\code{FALSE}. If TRUE only in treatment data will be considered}
+\item{max.time}{maximum time point of the plot, default \code{NULL} will plot complete data}
 
-\item{vol.normal}{\code{FALSE} . If TRUE volume will ne normalised}
+\item{treatment.only}{default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment}
 
-\item{impute.value}{\code{TRUE}, will impute values where missing}
+\item{vol.normal}{default \code{FALSE} . If TRUE volume will ne normalised}
+
+\item{impute.value}{default \code{TRUE}, will impute values where missing}
+
+\item{control.col}{color for control plots}
+
+\item{treatment.col}{color for treatment plots}
+
+\item{title}{title of the plot}
+
+\item{xlab}{title of x axis}
+
+\item{ylab}{title of y axis}
+
+\item{log.y}{default \code{FALSE}, if \code{TRUE} y axis will be in log}
+
+\item{drgName}{default \code{NULL} will extract drug name from data}
+
+\item{SE.plot}{plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}}
+
+\item{aspect.ratio}{default \code{1} will create equeal width and height plot}
+
+\item{minor.line.size}{line size for minor lines default \code{0.5}}
+
+\item{major.line.size}{line size for major lines default \code{0.7}}
 }
 \value{
-A list with dataframs of control, treatment and control.mean, treatment.mean
+A ggplot2 plot with control and treatment
 }
 \description{
 Plot data for a batch id or experiment design
 }
 \examples{
-#data(pdxe)
-#btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+data(pdxe)
+btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
 
 }

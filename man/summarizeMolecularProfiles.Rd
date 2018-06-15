@@ -5,7 +5,8 @@
 \title{summarizeMolecularProfiles}
 \usage{
 summarizeMolecularProfiles(object, drug, mDataType, tumor.type = NULL,
-  sensitivity.measure = NULL, unique.model = TRUE)
+  sensitivity.measure = NULL, unique.model = TRUE, batchName = NULL,
+  expDig = NULL)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}

@@ -9,8 +9,6 @@
   return(thetaD)
 }
 
-
-
 ## .computAngle(c(0,0), c(1,0), c(0,0), c(1,1))
 ## .computAngle(c(0,0), c(1,-1),c(0,0), c(1,1))
 ## anticlock wise angles are positive and clockwise are -ve
@@ -30,66 +28,116 @@
   return(angDiff)
 }
 
-
 .computSlopeFun <- function(x,y)
 {
-  data <- data.frame(x=x, y=y)
+  df <- data.frame(time=x, volume=y)
   ##---- remove all non finite (Inf, NA, NaN) data --------------
-  data <- data[is.finite(data$x), ]
-  data <- data[is.finite(data$y), ]
+  df <- df[is.finite(df$time), ]
+  df <- df[is.finite(df$volume),]
 
-  p= data$x[1]; q = data$y[1]
-  fit <- (lm(I(y-q)~I(x-p) +0, data))
-  ang <- atan(coef(fit)[["I(x - p)"]]) *180/base::pi
-  return(list(fit=fit, angel=ang, data=data))
+  df$time  <- df$time- df$time[1]
+  df$volume<- df$volume- df$volume[1]
+
+  fit <- lm(volume~time +0, df)
+  ang <- atan(coef(fit)[["time"]]) *180/base::pi
+
+  #df <- df[is.finite(df$x), ]
+  #df <- df[is.finite(df$y), ]
+  #p <- df$x[1]; q <- df$y[1]
+  #fit <- (lm(I(y-q)~I(x-p) +0, df))
+  #ang <- atan(coef(fit)[["I(x - p)"]]) *180/base::pi
+
+  #a=df$time; b=df$volume
+  #theta <- acos(sum(a*b) / ( sqrt(sum(a * a)) * sqrt(sum(b * b)) ) )
+  #theta*180/base::pi
+
+  return(list(fit=fit, angel=ang)) # , df=df))
 }
 
+####----------------------------------------------------------------------------
 
-#' @import ggplot2
-plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
-                                    title="plot", log.y=FALSE)
+#' Computes angle
+#' Compute angle for given models or batch
+#'
+#' @examples
+#' data(pdxe)
+#' angle(object=pdxe, model.id=c("X.007.BG98", "X.6047.uned"))
+#' angle(object=pdxe, batchName="X-6047.paclitaxel")
+#' @param object The \code{Xeva} dataset
+#' @param model.id The \code{model.id}
+#' @return a \code{data.fram} with treatment, control and batch.name
+#' @export
+angle <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
+                  treatment.only=TRUE, max.time=NULL, impute.value=TRUE,
+                  return.fit=FALSE)
 {
-  ##-----make one DF ----------------------------------------
-  dft = do.call(rbind, lapply(names(dt.fit), function(n)
-                       {d=dt.fit[[n]]$data; d$model.id=n; d } ))
-  dft$type = "treatment"
-
-  dfc = do.call(rbind, lapply(names(dc.fit), function(n)
-                       {d=dc.fit[[n]]$data; d$model.id=n; d } ))
-  dfc$type = "control"
-
-  DF = rbind(dft, dfc)
-
-  tcCol <- c("control" = "#6baed6", "treatment" = "#fc8d59")
-  plt <- ggplot(DF, aes_string(x="x", y="y", color= "type", group="model.id"))
-  plt <- plt + geom_line(linetype = 2)+ geom_point()
-  plt <- plt + scale_color_manual(values=tcCol)
-
-  ##-------add lm line -----------------------------------------------------------
-  plt <- plt+ geom_segment(aes(x = liC$x1, y = liC$y1, xend = liC$x2, yend = liC$y2), color="blue")
-  plt <- plt+ geom_segment(aes(x = liT$x1, y = liT$y1, xend = liT$x2, yend = liT$y2), color="red")
-
-  ##-------------------------------------------------------------------------------
-  plt <- plt + labs(title = title, x = "time", y = "volume", colour = "")
-
-  if(log.y==TRUE)
+  if(!is.null(model.id))
   {
-    plt <- plt+scale_y_continuous(trans='log')
-    plt <- plt + labs(y = "log(volume)", colour = "")
-    #plt <- plt+ coord_fixed(ratio = (max(DF$x)-min(DF$x)) / ( log(max(DF$y))- log(min(DF$y))))
+    rtx <- list()
+    for(mid in c(model.id))
+    {
+      d <- getExperiment(object, model.id= mid,treatment.only=treatment.only)
+      if(!is.null(max.time))
+      { d <- d[d$time<= max.time, ] }
 
-  } else{
-    plt <- plt+ coord_fixed(ratio = (max(DF$x)-min(DF$x)) / (max(DF$y)-min(DF$y)))
+      if(nrow(d)<2)
+      {
+        warning("too few data points to comput slope")
+        return(NA)
+      }
+
+      ang <- .computSlopeFun(d$time, d$volume.normal)
+      rtx[[mid]] <- ang
+    }
+
+    if(return.fit==FALSE)
+    {
+      rty <- sapply(rtx, "[[", "angel")
+      return(rty)
+    }
+    return(rtx)
   }
 
-  #plt <- plt + theme(aspect.ratio=1)
-  plt <- .ggplotEmptyTheme(plt)
-  plt <- plt + theme(plot.title = element_text(hjust = 0.5))
-  plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
-  return(plt)
+  if(!is.null(batchName) | !is.null(expDig))
+  {
+    bt <- getTimeVarData(object, expDig=expDig, batchName=batchName,
+                         treatment.only=treatment.only, impute.value=impute.value,
+                         max.time=max.time)
+    #compute angle -----
+    rtx <- list()
+    rty <- c(NA,NA,NA); names(rty) <- c("control.slope", "treatment.slope", "angle")
+
+    if(sum(bt$exp.type=="control")>1)
+    {
+      crAng <- .computSlopeFun(bt$time[bt$exp.type=="control"],
+                               bt$mean[bt$exp.type=="control"])
+      rtx[["control.slope"]] <- crAng
+      rty["control.slope"] <- crAng$angel
+    }
+
+    if(sum(bt$exp.type=="treatment")>1)
+    {
+      trAng <- .computSlopeFun(bt$time[bt$exp.type=="treatment"],
+                               bt$mean[bt$exp.type=="treatment"])
+      rtx[["treatment.slope"]] <- trAng
+      rty["treatment.slope"] <- trAng$angel
+    }
+
+    if(!is.null(rtx$control.slope) & !is.null(rtx$treatment.slope))
+    {
+      rtx[["angle"]] <- rtx$control.slope$angel - rtx$treatment.slope$angel
+      rty["angle"] <- rtx[["angle"]]
+    }
+
+    if(return.fit==FALSE)
+    { return(rty) }
+
+    return(rtx)
+  }
 }
 
-####-----------------------------------------------------------
+
+####----------------------------------------------------------------------------
 ### data(lpdx); object=lpdx
 ### expDegI  <- expDesign(lpdx, "PHLC111_P7")
 .computAngelFor1ExpDesign <- function(object, expDegI, var="volume", treatment.only=TRUE,
@@ -165,7 +213,6 @@ plot_Batch_angel_ggplot <- function(dt.fit, dc.fit, liC, liT,
   return(list(angle= angDiff, plot=plt))
   #return(angDiff)
 }
-
 
 ## calculate angle between control and treatment groups
 #'
