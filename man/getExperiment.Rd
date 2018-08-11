@@ -6,8 +6,8 @@
 containing all data stored in experiment slot}
 \usage{
 getExperiment(object, model.id = NULL, batchName = NULL, expDig = NULL,
-  treatment.only = FALSE, max.time = NULL, return.list = FALSE,
-  impute.value = FALSE)
+  treatment.only = FALSE, max.time = NULL, vol.normal = FALSE,
+  return.list = FALSE, impute.value = FALSE, concurrent.time = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
@@ -23,6 +23,10 @@ getExperiment(object, model.id = NULL, batchName = NULL, expDig = NULL,
 \item{max.time}{maximum time for data}
 
 \item{return.list}{default \code{FALSE} will return a datafram}
+
+\item{impute.value}{default \code{FALSE}. If TRUE will impute the values}
+
+\item{concurrent.time}{default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point}
 }
 \value{
 a \code{data.fram} will all the the values stored in experiment slot
@@ -36,5 +40,7 @@ data(pdxe)
 getExperiment(pdxe, model.id="X.6047.uned", treatment.only=TRUE)
 getExperiment(pdxe, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
 getExperiment(pdxe, batchName="X-6047.paclitaxel", treatment.only=TRUE)
+expDesign <- list(batch.name="myBatch", treatment=c("X.050.LE11","X.050.LE11.evus"), control=c("X.050.uned"))
+getExperiment(pdxe, expDig=expDesign)
 
 }

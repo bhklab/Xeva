@@ -20,21 +20,21 @@ head(df)
 
 ## ---- echo=TRUE----------------------------------------------------------
 print(batchNames(lpdx))
-df = getExperiment(lpdx, batch.name = batchNames(lpdx)[1], treatment.only = TRUE)
+df = getExperiment(lpdx, batchName = batchNames(lpdx)[1], treatment.only = TRUE)
 head(df)
 
 ## ---- echo=TRUE,fig.width = 12, fig.height = 12--------------------------
 batchNames <- batchNames(lpdx)
 expDesign  <- expDesign(lpdx, batchNames[1])
-ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
-print(ang)
+#ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
+#print(ang)
 
-for(I in batchNames)
-{
-  expDesign  <- expDesign(lpdx, I)
-  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
-  print(ang)
-}
+#for(I in batchNames)
+#{
+#  expDesign  <- expDesign(lpdx, I)
+#  ang <- calculateAngle(lpdx, expDesign, treatment.only = TRUE, plot=TRUE)
+#  print(ang)
+#}
 
 
 ## ---- echo=TRUE----------------------------------------------------------

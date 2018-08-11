@@ -6,10 +6,11 @@
 \usage{
 plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
   treatment.only = FALSE, vol.normal = FALSE, impute.value = TRUE,
-  control.col = "#6baed6", treatment.col = "#fc8d59", title = "",
-  xlab = "Time", ylab = "Volume", log.y = FALSE, drgName = NULL,
-  SE.plot = c("all", "none", "errorbar", "ribbon"), aspect.ratio = c(1,
-  NULL), minor.line.size = 0.5, major.line.size = 0.7)
+  concurrent.time = FALSE, control.col = "#6baed6",
+  treatment.col = "#fc8d59", title = "", xlab = "Time", ylab = "Volume",
+  log.y = FALSE, drug.name = NULL, SE.plot = c("all", "none", "errorbar",
+  "ribbon"), aspect.ratio = c(1, NULL), minor.line.size = 0.5,
+  major.line.size = 0.7)
 }
 \arguments{
 \item{object}{Xeva object}
@@ -38,7 +39,7 @@ plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
 
 \item{log.y}{default \code{FALSE}, if \code{TRUE} y axis will be in log}
 
-\item{drgName}{default \code{NULL} will extract drug name from data}
+\item{drug.name}{default \code{NULL} will extract drug name from data}
 
 \item{SE.plot}{plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}}
 
@@ -56,6 +57,8 @@ Plot data for a batch id or experiment design
 }
 \examples{
 data(pdxe)
-btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
-
+plt <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+expDesign <- list(batch.name="myBatch", treatment=c("X.1228.LC61.pael","X.1228.pael"), control=c("X.1228.uned"))
+plotBatch(pdxe, expDig=expDesign, vol.normal=T)
+plotBatch(pdxe, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
 }
