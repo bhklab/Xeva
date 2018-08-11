@@ -1,67 +1,49 @@
 ##--- to calculate mRECIST --------
 
-tumorVolumeChange <- function(volume)
+.tumorVolumeChange <- function(volume)
 {
-  Vini = volume[1]
-  return( sapply(volume, function(vt){ 100*(vt-Vini)/Vini }) )
+  Vini <- volume[1]
+  return(sapply(volume, function(vt){ 100*(vt-Vini)/Vini }) )
 }
 
-avgResponse <- function(volume.change)
+.avgResponse <- function(volume.change)
 {
-  ar = cumsum(volume.change)/seq(along=volume.change)
+  ar <- cumsum(volume.change)/seq(along=volume.change)
   return(ar)
 }
 
 
-checkNumericIntCharZero <- function(u)
+.checkNumericIntCharZero <- function(u)
 {
   if(length(u)==0){return(NA)}
   return(u)
 }
 
-getBestResponse <- function(time, response, min.time=NULL)
+.getBestResponse <- function(time, response, min.time=NULL)
 {
-  exdf =  data.frame(time= time, response=response)
+  exdf <-  data.frame(time= time, response=response)
   if(!is.null(min.time))
   {
     exdfMinAge = exdf[exdf$time >= min.time, ]
-  } else { exdfMinAge = exdf }
+  } else { exdfMinAge <- exdf }
 
   if(dim(exdfMinAge)[1]==0)
-  {exdfMinAge = exdf}
+  {exdfMinAge <- exdf}
 
-  minIndxA = which.min(exdfMinAge$response)
-  minIndx = minIndxA + nrow(exdf) - nrow(exdfMinAge)
+  minIndxA <- which.min(exdfMinAge$response)
+  minIndx  <- minIndxA + nrow(exdf) - nrow(exdfMinAge)
 
-  rtz = list() #time = exdf[minIndx, "time"],
-             #value= exdf[minIndx, ResColName],
-             #index= minIndx)
-
-  rtz$time  = checkNumericIntCharZero(exdf[minIndx, "time"])
-  rtz$value = checkNumericIntCharZero(exdf[minIndx, "response"])
-  rtz$index = checkNumericIntCharZero(minIndx)
+  rtz <- list()
+  rtz$time  <- .checkNumericIntCharZero(exdf[minIndx, "time"])
+  rtz$value <- .checkNumericIntCharZero(exdf[minIndx, "response"])
+  rtz$index <- .checkNumericIntCharZero(minIndx)
   return(rtz)
 }
-
-# calculateResponses <- function(time, volume, min.time=NULL)
-# {
-#   if(length(time)!= length(volume))
-#   {stop("time and volume should be of equeal lenght")}
-#
-#   exdf = list(time=time, volume=volume)
-#   exdf$volume.change = tumorVolumeChange(exdf$volume)
-#   exdf$average.response= avgResponse(exdf$volume.change)
-#
-#   exdf$best.response = getBestResponse(exdf$time, exdf$volume.change, min.time=min.time)
-#   exdf$best.average.response = getBestResponse(exdf$time, exdf$average.response, min.time=min.time)
-#
-#   return(exdf)
-# }
 
 ######################################################################
 #' Computes the mRECIST
 #'
-#' \code{computemRECIST} returns the mRECIST for given volume response
+#' \code{mRECIST} returns the mRECIST for given volume response
 #'
 #' @param time Value of best response
 #' @param volume Value of best average response
@@ -71,94 +53,47 @@ getBestResponse <- function(time, response, min.time=NULL)
 #' @examples
 #' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
-#' computemRECIST(time, volume, min.time=10, return.detail=FALSE)
+#' mRECIST(time, volume, min.time=10, return.detail=FALSE)
 #' @export
-computemRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
+mRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 {
-  exdf = list(time=time, volume=volume)
-  exdf$volume.change = tumorVolumeChange(exdf$volume)
-  exdf$average.response= avgResponse(exdf$volume.change)
-  exdf$best.response = getBestResponse(exdf$time, exdf$volume.change, min.time=min.time)
-  exdf$best.average.response = getBestResponse(exdf$time, exdf$average.response, min.time=min.time)
+  if(volume[1]==0) {volume <- volume + 1}
 
-  best.response = exdf$best.response$value
-  best.average.response = exdf$best.average.response$value
+  exdf <- list(volume.change= .tumorVolumeChange(volume))
+  exdf$average.response <- .avgResponse(exdf$volume.change)
 
-  mRecist = NA
-  if(is.na(best.response) | is.na(best.average.response) )
-  {return(mRecist)}
+  br <- .getBestResponse(time, exdf$volume.change, min.time=min.time)
+  exdf$best.response <- br$value
+  exdf$best.response.time <- br$time
+
+  bar <- .getBestResponse(time, exdf$average.response, min.time=min.time)
+  exdf$best.average.response <- bar$value
+  exdf$best.average.response.time <- bar$time
+
+  best.response <- exdf$best.response
+  best.average.response <- exdf$best.average.response
+
+  mRecist <- NA; exdf$mRECIST <- mRecist
 
   if(!is.na(best.response) & !is.na(best.average.response))
   {
     ####---- the order of mRecist assignment is really important ----------
-    mRecist = "PD"
+    mRecist <- "PD"
 
     if(best.response <  35 & best.average.response <  30)
-    {mRecist = "SD"}
+    {mRecist <- "SD"}
 
     if(best.response < -50 & best.average.response < -20)
-    {mRecist = "PR"}
+    {mRecist <- "PR"}
 
     if(best.response < -95 & best.average.response < -40)
-    {mRecist = "CR"}
+    {mRecist <- "CR"}
+
+    exdf$mRECIST <- mRecist
   }
 
-  exdf$mRecist = mRecist
-
   if(return.detail==FALSE)
-  {return(exdf$mRecist)}
+  {return(exdf$mRECIST)}
 
   return(exdf)
 }
-
-
-###===============================================================================================
-###===============================================================================================
-
-#' setmRECIST<- Generic for setmRECIST replace method
-#' @examples
-#' data(pdxe)
-#' #calculate mRECIST for each experiment
-#' setmRECIST(pdxe)<- setmRECIST(pdxe)
-#' getmRECIST(pdxe)
-#' @param object The \code{XevaSet} object
-#' @return Updated \code{XevaSet}
-setGeneric(name= "setmRECIST", def = function(object, min.time=10)
-  {standardGeneric("setmRECIST")} )
-
-#' @export
-setMethod( f="setmRECIST",
-           signature = "XevaSet",
-           definition= function(object, min.time=10)
-           {
-             if(is(object, "XevaSet"))
-             {
-               ##----- add column in sensitivity ----------------
-               object@sensitivity$model$mRECIST <- NA
-               object@sensitivity$model$best.response.time <- NA
-               object@sensitivity$model$best.response.value<- NA
-               object@sensitivity$model$best.average.response.time <- NA
-               object@sensitivity$model$best.average.response.value<- NA
-               for(modx in object@experiment)
-               {
-                 mrd = computemRECIST(modx$data$time, modx$data$volume, min.time=min.time, return.detail=TRUE)
-                 object@sensitivity$model[modx$model.id, "mRECIST"] <- mrd$mRecist
-                 object@sensitivity$model[modx$model.id, "best.response.time"] <- mrd$best.response$time
-                 object@sensitivity$model[modx$model.id, "best.response.value"]<- mrd$best.response$value
-                 object@sensitivity$model[modx$model.id, "best.average.response.time"] <- mrd$best.average.response$time
-                 object@sensitivity$model[modx$model.id, "best.average.response.value"]<- mrd$best.average.response$value
-               }
-             }
-             return(object)
-           } )
-
-
-setGeneric(name= "setmRECIST<-", def = function(object,value) {standardGeneric("setmRECIST<-")} )
-#' @export
-setMethod( f="setmRECIST<-",
-           signature= signature(object="XevaSet"),
-           definition=function(object, value)
-           {
-             object <- value
-             object
-           } )

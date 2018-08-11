@@ -1,0 +1,87 @@
+.trapz_AUC <- function (x, y)
+{
+  n <- 2:length(x)
+  auc <- as.double((x[n]-x[n - 1]) %*% (y[n] + y[n - 1]))/2
+  return(auc)
+}
+##-------- aac for 1 model ------------------------------
+#'
+#' \code{AUC} returns area under the curve
+#'
+#' @param time vector of time
+#' @param volume first vector of volume
+#' @return  returns angle and \code{slope} object
+#' @examples
+#' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' volume1<- time * tan(30*pi/180)
+#' volume2<- time * tan(45*pi/180)
+#' auc1 <- AUC(time, volume1)
+#' auc2 <- AUC(time, volume2)
+#' par(pty="s")
+#' xylimit <- range(c(time, volume1, volume2))
+#' plot(time, volume1, type = "b", xlim = xylimit, ylim = xylimit)
+#' lines(time, volume2, type = "b")
+#' abline(lm(volume1~time))
+#' abline(lm(volume2~time))
+#' @export
+AUC <- function(time, volume)
+{
+  auc <- .trapz_AUC(time, volume)
+
+  rtx <- model_response_class(name = "auc", value = auc)
+  return(rtx)
+  #return(auc)
+}
+
+#'
+#' \code{angle} returns the angle between two volume data
+#'
+#' @param contr.time time vector for control
+#' @param contr.volume volume vector for control
+#' @param treat.time time vector for treatment
+#' @param treat.volume volume vector for treatment
+#' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
+#' @return  returns angle and \code{slope}
+#' @examples
+#' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' contr.volume<- contr.time * tan(60*pi/180)
+#' treat.volume<- treat.time * tan(15*pi/180)
+#' ang <- angle(contr.time, contr.volume, treat.time, treat.volume)
+#' par(pty="s")
+#' xylimit <- range(c(time, volume1, time, volume2))
+#' plot(time, volume1, type = "b", xlim = xylimit, ylim = xylimit)
+#' lines(time, volume2, type = "b")
+#' abline(lm(volume1~time))
+#' abline(lm(volume2~time))
+#' @export
+ABC <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volume=NULL)
+{
+  con <- tre <- model_response_class(name = "auc", value = NA)
+  abc <- NA
+
+  if(!is.null(contr.time) & !is.null(contr.volume))
+  {
+    if(length(contr.volume)!=length(contr.time))
+    {
+      msg <- sprintf("contr.time and contr.volume should have same length")
+      stop(msg)
+    }
+    con <- AUC(contr.time, contr.volume)
+  }
+
+
+  if(!is.null(treat.time) & !is.null(treat.volume))
+  {
+    if(length(treat.volume)!=length(treat.time))
+    {
+      msg <- sprintf("treat.time and treat.volume should have same length")
+      stop(msg)
+    }
+    tre <- AUC(treat.time, treat.volume)
+  }
+
+  abc <- con$value - tre$value
+
+  rtx <- batch_response_class(name="abc", value=abc, control=con, treatment=tre)
+  return(rtx)
+}

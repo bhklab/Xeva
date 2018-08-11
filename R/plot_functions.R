@@ -7,11 +7,8 @@
   )
 }
 
-#' ##df = readRDS("DATA-raw/toPlot_DF.Rda")
-#' ##plotModelErrorBar(df)
-#' @export
 #' @import ggplot2
-plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d59",
+.plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d59",
                               title="", xlab = "Time", ylab = "Volume",
                               log.y=FALSE, drgName="",
                               SE.plot = c("all","none","errorbar", "ribbon"),
@@ -19,7 +16,6 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
                               aspect.ratio=c(1, NULL), minor.line.size=0.5,
                               major.line.size=0.7)
 {
-  #SE.plot <- SE.plot[1]
   SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
@@ -107,12 +103,6 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
   return(plt)
 }
 
-
-
-
-
-
-
 ######--------------------------------------------------------------------------
 ######--------------------------------------------------------------------------
 #batchName = "PHLC153_P6"
@@ -138,7 +128,7 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 #' @param xlab title of x axis
 #' @param ylab title of y axis
 #' @param log.y default \code{FALSE}, if \code{TRUE} y axis will be in log
-#' @param drgName default \code{NULL} will extract drug name from data
+#' @param drug.name default \code{NULL} will extract drug name from data
 #' @param SE.plot plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}
 #' @param aspect.ratio default \code{1} will create equeal width and height plot
 #' @param minor.line.size line size for minor lines default \code{0.5}
@@ -148,33 +138,36 @@ plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d
 #'
 #' @examples
 #' data(pdxe)
-#' btdata <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
-#'
+#' plt <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
+#' expDesign <- list(batch.name="myBatch", treatment=c("X.1228.LC61.pael","X.1228.pael"), control=c("X.1228.uned"))
+#' plotBatch(pdxe, expDig=expDesign, vol.normal=T)
+#' plotBatch(pdxe, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
 #' @export
 plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
                       treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE,
+                      concurrent.time=FALSE,
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
-                      log.y=FALSE, drgName=NULL,
+                      log.y=FALSE, drug.name=NULL,
                       SE.plot = c("all", "none", "errorbar", "ribbon"),
                       aspect.ratio=c(1, NULL),
                       minor.line.size=0.5, major.line.size=0.7)
 {
+  SE.plot <- match.arg(SE.plot)
+  aspect.ratio <- aspect.ratio[1]
+
   dfp <- getExperiment(object, batchName=batchName, expDig=expDig,
                        treatment.only=treatment.only, max.time=max.time,
-                       return.list = TRUE)
+                       vol.normal=vol.normal, return.list = TRUE,
+                       concurrent.time = concurrent.time)
 
-  dfp$mean <- getTimeVarData(object, batchName=batchName, expDig=expDig,
-                             treatment.only = treatment.only,
-                             drug.name = TRUE, vol.normal=vol.normal,
-                             impute.value=impute.value, max.time=max.time)
+  dfp$mean <- dfp$batch ##plot function uses mean as variable
+  if(is.null(drug.name))
+  {drug.name <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
 
-  if(is.null(drgName))
-  {drgName <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
-
-  plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
+  .plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
                     title=title, xlab = xlab, ylab = ylab,
-                    log.y=log.y, drgName=drgName,
+                    log.y=log.y, drgName=drug.name,
                     SE.plot = SE.plot, aspect.ratio=aspect.ratio,
                     minor.line.size=minor.line.size,
                     major.line.size=major.line.size)

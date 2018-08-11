@@ -1,4 +1,3 @@
-
 # This will comput angle from base line aka (0,0) (1,0)
 #.computAngle_New(c(0,0), c(1,1))
 #.computAngle_New(c(0,0), c(1,-1))
@@ -55,7 +54,6 @@
 }
 
 ####----------------------------------------------------------------------------
-
 #' Computes angle
 #' Compute angle for given models or batch
 #'
@@ -64,7 +62,14 @@
 #' angle(object=pdxe, model.id=c("X.007.BG98", "X.6047.uned"))
 #' angle(object=pdxe, batchName="X-6047.paclitaxel")
 #' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
+#' @param model.id The \code{model.id} for which slope is required
+#' @param batchName batch name
+#' @param expDig Experiment design list
+#' @param treatment.only default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment
+#' @param max.time maximum time point of the plot, default \code{NULL} will plot complete data
+#' @param impute.value default \code{TRUE} will impute missing values
+#' @param return.fit default \code{FALSE}. If \code{TRUE} will return \code{lm} fit also
+#'
 #' @return a \code{data.fram} with treatment, control and batch.name
 #' @export
 angle <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
@@ -76,9 +81,8 @@ angle <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
     rtx <- list()
     for(mid in c(model.id))
     {
-      d <- getExperiment(object, model.id= mid,treatment.only=treatment.only)
-      if(!is.null(max.time))
-      { d <- d[d$time<= max.time, ] }
+      d <- getExperiment(object, model.id= mid,treatment.only=treatment.only,
+                         max.time = max.time)
 
       if(nrow(d)<2)
       {
@@ -100,10 +104,11 @@ angle <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
 
   if(!is.null(batchName) | !is.null(expDig))
   {
-    bt <- getTimeVarData(object, expDig=expDig, batchName=batchName,
+    bt <- getTimeVarData(object, batchName=batchName, expDig=expDig,
                          treatment.only=treatment.only, impute.value=impute.value,
                          max.time=max.time)
-    #compute angle -----
+
+    ###----compute angle -----
     rtx <- list()
     rty <- c(NA,NA,NA); names(rty) <- c("control.slope", "treatment.slope", "angle")
 
@@ -136,7 +141,8 @@ angle <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
   }
 }
 
-
+####----------------------------------------------------------------------------
+####----------------------------------------------------------------------------
 ####----------------------------------------------------------------------------
 ### data(lpdx); object=lpdx
 ### expDegI  <- expDesign(lpdx, "PHLC111_P7")
@@ -376,10 +382,6 @@ setMethod( f="setSlope<-",
            signature=c(object = "XevaSet"),
            definition=function(object, value)
            {
-             #for(model.id in names(object@experiment))
-             #{
-             #   object@experiment[[model.id]]$slope = value[[model.id]]
-             #}
              object@sensitivity$model$slope <- NA
              ck1 <- symmetricSetDiff(rownames(object@sensitivity$model), names(value))
              if(length(ck1)!=0)

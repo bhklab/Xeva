@@ -1,3 +1,5 @@
+.foo<- function()
+{
 if(1==2)
 {
 
@@ -67,6 +69,4 @@ checkExperimentSlotVariable <- function(object, value)
 
 
 }
-
-
-
+}

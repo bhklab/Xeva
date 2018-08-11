@@ -82,7 +82,6 @@ setMethod( f=aac,
              .aacFor1ModelId <- function(object, model.id, treatment.only)
              {
                DFx <- getExperiment(object, model.id=model.id, treatment.only = treatment.only)
-               #vnor <- (DFx$volume- DFx$volume[1])/(DFx$volume[1])
                aac <- .getAAC(DFx$time, DFx$volume.normal)
                return(aac)
              }

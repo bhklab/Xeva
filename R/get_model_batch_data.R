@@ -14,7 +14,6 @@
   return(rtx)
 }
 
-
 .smoothCurve <- function(trDF, tsDF, x, y, approx.method="approx")
 {
   lmdf <- data.frame(X=trDF[,x], Y=trDF[,y])
@@ -85,13 +84,13 @@
 
 .getExperimentMultipalIDs <- function(object, mids, treatment.only=TRUE,
                                       max.time=NULL, return.list=TRUE,
-                                      impute.value=FALSE, var="volume")
+                                      impute.value=FALSE, vol.normal=FALSE,
+                                      var="volume")
 {
   rtx <- list()
   for(i in mids)
   {
     miD <- .getExperimentDataFromAExpID(object, model.id=i, treatment.only=treatment.only)
-    if(!is.null(max.time)) { miD <- miD[miD$time<=max.time, ]}
     rtx[[i]] <- miD
   }
 
@@ -109,20 +108,31 @@
       rtx <- inLst2
     }
 
+    for(i in names(rtx))
+    {
+      miD <- rtx[[i]]
+      if(vol.normal==TRUE)
+      {
+        miD$volume.raw <- miD$volume
+        miD$volume <- miD$volume.normal
+        miD$volume.normal <- NULL
+      }
+
+      if(!is.null(max.time))
+      { miD <- miD[miD$time<=max.time, ]}
+
+      rtx[[i]]<- miD
+    }
+
     if(return.list==FALSE)
     { rtx <- .rbindListOfDataframs(rtx) }
   }
   return(rtx)
 }
 
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-# To tolrate both types of expDig list
-# expDig <- list(batch.name="myBatch",treatment=c("a","b"), control=c("c","d"))
-# .reformatExpDesig(expDig)
-# .reformatExpDesig(list(myBatch=expDig))
-#
 .reformatExpDesig <- function(expDig)
 {
   if(any(c("batch.name", "treatment", "control") %in% names(expDig)))
@@ -132,8 +142,62 @@
   names(expDig) <- sapply(expDig, "[[", "batch.name")
   return(expDig)
 }
+
+## collapse time-vol data based on expDesign
+.collapseRplicate <- function(inLst, var = "volume")
+{
+  if(is.null(names(inLst))){names(inLst) <- sapply(inLst, function(x){ x$model.id[1]})}
+  timeAll <- sort(unique(unlist(lapply(inLst, "[[", "time" ))))
+  rd <- data.frame()
+  for(t in timeAll)
+  {
+    vx <- unlist(sapply(inLst, function(x){ x[x$time==t, var]}))
+    vx <- vx[!is.na(vx)]
+    vz <- as.list(Rmisc::STDERR(vx))
+    rd <- rbind(rd, data.frame(time=t, mean=vz$mean, upper= vz$upper, lower= vz$lower))
+  }
+  return(rd)
+}
+
+.getTimeVarData <- function(dfp, drug.name=TRUE, var="volume")
+{
+  df <- data.frame()
+  if(!is.null(dfp$control))
+  {
+    dfc <- .collapseRplicate(dfp$control, var = var)
+    dfc$exp.type <- "control"
+
+    if(drug.name==TRUE)
+    {
+      drugAll <- sort(unique(unlist(lapply(dfp$control, "[[", "drug.join.name"))))
+      if(length(drugAll)>1)
+      { warning("multipal drugs for batch, will colleps by ;") }
+      dfc$drug.name <- paste(drugAll, collapse = ";")
+    }
+    df <- rbind(df, dfc)
+  }
+
+  if(!is.null(dfp$treatment))
+  {
+    dft <- .collapseRplicate(dfp$treatment, var = var)
+    dft$exp.type <- "treatment"
+
+    if(drug.name==TRUE)
+    {
+      drugAll <- sort(unique(unlist(lapply(dfp$treatment, "[[", "drug.join.name"))))
+      if(length(drugAll)>1)
+      { warning("multipal drugs for batch, will colleps by ;") }
+      dft$drug.name <- paste(drugAll, collapse = ";")
+    }
+
+    df <- rbind(df, dft)
+  }
+  return(df)
+}
+
 .getBatchData <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE,
-                          max.time=NULL, return.list=TRUE, impute.value=FALSE)
+                          max.time=NULL, return.list = TRUE, impute.value=FALSE,
+                          vol.normal=FALSE, drug.name=TRUE, concurrent.time=FALSE)
 {
   if(is.null(batchName) & is.null(expDig))
   { stop("please provide 'batchName' or 'expDig'") }
@@ -148,13 +212,11 @@
     dfp$control <- .getExperimentMultipalIDs(object, mids=expDig$control,
                                              treatment.only=treatment.only,
                                              max.time=max.time,
-                                             return.list = return.list,
-                                             impute.value=impute.value)
-    if(return.list==TRUE)
-    {
-      for(ci in 1:length(dfp$control))
-      { dfp$control[[ci]]$exp.type <- "control"}
-    } else{ dfp$control$exp.type <- "control"}
+                                             return.list = TRUE, #return.list,
+                                             impute.value=impute.value,
+                                             vol.normal=vol.normal)
+    for(ci in 1:length(dfp$control))
+    { dfp$control[[ci]]$exp.type <- "control"}
   }
 
   if(length(expDig$treatment)>0)
@@ -162,33 +224,65 @@
     dfp$treatment <- .getExperimentMultipalIDs(object, mids=expDig$treatment,
                                                treatment.only=treatment.only,
                                                max.time=max.time,
-                                               return.list = return.list,
-                                               impute.value=impute.value)
+                                               return.list = TRUE, #return.list,
+                                               impute.value=impute.value,
+                                               vol.normal=vol.normal)
+    for(ti in 1:length(dfp$treatment))
+    { dfp$treatment[[ti]]$exp.type <- "treatment"}
+  }
 
-    if(return.list==TRUE)
+  dfp$batch <- .getTimeVarData(dfp, drug.name = drug.name)
+
+  if(concurrent.time==TRUE)
+  {
+    mc <- mt <- NA
+    if("control" %in% dfp$batch$exp.type)
+    { mc <- max(dfp$batch[dfp$batch$exp.type=="control", "time"])}
+    if("treatment" %in% dfp$batch$exp.type)
+    { mt <- max(dfp$batch[dfp$batch$exp.type=="treatment", "time"])}
+
+    tx <- c(mc, mt); tx <- tx[!is.na(tx)]
+    if(length(tx)>1)
     {
-      for(ti in 1:length(dfp$treatment))
-      { dfp$treatment[[ti]]$exp.type <- "treatment"}
-    } else{ dfp$treatment$exp.type <- "treatment"}
+      dfp$batch <- dfp$batch[dfp$batch$time<=min(tx), ]
+      if(!is.null(dfp$control))
+      {
+        for(ci in 1:length(dfp$control))
+        { dfp$control[[ci]] <- dfp$control[[ci]][dfp$control[[ci]]$time<=min(tx),]}
+      }
+
+      if(!is.null(dfp$treatment))
+      {
+        for(ci in 1:length(dfp$treatment))
+        { dfp$treatment[[ci]] <- dfp$treatment[[ci]][dfp$treatment[[ci]]$time<=min(tx),]}
+      }
+    }
   }
 
   if(return.list==TRUE)
-  {return(dfp)}
+  { rtx <- dfp } else
+  {
+    rtx <- list(batch= dfp$batch)
+    rtx$model <- data.frame()
+    if(length(dfp$control)>0)
+    { rtx$model <- .rbindListOfDataframs(dfp$control) }
 
-  dfp <- .rbindListOfDataframs(dfp)
-  return(dfp)
+    if(length(dfp$treatment)>0)
+    { rtx$model <- rbind(rtx$model, .rbindListOfDataframs(dfp$treatment)) }
+  }
+
+  return(rtx)
 }
+
+##------------------------------------------------------------------------------
+
+
+
 
 ##--------------------------------------------------------------------------------------------------
 ##----- get experiment data in flat data.fram ------------------------------------------------------
 #' For a given  model.id, it will return a data.fram
 #' containing all data stored in experiment slot
-#'
-#' @examples
-#' data(pdxe)
-#' getExperiment(pdxe, model.id="X.6047.uned", treatment.only=TRUE)
-#' getExperiment(pdxe, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
-#' getExperiment(pdxe, batchName="X-6047.paclitaxel", treatment.only=TRUE)
 #'
 #' @param object The \code{XevaSet}
 #' @param model.id The \code{model.id} for which data is required, multipal allowed
@@ -196,21 +290,34 @@
 #' @param expDig Experiment design
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @param max.time maximum time for data
+#' @param vol.normal default \code{TRUE} will use
 #' @param return.list default \code{FALSE} will return a datafram
+#' @param impute.value default \code{FALSE}. If TRUE will impute the values
+#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
+#'
+#' @examples
+#' data(pdxe)
+#' getExperiment(pdxe, model.id="X.6047.uned", treatment.only=TRUE)
+#' getExperiment(pdxe, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
+#' getExperiment(pdxe, batchName="X-6047.paclitaxel", treatment.only=TRUE)
+#' expDesign <- list(batch.name="myBatch", treatment=c("X.050.LE11","X.050.LE11.evus"), control=c("X.050.uned"))
+#' getExperiment(pdxe, expDig=expDesign)
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(name = "getExperiment",
            def = function(object, model.id=NULL, batchName=NULL, expDig=NULL,
-                          treatment.only=FALSE, max.time=NULL,
-                          return.list = FALSE, impute.value=FALSE)
+                          treatment.only=FALSE, max.time=NULL, vol.normal=FALSE,
+                          return.list = FALSE, impute.value=FALSE,
+                          concurrent.time=FALSE)
            {standardGeneric("getExperiment")} )
 
 #' @export
 setMethod( f=getExperiment,
            signature="XevaSet",
            definition=function(object, model.id=NULL, batchName=NULL, expDig=NULL,
-                               treatment.only=FALSE, max.time=NULL,
-                               return.list = FALSE, impute.value=FALSE)
+                               treatment.only=FALSE, max.time=NULL, vol.normal=FALSE,
+                               return.list = FALSE, impute.value=FALSE,
+                               concurrent.time=FALSE)
            {
              if(is.null(model.id) & is.null(batchName) & is.null(expDig))
              {
@@ -225,7 +332,8 @@ setMethod( f=getExperiment,
                                                 treatment.only=treatment.only,
                                                 max.time=max.time,
                                                 return.list = return.list,
-                                                impute.value=impute.value)
+                                                impute.value=impute.value,
+                                                vol.normal=vol.normal)
 
                if(!is.null(max.time))
                { rtz <- rtz[rtz$time<=max.time, ] }
@@ -236,7 +344,9 @@ setMethod( f=getExperiment,
                rtz <- .getBatchData(object, batchName=batchName, expDig=expDig,
                                     treatment.only=treatment.only, max.time=max.time,
                                     return.list = return.list,
-                                    impute.value=impute.value)
+                                    impute.value=impute.value,
+                                    vol.normal=vol.normal,
+                                    concurrent.time=concurrent.time)
              }
              return(rtz)
            })
@@ -244,65 +354,16 @@ setMethod( f=getExperiment,
 
 ###-----------------------------------------------------------------------------
 ##------------------------------------------------------------------------------
-
-##------------------------------------------------------------------------------
-## collapse time-vol data based on expDesign
-.collapseRplicate <- function(inLst, var = "volume")
-{
-  if(is.null(names(inLst))){names(inLst) <- sapply(inLst, function(x){ x$model.id[1]})}
-  # if(impute.value==TRUE)
-  # {
-  #   inLst2 <- list()
-  #   timeVec <- sort(unique(unlist(lapply(inLst, "[[", "time" ))))
-  #   for(mid in names(inLst))
-  #   {
-  #     dw <- inLst[[mid]]
-  #     inLst2[[mid]] <- .smoothModel(dw, timeVec=timeVec, var =var)
-  #   }
-  #   inLst <- inLst2
-  # }
-
-  timeAll <- sort(unique(unlist(lapply(inLst, "[[", "time" ))))
-  rd <- data.frame()
-  for(t in timeAll)
-  {
-    vx <- unlist(sapply(inLst, function(x){ x[x$time==t, var]}))
-    vx <- vx[!is.na(vx)]
-    vz <- as.list(Rmisc::STDERR(vx))
-    rd <- rbind(rd, data.frame(time=t, mean=vz$mean, upper= vz$upper, lower= vz$lower))
-  }
-  return(rd)
-}
-
-
-
-#' Get time vs volume data with standard error
-#'
-#' Given a batch (treatment and control model ids)
-#' it will return a data.fram with time vs volume (or any other variable)
-#' with standard error calculated. Note that this function do not check if
-#' model.id in given batch belongs to same patient
-#'
-#' @examples
-#' data(pdxe)
-#' # creat a experiment desing
-#' ExpDesign = list(batch.name="myBatch", treatment=c("X.010.BG98", "X.010.BG98"), control=c("X.010.uned"))
-#' df = getTimeVarData(object=pdxe, ExpDesign, var = "volume")
-#'
-#' @param object The \code{Xeva} dataset
-#' @param ExpDesign A list with batch.name, treatment and control
-#' @param var Name of the variable, default \code{volume}
-#' @param drug.name \code{FALSE}. If \code{TRUE} will return drug name also
-#' @return a \code{data.fram} with treatment, control and batch.name
-#' @export
 getTimeVarData <- function(object, batchName=NULL, expDig=NULL, var = "volume",
                            treatment.only=FALSE, drug.name=FALSE,
                            vol.normal=FALSE, impute.value=TRUE, max.time=NULL)
 {
+  warning("Do not use this function, use getExperiment ")
 
   dl <- .getBatchData(object, batchName=batchName, expDig=expDig,
-                       treatment.only=treatment.only, max.time=max.time,
-                       return.list=TRUE, impute.value=impute.value)
+                      treatment.only=treatment.only, max.time=max.time,
+                      return.list=TRUE, impute.value=impute.value,
+                      vol.normal=vol.normal)
 
   df <- data.frame()
   if(!is.null(dl$control))
