@@ -14,16 +14,16 @@ drugMatchFun <- function(drug, objPDX, exact.match)
   return(FALSE)
 }
 
-tumorTypeMatchFun<- function(tumor.type, objPDX)
+tumorTypeMatchFun<- function(tissue, objPDX)
 {
 
-  if (toupper(tumor.type) == toupper(objPDX$tumor.type))
+  if (toupper(tissue) == toupper(objPDX$tissue))
   {return(TRUE)}
 
   return(FALSE)
 }
 
-getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tumor.type=NULL)
+getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tissue=NULL)
 {
   objIndx = list()
   if(!(is.null(drug)))
@@ -32,9 +32,9 @@ getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tumor.type=NULL
     objIndx[["Drug"]] = sapply(expSlot, drugMatchFun, drug=drug, exact.match=drug.exact.match)
   }
 
-  if(!(is.null(tumor.type)))
+  if(!(is.null(tissue)))
   {
-    objIndx[["tumor.type"]] = sapply(expSlot, tumorTypeMatchFun, tumor.type=tumor.type)
+    objIndx[["tissue"]] = sapply(expSlot, tumorTypeMatchFun, tissue=tissue)
   }
 
   rtIndx = apply( do.call(cbind.data.frame, objIndx), 1, all )
@@ -109,15 +109,6 @@ getExpDesign <- function(objNames, expDesign)
   return(expDesign[expDesName])
 }
 
-
-
-getExperimentValues <- function(object, name = c("experiment.id"))
-{
-  #object = pdxe
-  #name = c("drug", "join.name")
-  rt  = sapply(object@experiment, "[[", c(name))
-  return(rt)
-}
 
 
 

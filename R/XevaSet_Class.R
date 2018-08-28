@@ -14,26 +14,18 @@ XevaSet <- setClass( "XevaSet",
 
 ######################################################################
 #' Creat Xeva class object
-#'
 #' \code{creatXevaSet} returns Xeva class object
 #'
-#' @param name A \code{character} string detailing the name of the dataset
-#' @param molecularProfiles A \code{list} of ExpressionSet objects containing molecular profiles
-#' @param experiment A \code{data.frame} containg all experiment information
-#' @param model A \code{data.frame} containg the annotations for all models used in the experiment
-#' @param drug A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types
+#' @param name a \code{character} string detailing the name of the dataset
+#' @param molecularProfiles a \code{list} of ExpressionSet objects containing different molecular profiles
+#' @param experiment a \code{data.frame} containg all experiment information
+#' @param model a \code{data.frame} containg the annotations for all models used in the experiment
+#' @param drug a \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types
 #'
 #' @return  Returns Xeva object
 #'
 #' @examples
-#' geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
-#' pdxe = creatPharmacoPxSet(name = "PDXE",
-#'                           molecularProfiles = list(RNASeq = geoExp$RNASeq),
-#'                           experiment = geoExp$experiment,
-#'                           model = geoExp$model,
-#'                           drug  = geoExp$drug )
-#' save(pdxe, file = "data/pdxe.rda")
-#' data("pdxe")
+#' \code{NULL}
 #' @export
 #' @import methods
 creatXevaSet <- function(name,
@@ -57,7 +49,7 @@ creatXevaSet <- function(name,
   drug <- .checkDrugSlot(drug)
   modToBiobaseMap <- .checkmodToBiobaseMapSlot(modToBiobaseMap, molecularProfiles)
 
-  pxset = XevaSet(annotation = annotation,
+  pxset <- XevaSet(annotation = annotation,
                   model = model,
                   drug  = drug,
                   sensitivity = sensitivity,
@@ -73,25 +65,17 @@ creatXevaSet <- function(name,
 ##===============================================================================
 #' A method to display object
 #' for "show" setGeneric is already defined
-#' @export
 #' @import methods
-setMethod(f="show",
-          signature="XevaSet",
-          definition= function(object)
+setMethod(f="show", signature="XevaSet", definition= function(object)
           {
-            msg <- sprintf(
-"Xeva-set name: %s
-Creation date: %s
-Number of models: %d
-Number of drugs: %d
-Moleculer dataset: %s\n",
-object@annotation$name, object@annotation$dateCreated,
-length(object@experiment), dim(object@drug)[1],
-paste(names(object@molecularProfiles), collapse = ", ")
-)
+            msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
+                           slot(object, "annotation")$name, slot(object, "annotation")$dateCreated,
+                           length(slot(object, "experiment")), nrow(slot(object, "drug")),
+                           paste(names(slot(object, "molecularProfiles")), collapse = ", ")
+                           )
             cat(msg)
           }
-)
+          )
 
 
 

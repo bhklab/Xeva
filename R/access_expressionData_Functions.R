@@ -7,8 +7,8 @@
 #' @param data.type \code{character}, which one of the molecular data types is needed
 #' @return a \code{ExpressionSet} where sample names are \code{biobase.id} of model
 #' @examples
-#' data(pdxe)
-#' pdxe_RNA <- getMolecularProfiles(pdxe, data.type="RNASeq")
+#' data(brca)
+#' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
 #' @export
 getMolecularProfiles <- function(object, data.type)
 {
@@ -54,7 +54,7 @@ getMolecularProfiles <- function(object, data.type)
   return(bat2mods)
 }
 
-.modelID2biobaseID <- function(object, mDataType, drug=NULL, tumor.type=NULL, unique.model=TRUE)
+.modelID2biobaseID <- function(object, mDataType, drug=NULL, tissue=NULL, unique.model=TRUE)
 {
   modIn <- modelInfo(object, mDataType = mDataType)
   if(unique.model==TRUE)
@@ -72,12 +72,12 @@ getMolecularProfiles <- function(object, data.type)
     }
   }
 
-  if(!is.null(tumor.type))
+  if(!is.null(tissue))
   {
-    modIn <- modIn[modIn$tumor.type %in% c(tumor.type), ]
+    modIn <- modIn[modIn$tissue %in% c(tissue), ]
     if(nrow(modIn)==0)
     {
-      msg <- sprintf("No model present with tumor.type %s ", tumor.type)
+      msg <- sprintf("No model present with tissue %s ", tissue)
       stop(msg)
     }
   }
@@ -87,10 +87,10 @@ getMolecularProfiles <- function(object, data.type)
   if(nrow(modIn)==0)
   {
     msg <- sprintf("No model present for drug %s with molecular data type %s", drug, mDataType)
-    if(!is.null(tumor.type))
+    if(!is.null(tissue))
     {
-      msg <- sprintf("No model present for drug %s and tumor type %s with molecular data type %s",
-                     drug, tumor.type, mDataType)
+      msg <- sprintf("No model present for drug %s and tissue %s with molecular data type %s",
+                     drug, tissue, mDataType)
     }
     stop(msg)
   }
@@ -105,14 +105,14 @@ getMolecularProfiles <- function(object, data.type)
 #' @param object The \code{XevaSet}
 #' @param drug Name of the drug
 #' @param mDataType \code{character}, which one of the molecular data types is needed
-#' @param tumor.type default \code{NULL} will return all across all tumor.type
+#' @param tissue default \code{NULL} will return all across all tissue
 #' @param sensitivity.measure default \code{NULL} will return all sensitivity measure
 #' @param unique.model default TRUE will return only one sequncing id, in case where one model id mapes to several sequencing ids
 #' @return A \code{ExpressionSet} where sample names are model.id and sensitivity measure will be present in pData
 #' @examples
-#' data(pdxe)
-#' pacRNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
-#'                                      tumor.type= "BRCA", sensitivity.measure="mRECIST")
+#' data(brca)
+#' pacRNA <- summarizeMolecularProfiles(brca, drug="paclitaxel", mDataType="RNASeq",
+#'                                      tissue= "BRCA", sensitivity.measure="mRECIST")
 #' print(pacRNA)
 #' @details
 #' \itemize{
@@ -121,7 +121,7 @@ getMolecularProfiles <- function(object, data.type)
 #' \item {All the models without the moleculer data will be removed from the output expression set.}
 #' }
 #' @export
-summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
+summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
                                        sensitivity.measure=NULL, unique.model=TRUE,
                                        batchName=NULL, expDig=NULL)
 {
@@ -160,7 +160,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
     if(is.null(sensitivity.measure))
     { sensitivity.measure <- colnames(sm)[!(colnames(sm) %in% c("model.id", "batch.name"))] }
 
-    modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tumor.type=tumor.type,
+    modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tissue=tissue,
                                 unique.model=unique.model)
     modIn <- modInX$data; bioName <- modInX$bioName
 
@@ -206,7 +206,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
       btDF[btDF$batch.name==bn, sensitivity.measure] <- sm[sm$batch.name==bn, sensitivity.measure]
     }
 
-    modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tumor.type=tumor.type,
+    modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tissue=tissue,
                                  unique.model=unique.model)
     modIn <- modInX$data; bioName <- modInX$bioName
 
@@ -252,7 +252,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
 
 
 
-# old_summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
+# old_summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
 #                                            sensitivity.measure=NULL, unique.model=TRUE)
 # {
 #   modIn <- modelInfo(object, mDataType = mDataType)
@@ -267,12 +267,12 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
 #     stop(msg)
 #   }
 #
-#   if(!is.null(tumor.type))
+#   if(!is.null(tissue))
 #   {
-#     modIn <- modIn[modIn$tumor.type %in% c(tumor.type), ]
+#     modIn <- modIn[modIn$tissue %in% c(tissue), ]
 #     if(nrow(modIn)==0)
 #     {
-#       msg <- sprintf("No model present with tumor.type %s ", tumor.type)
+#       msg <- sprintf("No model present with tissue %s ", tissue)
 #       stop(msg)
 #     }
 #   }
@@ -282,10 +282,10 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tumor.type=NULL,
 #   if(nrow(modIn)==0)
 #   {
 #     msg <- sprintf("No model present for drug %s with molecular data type %s", drug, mDataType)
-#     if(!is.null(tumor.type))
+#     if(!is.null(tissue))
 #     {
-#       msg <- sprintf("No model present for drug %s and tumor type %s with molecular data type %s",
-#                      drug, tumor.type, mDataType)
+#       msg <- sprintf("No model present for drug %s and tissue %s with molecular data type %s",
+#                      drug, tissue, mDataType)
 #     }
 #     stop(msg)
 #   }
