@@ -14,3 +14,4 @@ df <- data.frame(a=1:5, b=11:15)
 msg <- sprintf("data frame is:\\n\%s", printAndCapture(df))
 warning(msg)
 }
+\keyword{internal}
