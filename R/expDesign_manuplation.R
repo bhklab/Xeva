@@ -13,50 +13,54 @@
 #'
 #' Add a new experimental design in expDesign slot.
 #' @examples
-#' data(pdxe)
-#' pdxe = addExperimentalDesign(object=pdxe, treatment= c("X.010.BG98"), control=c("X.010.uned"),
-#'                              batch.name="new.batch", replace=FALSE)
+#' data(brca)
+#' brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
+#' control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
+#'
 #' @param object The \code{Xeva} dataset
 #' @param treatment The \code{model.id} of treatment
 #' @param control The \code{model.id} of control
-#' @param batch.name The \code{batch.name} for new batch
+#' @param batch.id The \code{batch.id} for new batch
 #' @param replace If TRUE will replace the old batch with new values
 #' @return returns \code{Xeva} dataset with new experimental design added
 setGeneric(name = "addExperimentalDesign",
-           def = function(object, treatment, control=NULL, batch.name=NULL,replace=FALSE)
+           def = function(object, treatment=NULL, control=NULL, batch.id=NULL,replace=FALSE)
                           {standardGeneric("addExperimentalDesign")} )
-
 #' @export
 setMethod( f=addExperimentalDesign,
            signature=c(object="XevaSet"),
-           definition= function(object, treatment, control=NULL, batch.name=NULL, replace=FALSE)
-           {
-
-             allBatchName = sapply(object@expDesign, '[[', "batch.name")
-             if(!is.null(batch.name))
+           definition= function(object, treatment=NULL, control=NULL,
+                                batch.id=NULL, replace=FALSE)
              {
-               if(is.element(batch.name, allBatchName)==TRUE)
+              if(is.null(treatment) & is.null(control) )
+              { stop("treatment and control both can't be NULL") }
+
+              for(mi in unlist(c(treatment,control)))
+              {
+                if(!(mi %in% names(slot(object, "experiment")) ))
+                {
+                  stop(sprintf("model.id %s not present in dataset", mi))
+                }
+              }
+
+             allBatchName <- sapply(slot(object, "expDesign"), '[[', "batch.name")
+             if(!is.null(batch.id))
+             {
+               if(is.element(batch.id, allBatchName)==TRUE)
                {
                  if(replace==FALSE){
-                 msg = sprintf("\nbatch.name %s already exist\nPlease give a new name\n", batch.name)
+                 msg = sprintf("\nbatch.id %s already exist\nPlease give a new name\n", batch.id)
                  stop(msg)}
 
                  if(replace==TRUE){
-                   msg = sprintf("\nThis will replace the old batch.name %s\n", batch.name)
+                   msg = sprintf("\nThis will replace the old batch.id %s\n", batch.id)
                    cat(msg)}
                }
-             } else
-             { batch.name = .generateNewNameForBatch(allBatchName, "batch")}
-
-             #object@expDesign = .appendToList(object@expDesign,
-             #                                list(batch.name=batch.name,
-             #                                     treatment=c(treatment),
-             #                                      control=c(control) ))
-             object@expDesign[[batch.name]] = list(batch.name=batch.name,
+             }
+             slot(object, "expDesign")[[batch.id]] <- list(batch.name=batch.id,
                                                    treatment=c(treatment),
-                                                   control=c(control) )
-
-             return(object)
+                                                   control=c(control))
+           return(object)
            })
 
 

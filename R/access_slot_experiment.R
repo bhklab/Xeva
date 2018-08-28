@@ -1,83 +1,87 @@
 
 .subsetExperimentSlotForDrug <- function(object, drugName, exact.match=TRUE)
 {
-  drgNames = stringr::str_trim(strsplit(drugName, "\\+")[[1]])
-  expList = c()
-  for(Ix in object@experiment)
+  dnSplit <- strsplit(drugName, "\\+")[[1]]
+  rdx <- data.frame()
+  for(Ix in slot(object, "experiment"))
   {
     if(exact.match==TRUE)
     {
-      if(length(drgNames) == length(Ix$drug$names))
+      if(drugName==slot(Ix, "drug")[["join.name"]])
       {
-        if(all(drgNames %in% Ix$drug$names)==TRUE)
-        {expList = c(expList, Ix$model.id)}
+        rdx <- rbind(rdx, data.frame(model.id=slot(Ix, "model.id"), drug=drugName,
+                                     stringsAsFactors = FALSE))
       }
     }
-    ###------------------------------------------------
+
     if(exact.match==FALSE)
     {
-      if(any(drgNames %in% Ix$drug$names)==TRUE)
-      {expList = c(expList, Ix$model.id)}
+      if(any(dnSplit %in% slot(Ix, "drug")[["names"]])==TRUE)
+      {
+        rdx <- rbind(rdx, data.frame(model.id=slot(Ix, "model.id"),
+                                     drug=slot(Ix, "drug")[["join.name"]],
+                                     stringsAsFactors = FALSE))
+      }
     }
-    ###------------------------------------------------
   }
-  rdx = data.frame(model.id=unique(expList), drug=drugName, stringsAsFactors = FALSE)
   return(rdx)
 }
 
 ##-----------------------------------------------------------------------------------------------------
 ##-----------------------------------------------------------------------------------------------------
-##----- select model.id based on drug, tumor.type -----------------------------------------------------
-#' To select model ids based on drug name and/or tumor type
+##----- select model.id based on drug, tissue -----------------------------------------------------
+#' To select model ids based on drug name and/or tissue
 #' @examples
-#' data(pdxe)
-#' selectModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+#' data(brca)
+#' selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
+#' selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
 #' @param object The \code{XevaSet}
 #' @param drug Name of the \code{drug}
 #' @param drug.match.exact Default \code{TRUE}
-#' @param tumor.type Tumor type. Default \code{NULL}
+#' @param tissue Tumor type. Default \code{NULL}
 #'
 #' @return a \code{vector} with the matched model.ids
 #'
 setGeneric(name = "selectModelIds",
            def = function(object,
                           drug=NULL, drug.match.exact=TRUE,
-                          tumor.type=NULL)
+                          tissue=NULL)
            {standardGeneric("selectModelIds")} )
 
 #' @export
 setMethod( f=selectModelIds, signature="XevaSet",
            definition=function(object,
                                drug=NULL, drug.match.exact=TRUE,
-                               tumor.type=NULL)
+                               tissue=NULL)
            {
-             if(is.null(drug) & is.null(tumor.type))
-             {stop("drug and tumor.type both NULL, Please provide atleast one")}
+             if(is.null(drug) & is.null(tissue))
+             {stop("drug and tissue both NULL, Please provide atleast one")}
 
-             ExpIdsDrug = NULL
+             ExpIdsDrug <- NULL
              if(!is.null(drug))
              {
-               drug = c(drug)
-               ExpIdsDrug = .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
+               ExpIdsDrug <- .subsetExperimentSlotForDrug(object, drug, exact.match=drug.match.exact)
              }
 
-             ExpIdsTumor = NULL
-             if(!is.null(tumor.type))
+             ExpIdsTumor <- NULL
+             if(!is.null(tissue))
              {
-               tumor.type = c(tumor.type)
-               ExpIdsTumor = mapModelSlotIds(object, id = tumor.type, id.name = "tumor.type", map.to="all")
+               ExpIdsTumor <- mapModelSlotIds(object, id = tissue, id.name = "tissue", map.to="all")
              }
 
+             if(!is.null(drug) & is.null(tissue))
+             { return(ExpIdsDrug) }
 
-             if(!is.null(drug) & is.null(tumor.type))
-             { return(ExpIdsDrug$model.id) }
+             if(is.null(drug) & !is.null(tissue))
+             { return(ExpIdsTumor) }
 
-             if(is.null(drug) & !is.null(tumor.type))
-             { return(ExpIdsTumor$model.id) }
-
-             if(!is.null(drug) & !is.null(tumor.type))
+             if(!is.null(drug) & !is.null(tissue))
              {
-               rtx = intersect(ExpIdsDrug$model.id, ExpIdsTumor$model.id)
+               #rtx <- intersect(ExpIdsDrug$model.id, ExpIdsTumor$model.id)
+               cmid <- intersect(ExpIdsDrug$model.id, ExpIdsTumor$model.id)
+               ExpIdsDrug <- ExpIdsDrug[ExpIdsDrug$model.id %in% cmid,]
+               ExpIdsTumor<- ExpIdsTumor[ExpIdsTumor$model.id%in% cmid,]
+               rtx <- merge(ExpIdsDrug, ExpIdsTumor, by="model.id")
                return(rtx)
              }
            })
@@ -95,18 +99,16 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #' @return  Prints object, model or batch information.
 #'
 #' @examples
-#' data(pdxe)
-#' # to print object information
-#' print(pdxe)
+#' data(brca)
+#' print(brca)
 #'
 #' # to print a model
-#' model.id = modelInfo(pdxe)$model.id[1]
-#' print(pdxe, id = model.id)
+#' print(brca, id = "X.1004.BG98")
 #'
 #' # to print a batch
-#' batch.id = batchNames(pdxe)[1]
-#' print(pdxe, id = batch.id)
-#' @export
+#' print(brca, id = "X-1004.BGJ398")
+#' @keywords internal
+#### @export
 print.XevaSet <- function(object, id=NULL)
 {
   if(is.null(id))
@@ -120,12 +122,13 @@ print.XevaSet <- function(object, id=NULL)
       stop(msg)
     }
     mod <- slot(object, "experiment")[[id]]
-    if(is.null(mod))
+    if(!is.null(mod))
+    {show(mod)} else
     {
       mod <- slot(object, "expDesign")[[id]]
+      print(mod)
     }
-    print(mod)
   }
 }
-##--------------------------------------------------------------------------------
+##------------------------------------------------------------------------------
 

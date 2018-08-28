@@ -2,7 +2,7 @@
 
 creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 {
-  rtx = list()
+  rtx <- list()
   exp.mod.dg <- data.frame(lapply(exp.mod.dg, as.character), stringsAsFactors=FALSE)
 
   rtx$model.id = unique(exp.mod.dg$model.id)
@@ -12,8 +12,8 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   drug = list("join.name" = unique(exp.mod.dg$drug))
   if(length(drgColName.No)>1)
   {
-    drug.N = sapply(drgColName.No, function(x){unique(exp.mod.dg[,x])  })
-    drug.N = drug.N[!is.na(drug.N)]
+    drug.N <- sapply(drgColName.No, function(x){unique(exp.mod.dg[,x])  })
+    drug.N <- drug.N[!is.na(drug.N)]
     drug[["names"]] = as.list(drug.N)
   }
 
@@ -26,45 +26,93 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
     {
       vx = exp.mod.dg[, ec]
       if(length(unique(vx))==1)
-      { vx = unique(vx) }
-      rtx[[ec]] = vx
+      { vx <- unique(vx) }
+      rtx[[ec]] <- vx
     }
   }
 
   ##-------------------------------------------------------------------------
-  doseColsNames = c("dose", gsub("drug", "dose", names(rtx$drug$names)))
-  dataColName = c("time", "volume", "width","length",
+  doseColsNames <- c("dose", gsub("drug", "dose", names(rtx$drug$names)))
+  dataColName <- c("time", "volume", "width","length",
                   doseColsNames, "body.weight", "date", "comment")
   for (w in dataColName)
   {
       if(is.element(w, colnames(exp.mod.dg))==FALSE)
       {
-        exp.mod.dg[,w] = NA
+        exp.mod.dg[,w] <- NA
       }
   }
 
   ##---- should we add dose.1 + dose.2 .... to dose
-  rtxData = data.frame(lapply(exp.mod.dg[,dataColName], as.character), stringsAsFactors=FALSE)
+  rtxData <- data.frame(lapply(exp.mod.dg[,dataColName], as.character), stringsAsFactors=FALSE)
   ##------ change column type for each column -----------------------------------------------
-  rtxData$time  = as.numeric(rtxData$time)
-  rtxData$volume= as.numeric(rtxData$volume)
-  rtxData$width = as.numeric(rtxData$width)
-  rtxData$length= as.numeric(rtxData$length)
-  rtxData$body.weight= as.numeric(rtxData$body.weight)
-  rtxData$date  = as.Date(rtxData$date)
+  rtxData$time  <- as.numeric(rtxData$time)
+  rtxData$volume<- as.numeric(rtxData$volume)
+  rtxData$width <- as.numeric(rtxData$width)
+  rtxData$length<- as.numeric(rtxData$length)
+  rtxData$body.weight<- as.numeric(rtxData$body.weight)
+  rtxData$date  <- as.Date(rtxData$date)
 
   rtxData[ ,doseColsNames]= sapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )
 
-  rtxData = BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
+  rtxData <- BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
   ##------ remove all cols which are NA -----------
-  rtxData = rtxData[, colSums(is.na(rtxData)) != nrow(rtxData)]
+  #rtxData <- rtxData[, colSums(is.na(rtxData)) != nrow(rtxData)]
 
-  rtx$data= rtxData
+  rtx$data<- rtxData
 
   return(rtx)
 }
 
+modelClassS4Vars <- function()
+{
+  return(
+    c("model.id", "drug", "data", "treatment.type", "treatment.target",
+      "patient.id", "patient.sex", "patient.age", "patient.diagnosis",
+      "patient.consent.to.share.data", "patient.ethnicity", "patient.current.treatment.drug",
+      "patient.current.treatment.protocol", "patient.prior.treatment.protocol",
+      "patient.response.to.prior.treatment", "patient.virology.status",
+
+      "tumor.id", "tumor.tissue.of.origin", "tumor.primary.metastasis.recurrence",
+      "tumor.specimen.tissue", "tumor.tissue.histology", "tumor.tumor.grade",
+      "tumor.disease.stage", "tumor.specific.markers", "tumor.fom.untreated.patient",
+      "tumor.original.sample.type", "tumor.from.existing.pdx.model",
+
+      "model.submitter.pdx.id", "model.mouse.strain.source", "model.strain.immune.system.humanized",
+      "model.type.of.humanization", "model.tumor.preparation", "model.injection.type.and.site",
+      "model.mouse.treatment.for.engraftment", "model.engraftment.rate",
+      "model.engraftment.time",
+
+      "model.tumor.characterization.technology",
+      "model.tumor.confirmed.not.to.be.of.mouse.origin", "model.response.to.standard.of.care",
+      "model.animal.health.status", "model.passage.qa.performed",
+
+      "model.treatment.passage", "model.treatment.protocol",
+      "model.treatment.response", "model.tumor.omics",
+      "model.development.of.metastases.in.strain", "model.doubling.time.of.tumor",
+
+      "pdx.model.availability", "governance.restriction.for.distribution",
+      "id.publication.data")
+  )
+}
+
+makePDXModClassS4 <- function(exp.mod.dg, extraCol)
+{
+  pdxS3 <- creatListFromDF(exp.mod.dg, extraCol=extraCol)
+  pdxS4 <- PDXmodClass(model.id = pdxS3$model.id, drug = pdxS3$drug, data=pdxS3$data)
+
+  pS4SlN<- modelClassS4Vars()
+
+
+  for(s in pS4SlN)
+  {
+    if(!is.null(pdxS3[[s]]))
+    { slot(pdxS4, s) <- pdxS3[[s]] }
+  }
+
+  return(pdxS4)
+}
 
 ###----- define standard column names -----------
 .getColumnsDF <- function()
@@ -109,12 +157,14 @@ experimentSlotfromDf <- function(experiment)
     warning(msg)
   }
 
-  standardCols = c(requredCols, doseColsName, "width","length", "date", "time",
-                   "body.weight", "comment" )
-  extraCol = setdiff(colnames(experiment), standardCols)
+  standardCols <- unique(unlist(c(requredCols, doseColsName, "width","length",
+                                  "date", "time", "body.weight", "comment",
+                                  modelClassS4Vars())))
+
+  extraCol <- setdiff(colnames(experiment), standardCols)
   if(length(extraCol)>0)
   {
-    msg = sprintf("These colums are not part of standard information, therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
+    msg <- sprintf("These colums are not part of standard information, therefor will be stored but not processed\n%s\n", paste(extraCol, collapse = ', '))
     warning(msg)
   }
 
@@ -150,22 +200,19 @@ experimentSlotfromDf <- function(experiment)
                      experiment$model.id== u.modDrg.id[i, "model.id"] &
                      experiment$drug == u.modDrg.id[i, "drug"] )
 
-    expSlot[[i]] = creatListFromDF(exp.mod.dg, extraCol=extraCol)
+    #expSlot[[i]] = creatListFromDF(exp.mod.dg, extraCol=extraCol)
+    expSlot[[i]] <- makePDXModClassS4(exp.mod.dg, extraCol=extraCol)
   }
 
-  mod.ids = unlist(sapply(expSlot , "[[" , "model.id" ))
-  if(any(table(mod.ids)!=1))
+  #mod.ids <- unlist(sapply(expSlot , "[[" , "model.id" ))
+  mod.ids <- sapply(expSlot, function(mod){ slot(mod, "model.id")}  )
+
+  if(length(mod.ids) != length(unique(mod.ids)))
   {
-    msg = sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
+    msg <- sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
     stop(msg)
   }
-
-  #expNames = make.unique(unlist(sapply(expSlot, function(x){ sprintf("%s.%s", x$model.id, x$drug$join.name)} )), sep="_")
-  #for(i in 1:length(expSlot))
-  #{ expSlot[[i]][["experiment.id"]] = expNames[i] }
-
-  expNames = unlist(sapply(expSlot, "[[", "model.id"))
-  names(expSlot) = expNames
+  names(expSlot) <- mod.ids
 
   return(expSlot)
 }

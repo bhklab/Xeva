@@ -57,7 +57,6 @@
   RTz = cbind(rtx1, rtx2)
   return(RTz)
 }
-
 ###-------------------------------------------------------------------------------------
 ###-------------------------------------------------------------------------------------
 
@@ -74,7 +73,6 @@ getIndex <- function(inVec, indxOf)
 {
   uqR <- unique(as.character(df[,row.var]))
   uqC <- unique(as.character(df[,col.var]))
-  #dfx <- data.frame( matrix(NA, nrow = length(uqR), ncol = length(uqC) ))
   dfx <- matrix(NA, nrow = length(uqR), ncol = length(uqC) )
   rownames(dfx) <- uqR ; colnames(dfx) <- uqC
 
@@ -90,7 +88,6 @@ getIndex <- function(inVec, indxOf)
   for(I in 1:nrow(df))
   {
     v <- ml[[df[I, row.var]]][[df[I, col.var]]]
-    #vx <- c(v, df[I, value])
     ml[[df[I, row.var]]][[df[I, col.var]]] <- c(v, df[I, value]) #vx
   }
 
@@ -120,35 +117,6 @@ getIndex <- function(inVec, indxOf)
       dfx[r,c] <- vz
     }
   }
-
-  ##----------------------------------------
-  # for(r in rownames(dfx))
-  # {
-  #   for(c in colnames(dfx))
-  #   {
-  #     v <- df[df[,row.var]==r & df[,col.var]==c, value]
-  #     if(length(v)==0){v=NA}
-  #     vz=NULL
-  #     if(collapse =="mean")
-  #     {
-  #       vz = mean(as.numeric(v[!is.na(v)]))
-  #     } else if (collapse =="median")
-  #     {
-  #       vz = median(as.numeric(v[!is.na(v)]))
-  #     } else
-  #     {
-  #       if(length(v)>1)
-  #       {
-  #         vz= pasteWithoutNA(v, collapse = collapse)
-  #       } else
-  #       { vz=v }
-  #
-  #       if(!is.na(vz) & vz==""){vz=NA}
-  #     }
-  #     if(is.nan(vz)){vz = NA}
-  #     dfx[r,c]=vz
-  #   }
-  # }
   dfx <- data.frame(dfx, stringsAsFactors = FALSE, check.names = FALSE)
   return(dfx)
 }
@@ -199,7 +167,7 @@ getIndex <- function(inVec, indxOf)
 #' @examples
 #' L = c("A", NA, "B", NA, NA, "C")
 #' pasteWithoutNA(L, collapse = " + ")
-#' @export
+#' @keywords internal
 pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
 
 ##------------------------------------------------------------------------------------------
@@ -216,13 +184,11 @@ pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = c
 #' @examples
 #' df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
 #' pasteColTogather(df, collapse = " + ")
-#' @export
+#' @keywords internal
 pasteColTogather <- function(df, collapse = " + ")
 {
   apply(df, 1, pasteWithoutNA, collapse =collapse)
 }
-
-
 
 ##------------------------------------------------------------------------
 ##--- this will creat empty theme for ggplot -----------------------------
@@ -249,22 +215,9 @@ pasteColTogather <- function(df, collapse = " + ")
 #' a <- c(1, 2, 3)
 #' b <- c(2, 3, 4)
 #' symmetricSetDiff(a, b)
-#' @export
+#' @keywords internal
+## @export
 symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }
-
-
-
-##-------------------
-#' Function to print
-#'
-#' \code{printf} is shortcut for cat(sprintf())
-#' @examples
-#' printf("Hello %s\n", "world" )
-#' @export
-printf <- function(...) cat(sprintf(...))
-
-
-
 
 ##-------------------
 #' Function to print data.frame in massage
@@ -274,7 +227,8 @@ printf <- function(...) cat(sprintf(...))
 #' df <- data.frame(a=1:5, b=11:15)
 #' msg <- sprintf("data frame is:\n%s", printAndCapture(df))
 #' warning(msg)
-#' @export
+#' @keywords internal
+## @export
 printAndCapture <- function(x)
 {
   paste(capture.output(print(x)), collapse = "\n")
@@ -292,7 +246,8 @@ printAndCapture <- function(x)
 #' @examples
 #' data(cars)
 #' removeZeroVar(cars, varCutoff=0)
-#' @export
+#' @keywords internal
+## @export
 removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 {
   dfR <- apply(df,2, stats::var)
@@ -324,4 +279,31 @@ extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 
   Vi = stIndx:enIndxR
   return(Vi)
+}
+
+
+
+
+
+
+
+
+# multiplyBy3
+#' This is an example of an internal function called \code{multiplyBy3()}
+#'
+#' Sometimes you want internal functions as part of an R Package built with
+#' RStudio and roxygen2, but you don't want .Rd files created for them
+#' or to have them be visible in the help document following the build process
+#'
+#' @keywords internal
+#'
+#' @param base_num The number to multiply by three
+#'
+#' @import jsonlite
+#'
+#' @return Returns a numeric vector
+#'
+multiplyBy3 <- function(base_number) {
+  stopifnot(is.numeric(base_number))
+  return(base_number * 3)
 }

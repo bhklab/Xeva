@@ -86,13 +86,13 @@
 #' @param model2bidMap a datafram with model.id and biobase.id. Default \code{NULL} will use internal mapping
 #' @param sensitivity.measure Name of the sensitivity measure
 #' @param fit Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"
-#' @param type Tissue type. Default is NULL which will use \code{'tumor.type'} from \code{object}
+#' @param type Tissue type. Default is NULL which will use \code{'tissue'} from \code{object}
 #' @return A datafram with fetures and values
 #'
 #' @examples
 #' data(pdxe)
 #' ## select BRCA samples
-#' mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
+#' mid <- modelInfo(pdxe)[modelInfo(pdxe)$tissue=="BRCA", ]
 #' senSig <- drugSensitivitySig(object=pdxe, drug="tamoxifen",
 #'                              mDataType="RNASeq", features=1:5,
 #'                              model.ids = mid$model.id,
@@ -107,7 +107,7 @@ setGeneric(name = "drugSensitivitySig",
                           sensitivity.measure="slope",
                           fit = c("lm", "maxCor", "gam"),
                           standardize=c("SD", "rescale", "none"),
-                          nthread=1, tumor.type=NULL, verbose=TRUE)
+                          nthread=1, tissue=NULL, verbose=TRUE)
             {standardGeneric("drugSensitivitySig")}
           )
 
@@ -120,7 +120,7 @@ setMethod(f= "drugSensitivitySig",
                                sensitivity.measure="slope",
                                fit = c("lm", "maxCor", "gam"),
                                standardize=c("SD", "rescale", "none"),
-                               nthread=1, tumor.type=NULL, verbose=TRUE)
+                               nthread=1, tissue=NULL, verbose=TRUE)
   {
   if(is.null(mDataType)& is.null(molData))
   {
@@ -155,45 +155,45 @@ setMethod(f= "drugSensitivitySig",
   { features <- rownames(molData)}
 
   ##---------------------------------------------------------------
-  if(!is.null(tumor.type))
+  if(!is.null(tissue))
   {
-    if(length(tumor.type) == 1)
+    if(length(tissue) == 1)
     {
-      printf("setting 'tumor.type' = %s for all models", tumor.type[1])
-      tt <- rep(tumor.type[1], nrow(mdfI))
+      printf("setting 'tissue' = %s for all models", tissue[1])
+      tt <- rep(tissue[1], nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
 
-  if(length(tumor.type) > 1)
+  if(length(tissue) > 1)
   {
-      if(length(tumor.type)!= nrow(mdfI))
+      if(length(tissue)!= nrow(mdfI))
       {stop("length of type should be equeal to length of models")}
 
-      if(is.null(names(tumor.type)))
+      if(is.null(names(tissue)))
       {
-        msg <- sprintf("'tumor.type' have no names. Plese provide a named list")
+        msg <- sprintf("'tissue' have no names. Plese provide a named list")
         stop(msg)
       }
 
-    tt <- tumor.type
+    tt <- tissue
     }
   } else
   {
-    if("tumor.type" %in% colnames(modelInfo(object)))
+    if("tissue" %in% colnames(modelInfo(object)))
     {
       typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
-                                map.to = "tumor.type", unique = FALSE)
-      tt <- typeDF[, "tumor.type"]
+                                map.to = "tissue", unique = FALSE)
+      tt <- typeDF[, "tissue"]
       names(tt) <- typeDF$model.id
     } else
     {
-      warning("'tumor.type' not present in modelInfo, setting tumor.type = 'tumor' for all models")
+      warning("'tissue' not present in modelInfo, setting tissue = 'tumor' for all models")
       tt <- rep("tumor", nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
   }
 
-  mdfI[, "tumor.type"] <- tt[mdfI$model.id]
+  mdfI[, "tissue"] <- tt[mdfI$model.id]
   ## -------------------------------------------------------------------------
 
   x <- t(molData[features, mdfI$biobase.id])
@@ -209,7 +209,7 @@ setMethod(f= "drugSensitivitySig",
   rtx <- .runFit(x = x,
                  y = mdfI[,sensitivity.measure],
                  fit = fit[1],
-                 nthread= nthread, type=mdfI[, "tumor.type"],
+                 nthread= nthread, type=mdfI[, "tissue"],
                  standardize=standardize[1], verbose=verbose)
 
   rtx$drug <- drugIx
@@ -262,10 +262,6 @@ setMethod(f= "drugSensitivitySig",
     #library(doSNOW)
     cl <- makeCluster(nthread)
     registerDoSNOW(cl)
-
-    #result <- foreach (i=colnames(x), .final = function(i) setNames(i, colnames(x))) %dopar%
-    #{ .nonLinerFits(x[,i], y, fit = fit )}
-
     result <- foreach (i=colnames(x),
                        .final = function(i) {setNames(i, colnames(x))},
                        .export=c(".nonLinerFits")) %dopar%
@@ -305,82 +301,4 @@ setMethod(f= "drugSensitivitySig",
 
   return(value)
 }
-
-
-
-nonLinerFitExample <- function()
-{
-  x = -100 : 100
-  y = (100^2 - x^2)^0.5    # let's make a circle
-
-  cor(x, y) # a circular line has zero linear correlation
-  cor(x, y, method='spearman') ## and zero rank correlation
-
-  ##--------- Maximal correlation ---------
-  library(acepack)
-  argmax = ace(x, y)
-  cor(argmax$tx, argmax$ty)
-
-  ##------- generalized additive model  -------------
-  library(mgcv)
-  g <- gam(y ~ s(x))
-  summary(g)
-  plot(g,scheme=2)
-
-}
-
-
-
-
-
-
-########-----------------------------------------------------
-########-----------------------------------------------------
-##====== geneSensitivityPlot for one drug ==========================
-#' geneSensitivityPlot
-#'
-#' Plot a gene expression against sensitivity signatures for a drug
-#' @description
-#' Given a Xeva object, feture name and drug name it will plot feture values against sensitivity value
-#'
-#' @examples
-#' data(pdxe)
-#' geneSensitivityPlot(object=pdxe, mDataType="RNASeq", feature="A1BG", drug="binimetinib",
-#' sensitivity.measure="slope", standardize="log")
-#'
-#' @export
-#' @import ggplot2
-geneSensitivityPlot <- function(object, mDataType, feature, drug,
-                                sensitivity.measure="slope",
-                                standardize=c("SD", "rescale", "log", "none"))
-{
-  molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
-  sdf <- .getBioIdSensitivityDF(object, molData, drug, sensitivity.measure, collapse.by="mean" )
-  ##---plot gene vs  sensitivity.measure---------------------
-  #feature = rownames(exprs(molData))[1]#:5]
-
-  sdf[, feature] <- molData[feature, sdf$biobase.id]
-  if(standardize[1]=="SD"){sdf[, feature] <- as.vector(scale(sdf[, feature]))}
-  if(standardize[1]=="rescale"){sdf[, feature] <- .normalize01(sdf[, feature])}
-  if(standardize[1]=="log")
-  {
-    if(min(sdf[, feature])<= 0)
-    {
-      sdf[, feature] <- sdf[, feature] + abs(min(sdf[, feature]))+0.0001
-    }
-    sdf[, feature] <- log(sdf[, feature])
-  }
-
-  plt <- ggplot(sdf, aes_string(x=sensitivity.measure, y=feature))#, color= "type", group="model.id"))
-  plt <- plt + geom_line(linetype = 1)+ geom_point()
-  .ggplotEmptyTheme(plt)
-}
-
-
-
-
-
-
-
-
 

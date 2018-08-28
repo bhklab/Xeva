@@ -23,8 +23,8 @@
 #' Generic for modelInfo method
 #'
 #' @examples
-#' data(pdxe)
-#' mid <- modelInfo(pdxe)
+#' data(brca)
+#' mid <- modelInfo(brca)
 #' head(mid)
 #' @param object The \code{XevaSet} to retrieve drug info from
 #' @return a \code{data.frame} with the model annotations
@@ -35,7 +35,11 @@ setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object, mDataType=NULL)
            {
              modI <- slot(object,name="model")
-             drgMod <- sapply(slot(object,name="experiment"), "[[", c("drug", "join.name"))
+             drgMod <- sapply(slot(object,name="experiment"), function(mod)
+                              {
+                                slot(mod,name="drug")[["join.name"]]
+                              })
+
              modI$drug <- drgMod[ modI$model.id ]
 
              if(!is.null(mDataType))
@@ -49,29 +53,8 @@ setMethod( f=modelInfo, signature="XevaSet",
              return(modI)
            } )
 
-
-#' modelInfo<- Generic
-#' Generic for modelInfo replace method
-#' @examples
-#' data(pdxe)
-#' modelInfo(pdxe) <- modelInfo(pdxe)
-#' @param object The \code{XevaSet} to replace drug info in
-#' @param value A \code{data.frame} with the new model annotations
-#' @return Updated \code{XevaSet}
-setGeneric(name= "modelInfo<-", def = function(object, value) {standardGeneric("modelInfo<-")} )
-
-#' @export
-setMethod( f="modelInfo<-",
-           signature=c(object = "XevaSet", value="data.frame"),
-           definition=function(object, value)
-           {
-             object@model = value
-             warning("This will not update drug information in experiment slot\n write the code to do so...")
-             return(object)
-           } )
-
-##-----------------------------------------------------------------------------------------
-##-----------------------------------------------------------------------------------------
+##------------------------------------------------------------------------------
+##------------------------------------------------------------------------------
 
 .checkIfColPresentinModel <- function(object, nameCol)
 {
@@ -92,47 +75,40 @@ setMethod( f="modelInfo<-",
 #' For example map a model.id to patient.id
 #'
 #' @examples
-#' data(pdxe)
-#' mapModelSlotIds(object=pdxe, id="X-007", id.name="patient.id", map.to="model.id")
+#' data(brca)
+#' mapModelSlotIds(brca, id="X-1004", id.name="patient.id", map.to="model.id")
 #' ##map batch ids
-#' mapModelSlotIds(pdxe, id= "X-011.INC280", id.name = "batch.name", map.to = "tumor.type")
+#' mapModelSlotIds(brca, id="X-1004.BGJ398", id.name="batch.name", map.to="tissue")
 #' @param object The \code{Xeva} dataset
 #' @param id The \code{id}
 #' @param id.name The \code{id} name
 #' @param map.to The name of the mapped id. Default \code{all}
 #' @param unique Default \code{TRUE}. If unique=FALSE output will be mapped to input
 #' @return a \code{data.fram} with id and mapped id
-setGeneric(name = "mapModelSlotIds", def = function(object, id, id.name, map.to="all",unique=TRUE) {standardGeneric("mapModelSlotIds")})
+#' @keywords internal
+#####export
+mapModelSlotIds <- function(object, id, id.name, map.to="all", unique=TRUE)
+{
+  id <- c(as.character(id))
 
-#' @export
-setMethod( f=mapModelSlotIds,
-           signature=c(object="XevaSet"),
-           definition= function(object, id, id.name, map.to="all", unique=TRUE)
-           {
-             id = c(as.character(id))
-
-             ##------------------------------------
-             if(id.name=="batch.name")
-             {
-               rtd = .mapBatchName2Id(object, id, map.to)
-             } else{
-
-               .checkIfColPresentinModel(object, id.name)
-               rtd <- object@model[object@model[,id.name] %in% id, ]
-               if(map.to!="all")
-               {
-                 .checkIfColPresentinModel(object, map.to)
-                 rtd = rtd[, c(id.name, map.to)]
-                 if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
-                 rtd = unique(rtd)
-               }
-
-               if(unique==FALSE)
-               { rtd = rtd[match(id, rtd[,id.name]),] }
-             }
-
-             return(rtd)
-           })
+  if(id.name=="batch.name")
+  {
+   rtd <- .mapBatchName2Id(object, id, map.to)
+  } else{
+   .checkIfColPresentinModel(object, id.name)
+   rtd <- object@model[object@model[,id.name] %in% id, ]
+   if(map.to!="all")
+   {
+     .checkIfColPresentinModel(object, map.to)
+     rtd = rtd[, c(id.name, map.to)]
+     if(id.name==map.to){rtd = rtd[,id.name, drop=FALSE]}
+     rtd = unique(rtd)
+   }
+   if(unique==FALSE)
+   { rtd = rtd[match(id, rtd[,id.name]),] }
+  }
+  return(rtd)
+}
 
 ##--------------------------------------------------------------------------------------
 ##-------------------------------------------------------------------------------------
@@ -140,14 +116,16 @@ setMethod( f=mapModelSlotIds,
 ##
 .mapBatchName2Id <- function(object, id, map.to)
 {
-  btMapRet = data.frame()
-  for(batch.name in id)
+  btMapRet <- data.frame()
+  for(bn in c(id))
   {
-    bt <- expDesign(object, batch.name = batch.name)
-    bt.Mod <- unique(c(bt$treatment, bt$control))
-    btMap = mapModelSlotIds(object, id= bt.Mod, id.name="model.id", map.to=map.to, unique=TRUE)
-    btMap[, "batch.name"] = batch.name
-    btMapRet = rbind(btMapRet, btMap)
+    bt <- expDesign(object, batch.name = bn)
+    bt.Mod <- unique(c(bt[[bn]]$treatment, bt[[bn]]$control))
+    btMap <- mapModelSlotIds(object, id= bt.Mod, id.name="model.id",
+                             map.to=map.to, unique=TRUE)
+
+    btMap[, "batch.name"] <- bn
+    btMapRet <- rbind(btMapRet, btMap)
   }
   btMapRet <- btMapRet[, c("batch.name", map.to)]
   btMapRet <- unique(btMapRet); rownames(btMapRet)=NULL

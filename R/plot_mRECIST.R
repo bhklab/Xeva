@@ -170,15 +170,22 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 #'
 #' \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
 #'
-#' @param object The \code{Xeva} dataset
-#' @param model.id The \code{model.id}
+#' @param mat The mRECIST matrix where rows are drugs and columns are patient
+#' @param control.name name of the control
+#' @param control.col color of the control
+#' @param drug.col color of the drug names
+#' @param colPalette color palette for mRECIST values
+#' @param name title of the plot
+#' @param sort if matrix should be sorted before ploting
+#' @param row_fontsize size of the row name font
+#' @param col_fontsize size of the column name font
+#' @param draw_plot default TRUE will plot the figure. If FALSE will return an object
 #' @return plot
 #' @examples
-#' data(pdxe)
+#' data(brca)
 #' ## select lung cancer pdxe data
-#' pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
-#'                                group.by="patient.id", tumor.type="NSCLC")
-#' plotmRECIST(pdxe.lung, control.name = "untreated")
+#' brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+#' plotmRECIST(brca.mr, control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
 #' @import grid

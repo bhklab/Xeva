@@ -63,18 +63,19 @@
     stop(msg)
   }
 
-  mod.data <- mod$data
-  mod.data$model.id <- mod$model.id
-  mod.data$drug.join.name <- mod$drug$join.name
+  mod.data <- slot(mod, "data")
+  mod.data$model.id <- slot(mod, "model.id")
+  mod.data$drug.join.name <- slot(mod, "drug")$join.name
 
-  mod.data = .removeNAcol(mod.data)
-  mod.data = .reorderCol(mod.data, "model.id", 1)
-  mod.data = .reorderCol(mod.data, "drug.join.name", 2)
+
+  mod.data <- .removeNAcol(mod.data)
+  mod.data <- .reorderCol(mod.data, "model.id", 1)
+  mod.data <- .reorderCol(mod.data, "drug.join.name", 2)
 
   if(treatment.only==TRUE & !is.null(mod.data$dose))
   {
-    tretIndx = extractBetweenTags(mod.data$dose, start.tag=0, end.tag=0)
-    mod.data = mod.data[tretIndx, ]
+    tretIndx <- extractBetweenTags(mod.data$dose, start.tag=0, end.tag=0)
+    mod.data <- mod.data[tretIndx, ]
   }
 
   mod.data$volume.normal <- NA
@@ -263,24 +264,33 @@
   { rtx <- dfp } else
   {
     rtx <- list(batch= dfp$batch)
-    rtx$model <- data.frame()
+    dfcnt <- data.frame()
+    dftre <- data.frame()
+
     if(length(dfp$control)>0)
-    { rtx$model <- .rbindListOfDataframs(dfp$control) }
+    { dfcnt <- .rbindListOfDataframs(dfp$control) }
 
     if(length(dfp$treatment)>0)
-    { rtx$model <- rbind(rtx$model, .rbindListOfDataframs(dfp$treatment)) }
+    { dftre <- .rbindListOfDataframs(dfp$treatment) }
+
+    if(nrow(dfcnt)>0 & nrow(dftre)>0)
+    {
+      allClNames <- unique(c(colnames(dfcnt), colnames(dftre)))
+      dfcnt[, setdiff(allClNames, colnames(dfcnt))] <- NA
+      dftre[, setdiff(allClNames, colnames(dftre))] <- NA
+
+      dfcnt <- dfcnt[, allClNames]
+      dftre <- dftre[, allClNames]
+    }
+    rtx$model <- rbind(dfcnt, dftre)
   }
 
   return(rtx)
 }
 
 ##------------------------------------------------------------------------------
-
-
-
-
-##--------------------------------------------------------------------------------------------------
-##----- get experiment data in flat data.fram ------------------------------------------------------
+##------------------------------------------------------------------------------
+##----- get experiment data in flat data.fram ----------------------------------
 #' For a given  model.id, it will return a data.fram
 #' containing all data stored in experiment slot
 #'
@@ -296,12 +306,13 @@
 #' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
 #'
 #' @examples
-#' data(pdxe)
-#' getExperiment(pdxe, model.id="X.6047.uned", treatment.only=TRUE)
-#' getExperiment(pdxe, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
-#' getExperiment(pdxe, batchName="X-6047.paclitaxel", treatment.only=TRUE)
-#' expDesign <- list(batch.name="myBatch", treatment=c("X.050.LE11","X.050.LE11.evus"), control=c("X.050.uned"))
-#' getExperiment(pdxe, expDig=expDesign)
+#' data(brca)
+#' getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
+#' getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
+#' getExperiment(brca, batchName="X-6047.paclitaxel", treatment.only=TRUE)
+#' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+#'              control=c("X.6047.uned"))
+#' getExperiment(brca, expDig=expDesign)
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(name = "getExperiment",
@@ -350,56 +361,3 @@ setMethod( f=getExperiment,
              }
              return(rtz)
            })
-
-
-###-----------------------------------------------------------------------------
-##------------------------------------------------------------------------------
-getTimeVarData <- function(object, batchName=NULL, expDig=NULL, var = "volume",
-                           treatment.only=FALSE, drug.name=FALSE,
-                           vol.normal=FALSE, impute.value=TRUE, max.time=NULL)
-{
-  warning("Do not use this function, use getExperiment ")
-
-  dl <- .getBatchData(object, batchName=batchName, expDig=expDig,
-                      treatment.only=treatment.only, max.time=max.time,
-                      return.list=TRUE, impute.value=impute.value,
-                      vol.normal=vol.normal)
-
-  df <- data.frame()
-  if(!is.null(dl$control))
-  {
-    dfc <- .collapseRplicate(dl$control, var = var)
-    dfc$exp.type <- "control"
-
-    if(drug.name==TRUE)
-    {
-      drugAll <- sort(unique(unlist(lapply(dl$control, "[[", "drug.join.name"))))
-      if(length(drugAll)>1)
-      { warning("multipal drugs for batch, will colleps by ;") }
-      dfc$drug.name <- paste(drugAll, collapse = ";")
-    }
-
-    df <- rbind(df, dfc)
-  }
-
-  if(!is.null(dl$treatment))
-  {
-    dft <- .collapseRplicate(dl$treatment, var = var)
-    dft$exp.type <- "treatment"
-
-    if(drug.name==TRUE)
-    {
-      drugAll <- sort(unique(unlist(lapply(dl$treatment, "[[", "drug.join.name"))))
-      if(length(drugAll)>1)
-      { warning("multipal drugs for batch, will colleps by ;") }
-      dft$drug.name <- paste(drugAll, collapse = ";")
-    }
-
-    df <- rbind(df, dft)
-  }
-  return(df)
-}
-
-
-
-
