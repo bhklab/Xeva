@@ -22,6 +22,8 @@ getExperiment(object, model.id = NULL, batchName = NULL, expDig = NULL,
 
 \item{max.time}{maximum time for data}
 
+\item{vol.normal}{default \code{TRUE} will use}
+
 \item{return.list}{default \code{FALSE} will return a datafram}
 
 \item{impute.value}{default \code{FALSE}. If TRUE will impute the values}
@@ -36,11 +38,12 @@ For a given  model.id, it will return a data.fram
 containing all data stored in experiment slot
 }
 \examples{
-data(pdxe)
-getExperiment(pdxe, model.id="X.6047.uned", treatment.only=TRUE)
-getExperiment(pdxe, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
-getExperiment(pdxe, batchName="X-6047.paclitaxel", treatment.only=TRUE)
-expDesign <- list(batch.name="myBatch", treatment=c("X.050.LE11","X.050.LE11.evus"), control=c("X.050.uned"))
-getExperiment(pdxe, expDig=expDesign)
+data(brca)
+getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
+getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
+getExperiment(brca, batchName="X-6047.paclitaxel", treatment.only=TRUE)
+expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+             control=c("X.6047.uned"))
+getExperiment(brca, expDig=expDesign)
 
 }

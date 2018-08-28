@@ -2,8 +2,8 @@
 % Please edit documentation in R/access_slot_drug.R
 \name{drugInfo}
 \alias{drugInfo}
-\title{drugInfo Generic
-Generic for drugInfo method}
+\title{get drug information
+get drug information slot}
 \usage{
 drugInfo(object)
 }
@@ -14,10 +14,10 @@ drugInfo(object)
 a \code{data.frame} with the drug annotations
 }
 \description{
-drugInfo Generic
-Generic for drugInfo method
+get drug information
+get drug information slot
 }
 \examples{
-data(pdxe)
-drugInfo(pdxe)
+data(brca)
+drugInfo(brca)
 }

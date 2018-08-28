@@ -20,7 +20,7 @@ a \code{data.fram} with model or batch id and sensitivity values
 Given a Xeva object, it will return sensitivity datafram
 }
 \examples{
-data(cm.pdxe)
-head(sensitivity(cm.pdxe, type="batch"))
-head(sensitivity(cm.pdxe, type="model"))
+data(brca)
+head(sensitivity(brca, type="batch"))
+head(sensitivity(brca, type="model"))
 }

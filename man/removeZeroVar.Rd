@@ -13,3 +13,4 @@ Function to remove low variance features
 data(cars)
 removeZeroVar(cars, varCutoff=0)
 }
+\keyword{internal}

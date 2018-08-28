@@ -56,9 +56,10 @@ A ggplot2 plot with control and treatment
 Plot data for a batch id or experiment design
 }
 \examples{
-data(pdxe)
-plt <- plotBatch(pdxe, batchName="X-1228.CKX620", vol.normal=TRUE)
-expDesign <- list(batch.name="myBatch", treatment=c("X.1228.LC61.pael","X.1228.pael"), control=c("X.1228.uned"))
-plotBatch(pdxe, expDig=expDesign, vol.normal=T)
-plotBatch(pdxe, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
+data(brca)
+plt <- plotBatch(brca, batchName="X-1004.BGJ398", vol.normal=TRUE)
+expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+             control=c("X.6047.uned"))
+plotBatch(brca, expDig=expDesign, vol.normal=T)
+plotBatch(brca, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
 }

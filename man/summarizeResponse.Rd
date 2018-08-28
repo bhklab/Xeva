@@ -4,9 +4,9 @@
 \alias{summarizeResponse}
 \title{Summarize Response of PDXs}
 \usage{
-summarizeResponse(object, response.measure = "mRECIST_recomputed",
-  group.by = "patient.id", summary.stat = c(";", "mean", "median"),
-  batch.name = NULL, tumor.type = NULL)
+summarizeResponse(object, response.measure = "mRECIST", model.id = NULL,
+  batch.id = NULL, group.by = "patient.id", summary.stat = c(";", "mean",
+  "median"), tissue = NULL)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
@@ -35,9 +35,6 @@ In case of \code{per model response} output columns will be \code{model.id} (or 
 For \code{per batch response} \code{group.by} value can be \code{"batch.name"} .
 }
 \examples{
-data(pdxe)
-pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed", group.by="patient.id")
-#to get only lung PDXE
-pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
-                             group.by="patient.id", tumor.type="NSCLC")
+data(brca)
+brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 }

@@ -2,7 +2,8 @@
 % Please edit documentation in R/XevaSet_Class.R
 \name{creatXevaSet}
 \alias{creatXevaSet}
-\title{Creat Xeva class object}
+\title{Creat Xeva class object
+\code{creatXevaSet} returns Xeva class object}
 \usage{
 creatXevaSet(name, model = data.frame(), drug = data.frame(),
   experiment = data.frame(), expDesign = list(),
@@ -10,29 +11,23 @@ creatXevaSet(name, model = data.frame(), drug = data.frame(),
   molecularProfiles = list(), modToBiobaseMap = data.frame())
 }
 \arguments{
-\item{name}{A \code{character} string detailing the name of the dataset}
+\item{name}{a \code{character} string detailing the name of the dataset}
 
-\item{model}{A \code{data.frame} containg the annotations for all models used in the experiment}
+\item{model}{a \code{data.frame} containg the annotations for all models used in the experiment}
 
-\item{drug}{A \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types}
+\item{drug}{a \code{data.frame} containg the annotations for all the drugs profiled in the data set, across all data types}
 
-\item{experiment}{A \code{data.frame} containg all experiment information}
+\item{experiment}{a \code{data.frame} containg all experiment information}
 
-\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing molecular profiles}
+\item{molecularProfiles}{a \code{list} of ExpressionSet objects containing different molecular profiles}
 }
 \value{
 Returns Xeva object
 }
 \description{
+Creat Xeva class object
 \code{creatXevaSet} returns Xeva class object
 }
 \examples{
-geoExp = readRDS("DATA-raw/Geo_Exp.Rda")
-pdxe = creatPharmacoPxSet(name = "PDXE",
-                          molecularProfiles = list(RNASeq = geoExp$RNASeq),
-                          experiment = geoExp$experiment,
-                          model = geoExp$model,
-                          drug  = geoExp$drug )
-save(pdxe, file = "data/pdxe.rda")
-data("pdxe")
+\\code{NULL}
 }

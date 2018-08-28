@@ -18,6 +18,6 @@ a \code{ExpressionSet} where sample names are \code{biobase.id} of model
 Get Molecular Profiles
 }
 \examples{
-data(pdxe)
-pdxe_RNA <- getMolecularProfiles(pdxe, data.type="RNASeq")
+data(brca)
+brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
 }

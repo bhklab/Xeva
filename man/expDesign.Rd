@@ -4,12 +4,12 @@
 \alias{expDesign}
 \title{Given a batch.name get batch}
 \usage{
-expDesign(object, batch.name)
+expDesign(object, batch.name = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{\code{XevaSet}}
 
-\item{object}{The \code{batch.name}}
+\item{object}{\code{batch.name}. If NULL will return all batch in the dataset}
 }
 \value{
 A \code{Vector} with all batch.name
@@ -18,6 +18,6 @@ A \code{Vector} with all batch.name
 Given a batch.name get batch from a Xeva dataset
 }
 \examples{
-data(pdxe)
-expDesign(pdxe, batch.name = "X-6047.paclitaxel")
+data(brca)
+expDesign(brca, batch.name = "X-6047.paclitaxel")
 }

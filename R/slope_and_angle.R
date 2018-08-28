@@ -36,26 +36,26 @@ slope <- function(time, volume, degree=TRUE)
 }
 
 
-#'
-#' \code{angle} returns the angle between two volume data
+#' compute angle
+#' computes angle between two time-volume curves
 #'
 #' @param contr.time time vector for control
 #' @param contr.volume volume vector for control
 #' @param treat.time time vector for treatment
 #' @param treat.volume volume vector for treatment
 #' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
-#' @return  returns angle and \code{slope}
+#' @return returns batch response object
 #' @examples
 #' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' contr.volume<- contr.time * tan(60*pi/180)
 #' treat.volume<- treat.time * tan(15*pi/180)
 #' ang <- angle(contr.time, contr.volume, treat.time, treat.volume)
 #' par(pty="s")
-#' xylimit <- range(c(time, volume1, time, volume2))
-#' plot(time, volume1, type = "b", xlim = xylimit, ylim = xylimit)
-#' lines(time, volume2, type = "b")
-#' abline(lm(volume1~time))
-#' abline(lm(volume2~time))
+#' xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
+#' plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)
+#' lines(treat.time, treat.volume, type = "b")
+#' abline(lm(contr.volume~contr.time))
+#' abline(lm(treat.volume~treat.time))
 #' @export
 angle <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volume=NULL,
                   degree=TRUE)

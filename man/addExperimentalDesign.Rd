@@ -4,8 +4,8 @@
 \alias{addExperimentalDesign}
 \title{Add a new experimental design}
 \usage{
-addExperimentalDesign(object, treatment, control = NULL, batch.name = NULL,
-  replace = FALSE)
+addExperimentalDesign(object, treatment = NULL, control = NULL,
+  batch.id = NULL, replace = FALSE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -14,7 +14,7 @@ addExperimentalDesign(object, treatment, control = NULL, batch.name = NULL,
 
 \item{control}{The \code{model.id} of control}
 
-\item{batch.name}{The \code{batch.name} for new batch}
+\item{batch.id}{The \code{batch.id} for new batch}
 
 \item{replace}{If TRUE will replace the old batch with new values}
 }
@@ -25,7 +25,8 @@ returns \code{Xeva} dataset with new experimental design added
 Add a new experimental design in expDesign slot.
 }
 \examples{
-data(pdxe)
-pdxe = addExperimentalDesign(object=pdxe, treatment= c("X.010.BG98"), control=c("X.010.uned"),
-                             batch.name="new.batch", replace=FALSE)
+data(brca)
+brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
+control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
+
 }

@@ -42,15 +42,16 @@ print.batchResponse <- function(br)
 #' @param verbose default \code{TRUE} will print infromation
 #'
 #' @return  returns updated Xeva object
-#' @examples
 #'
+#' @examples
+#' data(brca)
+#' brca  <- setResponse(brca, res.measure = c("mRECIST"))
 #' @export
-setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
+setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle", "abc"),
                         min.time=10, treatment.only=TRUE, max.time=NULL,
                         vol.normal=TRUE, impute.value=TRUE, concurrent.time =TRUE,
                         verbose=TRUE)
 {
-
   sen <- slot(object, "sensitivity")
 
   ###--------compute mRECIST ---------------------------------------------------
@@ -62,7 +63,6 @@ setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle"
 
     for(mid in modelInfo(object)$model.id)
     {
-
       mr <- response(object, model.id=mid, res.measure="mRECIST",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
@@ -82,7 +82,7 @@ setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle"
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
                      concurrent.time=FALSE, verbose=verbose)
-      sen$model[mid, "slope"] <- sl$slope
+      sen$model[mid, "slope"] <- sl$value #$slope
     }
   }
 
@@ -97,7 +97,7 @@ setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle"
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
                      concurrent.time=FALSE, verbose=verbose)
-      sen$model[mid, "AUC"] <- auc
+      sen$model[mid, "AUC"] <- auc$value
     }
   }
 
@@ -126,8 +126,15 @@ setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle"
   if("abc" %in% res.measure)
   {
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
-    ##get abc from response
-
+    for(bid in batchNames(object))
+    {
+      sl <- response(object, batchName = bid, res.measure="abc",
+                     treatment.only=treatment.only, max.time=max.time,
+                     impute.value=impute.value, min.time=min.time,
+                     concurrent.time=concurrent.time, verbose=verbose)
+      sen$batch[bid, c("auc.control", "auc.treatment", "abc")] <-
+        c(sl$control$value, sl$treatment$value, sl$value)
+    }
   }
 
   ##--------------code for batch level mR --------------------------------------
@@ -136,36 +143,43 @@ setResponse <- function(object, res.measure=c("angle", "mRECIST", "AUC", "angle"
   return(object)
 }
 
+
+
+#' compute response
+#'
+#' \code{response} computes response of a PDX model or batch
+#'
+#' @param object Xeva object
+#' @param res.measure response measure
+#' @param model.id model id for which response to be computed
+#' @param batchName batch id for which response to be computed
+#' @param expDig experiment design for which response to be computed
+#' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
+#' @param min.time default \strong{10} days. Used for \emph{mRECIST} computation
+#' @param max.time maximum time for data
+#' @param vol.normal default \code{TRUE} will use
+#' @param impute.value default \code{FALSE}. If TRUE will impute the values
+#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
+#' @param verbose default \code{TRUE} will print infromation
+#'
+#' @return  returns model or batch response object
 #'
 #' @examples
-#' data(pdxe)
-#' response(pdxe, model.id="X.1270.LK36", res.measure="mRECIST")
-#' response(pdxe, model.id="X.1270.LK36", res.measure="AUC")
+#' data(brca)
+#' response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
 #'
-#' response(pdxe, batchName="X-1270.HDM201", res.measure="angle")
-#' response(pdxe, batchName="X-1270.HDM201", res.measure="abc")
-#' response(pdxe, batchName="X-007.BGJ398", res.measure="angle")
+#' response(brca, batchName="X-6047.paclitaxel", res.measure="angle")
 #'
-#' object <- pdxe
-#' batchName=c("X-007.BGJ398", "X-007.binimetinib", "X-007.BKM120", "X-007.BYL719")
-#' model.id=expDig=max.time=NULL
-#' treatment.only=vol.normal=impute.value=verbose=TRUE
+#' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+#'              control=c("X.6047.uned"))
+#' response(brca, expDig=ed, res.measure="angle")
 #'
-#'
-#' batchName=expDig=max.time=NULL
-#' model.id=c("X.1228.LC61.pael","X.1228.pael")
-#' treatment.only=vol.normal=impute.value=verbose=TRUE
-#'
-#' batchName=model.id=max.time=NULL
-#' treatment.only=vol.normal=impute.value=verbose=TRUE
-#' b1 <- list(batch.name="b1", treatment=c("X.1228.LC61.pael","X.1228.pael"), control=c("X.1228.uned"))
-#' b2 <- list(batch.name="b2", treatment=c("X.1270.LK36"), control=c("X.1270.uned"))
-#' expDig <- list(b1, b2)
-
+#' @export
 response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
                      res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
                      treatment.only=TRUE, max.time=NULL, impute.value=TRUE,
-                     min.time=10, concurrent.time =TRUE, verbose=TRUE)
+                     min.time=10, concurrent.time =TRUE, vol.normal=F,
+                     verbose=TRUE)
 {
   if(is.null(model.id) & is.null(batchName) & is.null(expDig))
   { stop("'model.id', 'batchName' and 'expDig' all NULL") }
@@ -229,7 +243,7 @@ response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
     printMessage <- function(meas, batchName, expDig)
     {
       if(!is.null(batchName))
-      { cat(sprintf("computing %s for batch %s\n",meas, bid)) } else
+      { cat(sprintf("computing %s for batch %s\n",meas, batchName)) } else
       {
         if(!is.null(expDig$batch.name))
         {cat(sprintf("computing %s for batch %s\n",meas,expDig$batch.name)) } else
@@ -241,19 +255,6 @@ response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
     ###--------compute angle for batch -----------------------------------------
     if(res.measure =="angle")
     {
-      # vl.con <- vl.tre <- vl.batch <- NA
-      # if(sum(cInd)>1)
-      # { vl.con <- slope(dl$batch$time[cInd], dl$batch$mean[cInd], degree=TRUE) }
-      #
-      # if(sum(tInd)>1)
-      # { vl.tre <- slope(dl$batch$time[tInd], dl$batch$mean[tInd], degree=TRUE) }
-      #
-      # if(all(c(!is.na(vl.con), !is.na(vl.tre))))
-      # { vl.batch <- vl.con$slope - vl.tre$slope}
-      #
-      # rtx <- batch_response_class(name = "angle", value = vl.batch,
-      #                              control=vl.con,  treatment=vl.tre)
-
       rtx <- angle(contr.time, contr.volume, treat.time,treat.volume, degree=TRUE)
       return(rtx)
     }
@@ -261,18 +262,6 @@ response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
     ###--------compute abc for batch ---------------------------------------------
     if(res.measure=="abc")
     {
-      # vl.con <- vl.tre <- vl.batch <- NA
-      # if(sum(cInd)>1)
-      # { vl.con <- AUC(dl$batch$time[cInd], dl$batch$mean[cInd]) }
-      #
-      # if(sum(tInd)>1)
-      # { vl.tre <- AUC(dl$batch$time[tInd], dl$batch$mean[tInd]) }
-      #
-      # if(all(c(!is.na(vl.con), !is.na(vl.tre))))
-      # { vl.batch <- vl.con - vl.tre}
-      #
-      # rtx <- batch_response_class(name = "abc", value = vl.batch,
-      #                              control=vl.con,  treatment=vl.tre)
       rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume)
       return(rtx)
     }

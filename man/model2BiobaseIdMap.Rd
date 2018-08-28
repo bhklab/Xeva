@@ -20,7 +20,8 @@ model2BiobaseIdMap
 Gives model.id to biobase.id mapping datafram
 }
 \examples{
-data(pdxe)
-idMap <- model2BiobaseIdMap(pdxe, mDataType="RNASeq")
+data(brca)
+idMap <- model2BiobaseIdMap(brca, mDataType="RNASeq")
 head(idMap)
 }
+\keyword{internal}

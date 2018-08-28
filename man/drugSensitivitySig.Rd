@@ -7,8 +7,8 @@
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   features = NULL, model.ids = NULL, model2bidMap = NULL,
   sensitivity.measure = "slope", fit = c("lm", "maxCor", "gam"),
-  standardize = c("SD", "rescale", "none"), nthread = 1,
-  tumor.type = NULL, verbose = TRUE)
+  standardize = c("SD", "rescale", "none"), nthread = 1, tissue = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset}
@@ -29,7 +29,7 @@ drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
 
 \item{fit}{Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"}
 
-\item{type}{Tissue type. Default is NULL which will use \code{'tumor.type'} from \code{object}}
+\item{type}{Tissue type. Default is NULL which will use \code{'tissue'} from \code{object}}
 }
 \value{
 A datafram with fetures and values
@@ -44,7 +44,7 @@ In case where a model.id map to multipal biobase.id the first biobase.id in the 
 \examples{
 data(pdxe)
 ## select BRCA samples
-mid <- modelInfo(pdxe)[modelInfo(pdxe)$tumor.type=="BRCA", ]
+mid <- modelInfo(pdxe)[modelInfo(pdxe)$tissue=="BRCA", ]
 senSig <- drugSensitivitySig(object=pdxe, drug="tamoxifen",
                              mDataType="RNASeq", features=1:5,
                              model.ids = mid$model.id,

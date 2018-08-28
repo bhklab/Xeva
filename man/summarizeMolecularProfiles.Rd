@@ -4,7 +4,7 @@
 \alias{summarizeMolecularProfiles}
 \title{summarizeMolecularProfiles}
 \usage{
-summarizeMolecularProfiles(object, drug, mDataType, tumor.type = NULL,
+summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
   sensitivity.measure = NULL, unique.model = TRUE, batchName = NULL,
   expDig = NULL)
 }
@@ -15,7 +15,7 @@ summarizeMolecularProfiles(object, drug, mDataType, tumor.type = NULL,
 
 \item{mDataType}{\code{character}, which one of the molecular data types is needed}
 
-\item{tumor.type}{default \code{NULL} will return all across all tumor.type}
+\item{tissue}{default \code{NULL} will return all across all tissue}
 
 \item{sensitivity.measure}{default \code{NULL} will return all sensitivity measure}
 
@@ -35,8 +35,8 @@ will creat saperate column for each model. }
 }
 }
 \examples{
-data(pdxe)
-pacRNA <- summarizeMolecularProfiles(pdxe, drug="paclitaxel", mDataType="RNASeq",
-                                     tumor.type= "BRCA", sensitivity.measure="mRECIST")
+data(brca)
+pacRNA <- summarizeMolecularProfiles(brca, drug="paclitaxel", mDataType="RNASeq",
+                                     tissue= "BRCA", sensitivity.measure="mRECIST")
 print(pacRNA)
 }

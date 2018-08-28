@@ -22,7 +22,8 @@ a \code{Xeva} object with updated with updated sensitivity
 This will add a add new sensitivity in a Xeva object
 }
 \examples{
-data(pdxe)
-s <- sensitivity(pdxe, "model")
-pdxe <- setSensitivity(pdxe, "model", "mR", s$mRECIST)
+data(brca)
+s <- sensitivity(brca, "model")
+brca <- setSensitivity(brca, "model", "mR", s$mRECIST)
 }
+\keyword{internal}

@@ -2,10 +2,10 @@
 % Please edit documentation in R/access_slot_experiment.R
 \name{selectModelIds}
 \alias{selectModelIds}
-\title{To select model ids based on drug name and/or tumor type}
+\title{To select model ids based on drug name and/or tissue}
 \usage{
 selectModelIds(object, drug = NULL, drug.match.exact = TRUE,
-  tumor.type = NULL)
+  tissue = NULL)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
@@ -14,15 +14,16 @@ selectModelIds(object, drug = NULL, drug.match.exact = TRUE,
 
 \item{drug.match.exact}{Default \code{TRUE}}
 
-\item{tumor.type}{Tumor type. Default \code{NULL}}
+\item{tissue}{Tumor type. Default \code{NULL}}
 }
 \value{
 a \code{vector} with the matched model.ids
 }
 \description{
-To select model ids based on drug name and/or tumor type
+To select model ids based on drug name and/or tissue
 }
 \examples{
-data(pdxe)
-selectModelIds(pdxe, drug="paclitaxel", drug.match.exact=TRUE, tumor.type="BRCA")
+data(brca)
+selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
+selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
 }

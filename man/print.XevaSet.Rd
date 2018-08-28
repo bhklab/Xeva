@@ -18,15 +18,13 @@ Prints object, model or batch information.
 \code{print} displays Xeva object information or model or batch information
 }
 \examples{
-data(pdxe)
-# to print object information
-print(pdxe)
+data(brca)
+print(brca)
 
 # to print a model
-model.id = modelInfo(pdxe)$model.id[1]
-print(pdxe, id = model.id)
+print(brca, id = "X.1004.BG98")
 
 # to print a batch
-batch.id = batchNames(pdxe)[1]
-print(pdxe, id = batch.id)
+print(brca, id = "X-1004.BGJ398")
 }
+\keyword{internal}

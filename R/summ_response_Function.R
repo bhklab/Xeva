@@ -1,182 +1,43 @@
-
-.getDrugsForABatch <- function(object, batch)
+.summarizePerModelResponse <- function(object, response.measure, model.id,
+                                       group.by, summary.stat, tissue)
 {
-  getDrugForMod <- function(x){ object@experiment[[x]]$drug$join.name}
-  treatment = unlist(sapply(batch$treatment, getDrugForMod))
-  control   = unlist(sapply(batch$control  , getDrugForMod))
-  return(list(treatment=treatment, control=control))
-}
-
-#
-# .getAngleSummary <- function(object, tumor.type)
-# {
-#   rdf = data.frame()
-#   for(batch in expDesignInfo(object))
-#   {
-#     if(!is.null(tumor.type))
-#     {
-#       tt <- modelInfo(object)[modelInfo(object)$model.id %in% c(batch$treatment,batch$control),"tumor.type"]
-#
-#       if(is.element(tumor.type, tt)==FALSE)
-#       { next }
-#
-#       if(length(unique(tt))>1)
-#       {
-#         msg <- sprintf("batch %s contains models with different tumor type", batch$batch.name)
-#         warning(msg)
-#       }
-#     }
-#
-#     drugX = .getDrugsForABatch(object, batch)
-#     drug = unique(drugX$treatment)
-#     rdf = rbind(rdf, data.frame(batch.name = batch$batch.name,
-#                                 drug.join.name=drug))
-#   }
-#   rdf <- .factor2char(rdf)
-#   rdf$angle <- slot(object, "sensitivity")[["batch"]][rdf$batch.name, ]
-#   return(rdf)
-# }
-#
-# .summarizePerBatchResponse <- function(object, response.measure = "angle", group.by=NULL,
-#                                        summary.stat, tumor.type)
-# {
-#
-#   if(response.measure == "angle")
-#   {
-#     df = .getAngleSummary(object, tumor.type=tumor.type)
-#   }
-#
-#   if(!is.null(group.by) & group.by != "batch.name")
-#   {
-#     mapId = mapModelSlotIds(object, id=df$batch.name, id.name="batch.name",
-#                             map.to=group.by, unique = TRUE)
-#
-#     for(I in unique(mapId$batch.name))
-#     {
-#       di = unique(mapId[mapId$batch.name==I, group.by])
-#       if(length(di)>1)
-#       {
-#         msg1 = sprintf("batch.name mapped to multipal %s therefore all such %s will contain same information", group.by, group.by)
-#         msg2 = sprintf("\nbatch.name = %s %s = %s\n", I, group.by, paste(di, collapse =","))
-#         warning(msg1, msg2)
-#       }
-#     }
-#
-#     df = merge(df, mapId, by.x = "batch.name", by.y="batch.name")
-#
-#     for(I in unique(df[, group.by]))
-#     {
-#       di = df[df[, group.by]==I, ]
-#       if(nrow(di)>1)
-#       {
-#         drg <- di$drug.join.name
-#         if(length(drg) > length(unique(drg)))
-#         {
-#           msg1 <- sprintf("'%s' mapped to multipal batch.name, values will be collapsed using '%s'\n", group.by, summary.stat)
-#           df2Pr<- unique(di[, c("batch.name", group.by)]); rownames(df2Pr)<- NULL
-#           msg2 <- paste(capture.output(print(df2Pr)), collapse = "\n")
-#           warning(msg1, msg2)
-#         }
-#       }
-#     }
-#   }
-#
-#   mat = .castDataFram(df, row.var="drug.join.name", col.var = group.by,
-#                       value=response.measure, collapse = summary.stat)
-#   return(mat)
-# }
-
-
-
-.getValueFrom1Model <- function(object, model.id, values)
-{
-  mod = slot(object, "experiment")[[model.id]]
-  vz = list() #c()
-  for(v in c(values))
-  {
-    if(v=="drug.join.name")
-    {
-      vl = mod$drug$join.name
-    } else
-    {
-      vl = mod[[v]]
-    }
-
-    if(is.null(vl)) {vl = NA}
-    vz[[v]] = vl
-  }
-  return(vz)
-}
-
-.getValueFromAllModel <- function(object, values, tumor.type)
-{
-  mInfo <- modelInfo(object)
-  allModNames = mInfo[, "model.id"]
-  if(!is.null(tumor.type))
-  {
-    allModNames = mInfo[mInfo$tumor.type==tumor.type, "model.id"]
-    if(length(allModNames)<1)
-    {
-      tx <- paste(unique(mInfo$tumor.type), collapse = "\n")
-      msg <- sprintf("No model found for tumor.type %s\ntumor.type are %s", tumor.type, tx)
-      stop(msg)
-    }
-  }
-
-  #allModNames = names(slot(object, "experiment"))
-  dfL = lapply(allModNames, function(model.id)
-              { .getValueFrom1Model(object, model.id, values)})
-  df = .convertListToDataFram(dfL)
-  return(df)
-}
-
-.mapAndAttachColumn <- function(object, df, id.name, map.to)
-{
-  dfMap = mapModelSlotIds(object, id=df[, id.name], id.name=id.name,
-                          map.to= map.to, unique = FALSE)
-
-  if(all(df[, id.name] ==dfMap[, id.name]))
-  {df[,map.to] = dfMap[,map.to]} else{stop("column do not match")}
-  return(df)
-}
-
-.summarizePerModelResponse <- function(object, response.measure, group.by, summary.stat, tumor.type)
-{
-  if(is.element(response.measure,  colnames(slot(object, "sensitivity")[["model"]]) )==FALSE)
-  {
-    msg <- sprintf("'%s' is not present in sensitivity slot\n", response.measure)
-    stop(msg)
-  }
+  if(is.element(response.measure, colnames(slot(object, "sensitivity")[["model"]]) )==FALSE)
+  { stop(sprintf("'%s' is not present in sensitivity slot\n", response.measure)) }
 
   dfVal <- slot(object, "sensitivity")[["model"]] [,c("model.id", response.measure)]
-
   df <- modelInfo(object)
   df[, response.measure] <- dfVal[df$model.id, response.measure]
 
-  if(!is.null(tumor.type))
+  if(!is.null(model.id))
   {
-    df <- df[df$tumor.type==tumor.type,]
+    df <- df[model.id, ]
+    if(nrow(df)==0)
+    { stop(sprintf("given model.id not present in the Xeva object\n")) }
   }
+
+  if(!is.null(tissue))
+  {
+    df <- df[df$tissue==tissue,]
+    if(nrow(df)==0)
+    { stop(sprintf("given tissue not present in the Xeva object\n")) }
+  }
+
+  if(is.null(group.by)){group.by <- "model.id"}
 
   if(is.element(group.by, colnames(df))==FALSE)
-  {
-    msg <- sprintf("'group.by' %s not present in model\n", group.by)
-    stop(msg)
-  }
+  { stop(sprintf("'group.by' %s not present in model\n", group.by)) }
 
   mat <- .castDataFram(df, row.var="drug", col.var = group.by,
-                      value=response.measure, collapse = summary.stat)
+                       value=response.measure, collapse = summary.stat)
   return(mat)
 }
 
 
 .summarizePerBatchResponse <- function(object, response.measure = NULL, batch.name=NULL)
 {
-  rtx <- object@sensitivity$batch
+  rtx <- slot(object, "sensitivity")[["batch"]]
   if(!is.null(response.measure))
-  {
-    rtx <- rtx[, c("batch.name", response.measure)]
-  }
+  { rtx <- rtx[, c("batch.name", response.measure)] }
 
   if(!is.null(batch.name))
   {
@@ -191,6 +52,27 @@
   return(rtx)
 }
 
+
+.checkResMes <- function(object, response.measure)
+{
+  rm.type <- NULL
+  if(response.measure %in% colnames(slot(object, "sensitivity")[["model"]]))
+  { rm.type <- "model" }
+
+  if(response.measure %in% colnames(slot(object, "sensitivity")[["batch"]]))
+  { rm.type <- "batch" }
+
+  if(is.null(rm.type))
+  {
+    msg <- sprintf("valid response.measure values are\nFor model: %s\n\nFor batch: %s\n",
+                   paste0(colnames(slot(object, "sensitivity")[["model"]]), collapse = ", "),
+                   paste0(colnames(slot(object, "sensitivity")[["batch"]]), collapse = ", ")
+                   )
+    stop(msg)
+  }
+
+  return(rm.type)
+}
 #####================= summarizeResponse ==================
 #' Summarize Response of PDXs
 #'
@@ -213,68 +95,34 @@
 #' For \code{per batch response} \code{group.by} value can be \code{"batch.name"} .
 #'
 #' @examples
-#' data(pdxe)
-#' pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed", group.by="patient.id")
-#' #to get only lung PDXE
-#' pdxe_mR <- summarizeResponse(pdxe, response.measure = "mRECIST_recomputed",
-#'                              group.by="patient.id", tumor.type="NSCLC")
+#' data(brca)
+#' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 #' @export
-summarizeResponse <- function(object, response.measure = "mRECIST_recomputed",
-                              group.by="patient.id", summary.stat=c(";", "mean", "median"),
-                              batch.name=NULL, tumor.type=NULL)
+summarizeResponse <- function(object, response.measure = "mRECIST",
+                              model.id=NULL, batch.id=NULL,
+                              group.by="patient.id",
+                              summary.stat=c(";", "mean", "median"),
+                              tissue=NULL)
 {
+  summary.stat <- c(summary.stat)[1]
 
-  summary.stat = c(summary.stat)[1]
+  rm.type <- .checkResMes(object, response.measure)
 
-  if(group.by=="batch.name")
-  {
-    if(is.element(response.measure, c("angle"))==FALSE)
-    {
-      msg1 = sprintf("group.by== 'batch.name' is only allowed in per batch response" )
-      stop(msg1)
-    }
-  }
-
-
-  if(!(response.measure %in% c(colnames(object@sensitivity$model),
-                               colnames(object@sensitivity$batch))))
-  {
-    msg <- sprintf("valid response.measure values are\nFor model: %s\nFor batch: %s\n",
-                   paste0(colnames(object@sensitivity$model), collapse = ", "),
-                   paste0(colnames(object@sensitivity$batch), collapse = ", ")
-                   )
-    stop(msg)
-  }
-
-  if(response.measure %in% colnames(object@sensitivity$model))
+  if(rm.type=="model")
   {
     mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-                                        group.by=group.by, summary.stat=summary.stat,
-                                        tumor.type=tumor.type)
+                                      model.id=model.id, group.by=group.by,
+                                      summary.stat=summary.stat,
+                                      tissue=tissue)
     return(mat)
   }
 
-  if(response.measure %in% colnames(object@sensitivity$batch))
+  if(rm.type=="batch")
   {
     mat <- .summarizePerBatchResponse(object, response.measure = response.measure,
-                                      batch.name=batch.name)
-                                      #group.by=group.by, summary.stat=summary.stat,
-                                      #tumor.type=tumor.type)
+                                      batch.name=batch.id)
     return(mat)
   }
-
-  #if(response.measure =="angle")
-  #{
-  #  mat <- .summarizePerBatchResponse(object, response.measure = "angle",
-  #                                    group.by=group.by, summary.stat=summary.stat,
-  #                                    tumor.type=tumor.type)
-  #} #else
-  #{
-  #  mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-  #                                    group.by=group.by, summary.stat=summary.stat,
-  #                                    tumor.type=tumor.type)
-  #}
-  #return(mat)
 }
 
 

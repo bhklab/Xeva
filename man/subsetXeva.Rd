@@ -22,6 +22,8 @@ New Xeva object
 Subset Xeva object
 }
 \examples{
-data(pdxe)
-df <- subsetXeva(pdxe, ids = c("X-1008", "X-1027"), id.name="patient.id", keep.batch=TRUE)
+data(brca)
+print(brca)
+df <- subsetXeva(brca, ids = c("X-1004", "X-1008", "X-1286"), id.name="patient.id", keep.batch=TRUE)
+print(df)
 }

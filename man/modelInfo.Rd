@@ -18,7 +18,7 @@ modelInfo Generic
 Generic for modelInfo method
 }
 \examples{
-data(pdxe)
-mid <- modelInfo(pdxe)
+data(brca)
+mid <- modelInfo(brca)
 head(mid)
 }

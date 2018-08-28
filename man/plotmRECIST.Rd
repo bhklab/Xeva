@@ -9,9 +9,25 @@ plotmRECIST(mat, control.name = NA, control.col = "#238b45",
   sort = TRUE, row_fontsize = 12, col_fontsize = 12, draw_plot = TRUE)
 }
 \arguments{
-\item{object}{The \code{Xeva} dataset}
+\item{mat}{The mRECIST matrix where rows are drugs and columns are patient}
 
-\item{model.id}{The \code{model.id}}
+\item{control.name}{name of the control}
+
+\item{control.col}{color of the control}
+
+\item{drug.col}{color of the drug names}
+
+\item{colPalette}{color palette for mRECIST values}
+
+\item{name}{title of the plot}
+
+\item{sort}{if matrix should be sorted before ploting}
+
+\item{row_fontsize}{size of the row name font}
+
+\item{col_fontsize}{size of the column name font}
+
+\item{draw_plot}{default TRUE will plot the figure. If FALSE will return an object}
 }
 \value{
 plot
@@ -20,9 +36,8 @@ plot
 \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
 }
 \examples{
-data(pdxe)
+data(brca)
 ## select lung cancer pdxe data
-pdxe.lung <- summarizeResponse(pdxe, response.measure = "mRECIST",
-                               group.by="patient.id", tumor.type="NSCLC")
-plotmRECIST(pdxe.lung, control.name = "untreated")
+brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+plotmRECIST(brca.mr, control.name = "untreated")
 }

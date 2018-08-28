@@ -2,8 +2,8 @@
 % Please edit documentation in R/access_slot_drug.R
 \name{drugInfo<-}
 \alias{drugInfo<-}
-\title{drugInfo<- Generic
-Generic for drugInfo replace method}
+\title{set drug information
+set drug information slot}
 \usage{
 drugInfo(object) <- value
 }
@@ -13,13 +13,13 @@ drugInfo(object) <- value
 \item{value}{A \code{data.frame} with the new drug annotations}
 }
 \value{
-Updated \code{XevaSet}
+updated \code{XevaSet}
 }
 \description{
-drugInfo<- Generic
-Generic for drugInfo replace method
+set drug information
+set drug information slot
 }
 \examples{
-data(pdxe)
-drugInfo(pdxe) <- drugInfo(pdxe)
+data(brca)
+drugInfo(brca)<- drugInfo(brca)
 }

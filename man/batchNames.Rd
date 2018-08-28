@@ -2,20 +2,23 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{batchNames}
 \alias{batchNames}
-\title{Get all batch names}
+\title{Get batch names/ids}
 \usage{
-batchNames(object)
+batchNames(object, model.id = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet} to replace drug info in}
+\item{object}{A \code{XevaSet}}
+
+\item{model.id}{default \code{NULL}. if specified it will return batch names conting that model.id}
 }
 \value{
-A \code{Vector} with all batch.name
+A \code{Vector} with batch names
 }
 \description{
-Get all batch.name from a Xeva dataset
+Get batch names/ids from a Xeva dataset. If \code{model.id} is specified, will return all batch names conting that model.id
 }
 \examples{
-data(pdxe)
-batchNames(pdxe)
+data(brca)
+batchNames(brca)
+batchNames(brca, model.id="X.6047.uned")
 }
