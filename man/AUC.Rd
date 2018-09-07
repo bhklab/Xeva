@@ -2,7 +2,8 @@
 % Please edit documentation in R/auc.R
 \name{AUC}
 \alias{AUC}
-\title{\code{AUC} returns area under the curve}
+\title{area under the curve
+\code{AUC} returns area under the curve}
 \usage{
 AUC(time, volume)
 }
@@ -15,6 +16,7 @@ AUC(time, volume)
 returns angle and \code{slope} object
 }
 \description{
+area under the curve
 \code{AUC} returns area under the curve
 }
 \examples{

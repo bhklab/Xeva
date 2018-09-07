@@ -137,9 +137,7 @@
 .reformatExpDesig <- function(expDig)
 {
   if(any(c("batch.name", "treatment", "control") %in% names(expDig)))
-  {
-    expDig <- list(expDig)
-  }
+  { expDig <- list(expDig) }
   names(expDig) <- sapply(expDig, "[[", "batch.name")
   return(expDig)
 }
@@ -196,15 +194,12 @@
   return(df)
 }
 
-.getBatchData <- function(object, batchName=NULL, expDig =NULL, treatment.only=FALSE,
+.getBatchData <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL,
+                          treatment.only=FALSE,
                           max.time=NULL, return.list = TRUE, impute.value=FALSE,
                           vol.normal=FALSE, drug.name=TRUE, concurrent.time=FALSE)
 {
-  if(is.null(batchName) & is.null(expDig))
-  { stop("please provide 'batchName' or 'expDig'") }
-
-  if(!is.null(batchName))
-  { expDig <- expDesign(object, batchName) }
+  expDig <- getBatchFormatted(object, batch, patient.id, drug, control.name)
   expDig <- .reformatExpDesig(expDig)[[1]]
 
   dfp <- list()
@@ -296,8 +291,7 @@
 #'
 #' @param object The \code{XevaSet}
 #' @param model.id The \code{model.id} for which data is required, multipal allowed
-#' @param batchName batch name from the Xeva set
-#' @param expDig Experiment design
+#' @param batch batch name from the Xeva set or experiment design
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @param max.time maximum time for data
 #' @param vol.normal default \code{TRUE} will use
@@ -309,14 +303,16 @@
 #' data(brca)
 #' getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
 #' getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
-#' getExperiment(brca, batchName="X-6047.paclitaxel", treatment.only=TRUE)
-#' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+#' getExperiment(brca, batch="X-6047.paclitaxel", treatment.only=TRUE)
+#' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
-#' getExperiment(brca, expDig=expDesign)
+#'
+#' getExperiment(brca, batch=ed)
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(name = "getExperiment",
-           def = function(object, model.id=NULL, batchName=NULL, expDig=NULL,
+           def = function(object, model.id=NULL, batch=NULL,
+                          patient.id=NULL, drug=NULL, control.name=NULL,
                           treatment.only=FALSE, max.time=NULL, vol.normal=FALSE,
                           return.list = FALSE, impute.value=FALSE,
                           concurrent.time=FALSE)
@@ -325,14 +321,15 @@ setGeneric(name = "getExperiment",
 #' @export
 setMethod( f=getExperiment,
            signature="XevaSet",
-           definition=function(object, model.id=NULL, batchName=NULL, expDig=NULL,
+           definition=function(object, model.id=NULL, batch=NULL,
+                               patient.id=NULL, drug=NULL, control.name=NULL,
                                treatment.only=FALSE, max.time=NULL, vol.normal=FALSE,
                                return.list = FALSE, impute.value=FALSE,
                                concurrent.time=FALSE)
            {
-             if(is.null(model.id) & is.null(batchName) & is.null(expDig))
+             if(is.null(model.id) & is.null(batch) & is.null(patient.id))
              {
-               msg = sprintf("'model.id' 'batchName' and 'expDig' all NULL")
+               msg <- sprintf("'model.id' 'batch' and 'patient.id' all NULL")
                stop(msg)
              }
 
@@ -350,9 +347,10 @@ setMethod( f=getExperiment,
                { rtz <- rtz[rtz$time<=max.time, ] }
              }
 
-             if(is.null(model.id))
+             if(!is.null(batch) | !is.null(patient.id))
              {
-               rtz <- .getBatchData(object, batchName=batchName, expDig=expDig,
+               rtz <- .getBatchData(object, batch=batch, patient.id=patient.id,
+                                    drug=drug, control.name=control.name,
                                     treatment.only=treatment.only, max.time=max.time,
                                     return.list = return.list,
                                     impute.value=impute.value,
@@ -361,3 +359,10 @@ setMethod( f=getExperiment,
              }
              return(rtz)
            })
+
+
+
+
+##----------
+#patient.id="X-5249"; drug="BKM120"; control.name = "untreated"
+

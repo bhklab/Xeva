@@ -72,3 +72,46 @@ setMethod(f="expDesign", signature=c(object = "XevaSet"),
 
 ##------------------------------------------------------------------------------
 
+
+getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL)
+{
+  if(!is.null(batch))
+  {
+    if(is.character(batch))
+    {
+      bt <- slot(object, "expDesign")[[batch]]
+      if(is.null(bt))
+      {
+        msg <- sprintf("batch name %s not present in object", batch)
+        stop(msg)
+      }
+      return(bt)
+    }
+
+    if(is.list(batch))
+    {
+      if(!"batch.name" %in% names(batch))
+      { stop(sprintf("'batch.name' is required")) }
+
+      if(is.null(batch$treatment) & is.null(batch$control))
+      { stop(sprintf("'treatment' and 'control' both can't be NULL")) }
+
+      allMod <- c(batch$treatment, batch$control)
+      modNotPr <- setdiff(allMod, rownames(modelInfo(object)))
+      if(length(modNotPr)>0)
+      {
+        stop(sprintf("model.id not present in dataset: %s", paste(modNotPr, collapse = ", ")))
+      }
+
+      return(batch)
+    }
+  } else {
+    mid <- modelInfo(object)
+    mid <- mid[mid$patient.id==patient.id, ]
+    rtx <- list(name=patient.id)
+    rtx$treatment <- mid[mid$drug==drug, "model.id"]
+    if(!is.null(control.name))
+    { rtx$control <- mid[mid$drug==control.name, "model.id"]}
+    return(rtx)
+  }
+}

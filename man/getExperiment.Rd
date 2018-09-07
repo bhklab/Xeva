@@ -5,18 +5,17 @@
 \title{For a given  model.id, it will return a data.fram
 containing all data stored in experiment slot}
 \usage{
-getExperiment(object, model.id = NULL, batchName = NULL, expDig = NULL,
-  treatment.only = FALSE, max.time = NULL, vol.normal = FALSE,
-  return.list = FALSE, impute.value = FALSE, concurrent.time = FALSE)
+getExperiment(object, model.id = NULL, batch = NULL, patient.id = NULL,
+  drug = NULL, control.name = NULL, treatment.only = FALSE,
+  max.time = NULL, vol.normal = FALSE, return.list = FALSE,
+  impute.value = FALSE, concurrent.time = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet}}
 
 \item{model.id}{The \code{model.id} for which data is required, multipal allowed}
 
-\item{batchName}{batch name from the Xeva set}
-
-\item{expDig}{Experiment design}
+\item{batch}{batch name from the Xeva set or experiment design}
 
 \item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
 
@@ -41,9 +40,10 @@ containing all data stored in experiment slot
 data(brca)
 getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
 getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
-getExperiment(brca, batchName="X-6047.paclitaxel", treatment.only=TRUE)
-expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+getExperiment(brca, batch="X-6047.paclitaxel", treatment.only=TRUE)
+ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
              control=c("X.6047.uned"))
-getExperiment(brca, expDig=expDesign)
+
+getExperiment(brca, batch=ed)
 
 }

@@ -4,20 +4,18 @@
 \alias{plotBatch}
 \title{Plot batch data}
 \usage{
-plotBatch(object, batchName = NULL, expDig = NULL, max.time = NULL,
-  treatment.only = FALSE, vol.normal = FALSE, impute.value = TRUE,
-  concurrent.time = FALSE, control.col = "#6baed6",
-  treatment.col = "#fc8d59", title = "", xlab = "Time", ylab = "Volume",
-  log.y = FALSE, drug.name = NULL, SE.plot = c("all", "none", "errorbar",
-  "ribbon"), aspect.ratio = c(1, NULL), minor.line.size = 0.5,
-  major.line.size = 0.7)
+plotBatch(object, batch = NULL, patient.id = NULL, drug = NULL,
+  control.name = NULL, max.time = NULL, treatment.only = FALSE,
+  vol.normal = FALSE, impute.value = TRUE, concurrent.time = FALSE,
+  control.col = "#6baed6", treatment.col = "#fc8d59", title = "",
+  xlab = "Time", ylab = "Volume", log.y = FALSE, drug.name = NULL,
+  SE.plot = c("all", "none", "errorbar", "ribbon"), aspect.ratio = c(1,
+  NULL), minor.line.size = 0.5, major.line.size = 0.7)
 }
 \arguments{
 \item{object}{Xeva object}
 
-\item{batchName}{batch name}
-
-\item{expDig}{Experiment design list}
+\item{batch}{batch name or experiment design list}
 
 \item{max.time}{maximum time point of the plot, default \code{NULL} will plot complete data}
 
@@ -57,9 +55,9 @@ Plot data for a batch id or experiment design
 }
 \examples{
 data(brca)
-plt <- plotBatch(brca, batchName="X-1004.BGJ398", vol.normal=TRUE)
+plotBatch(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
 expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
              control=c("X.6047.uned"))
-plotBatch(brca, expDig=expDesign, vol.normal=T)
-plotBatch(brca, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
+plotBatch(brca, batch=expDesign, vol.normal=T)
+plotBatch(brca, batch=expDesign, vol.normal=F, SE.plot = "errorbar")
 }

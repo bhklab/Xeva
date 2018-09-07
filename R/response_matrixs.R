@@ -113,7 +113,7 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     sen$batch[, c("slope.control", "slope.treatment", "angle")] <- NA
     for(bid in batchNames(object))
     {
-      sl <- response(object, batchName = bid, res.measure="angle",
+      sl <- response(object, batch = bid, res.measure="angle",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
                      concurrent.time=concurrent.time, verbose=verbose)
@@ -128,7 +128,7 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
     for(bid in batchNames(object))
     {
-      sl <- response(object, batchName = bid, res.measure="abc",
+      sl <- response(object, batch = bid, res.measure="abc",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
                      concurrent.time=concurrent.time, verbose=verbose)
@@ -152,8 +152,7 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #' @param object Xeva object
 #' @param res.measure response measure
 #' @param model.id model id for which response to be computed
-#' @param batchName batch id for which response to be computed
-#' @param expDig experiment design for which response to be computed
+#' @param batch batch id or experiment design for which response to be computed
 #' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
 #' @param min.time default \strong{10} days. Used for \emph{mRECIST} computation
 #' @param max.time maximum time for data
@@ -168,21 +167,22 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #' data(brca)
 #' response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
 #'
-#' response(brca, batchName="X-6047.paclitaxel", res.measure="angle")
+#' response(brca, batch="X-6047.paclitaxel", res.measure="angle")
 #'
 #' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
-#' response(brca, expDig=ed, res.measure="angle")
+#' response(brca, batch=ed, res.measure="angle")
 #'
 #' @export
-response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
+response <- function(object, model.id=NULL,
+                     batch=NULL,
                      res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
                      treatment.only=TRUE, max.time=NULL, impute.value=TRUE,
                      min.time=10, concurrent.time =TRUE, vol.normal=F,
                      verbose=TRUE)
 {
-  if(is.null(model.id) & is.null(batchName) & is.null(expDig))
-  { stop("'model.id', 'batchName' and 'expDig' all NULL") }
+  if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
+  { stop("'model.id', 'batch' all NULL") }
 
   model.measure <- c("mRECIST", "best.response", "best.response.time",
                      "best.average.response", "best.average.response.time",
@@ -221,11 +221,10 @@ response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
 
   }
 
-
   ##-----------------for batch -------------------------------------------------
   if(is.null(model.id))
   {
-    dl <- getExperiment(object, batchName=batchName, expDig=expDig,
+    dl <- getExperiment(object, batch=batch,
                         treatment.only=treatment.only, max.time=max.time,
                         vol.normal=vol.normal, impute.value=impute.value,
                         concurrent.time=concurrent.time)
@@ -240,18 +239,12 @@ response <- function(object, model.id=NULL, batchName=NULL, expDig=NULL,
     if(sum(tInd)>1)
     { treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]}
 
-    printMessage <- function(meas, batchName, expDig)
-    {
-      if(!is.null(batchName))
-      { cat(sprintf("computing %s for batch %s\n",meas, batchName)) } else
-      {
-        if(!is.null(expDig$batch.name))
-        {cat(sprintf("computing %s for batch %s\n",meas,expDig$batch.name)) } else
-        {cat(sprintf("computing %s for experiemnt\n", meas))}
-      }
-    }
+    if(verbose==TRUE){
+      if(is.character(batch))
+        {bName <- batch} else {bName <- batch$batch.name}
+      cat(sprintf("computing %s for batch %s\n",res.measure, bName))
 
-    if(verbose==TRUE){ printMessage(res.measure, batchName, expDig) }
+      }
     ###--------compute angle for batch -----------------------------------------
     if(res.measure =="angle")
     {

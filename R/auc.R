@@ -4,8 +4,9 @@
   auc <- as.double((x[n]-x[n - 1]) %*% (y[n] + y[n - 1]))/2
   return(auc)
 }
-##-------- aac for 1 model ------------------------------
-#'
+
+
+#' area under the curve
 #' \code{AUC} returns area under the curve
 #'
 #' @param time vector of time
@@ -33,7 +34,7 @@ AUC <- function(time, volume)
   #return(auc)
 }
 
-#' compute area between two curves
+#' area between curves
 #' compute area between two time-volume curves
 #'
 #' @param contr.time time vector for control

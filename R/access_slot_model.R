@@ -132,6 +132,3 @@ mapModelSlotIds <- function(object, id, id.name, map.to="all", unique=TRUE)
   return(btMapRet)
 }
 
-
-
-

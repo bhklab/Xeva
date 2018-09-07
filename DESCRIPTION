@@ -7,6 +7,7 @@ Maintainer: Arvind Mer <amer@uhnresearch.ca>
 Description: Contains set of functions to perform analysis of patient-derived xenograft (PDX) data.
 License: Artistic-2.0
 RoxygenNote: 6.0.1
+LazyData: true
 VignetteBuilder: knitr
 Suggests: knitr
 Imports:

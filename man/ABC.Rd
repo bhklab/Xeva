@@ -2,7 +2,7 @@
 % Please edit documentation in R/auc.R
 \name{ABC}
 \alias{ABC}
-\title{compute area between two curves
+\title{area between curves
 compute area between two time-volume curves}
 \usage{
 ABC(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
@@ -23,7 +23,7 @@ ABC(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
 returns batch response object
 }
 \description{
-compute area between two curves
+area between curves
 compute area between two time-volume curves
 }
 \examples{

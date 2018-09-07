@@ -105,19 +105,13 @@
 
 ######--------------------------------------------------------------------------
 ######--------------------------------------------------------------------------
-#batchName = "PHLC153_P6"
-##
-# data(lpdx)
-# plotBatch(lpdx, "PHLC153_P6", treatment.only=FALSE, log.y=TRUE)
-
 
 #' Plot batch data
 #'
 #' Plot data for a batch id or experiment design
 #'
 #' @param object Xeva object
-#' @param batchName batch name
-#' @param expDig Experiment design list
+#' @param batch batch name or experiment design list
 #' @param max.time maximum time point of the plot, default \code{NULL} will plot complete data
 #' @param treatment.only default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment
 #' @param vol.normal default \code{FALSE} . If TRUE volume will ne normalised
@@ -138,14 +132,14 @@
 #'
 #' @examples
 #' data(brca)
-#' plt <- plotBatch(brca, batchName="X-1004.BGJ398", vol.normal=TRUE)
+#' plotBatch(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
 #' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
-#' plotBatch(brca, expDig=expDesign, vol.normal=T)
-#' plotBatch(brca, expDig=expDesign, vol.normal=F, SE.plot = "errorbar")
+#' plotBatch(brca, batch=expDesign, vol.normal=T)
+#' plotBatch(brca, batch=expDesign, vol.normal=F, SE.plot = "errorbar")
 #' @export
-plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
-                      treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE,
+plotBatch <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL,
+                      max.time=NULL, treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE,
                       concurrent.time=FALSE,
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
@@ -157,7 +151,8 @@ plotBatch <- function(object, batchName=NULL, expDig =NULL, max.time=NULL,
   SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
-  dfp <- getExperiment(object, batchName=batchName, expDig=expDig,
+  dfp <- getExperiment(object, batch=batch,
+                       patient.id=patient.id, drug=drug, control.name=control.name,
                        treatment.only=treatment.only, max.time=max.time,
                        vol.normal=vol.normal, return.list = TRUE,
                        concurrent.time = concurrent.time)

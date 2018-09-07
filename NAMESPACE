@@ -2,7 +2,6 @@
 
 export(ABC)
 export(AUC)
-export(PDX_MI)
 export(angle)
 export(creatXevaSet)
 export(getMolecularProfiles)

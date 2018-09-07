@@ -4,19 +4,17 @@
 \alias{response}
 \title{compute response}
 \usage{
-response(object, model.id = NULL, batchName = NULL, expDig = NULL,
-  res.measure = c("angle", "mRECIST", "AUC", "angle", "abc"),
-  treatment.only = TRUE, max.time = NULL, impute.value = TRUE,
-  min.time = 10, concurrent.time = TRUE, vol.normal = F, verbose = TRUE)
+response(object, model.id = NULL, batch = NULL, res.measure = c("angle",
+  "mRECIST", "AUC", "angle", "abc"), treatment.only = TRUE, max.time = NULL,
+  impute.value = TRUE, min.time = 10, concurrent.time = TRUE,
+  vol.normal = F, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object}
 
 \item{model.id}{model id for which response to be computed}
 
-\item{batchName}{batch id for which response to be computed}
-
-\item{expDig}{experiment design for which response to be computed}
+\item{batch}{batch id or experiment design for which response to be computed}
 
 \item{res.measure}{response measure}
 
@@ -44,10 +42,10 @@ returns model or batch response object
 data(brca)
 response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
 
-response(brca, batchName="X-6047.paclitaxel", res.measure="angle")
+response(brca, batch="X-6047.paclitaxel", res.measure="angle")
 
 ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
              control=c("X.6047.uned"))
-response(brca, expDig=ed, res.measure="angle")
+response(brca, batch=ed, res.measure="angle")
 
 }
