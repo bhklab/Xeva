@@ -22,7 +22,7 @@ createXevaModelClass <- function()
   pdxmodSlote <- append(xevaVar, pdxmiVar)
   pdxmodPrototype <- append(xevaPrototype, pdxmiPrototype)
 
-  PDXmodClass<-setClass("PDX_model",
+  PDXmodClass<-setClass("pdxModel",
                       slots=pdxmodSlote,
                       prototype=pdxmodPrototype
                       )
@@ -37,7 +37,7 @@ PDXmodClass <- createXevaModelClass()
 ## @export
 #' @import methods
 setMethod(f="show",
-          signature="PDX_model",
+          signature="pdxModel",
           definition= function(object)
           {
             msg <- sprintf("model.id = %s\ndrug = %s\n",

@@ -62,20 +62,22 @@ creatXevaSet <- function(name,
 
 
 
-##===============================================================================
+##==============================================================================
+#setGeneric("show", function(object, model.id) { standardGeneric("show")})
+
 #' A method to display object
 #' for "show" setGeneric is already defined
 #' @import methods
-setMethod(f="show", signature="XevaSet", definition= function(object)
-          {
-            msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
-                           slot(object, "annotation")$name, slot(object, "annotation")$dateCreated,
-                           length(slot(object, "experiment")), nrow(slot(object, "drug")),
-                           paste(names(slot(object, "molecularProfiles")), collapse = ", ")
-                           )
-            cat(msg)
-          }
-          )
+setMethod(f="show", signature="XevaSet",
+          definition= function(object)
+{
+  msg <- sprintf("Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
+                   slot(object, "annotation")$name, slot(object, "annotation")$dateCreated,
+                   length(slot(object, "experiment")), nrow(slot(object, "drug")),
+                   paste(names(slot(object, "molecularProfiles")), collapse = ", ")
+                   )
+  cat(msg)
+})
 
 
 

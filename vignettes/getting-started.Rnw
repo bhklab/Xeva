@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+
+\newenvironment{myitemize}
+{ \begin{itemize}
+    \setlength{\itemsep}{0.5pt}
+    \setlength{\parskip}{0.5pt}
+    \setlength{\parsep}{0.5pt}     }
+{ \end{itemize}                  }
+
+
+\title{The Xeva user's guide}
+\author[1,2]{Arvind Mer}
+\author[1,2,3]{Benjamin Haibe-Kains}
+\affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
+\affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+<<options, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+library(Xeva)
+@
+
+\section{Introduction}
+
+The Xeva package provides efficient and powerfull functions for patient drived xenograft (PDX) based pharmacogenomic data analysis.
+
+\section{Installation and Settings}
+
+Xeva requires that several packages are installed. However, all dependencies are available from CRAN or Bioconductor.
+
+<<univariate_narrow_library, results='hide', message=FALSE, eval=FALSE>>=
+source('http://bioconductor.org/biocLite.R')
+biocLite('Xeva')
+@
+
+Load Xeva into your current workspace:
+<<l, results='hide', message=FALSE, eval=TRUE>>=
+library(Xeva)
+@
+
+Load PDXE breast cancer dataset:
+<<l2>>=
+data(brca)
+print(brca)
+@
+
+\section{Definations}
+Before we further dive into the analysis and visualization, it is important to underastand terms used in the \Rpackage{Xeva} package. In a \textb{Xeva} object, the \textb{experiment} slot stores each individual PDX/mouse data. This data is stored using the class \textb{pdxModel} and a unique id called \textit{model.id} is given to each PDX model.
+Therefore \textit{model.id} represents individual mouse/PDX id. We can visualize data for an exampl
+
+
+\section{PDX Data Access}
+To store and access the data \textbf{Xeva} uses \Sexpr{class(brca)[1]} class.
+Xeva stores data for each individual PDX model. We can see the infromation about models using:
+<<l3>>=
+brca.mod <- modelInfo(brca)
+brca.mod[1:4, ]
+@
+
+
+\section{PDX Model Response}
+Xeva can effectively summarize the PDX response data. Here we summarize the \textbf{mRECIST} values for models in the dataset:
+
+<<l4>>=
+brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
+brca.mr[1:5, 1:4]
+@
+
+These \textbf{mRECIST}  values can be visualized as:
+<<l5, fig.cap="mRECIST plot for PDXE breast cancer data",fig.width=12, fig.height=8>>=
+plotmRECIST(brca.mr, control.name = "untreated")
+@
+
+
+\section{Visualizing PDX Growth Curve}
+
+<<l6, fig.cap="mRECIST plot for PDXE breast cancer data",fig.width=12, fig.height=8>>=
+plotBatch(brca, batch = "X-4567.BKM120")
+
+plotBatch(brca, patient.id="X-4567", drug="BKM120", control.name="untreated")
+@
+
+
+\end{document}
