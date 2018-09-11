@@ -53,7 +53,7 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   rtxData$body.weight<- as.numeric(rtxData$body.weight)
   rtxData$date  <- as.Date(rtxData$date)
 
-  rtxData[ ,doseColsNames]= sapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )
+  rtxData[ ,doseColsNames]<- sapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )
 
   rtxData <- BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
@@ -117,11 +117,11 @@ makePDXModClassS4 <- function(exp.mod.dg, extraCol)
 ###----- define standard column names -----------
 .getColumnsDF <- function()
 {
-  standCol = c("model.id", "drug", "time", "volume", "width","length",
+  standCol <- c("model.id", "drug", "time", "volume", "width","length",
                "date", "body.weight","formula")
 
-  requredCols = c("model.id", "time", "volume", "drug")
-  rtz = list(standCol=standCol,requredCols=requredCols)
+  requredCols <- c("model.id", "time", "volume", "drug")
+  rtz <- list(standCol=standCol,requredCols=requredCols)
   return(rtz)
 }
 
@@ -129,9 +129,9 @@ makePDXModClassS4 <- function(exp.mod.dg, extraCol)
 ## @export
 experimentSlotfromDf <- function(experiment)
 {
-  clnm = .getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
+  clnm <- .getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
 
-  drugColsName = colnames(experiment)[grep("drug",colnames(experiment))]
+  drugColsName <- colnames(experiment)[grep("drug",colnames(experiment))]
 
   requredCols = c("model.id", "time", "volume", drugColsName)
   colAbsent = setdiff(requredCols, colnames(experiment))
@@ -150,7 +150,7 @@ experimentSlotfromDf <- function(experiment)
     cat(msg)
   }
 
-  doseColsName = colnames(experiment)[grep("dose",colnames(experiment))]
+  doseColsName <- colnames(experiment)[grep("dose",colnames(experiment))]
   if(length(doseColsName)==0)
   {
     msg = sprintf("No dose column found\n")
@@ -179,9 +179,7 @@ experimentSlotfromDf <- function(experiment)
   }
 
   ##------- if drug names are already in drug1 + drug2 split them ----------
-
-
-  u.modDrg.id = unique(experiment[, c("model.id", "drug")])
+  u.modDrg.id <- unique(experiment[, c("model.id", "drug")])
   if(any(is.na(u.modDrg.id$model.id)))
   { stop("model.id is NA") }
 
@@ -196,11 +194,10 @@ experimentSlotfromDf <- function(experiment)
   expSlot = list()
   for (i in 1:dim(u.modDrg.id)[1])
   {
-    exp.mod.dg = subset(experiment,
+    exp.mod.dg <- subset(experiment,
                      experiment$model.id== u.modDrg.id[i, "model.id"] &
                      experiment$drug == u.modDrg.id[i, "drug"] )
 
-    #expSlot[[i]] = creatListFromDF(exp.mod.dg, extraCol=extraCol)
     expSlot[[i]] <- makePDXModClassS4(exp.mod.dg, extraCol=extraCol)
   }
 
