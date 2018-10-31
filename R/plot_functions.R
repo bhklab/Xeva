@@ -104,7 +104,30 @@
 }
 
 ######--------------------------------------------------------------------------
+#' @import ggplot2
+.plotMultipalModels <- function(dfx, color=NULL, major.line.size=1, aspect.ratio=NULL)
+{
+  plt <- ggplot(dfx, aes_string(x="time", y="volume", color= "model.id"))
+  plt <- plt + geom_line(linetype = 1, size=major.line.size)+ geom_point()
+
+  if(!is.null(color))
+  { plt <- plt+scale_color_manual(values = color) }
+
+  plt <- .ggplotEmptyTheme(plt)
+
+  if(!is.null(aspect.ratio))
+  {
+    plt <- plt + theme(aspect.ratio=aspect.ratio)
+  }
+  return(plt)
+
+}
+
 ######--------------------------------------------------------------------------
+
+
+
+
 
 #' Plot batch data
 #'
@@ -116,13 +139,14 @@
 #' @param treatment.only default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment
 #' @param vol.normal default \code{FALSE} . If TRUE volume will ne normalised
 #' @param impute.value default \code{TRUE}, will impute values where missing
+#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
 #' @param control.col color for control plots
 #' @param treatment.col color for treatment plots
 #' @param title title of the plot
 #' @param xlab title of x axis
 #' @param ylab title of y axis
 #' @param log.y default \code{FALSE}, if \code{TRUE} y axis will be in log
-#' @param drug.name default \code{NULL} will extract drug name from data
+#' @param drug default \code{NULL} will extract drug name from data
 #' @param SE.plot plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}
 #' @param aspect.ratio default \code{1} will create equeal width and height plot
 #' @param minor.line.size line size for minor lines default \code{0.5}
@@ -132,18 +156,62 @@
 #'
 #' @examples
 #' data(brca)
-#' plotBatch(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
+#' plotPDX(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"))
+#'
+#' plotPDX(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
 #' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
 #' plotBatch(brca, batch=expDesign, vol.normal=T)
 #' plotBatch(brca, batch=expDesign, vol.normal=F, SE.plot = "errorbar")
 #' @export
+plotPDX <- function(object, batch=NULL,
+                    patient.id=NULL, drug=NULL, model.id=NULL, model.color=NULL,
+                    control.name=NULL,
+                    max.time=NULL, treatment.only=FALSE, vol.normal=FALSE,
+                    impute.value=TRUE, concurrent.time=FALSE,
+                    control.col = "#e41a1c", treatment.col = "#377eb8",
+                    title="", xlab = "Time", ylab = "Volume",
+                    log.y=FALSE, #drug.name=NULL,
+                    SE.plot = c("all", "none", "errorbar", "ribbon"),
+                    aspect.ratio=c(1, NULL),
+                    minor.line.size=0.5, major.line.size=0.7)
+{
+  if(!is.null(model.id))
+  {
+    dfx <- getExperiment(object, model.id=model.id,
+                         treatment.only=treatment.only, max.time=max.time,
+                         vol.normal=vol.normal, return.list = FALSE,
+                         concurrent.time = concurrent.time)
+
+    .plotMultipalModels(dfx, color=model.color, major.line.size=major.line.size,
+                        aspect.ratio=aspect.ratio)
+
+  } else
+  {
+    plotBatch(object, batch=batch, patient.id=patient.id, drug=drug,
+              control.name=control.name, max.time=max.time,
+              treatment.only=treatment.only, vol.normal=vol.normal,
+              impute.value=impute.value,
+              concurrent.time=concurrent.time,
+              control.col = control.col, treatment.col=treatment.col,
+              title=title, xlab = xlab, ylab = ylab,
+              log.y=log.y, #drug.name=drug.name,
+              SE.plot =SE.plot,
+              aspect.ratio=aspect.ratio,
+              minor.line.size=minor.line.size, major.line.size=major.line.size)
+  }
+
+}
+
+#' @rdname plotPDX
+#### @export
 plotBatch <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL,
-                      max.time=NULL, treatment.only=FALSE, vol.normal=FALSE, impute.value=TRUE,
+                      max.time=NULL, treatment.only=FALSE, vol.normal=FALSE,
+                      impute.value=TRUE,
                       concurrent.time=FALSE,
                       control.col = "#6baed6", treatment.col="#fc8d59",
                       title="", xlab = "Time", ylab = "Volume",
-                      log.y=FALSE, drug.name=NULL,
+                      log.y=FALSE,
                       SE.plot = c("all", "none", "errorbar", "ribbon"),
                       aspect.ratio=c(1, NULL),
                       minor.line.size=0.5, major.line.size=0.7)
@@ -155,18 +223,18 @@ plotBatch <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.na
                        patient.id=patient.id, drug=drug, control.name=control.name,
                        treatment.only=treatment.only, max.time=max.time,
                        vol.normal=vol.normal, return.list = TRUE,
+                       impute.value=impute.value,
                        concurrent.time = concurrent.time)
 
   dfp$mean <- dfp$batch ##plot function uses mean as variable
-  if(is.null(drug.name))
-  {drug.name <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
+
+  if(is.null(drug))
+  {drug <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
 
   .plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
-                    title=title, xlab = xlab, ylab = ylab,
-                    log.y=log.y, drgName=drug.name,
-                    SE.plot = SE.plot, aspect.ratio=aspect.ratio,
-                    minor.line.size=minor.line.size,
-                    major.line.size=major.line.size)
+                     title=title, xlab = xlab, ylab = ylab,
+                     log.y=log.y, drgName=drug, #.name,
+                     SE.plot = SE.plot, aspect.ratio=aspect.ratio,
+                     minor.line.size=minor.line.size,
+                     major.line.size=major.line.size)
 }
-
-

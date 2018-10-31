@@ -1,18 +1,8 @@
-\documentclass[11pt]{article}
-<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
 @
-
-\usepackage[utf8]{inputenc}
-\usepackage{authblk}
-
-\newenvironment{myitemize}
-{ \begin{itemize}
-    \setlength{\itemsep}{0.5pt}
-    \setlength{\parskip}{0.5pt}
-    \setlength{\parsep}{0.5pt}     }
-{ \end{itemize}                  }
-
 
 \title{The Xeva user's guide}
 \author[1,2]{Arvind Mer}
@@ -21,8 +11,9 @@ BiocStyle::latex()
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
 \affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
 
-\begin{document}
+\date{\today}
 
+\begin{document}
 \maketitle
 \tableofcontents
 \newpage
@@ -39,7 +30,7 @@ The Xeva package provides efficient and powerfull functions for patient drived x
 
 Xeva requires that several packages are installed. However, all dependencies are available from CRAN or Bioconductor.
 
-<<univariate_narrow_library, results='hide', message=FALSE, eval=FALSE>>=
+<<get_lib, results='hide', message=FALSE, eval=FALSE>>=
 source('http://bioconductor.org/biocLite.R')
 biocLite('Xeva')
 @
@@ -56,16 +47,79 @@ print(brca)
 @
 
 \section{Definations}
-Before we further dive into the analysis and visualization, it is important to underastand terms used in the \Rpackage{Xeva} package. In a \textb{Xeva} object, the \textb{experiment} slot stores each individual PDX/mouse data. This data is stored using the class \textb{pdxModel} and a unique id called \textit{model.id} is given to each PDX model.
-Therefore \textit{model.id} represents individual mouse/PDX id. We can visualize data for an exampl
+Before we further dive into the analysis and visualization, it is important to underastand terms used in the \Rpackage{Xeva} package.
+In a \textbf{Xeva} object, the \textbf{experiment} slot stores each individual PDX/mouse data. Other then the tumore growth data (time vs. tumor volume), for each individual PDX/mouse we can have meta data such as patient's age, sex, tissue histology, passage infromation etc.
+All this data is stored using the class \textbf{pdxModel} and a unique id called \texttt{model.id} is given to each PDX/mouse model.
+We will see later how to get data for an individual \textit{model.id}.
+
+A PDX experiment can one of the two catagerious:
+\begin{itemize}
+  \item \textbf{treatment} are the experiments in which PDX recives drug (or drug combination)
+  \item \textbf{control} are the experiments where PDX recives no drug
+\end{itemize}
+
+To see the effect of the drug several replicate experiemts are done for control and treatment.
+In \textbf{Xeva} a collection of PDX \textit{model.ids} which are orignetating form same patient are called \textit{batch}. A \textit{batch} have two arms: \textit{control} and \textit{treatment}. This is illustreate in figure~\ref{fig:1}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[keepaspectratio=true,width=1\textwidth]{figure/Xeva_batch_2.pdf}
+    \caption{A PDX experiment. Text under the each PDX (e.g. m1, m2, p1 etc.) denotes \textit{model.id} in \textbf{Xeva}. In this example three PDX are delclered as control (m1, m2 and m2). Simillerly in a treatment arm 3 PDXs are give drug paclitaxel (p1, p2 and p3). The PDXs in control arm and one of the treatment arm togather consitute a \textit{batch}. For example control arm models (m1, m2, m3) and treatment arm moldes (t1,t2, t3) togather creates a batch called batch-2. } \label{fig:1}
+\end{figure}
+
+A \textbf{Xeva} objects binds togather all individual experiments, batch infroamtion and moleculer data into one single class \Sexpr{class(brca)[1]}.
 
 
-\section{PDX Data Access}
-To store and access the data \textbf{Xeva} uses \Sexpr{class(brca)[1]} class.
-Xeva stores data for each individual PDX model. We can see the infromation about models using:
+\section{Data Access}
+As mentioned earlier \textbf{Xeva} stores data for each individual PDX model.
+We can retrive meta information about PDX  such as number of models and tissue type see the infromation about models using:
 <<l3>>=
 brca.mod <- modelInfo(brca)
+dim(brca.mod)
 brca.mod[1:4, ]
+@
+The output shows that the \textit{brca} dataset contatins \Sexpr{nrow(brca.mod)} PDX models.
+We can see time vs. tumore volume data for a model as:
+
+<<expre>>=
+model.data <- getExperiment(brca, model.id = "X.1004.BG98")
+head(model.data)
+@
+
+Simillerly for \textbf{batch} we can obtin all predefined batch names as:
+
+<<batch1>>=
+batch.name <- batchInfo(brca)
+batch.name[1:4]
+@
+
+The information about a \textbf{batch} can be shown as :
+<<batch2>>=
+batchInfo(brca, batch = "X-1004.binimetinib")
+@
+Here for the batch named \textit{X-1004.binimetinib} we can see that control sample is \textit{X.1004.uned} and treatment sample is \textit{X.1004.biib}.
+
+
+
+\section{Visualizing PDX Growth Curve}
+
+Xeva provides function to plot time vs. tumor volum data for individual models and also for a batch. Data can be plotted by using the name of the batch:
+<< plot1, fig.cap="Tumor growth curve for control and treated PDX", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, batch = "X-4567.BKM120")
+@
+
+
+Different aspects of this visualization can be chaged. For example we can plot normalized volume and change colors of lines:
+<<pdxplot2, fig.cap="Tumor growth curve for control and treated PDX. Here volume is normalised and plots are trunketed at 40 days", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, batch = "X-4567.BKM120", vol.normal = T, control.col = "#a6611a",
+        treatment.col = "#018571", major.line.size = 1, max.time = 40)
+@
+
+
+Data can also be visualised at patient level by specifying patient id.
+%%##X-2344, X-1004, X-3078 and X-5975
+<<pdxplot3, fig.cap="Tumor growth curve for control and treated PDX generated using patient id and drug", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
 @
 
 
@@ -78,17 +132,30 @@ brca.mr[1:5, 1:4]
 @
 
 These \textbf{mRECIST}  values can be visualized as:
-<<l5, fig.cap="mRECIST plot for PDXE breast cancer data",fig.width=12, fig.height=8>>=
-plotmRECIST(brca.mr, control.name = "untreated")
+<<mR_BRCA, fig.cap="mRECIST plot for PDXE breast cancer data", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+plotmRECIST(brca.mr, control.name="untreated", row_fontsize=13, col_fontsize=12)
 @
 
 
-\section{Visualizing PDX Growth Curve}
+Waterfall plots are also commenly used to visulize the PDX response data.
+Xeva provides function to visualize and color waterfall plots.
+<<waterFall1, fig.cap="waterfall plot for binimetinib drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+waterfall(brca, drug="binimetinib", res.measure="best.average.response")
+@
 
-<<l6, fig.cap="mRECIST plot for PDXE breast cancer data",fig.width=12, fig.height=8>>=
-plotBatch(brca, batch = "X-4567.BKM120")
 
-plotBatch(brca, patient.id="X-4567", drug="BKM120", control.name="untreated")
+It is usefull to color the bars of waterfall plot by genomic properties.
+Here we create waterfallplot for drug BYL719 and color it by mutation in CDK13 gene.
+First we extract the genomic data for models:
+<<waterFall2, fig.cap="waterfall plot for binimetinib drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
+model.type <- Biobase::exprs(mut)["CDK13", ]
+model.type[grepl("Mut", model.type)] <- "mutation"
+model.type[model.type!="mutation"] <- "wild type"
+model.color <- list("mutation"="#fb8072", "wild type"="#80b1d3")
+waterfall(brca, drug="BYL719", res.measure="best.average.response",
+          model.id=names(model.type), model.type= model.type,
+          type.color = model.color)
 @
 
 

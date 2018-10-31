@@ -146,16 +146,16 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
 }
 
 
-
-
-
 .batch2DataFram <- function(object, batchName=NULL, expDig=NULL)
 {
   if(is.null(batchName) & is.null(expDig))
   { stop("please provide 'batchName' or 'expDig'") }
 
   if(!is.null(batchName))
-  { expDig <- expDesign(object, batchName) }
+  {
+    #expDig <- expDesign(object, batchName)
+    expDig <- batchInfo(object, batch = batchName)
+  }
 
   bat2mods <- data.frame()
   for(i in 1:length(expDig))

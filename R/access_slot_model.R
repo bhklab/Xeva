@@ -119,7 +119,8 @@ mapModelSlotIds <- function(object, id, id.name, map.to="all", unique=TRUE)
   btMapRet <- data.frame()
   for(bn in c(id))
   {
-    bt <- expDesign(object, batch.name = bn)
+    #bt <- expDesign(object, batch.name = bn)
+    bt <- batchInfo(object, batch = bn)
     bt.Mod <- unique(c(bt[[bn]]$treatment, bt[[bn]]$control))
     btMap <- mapModelSlotIds(object, id= bt.Mod, id.name="model.id",
                              map.to=map.to, unique=TRUE)

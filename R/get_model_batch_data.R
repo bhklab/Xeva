@@ -170,7 +170,11 @@
     {
       drugAll <- sort(unique(unlist(lapply(dfp$control, "[[", "drug.join.name"))))
       if(length(drugAll)>1)
-      { warning("multipal drugs for batch, will colleps by ;") }
+      {
+        txt <- sprintf("multipal drugs for batch (in control arm), will colleps by ;\nDrugs are %s\n",
+                       paste0(drugAll, collapse = ","))
+        warning(txt)
+      }
       dfc$drug.name <- paste(drugAll, collapse = ";")
     }
     df <- rbind(df, dfc)
@@ -185,7 +189,11 @@
     {
       drugAll <- sort(unique(unlist(lapply(dfp$treatment, "[[", "drug.join.name"))))
       if(length(drugAll)>1)
-      { warning("multipal drugs for batch, will colleps by ;") }
+      {
+        txt <- sprintf("multipal drugs for batch (in treatment arm), will colleps by ;\nDrugs are %s\n",
+                       paste0(drugAll, collapse = ","))
+        warning(txt)
+      }
       dft$drug.name <- paste(drugAll, collapse = ";")
     }
 

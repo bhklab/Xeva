@@ -1,6 +1,6 @@
 .checkmodToBiobaseMapSlot <- function(modToBiobaseMap, molecularProfiles)
 {
-  if(nrow(modToBiobaseMap) > 0 & length(molecularProfiles)>0)
+  if(!is.null(modToBiobaseMap) & nrow(modToBiobaseMap) > 0 & length(molecularProfiles)>0)
   {
     rqdCol <- c("model.id", "biobase.id", "mDataType")
     for(cx in rqdCol)

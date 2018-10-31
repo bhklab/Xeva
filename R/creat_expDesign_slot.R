@@ -1,6 +1,3 @@
-
-
-
 .checkExperimentDesign<- function(expDesign)
 {
   modNoControl = c()
@@ -22,18 +19,33 @@
   }
 
   ##------- setting name -----------------
-  bnam = sapply(expDesign, "[[", "batch.name")
-  bnamDup = bnam[duplicated(bnam)]
+  bnam <- sapply(expDesign, "[[", "batch.name")
+  bnamDup <- bnam[duplicated(bnam)]
   if(length(bnamDup)>0)
   {
-    txt = sprintf("These batch names are duplicated\n%s\n", paste(bnamDup, collapse = "\n"))
+    txt <- sprintf("These batch names are duplicated\n%s\n", paste(bnamDup, collapse = "\n"))
     stop(txt)
   }
-  names(expDesign) = bnam
+  names(expDesign) <- bnam
+
+  for(i in names(expDesign))
+  {
+    class(expDesign[[i]]) <- append(class(expDesign[[i]]),"pdxBatch")
+  }
 
   return(expDesign)
 }
 
+#' @export
+print.pdxBatch <- function(b)
+{
+  if(is.null(b$control))  { b$control  <- "NA"}
+  if(is.null(b$treatment)){ b$treatment<- "NA"}
+  txt <- sprintf("name = %s\ncontrol = %s\ntreatment = %s\n", b$batch.name,
+                 paste0(b$control, collapse = ", "),
+                 paste0(b$treatment, collapse = ", "))
+  cat(txt)
+}
 
 
 

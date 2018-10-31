@@ -9,7 +9,7 @@ License: Artistic-2.0
 RoxygenNote: 6.0.1
 LazyData: true
 VignetteBuilder: knitr
-Suggests: knitr
+Suggests: BiocStyle, knitr, rmarkdown
 Imports:
   methods,
   BBmisc,

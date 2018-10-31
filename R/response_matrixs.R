@@ -111,7 +111,8 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
   if("angle" %in% res.measure)
   {
     sen$batch[, c("slope.control", "slope.treatment", "angle")] <- NA
-    for(bid in batchNames(object))
+    #for(bid in batchNames(object))
+    for(bid in batchInfo(object))
     {
       sl <- response(object, batch = bid, res.measure="angle",
                      treatment.only=treatment.only, max.time=max.time,
@@ -126,7 +127,8 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
   if("abc" %in% res.measure)
   {
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
-    for(bid in batchNames(object))
+    #for(bid in batchNames(object))
+    for(bid in batchInfo(object))
     {
       sl <- response(object, batch = bid, res.measure="abc",
                      treatment.only=treatment.only, max.time=max.time,
