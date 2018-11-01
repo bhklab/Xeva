@@ -64,7 +64,7 @@ In \textbf{Xeva}, a collection of PDX \textit{model.ids} originating from the sa
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[keepaspectratio=true,width=1\textwidth]{figure/Xeva_batch_2.pdf}
+    \includegraphics[keepaspectratio=true,width=1\textwidth]{images/Xeva_batch_2.pdf}
     \caption{A PDX experiment. The text under each of the PDX/mouse (ie. m1, m2, p1, etc.) denotes the \textit{model.id} in \textbf{Xeva}. In this example, three PDXs are delclared as control (m1, m2, and m3). Similarly, in the treatment arm, 3 PDXs are given the drug paclitaxel (p1, p2, and p3), 3 are given tamoxifen (t1, t2, and t3), and 3 are given binimetinib (b1, b2, b3). The PDXs in the control arm and one of the treatment arms together constitute a \textit{batch}. For example, control arm models (m1, m2, and m3) and treatment arm models (t1,t2, and t3) together create a batch called batch-2. } \label{fig:1}
 \end{figure}
 
