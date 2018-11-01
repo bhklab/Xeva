@@ -48,9 +48,9 @@ print(brca)
 @
 
 \section{Definitions}
-Before we further dive into the analysis and visualization, it is important to underastand the terminology used in the \Rpackage{Xeva} package.
+Before we further dive into the analysis and visualization, it is important to understand the terminology used in the \Rpackage{Xeva} package.
 In a \textbf{Xeva} object, the \textbf{experiment} slot stores the data for each individual PDX/mouse. With the exception of tumor growth data (time vs. tumor volume), for each individual PDX/mouse, you can access metadata such as the patient's age, sex, tissue histology, and passage information.
-All of this metadata is stored in the \textbf{pdxModel} class, where a unique ID called \texttt{model.id} is given to each PDX/mouse model. As for the tumor growth information, Xeva provides separate functions for retrieving visualizing time vs. tumor volume data.
+All of this metadata is stored in the \textbf{pdxModel} class, where a unique ID called \texttt{model.id} is given to each PDX/mouse model. As for the tumor growth information, Xeva provides separate functions for retrieving and visualizing time vs. tumor volume data.
 We will see later how to get these data for an individual \textit{model.id}, but first, let's define some other terms that appear in the \Rpackage{Xeva} package.
 
 A PDX experiment can be one of the two categories:
@@ -124,7 +124,7 @@ plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
 @
 
 
-\section{PDX Model Response}
+\section{PDX Model Drug Response}
 Xeva can effectively summarize PDX drug response data. Here we summarize the \textbf{mRECIST} values for the models in our dataset:
 
 <<l4>>=
