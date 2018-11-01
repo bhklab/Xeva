@@ -14,7 +14,7 @@ BiocStyle::latex()
 \date{\today}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+
 \maketitle
 \tableofcontents
 \newpage
