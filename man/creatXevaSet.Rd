@@ -2,8 +2,7 @@
 % Please edit documentation in R/XevaSet_Class.R
 \name{creatXevaSet}
 \alias{creatXevaSet}
-\title{Creat Xeva class object
-\code{creatXevaSet} returns Xeva class object}
+\title{XevaSet constructor}
 \usage{
 creatXevaSet(name, model = data.frame(), drug = data.frame(),
   experiment = data.frame(), expDesign = list(),
@@ -20,14 +19,17 @@ creatXevaSet(name, model = data.frame(), drug = data.frame(),
 \item{experiment}{a \code{data.frame} containg all experiment information}
 
 \item{molecularProfiles}{a \code{list} of ExpressionSet objects containing different molecular profiles}
+
+\item{modToBiobaseMap}{}
 }
 \value{
 Returns Xeva object
 }
 \description{
-Creat Xeva class object
-\code{creatXevaSet} returns Xeva class object
+A constructor to create XevaSet. Only objects returned by this constructor
+are expected to work with the XevaSet methods.
 }
 \examples{
-\\code{NULL}
+NULL
+
 }
