@@ -1,0 +1,49 @@
+---
+title: "Xeva Tutorial"
+author: "Arvind Mer"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document
+vignette: >
+  %\VignetteIndexEntry{Introduction to the Xeva R package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{style-knitr, eval=TRUE, echo=FALSE, results="asis"}
+BiocStyle::latex()
+```
+
+The Xeva package provides efficient and powerfull functions for patient drived xenograft (PDX) based pharmacogenomic data analysis. 
+
+Load Xeva library and PDXE breast cancer dataset
+```{r load, echo=TRUE}
+library(Xeva)
+data(brca)
+brca
+```
+To store and access the data **Xeva** uses `r class(brca)[1]` class. 
+**Xeva** stores data for each individual PDX model. We can see the infromation about models as
+```{r, echo=TRUE, tidy=TRUE}
+brca.mod <- modelInfo(brca)
+head(brca.mod)
+```
+
+Create the mRECIST plot for data
+```{r, echo=TRUE, tidy=TRUE}
+brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
+head(brca.mr)
+plotmRECIST(brca.mr, control.name = "untreated")
+```
+
+Plot PDX curve for a drug
+```{r, echo=TRUE, tidy=TRUE}
+plotBatch(brca, batch = "X-4567.BKM120")
+
+plotBatch(brca, patient.id="X-4567", drug="BKM120", control.name="untreated")
+
+```
+

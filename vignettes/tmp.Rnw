@@ -1,0 +1,58 @@
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\title{The Xeva user's guide}
+\author[1,2]{Arvind Mer}
+\author[1,2,3]{Benjamin Haibe-Kains}
+\affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto Canada}
+\affil[2]{Department of Medical Biophysics, University of Toronto, Toronto Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto Canada}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+<<options, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+library(Xeva)
+@
+
+\section{Introduction}
+
+The Xeva package provides efficient and powerfull functions for patient drived xenograft (PDX) based pharmacogenomic data analysis.
+
+\section{Installation and Settings}
+
+Xeva requires that several packages are installed. However, all dependencies are available from CRAN or Bioconductor.
+
+<<univariate_narrow_library, results='hide', message=FALSE, eval=FALSE>>=
+source('http://bioconductor.org/biocLite.R')
+biocLite('Xeva')
+@
+
+Load Xeva into your current workspace:
+<<l, results='hide', message=FALSE, eval=TRUE>>=
+library(Xeva)
+@
+
+Load PDXE breast cancer dataset:
+<<l2>>=
+data(brca)
+print(brca)
+@
+
+\section{Definations}
+Before we further dive into the analysis and visualization, it is important to underastand terms used in the \Rpackage{Xeva} package.
+In a \textbf{Xeva} object, the \textbf{experiment} slot stores each individual PDX/mouse data.
+Other then the tumore growth data (time vs. tumor volume), for each individual PDX/mouse we can have meta data such as patient's age, sex, tissue histology, passage infromation etc.
+All this data is stored using the class \textbf{pdxModel} and a unique id called \texttt{model.id} is given to each PDX/mouse model. We will see later how to get data for an individual \textit{model.id}.
+
+
+
+
+\end{document}
