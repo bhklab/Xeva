@@ -21,7 +21,9 @@ vignettes/tmp.tex
 vignettes/tmp.pdf
 vignettes/tmp.Rnw
 vignettes/tmp-blx.bib
+vignettes/.*
 
 
 ##ignore vignette figure dir
 vignettes/figure
+vignettes/figure/*
