@@ -40,7 +40,7 @@ XevaSet <- setClass(
 #'
 #' @export
 #' @import methods
-creatXevaSet <- function(name,
+createXevaSet <- function(name,
                          model = data.frame(),
                          drug  = data.frame(),
                          experiment = data.frame(),
