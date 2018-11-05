@@ -68,7 +68,6 @@ waterfall <- function(object, drug, res.measure, group.by=NULL, tissue=NULL,
                       legend.name=NULL, yname = NULL, title=NULL, sort=TRUE)
 {
   if(is.null(yname)){ yname <- res.measure}
-  if(is.null(title)){ title <- sprintf("waterfall plot for %s", drug)}
 
   res <- summarizeResponse(object, response.measure = res.measure,
                            model.id=model.id, batch.id=batch.id,
