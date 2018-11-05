@@ -173,6 +173,7 @@ model.color <- list("mutation"="#b2182b", "wild type"="#878787")
 waterfall(brca, drug="BYL719", res.measure="best.average.response",
           model.id=names(model.type), model.type= model.type,
           type.color = model.color)
+
 @
 
 
