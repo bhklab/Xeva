@@ -3,3 +3,25 @@
 .RData
 .Ruserdata
 .Rbuildignore
+Xeva.Rproj
+
+##ignore vignette files
+vignettes/*.aux  
+vignettes/*.log  
+vignettes/*.out  
+vignettes/*.run.xml
+vignettes/*.synctex.gz
+vignettes/*concordance.tex
+vignettes/*.toc
+vignettes/*.tex
+
+
+##ignore vignette tmp files
+vignettes/tmp.tex
+vignettes/tmp.pdf
+vignettes/tmp.Rnw
+vignettes/tmp-blx.bib
+
+
+##ignore vignette figure dir
+vignettes/figure
