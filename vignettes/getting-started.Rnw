@@ -32,16 +32,32 @@ The Xeva package provides efficient and powerful functions for patient-drived xe
 Xeva requires that several packages be installed. All dependencies are available from CRAN or Bioconductor:
 
 <<get_lib, results='hide', message=FALSE, eval=FALSE>>=
-source('http://bioconductor.org/biocLite.R')
-biocLite('Xeva')
+##package not yet on bioconductor
+#source('http://bioconductor.org/biocLite.R')
+#biocLite('Xeva')
 @
+
+Package can also be install directly form github using devtools:
+
+<<githubInst, results='hide', message=FALSE, eval=FALSE>>=
+#install devtools if required
+install.packages("devtools")
+
+#install Xeva as:
+devtools::install_github("bhklab/Xeva")
+@
+
 
 Load Xeva into your current workspace:
 <<l, results='hide', message=FALSE, eval=TRUE>>=
 library(Xeva)
 @
 
-Load the dataset you wish to analyze. For the sake of this tutorial, here we load the NIBR PDXE breast cancer dataset as an example:
+<<biobase, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+suppressMessages(library(Biobase))
+@
+
+Load the dataset you wish to analyze. For the sake of this tutorial, here we load the Novartis PDXE \cite{gao2015high} breast cancer dataset as an example:
 <<l2>>=
 data(brca)
 print(brca)
@@ -160,4 +176,7 @@ waterfall(brca, drug="BYL719", res.measure="best.average.response",
 @
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\bibliography{getting-started}
 \end{document}
