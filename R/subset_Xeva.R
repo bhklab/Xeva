@@ -27,18 +27,18 @@
 
 
 
-#' Subset Xeva object
+#' Subset Xeva object.
 #'
 #' @examples
 #' data(brca)
 #' print(brca)
 #' df <- subsetXeva(brca, ids = c("X-1004", "X-1008", "X-1286"), id.name="patient.id", keep.batch=TRUE)
 #' print(df)
-#' @param object the \code{XevaSet}
-#' @param ids ids to be selected for
-#' @param id.name names of the id
-#' @param keep.batch Default is \code{TRUE}. If FALSE will remove all the other model.ids from the experiemt design that do not belong to selection
-#' @return New Xeva object
+#' @param object The \code{XevaSet} object.
+#' @param ids IDs to be selected for.
+#' @param id.name Names of the IDs.
+#' @param keep.batch Default \code{TRUE}. If \code{FALSE}, remove all other \code{model.ids} from the experiemt design that do not belong to selection.
+#' @return New Xeva object.
 #' @export
 subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
 {

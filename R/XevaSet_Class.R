@@ -20,20 +20,20 @@ XevaSet <- setClass(
 #' A constructor to create XevaSet. Only objects returned by this constructor
 #' are expected to work with the XevaSet methods.
 #'
-#' @param name a \code{character} string detailing the name of the dataset
-#' @param model a \code{data.frame} containg the annotations for all models used
-#'   in the experiment
-#' @param drug a \code{data.frame} containg the annotations for all the drugs
-#'   profiled in the data set, across all data types
-#' @param experiment a \code{data.frame} containg all experiment information
+#' @param name A \code{character} string detailing the name of the dataset.
+#' @param model A \code{data.frame} containing the annotations for all the models used
+#'   in the experiment.
+#' @param drug A \code{data.frame} containing the annotations for all the drugs
+#'   profiled in the dataset, across all data types.
+#' @param experiment A \code{data.frame} containing all experiment information.
 #' @param expDesign
 #' @param modelSensitivity
 #' @param batchSensitivity
-#' @param molecularProfiles a \code{list} of ExpressionSet objects containing
-#'   different molecular profiles
+#' @param molecularProfiles A \code{list} of \code{ExpressionSet} objects containing
+#'   different molecular profiles.
 #' @param modToBiobaseMap
 #'
-#' @return  Returns Xeva object
+#' @return  Returns Xeva object.
 #'
 #' @examples
 #' NULL
@@ -84,7 +84,7 @@ createXevaSet <- function(name,
 #setGeneric("show", function(object, model.id) { standardGeneric("show")})
 
 #' A method to display object
-#' for "show" setGeneric is already defined
+#' for "show" setGeneric is already defined.
 #' @import methods
 setMethod(
   f = "show",

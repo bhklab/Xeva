@@ -38,7 +38,7 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 }
 
 #' waterfall plot
-#' creates waterfall plot for a given drug
+#' Creates waterfall plot for a given drug.
 #'
 #' @examples
 #' data(brca)
@@ -49,18 +49,18 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 #' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published",
 #'           tissue="BRCA", model.id=names(model.type), model.type= model.type)
 #'
-#' @param object the \code{XevaSet}
-#' @param drug name of the drug
-#' @param res.measure PDX model response measure
-#' @param group.by group response data
-#' @param tissue tissue
-#' @param model.id which model.id to plot. Default is \code{NULL} will plot all models
-#' @param model.type type of model such as mutated or wild type
-#' @param type.color a list with colors used for each type
-#' @param legend.name name of the legend
-#' @param yname name for y axis
-#' @param title title of the plot
-#' @param sort default TRUE will sort the data
+#' @param object The \code{XevaSet} object.
+#' @param drug Name of the drug.
+#' @param res.measure PDX model drug response measure.
+#' @param group.by Group drug response data.
+#' @param tissue Tissue type.
+#' @param model.id Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models.
+#' @param model.type Type of model, such as mutated or wild type.
+#' @param type.color A list with colors used for each type in the legend.
+#' @param legend.name Name of the legend.
+#' @param yname Name for the y-axis.
+#' @param title Title of the plot.
+#' @param sort Default \code{TRUE} will sort the data.
 #' @export
 #' @import ggplot2
 waterfall <- function(object, drug, res.measure, group.by=NULL, tissue=NULL,

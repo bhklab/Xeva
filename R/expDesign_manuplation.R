@@ -11,18 +11,18 @@
 #' Add a new experimental design
 #'
 #'
-#' Add a new experimental design in expDesign slot.
+#' Add a new experimental design in the \code{expDesign} slot.
 #' @examples
 #' data(brca)
 #' brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
 #' control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
 #'
-#' @param object The \code{Xeva} dataset
-#' @param treatment The \code{model.id} of treatment
-#' @param control The \code{model.id} of control
-#' @param batch.id The \code{batch.id} for new batch
-#' @param replace If TRUE will replace the old batch with new values
-#' @return returns \code{Xeva} dataset with new experimental design added
+#' @param object The \code{Xeva} dataset.
+#' @param treatment The \code{model.id} of treatment.
+#' @param control The \code{model.id} of control.
+#' @param batch.id The \code{batch.id} for a new batch.
+#' @param replace If \code{TRUE}, replace an old batch with new values.
+#' @return Returns \code{Xeva} dataset with new experimental design added.
 setGeneric(name = "addExperimentalDesign",
            def = function(object, treatment=NULL, control=NULL, batch.id=NULL,replace=FALSE)
                           {standardGeneric("addExperimentalDesign")} )

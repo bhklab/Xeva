@@ -131,28 +131,28 @@
 
 #' Plot batch data
 #'
-#' Plot data for a batch id or experiment design
+#' Plot data for a \code{batch.id} or experiment design.
 #'
-#' @param object Xeva object
-#' @param batch batch name or experiment design list
-#' @param max.time maximum time point of the plot, default \code{NULL} will plot complete data
-#' @param treatment.only default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment
-#' @param vol.normal default \code{FALSE} . If TRUE volume will ne normalised
-#' @param impute.value default \code{TRUE}, will impute values where missing
-#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
-#' @param control.col color for control plots
-#' @param treatment.col color for treatment plots
-#' @param title title of the plot
-#' @param xlab title of x axis
-#' @param ylab title of y axis
-#' @param log.y default \code{FALSE}, if \code{TRUE} y axis will be in log
-#' @param drug default \code{NULL} will extract drug name from data
-#' @param SE.plot plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}
-#' @param aspect.ratio default \code{1} will create equeal width and height plot
-#' @param minor.line.size line size for minor lines default \code{0.5}
-#' @param major.line.size line size for major lines default \code{0.7}
+#' @param object Xeva object.
+#' @param batch Batch name or experiment design list.
+#' @param max.time Maximum time point of the plot. Default \code{NULL} will plot complete data.
+#' @param treatment.only Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.
+#' @param vol.normal Default \code{FALSE}. If \code{TRUE}, volume will be normalized.
+#' @param impute.value Default \code{TRUE} will impute values if missing.
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point.
+#' @param control.col Color for control plots.
+#' @param treatment.col Color for treatment plots.
+#' @param title Title of the plot.
+#' @param xlab Title of the x-axis.
+#' @param ylab Title of the y-axis.
+#' @param log.y Default \code{FALSE}. If \code{TRUE}, y-axis will be log-transformed.
+#' @param drug Default \code{NULL} will extract drug name from data.
+#' @param SE.plot Plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, and \code{"ribbon"}.
+#' @param aspect.ratio Default \code{1} will create a plot of equal width and height.
+#' @param minor.line.size Line size for minor lines. Default \code{0.5}.
+#' @param major.line.size Line size for major lines. Default \code{0.7}.
 #'
-#' @return A ggplot2 plot with control and treatment
+#' @return A ggplot2 plot with control and treatment batch data.
 #'
 #' @examples
 #' data(brca)

@@ -29,19 +29,19 @@ print.batchResponse <- function(br)
 
 
 
-#' \code{setResponse} sets response of an Xeva object
+#' \code{setResponse} sets response of an Xeva object.
 #'
-#' @param object Xeva object
-#' @param res.measure response measure, multipal measure allowed
-#' @param min.time default \strong{10} days. Used for \emph{mRECIST} computation
-#' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
-#' @param max.time maximum time for data
-#' @param vol.normal default \code{TRUE} will use
-#' @param impute.value default \code{FALSE}. If TRUE will impute the values
-#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
-#' @param verbose default \code{TRUE} will print infromation
+#' @param object Xeva object.
+#' @param res.measure Response measure; multiple measures are allowed.
+#' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
+#' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
+#' @param max.time Maximum time for data.
+#' @param vol.normal Default \code{TRUE} will use
+#' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
+#' @param verbose Default \code{TRUE} will print information
 #'
-#' @return  returns updated Xeva object
+#' @return  Returns updated Xeva object.
 #'
 #' @examples
 #' data(brca)
@@ -149,21 +149,21 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 
 #' compute response
 #'
-#' \code{response} computes response of a PDX model or batch
+#' \code{response} Computes the drug response of a PDX model or batch.
 #'
-#' @param object Xeva object
-#' @param res.measure response measure
-#' @param model.id model id for which response to be computed
-#' @param batch batch id or experiment design for which response to be computed
-#' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
-#' @param min.time default \strong{10} days. Used for \emph{mRECIST} computation
-#' @param max.time maximum time for data
-#' @param vol.normal default \code{TRUE} will use
-#' @param impute.value default \code{FALSE}. If TRUE will impute the values
-#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
-#' @param verbose default \code{TRUE} will print infromation
+#' @param object Xeva object.
+#' @param res.measure Drug response measure.
+#' @param model.id \code{model.id} for which the durg response is to be computed.
+#' @param batch \code{batch.id} or experiment design for which the drug response is to be computed.
+#' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
+#' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
+#' @param max.time Maximum time for data.
+#' @param vol.normal Default \code{TRUE} will use
+#' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
+#' @param verbose Default \code{TRUE} will print information.
 #'
-#' @return  returns model or batch response object
+#' @return  Returns model or batch drug response object.
 #'
 #' @examples
 #' data(brca)

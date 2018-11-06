@@ -1,11 +1,11 @@
 #####================= getMolecularProfiles ==================
-#' Get Molecular Profiles
+#' Get molecular profiles from a XevaSet object
 #'
-#' Get Molecular Profiles
+#' This function serves to get molecular profiles from a \code{XevaSet} object.
 #'
-#' @param object The \code{XevaSet}
-#' @param data.type \code{character}, which one of the molecular data types is needed
-#' @return a \code{ExpressionSet} where sample names are \code{biobase.id} of model
+#' @param object The \code{XevaSet}.
+#' @param data.type \code{character}, where one of the molecular data types is needed.
+#' @return An \code{ExpressionSet} where sample names are the \code{biobase.id} of the model.
 #' @examples
 #' data(brca)
 #' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
@@ -70,13 +70,13 @@ getMolecularProfiles <- function(object, data.type)
 #'
 #' summarizeMolecularProfiles
 #'
-#' @param object The \code{XevaSet}
-#' @param drug Name of the drug
-#' @param mDataType \code{character}, which one of the molecular data types is needed
-#' @param tissue default \code{NULL} will return all across all tissue
-#' @param sensitivity.measure default \code{NULL} will return all sensitivity measure
-#' @param unique.model default TRUE will return only one sequncing id, in case where one model id mapes to several sequencing ids
-#' @return A \code{ExpressionSet} where sample names are model.id and sensitivity measure will be present in pData
+#' @param object The \code{XevaSet}.
+#' @param drug Name of the drug.
+#' @param mDataType \code{character}, where one of the molecular data types is needed.
+#' @param tissue Default \code{NULL} will return all tissue types.
+#' @param sensitivity.measure Default \code{NULL} will return all sensitivity measures.
+#' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
+#' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 #' @examples
 #' data(brca)
 #' pacRNA <- summarizeMolecularProfiles(brca, drug="paclitaxel", mDataType="RNASeq",
@@ -84,9 +84,9 @@ getMolecularProfiles <- function(object, data.type)
 #' print(pacRNA)
 #' @details
 #' \itemize{
-#' \item {If a sequencing sample belong to multipal models, summarizeMolecularProfiles
-#' will creat saperate column for each model. }
-#' \item {All the models without the moleculer data will be removed from the output expression set.}
+#' \item {If a sequencing sample belongs to multiple models, \code{summarizeMolecularProfiles}
+#' will create a separate column for each model.}
+#' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
 #' }
 #' @export
 summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,

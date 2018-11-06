@@ -72,22 +72,22 @@
 }
 
 ##====== drugSensitivitySig for one drug ==========================
-#' drugSensitivitySig
+#' Shows drug sensitivity values
 #'
 #' @description
-#' Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
+#' Given a Xeva object and drug name, this function will return sensitivity values for all the genes/features.
 #'
-#' @param object The \code{Xeva} dataset
-#' @param drug Name of the drug
-#' @param mDataType molecular data type
-#' @param molData External data matrix. Rows as features and columns as samples
-#' @param features which  molecular data fetures to use. Default \code{NULL} will use all fetures
-#' @param model.ids which model.id to use from the dataset. Default \code{NULL} will use all model.id
-#' @param model2bidMap a datafram with model.id and biobase.id. Default \code{NULL} will use internal mapping
-#' @param sensitivity.measure Name of the sensitivity measure
-#' @param fit Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"
-#' @param type Tissue type. Default is NULL which will use \code{'tissue'} from \code{object}
-#' @return A datafram with fetures and values
+#' @param object The \code{Xeva} dataset.
+#' @param drug Name of the drug.
+#' @param mDataType Molecular data type.
+#' @param molData External data matrix. Rows as features and columns as samples.
+#' @param features Set which molecular data features to use. Default \code{NULL} will use all features.
+#' @param model.ids Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.
+#' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
+#' @param sensitivity.measure Name of the sensitivity measure.
+#' @param fit Default \code{lm}. Name of the model to be fitted. Options are \code{lm}, \code{maxCor}, and \code{gam}.
+#' @param type Tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
+#' @return A \code{data.frame} with features and values.
 #'
 #' @examples
 #' data(pdxe)
@@ -97,8 +97,8 @@
 #'                              mDataType="RNASeq", features=1:5,
 #'                              model.ids = mid$model.id,
 #'                              sensitivity.measure="slope", fit = "lm")
-#' @details A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam".
-#' In case where a model.id map to multipal biobase.id the first biobase.id in the datafram will be used.
+#' @details A matrix of values can be directly passed to molData. \code{fit} can be \code{lm}, \code{maxCor}, or \code{gam}.
+#' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 #'
 setGeneric(name = "drugSensitivitySig",
            def = function(object, drug,

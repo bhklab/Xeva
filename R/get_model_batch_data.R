@@ -386,18 +386,18 @@
 ##------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------
 ##----- get experiment data in flat data.fram ----------------------------------
-#' For a given  model.id, it will return a data.fram
-#' containing all data stored in experiment slot
+#' For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
+#' containing all the data stored in the experiment slot.
 #'
-#' @param object The \code{XevaSet}
-#' @param model.id The \code{model.id} for which data is required, multipal allowed
-#' @param batch batch name from the Xeva set or experiment design
-#' @param treatment.only Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)
-#' @param max.time maximum time for data
-#' @param vol.normal default \code{TRUE} will use
-#' @param return.list default \code{FALSE} will return a datafram
-#' @param impute.value default \code{FALSE}. If TRUE will impute the values
-#' @param concurrent.time default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point
+#' @param object The \code{XevaSet} object.
+#' @param model.id The \code{model.id} for which data is required, multiple IDs are allowed.
+#' @param batch Batch name from the \code{XevaSet} or experiment design.
+#' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
+#' @param max.time Maximum time for data.
+#' @param vol.normal Default \code{TRUE} will use
+#' @param return.list Default \code{FALSE} will return a \code{data.frame}.
+#' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
 #'
 #' @examples
 #' data(brca)
