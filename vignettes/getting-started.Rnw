@@ -32,16 +32,32 @@ The Xeva package provides efficient and powerful functions for patient-drived xe
 Xeva requires that several packages be installed. All dependencies are available from CRAN or Bioconductor:
 
 <<get_lib, results='hide', message=FALSE, eval=FALSE>>=
-source('http://bioconductor.org/biocLite.R')
-biocLite('Xeva')
+##package not yet on bioconductor
+#source('http://bioconductor.org/biocLite.R')
+#biocLite('Xeva')
 @
+
+Package can also be install directly form github using devtools:
+
+<<githubInst, results='hide', message=FALSE, eval=FALSE>>=
+#install devtools if required
+install.packages("devtools")
+
+#install Xeva as:
+devtools::install_github("bhklab/Xeva")
+@
+
 
 Load Xeva into your current workspace:
 <<l, results='hide', message=FALSE, eval=TRUE>>=
 library(Xeva)
 @
 
-Load the dataset you wish to analyze. For the sake of this tutorial, here we load the NIBR PDXE breast cancer dataset as an example:
+<<biobase, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+suppressMessages(library(Biobase))
+@
+
+Load the dataset you wish to analyze. For the sake of this tutorial, here we load the Novartis PDXE \cite{gao2015high} breast cancer dataset as an example:
 <<l2>>=
 data(brca)
 print(brca)
@@ -148,16 +164,20 @@ waterfall(brca, drug="binimetinib", res.measure="best.average.response")
 It is useful to color the bars of your waterfall plot by genomic properties.
 Here we create a waterfall plot for drug BYL719 and color it based on the mutation status of the CDK13 gene.
 First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
-<<waterFall2, fig.cap="Waterfall plot for binimetinib drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+<<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
 mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
 model.type <- Biobase::exprs(mut)["CDK13", ]
 model.type[grepl("Mut", model.type)] <- "mutation"
 model.type[model.type!="mutation"] <- "wild type"
-model.color <- list("mutation"="#fb8072", "wild type"="#80b1d3")
+model.color <- list("mutation"="#b2182b", "wild type"="#878787")
 waterfall(brca, drug="BYL719", res.measure="best.average.response",
           model.id=names(model.type), model.type= model.type,
           type.color = model.color)
+
 @
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\bibliography{getting-started}
 \end{document}
