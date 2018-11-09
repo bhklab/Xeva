@@ -24,7 +24,7 @@ vignettes/tmp-blx.bib
 vignettes/.*
 vignettes/=.*
 vignettes/Roger.save
-
+vignettes/figure/*
 ##ignore vignette figure dir
 vignettes/figure
 vignettes/figure/*
