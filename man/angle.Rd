@@ -3,34 +3,35 @@
 \name{angle}
 \alias{angle}
 \title{compute angle
-computes angle between two time-volume curves}
+Computes the angle between two time-volume curves.}
 \usage{
 angle(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
   treat.volume = NULL, degree = TRUE)
 }
 \arguments{
-\item{contr.time}{time vector for control}
+\item{contr.time}{Time vector for control.}
 
-\item{contr.volume}{volume vector for control}
+\item{contr.volume}{Volume vector for control.}
 
-\item{treat.time}{time vector for treatment}
+\item{treat.time}{Time vector for treatment.}
 
-\item{treat.volume}{volume vector for treatment}
+\item{treat.volume}{Volume vector for treatment.}
 
-\item{degree}{default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians}
+\item{degree}{Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.}
 }
 \value{
-returns batch response object
+Returns batch response object.
 }
 \description{
 compute angle
-computes angle between two time-volume curves
+Computes the angle between two time-volume curves.
 }
 \examples{
 contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 contr.volume<- contr.time * tan(60*pi/180)
 treat.volume<- treat.time * tan(15*pi/180)
 ang <- angle(contr.time, contr.volume, treat.time, treat.volume)
+print(ang)
 par(pty="s")
 xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
 plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)

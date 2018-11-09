@@ -8,21 +8,21 @@ addExperimentalDesign(object, treatment = NULL, control = NULL,
   batch.id = NULL, replace = FALSE)
 }
 \arguments{
-\item{object}{The \code{Xeva} dataset}
+\item{object}{The \code{Xeva} dataset.}
 
-\item{treatment}{The \code{model.id} of treatment}
+\item{treatment}{The \code{model.id} of treatment.}
 
-\item{control}{The \code{model.id} of control}
+\item{control}{The \code{model.id} of control.}
 
-\item{batch.id}{The \code{batch.id} for new batch}
+\item{batch.id}{The \code{batch.id} for a new batch.}
 
-\item{replace}{If TRUE will replace the old batch with new values}
+\item{replace}{If \code{TRUE}, replace an old batch with new values.}
 }
 \value{
-returns \code{Xeva} dataset with new experimental design added
+Returns \code{Xeva} dataset with new experimental design added.
 }
 \description{
-Add a new experimental design in expDesign slot.
+Add a new experimental design in the \code{expDesign} slot.
 }
 \examples{
 data(brca)

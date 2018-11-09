@@ -9,31 +9,31 @@ plotmRECIST(mat, control.name = NA, control.col = "#238b45",
   sort = TRUE, row_fontsize = 12, col_fontsize = 12, draw_plot = TRUE)
 }
 \arguments{
-\item{mat}{The mRECIST matrix where rows are drugs and columns are patient}
+\item{mat}{The mRECIST matrix where rows are drugs and columns are patients.}
 
-\item{control.name}{name of the control}
+\item{control.name}{Name of the control.}
 
-\item{control.col}{color of the control}
+\item{control.col}{Color of the control.}
 
-\item{drug.col}{color of the drug names}
+\item{drug.col}{Color of the drug names.}
 
-\item{colPalette}{color palette for mRECIST values}
+\item{colPalette}{Color palette for mRECIST values.}
 
-\item{name}{title of the plot}
+\item{name}{Title of the plot.}
 
-\item{sort}{if matrix should be sorted before ploting}
+\item{sort}{If matrix should be sorted before plotting.}
 
-\item{row_fontsize}{size of the row name font}
+\item{row_fontsize}{Size of the row name font.}
 
-\item{col_fontsize}{size of the column name font}
+\item{col_fontsize}{Size of the column name font.}
 
-\item{draw_plot}{default TRUE will plot the figure. If FALSE will return an object}
+\item{draw_plot}{Default \code{TRUE} will plot the figure. If \code{FALSE}, return an object.}
 }
 \value{
-plot
+mRECIST plot.
 }
 \description{
-\code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
+\code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}.
 }
 \examples{
 data(brca)

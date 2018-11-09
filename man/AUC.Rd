@@ -3,21 +3,21 @@
 \name{AUC}
 \alias{AUC}
 \title{area under the curve
-\code{AUC} returns area under the curve}
+\code{AUC} Returns area under the curve}
 \usage{
 AUC(time, volume)
 }
 \arguments{
-\item{time}{vector of time}
+\item{time}{A \code{vector} of time points recorded for the experiment.}
 
-\item{volume}{first vector of volume}
+\item{volume}{First \code{vector} of volume.}
 }
 \value{
-returns angle and \code{slope} object
+Returns \code{angle} and \code{slope} object.
 }
 \description{
 area under the curve
-\code{AUC} returns area under the curve
+\code{AUC} Returns area under the curve
 }
 \examples{
 time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)

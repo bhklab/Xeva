@@ -7,17 +7,17 @@
 slope(time, volume, degree = TRUE)
 }
 \arguments{
-\item{time}{vector of time}
+\item{time}{A \code{vector} of time.}
 
-\item{volume}{vector of volume}
+\item{volume}{A \code{vector} of volume.}
 
-\item{degree}{default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians}
+\item{degree}{Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.}
 }
 \value{
-returns the slope and a fit object
+Returns the slope and a \code{fit} object.
 }
 \description{
-\code{slope} returns the slope for given time and volume data
+\code{slope} returns the slope for given time and volume data.
 }
 \examples{
 time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)

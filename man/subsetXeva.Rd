@@ -2,24 +2,24 @@
 % Please edit documentation in R/subset_Xeva.R
 \name{subsetXeva}
 \alias{subsetXeva}
-\title{Subset Xeva object}
+\title{Subset Xeva object.}
 \usage{
 subsetXeva(object, ids, id.name, keep.batch = TRUE)
 }
 \arguments{
-\item{object}{the \code{XevaSet}}
+\item{object}{The \code{XevaSet} object.}
 
-\item{ids}{ids to be selected for}
+\item{ids}{IDs to be selected for.}
 
-\item{id.name}{names of the id}
+\item{id.name}{Names of the IDs.}
 
-\item{keep.batch}{Default is \code{TRUE}. If FALSE will remove all the other model.ids from the experiemt design that do not belong to selection}
+\item{keep.batch}{Default \code{TRUE}. If \code{FALSE}, remove all other \code{model.ids} from the experiemt design that do not belong to selection.}
 }
 \value{
-New Xeva object
+New Xeva object.
 }
 \description{
-Subset Xeva object
+Subset Xeva object.
 }
 \examples{
 data(brca)

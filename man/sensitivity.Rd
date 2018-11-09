@@ -7,17 +7,17 @@
 sensitivity(object, type = c("model", "batch"), sensitivity.measure = NULL)
 }
 \arguments{
-\item{object}{The \code{Xeva} dataset}
+\item{object}{The \code{Xeva} dataset.}
 
-\item{type}{sensitivity type (either model or batch)}
+\item{type}{Sensitivity type (either model or batch).}
 
-\item{sensitivity.measure}{Name of the sensitivity.measure. Default \code{NULL}, will return all}
+\item{sensitivity.measure}{Name of the \code{sensitivity.measure}. Default \code{NULL} will return all sensitivity measures.}
 }
 \value{
-a \code{data.fram} with model or batch id and sensitivity values
+A \code{data.frame} with model or batch ID and sensitivity values.
 }
 \description{
-Given a Xeva object, it will return sensitivity datafram
+Given a Xeva object, it will return a \code{data.frame} detailing sensitivity information.
 }
 \examples{
 data(brca)

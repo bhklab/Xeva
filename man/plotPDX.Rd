@@ -22,47 +22,47 @@ plotBatch(object, batch = NULL, patient.id = NULL, drug = NULL,
   minor.line.size = 0.5, major.line.size = 0.7)
 }
 \arguments{
-\item{object}{Xeva object}
+\item{object}{Xeva object.}
 
-\item{batch}{batch name or experiment design list}
+\item{batch}{Batch name or experiment design list.}
 
-\item{drug}{default \code{NULL} will extract drug name from data}
+\item{drug}{Default \code{NULL} will extract drug name from data.}
 
-\item{max.time}{maximum time point of the plot, default \code{NULL} will plot complete data}
+\item{max.time}{Maximum time point of the plot. Default \code{NULL} will plot complete data.}
 
-\item{treatment.only}{default \code{FALSE}. Given full data treatment.only=\code{TRUE} will plot data only during treatment}
+\item{treatment.only}{Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.}
 
-\item{vol.normal}{default \code{FALSE} . If TRUE volume will ne normalised}
+\item{vol.normal}{Default \code{FALSE}. If \code{TRUE}, volume will be normalized.}
 
-\item{impute.value}{default \code{TRUE}, will impute values where missing}
+\item{impute.value}{Default \code{TRUE} will impute values if missing.}
 
-\item{concurrent.time}{default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point}
+\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point.}
 
-\item{control.col}{color for control plots}
+\item{control.col}{Color for control plots.}
 
-\item{treatment.col}{color for treatment plots}
+\item{treatment.col}{Color for treatment plots.}
 
-\item{title}{title of the plot}
+\item{title}{Title of the plot.}
 
-\item{xlab}{title of x axis}
+\item{xlab}{Title of the x-axis.}
 
-\item{ylab}{title of y axis}
+\item{ylab}{Title of the y-axis.}
 
-\item{log.y}{default \code{FALSE}, if \code{TRUE} y axis will be in log}
+\item{log.y}{Default \code{FALSE}. If \code{TRUE}, y-axis will be log-transformed.}
 
-\item{SE.plot}{plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, \code{"ribbon"}}
+\item{SE.plot}{Plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, and \code{"ribbon"}.}
 
-\item{aspect.ratio}{default \code{1} will create equeal width and height plot}
+\item{aspect.ratio}{Default \code{1} will create a plot of equal width and height.}
 
-\item{minor.line.size}{line size for minor lines default \code{0.5}}
+\item{minor.line.size}{Line size for minor lines. Default \code{0.5}.}
 
-\item{major.line.size}{line size for major lines default \code{0.7}}
+\item{major.line.size}{Line size for major lines. Default \code{0.7}.}
 }
 \value{
-A ggplot2 plot with control and treatment
+A ggplot2 plot with control and treatment batch data.
 }
 \description{
-Plot data for a batch id or experiment design
+Plot data for a batch.id, experiment design or model.id
 }
 \examples{
 data(brca)

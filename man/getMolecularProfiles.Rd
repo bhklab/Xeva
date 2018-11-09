@@ -2,20 +2,20 @@
 % Please edit documentation in R/access_expressionData_Functions.R
 \name{getMolecularProfiles}
 \alias{getMolecularProfiles}
-\title{Get Molecular Profiles}
+\title{Get molecular profiles from a XevaSet object}
 \usage{
 getMolecularProfiles(object, data.type)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{The \code{XevaSet}.}
 
-\item{data.type}{\code{character}, which one of the molecular data types is needed}
+\item{data.type}{\code{character}, where one of the molecular data types is needed.}
 }
 \value{
-a \code{ExpressionSet} where sample names are \code{biobase.id} of model
+An \code{ExpressionSet} where sample names are the \code{biobase.id} of the model.
 }
 \description{
-Get Molecular Profiles
+This function serves to get molecular profiles from a \code{XevaSet} object.
 }
 \examples{
 data(brca)

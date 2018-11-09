@@ -3,40 +3,41 @@
 \name{waterfall}
 \alias{waterfall}
 \title{waterfall plot
-creates waterfall plot for a given drug}
+Creates waterfall plot for a given drug.}
 \usage{
-waterfall(object, drug, res.measure, group.by = NULL, tissue = NULL,
-  model.id = NULL, model.type = NULL, type.color = "#cc4c02",
-  legend.name = NULL, yname = NULL, title = NULL, sort = TRUE)
+waterfall(object, res.measure, drug = NULL, group.by = NULL,
+  summary.stat = c(";", "mean", "median"), tissue = NULL, model.id = NULL,
+  model.type = NULL, type.color = "#cc4c02", legend.name = NULL,
+  yname = NULL, title = NULL, sort = TRUE)
 }
 \arguments{
-\item{object}{the \code{XevaSet}}
+\item{object}{The \code{XevaSet} object}
 
-\item{drug}{name of the drug}
+\item{res.measure}{PDX model drug response measure}
 
-\item{res.measure}{PDX model response measure}
+\item{drug}{Name of the drug}
 
-\item{group.by}{group response data}
+\item{group.by}{Group drug response data}
 
-\item{tissue}{tissue}
+\item{tissue}{Tissue type}
 
-\item{model.id}{which model.id to plot. Default is \code{NULL} will plot all models}
+\item{model.id}{Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models}
 
-\item{model.type}{type of model such as mutated or wild type}
+\item{model.type}{Type of model, such as mutated or wild type}
 
-\item{type.color}{a list with colors used for each type}
+\item{type.color}{A list with colors used for each type in the legend}
 
-\item{legend.name}{name of the legend}
+\item{legend.name}{Name of the legend}
 
-\item{yname}{name for y axis}
+\item{yname}{Name for the y-axis}
 
-\item{title}{title of the plot}
+\item{title}{Title of the plot}
 
-\item{sort}{default TRUE will sort the data}
+\item{sort}{Default \code{TRUE} will sort the data}
 }
 \description{
 waterfall plot
-creates waterfall plot for a given drug
+Creates waterfall plot for a given drug.
 }
 \examples{
 data(brca)

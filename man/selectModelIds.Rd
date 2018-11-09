@@ -2,25 +2,25 @@
 % Please edit documentation in R/access_slot_experiment.R
 \name{selectModelIds}
 \alias{selectModelIds}
-\title{To select model ids based on drug name and/or tissue}
+\title{To select model IDs based on drug name and/or tissue type.}
 \usage{
 selectModelIds(object, drug = NULL, drug.match.exact = TRUE,
   tissue = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{The \code{XevaSet}.}
 
-\item{drug}{Name of the \code{drug}}
+\item{drug}{Name of the \code{drug}.}
 
-\item{drug.match.exact}{Default \code{TRUE}}
+\item{drug.match.exact}{Default \code{TRUE}.}
 
-\item{tissue}{Tumor type. Default \code{NULL}}
+\item{tissue}{Tumor type. Default \code{NULL}.}
 }
 \value{
-a \code{vector} with the matched model.ids
+A \code{vector} with the matched \code{model.id}s.
 }
 \description{
-To select model ids based on drug name and/or tissue
+To select model IDs based on drug name and/or tissue type.
 }
 \examples{
 data(brca)

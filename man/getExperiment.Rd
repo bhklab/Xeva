@@ -2,8 +2,8 @@
 % Please edit documentation in R/get_model_batch_data.R
 \name{getExperiment}
 \alias{getExperiment}
-\title{For a given  model.id, it will return a data.fram
-containing all data stored in experiment slot}
+\title{For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
+containing all the data stored in the experiment slot.}
 \usage{
 getExperiment(object, model.id = NULL, batch = NULL, patient.id = NULL,
   drug = NULL, control.name = NULL, treatment.only = FALSE,
@@ -11,30 +11,30 @@ getExperiment(object, model.id = NULL, batch = NULL, patient.id = NULL,
   impute.value = FALSE, concurrent.time = FALSE)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{The \code{XevaSet} object.}
 
-\item{model.id}{The \code{model.id} for which data is required, multipal allowed}
+\item{model.id}{The \code{model.id} for which data is required, multiple IDs are allowed.}
 
-\item{batch}{batch name from the Xeva set or experiment design}
+\item{batch}{Batch name from the \code{XevaSet} or experiment design.}
 
-\item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
+\item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
-\item{max.time}{maximum time for data}
+\item{max.time}{Maximum time for data.}
 
-\item{vol.normal}{default \code{TRUE} will use}
+\item{vol.normal}{Default \code{TRUE} will use}
 
-\item{return.list}{default \code{FALSE} will return a datafram}
+\item{return.list}{Default \code{FALSE} will return a \code{data.frame}.}
 
-\item{impute.value}{default \code{FALSE}. If TRUE will impute the values}
+\item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing values.}
 
-\item{concurrent.time}{default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point}
+\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
 }
 \value{
 a \code{data.fram} will all the the values stored in experiment slot
 }
 \description{
-For a given  model.id, it will return a data.fram
-containing all data stored in experiment slot
+For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
+containing all the data stored in the experiment slot.
 }
 \examples{
 data(brca)

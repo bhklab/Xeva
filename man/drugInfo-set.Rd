@@ -2,22 +2,22 @@
 % Please edit documentation in R/access_slot_drug.R
 \name{drugInfo<-}
 \alias{drugInfo<-}
-\title{set drug information
-set drug information slot}
+\title{Set new drug information in a XevaSet
+A method to set the drug information slot in a \code{XevaSet} object.}
 \usage{
 drugInfo(object) <- value
 }
 \arguments{
-\item{object}{The \code{XevaSet} to replace drug info in}
+\item{object}{The \code{XevaSet} to replace drug info in.}
 
-\item{value}{A \code{data.frame} with the new drug annotations}
+\item{value}{A \code{data.frame} with the new drug annotations.}
 }
 \value{
 updated \code{XevaSet}
 }
 \description{
-set drug information
-set drug information slot
+Set new drug information in a XevaSet
+A method to set the drug information slot in a \code{XevaSet} object.
 }
 \examples{
 data(brca)

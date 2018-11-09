@@ -87,8 +87,6 @@
   if(SE.plot == "ribbon")
   { plt <- plt + scale_fill_manual(values=tcCol) }
   plt <- .ggplotEmptyTheme(plt)
-  #drgName <- df[df$exp.type=="treatment", "drug.name"][1]
-
   plt <- plt + labs(title = title, x = xlab, y = ylab, colour = drgName, fill=drgName)
   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
   plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
@@ -96,10 +94,6 @@
   {
     plt <- plt + theme(aspect.ratio=aspect.ratio)
   }
-
-  ###----- to do ---------
-  ###----- add line showing Dose at the bottam ---------
-  ###----- look at the packege library(ggExtra) --------
   return(plt)
 }
 
@@ -124,14 +118,74 @@
 }
 
 ######--------------------------------------------------------------------------
+#' @import ggplot2
+.plotDose <- function(do, point.shape=21, point.size=5, point.color="black",
+                     line.size=4, line.color="black", modify.x.axis=TRUE)
+{
+  plt <- ggplot(do, aes(x=time, y=model.id))
+  plt <- plt + geom_point(size=0)
+  plt <- plt + geom_hline(aes(yintercept = model.n), do, size=line.size, color=line.color)
+  plt <- plt + geom_point(fill=do$color,shape=point.shape, size=point.size, color=point.color)
 
+  if(modify.x.axis==TRUE)
+  {
+    unqTime <- unique(do$time)
+    plt <- plt + scale_x_continuous(breaks=unqTime, labels=unqTime)
+  }
 
+  plt <- plt + theme_bw()
+  return(plt)
+}
 
+#' plot dose data
+#'
+#' plot data for dose in model.id
+#'
+#' @param object Xeva object.
+#' @param model.id one or multiple model.id
+#' @param max.time Maximum time point of the plot. Default \code{NULL} will plot complete data.
+#' @param treatment.only Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.
+#' @param vol.normal Default \code{FALSE}. If \code{TRUE}, volume will be normalized.
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point.
+#'
+#' @return A ggplot2 plot
+#'
+#' @examples
+#' data(brca)
+#' dosePlot(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"), fill.col=c("#f5f5f5", "#993404"))
+#' @export
+dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
+                     vol.normal=FALSE, concurrent.time=FALSE,
+                     point.shape=21, point.size=3, line.size=4,
+                     point.color="#878787", line.color="#bababa",
+                     fill.col=c("#f5f5f5", "#E55100"),
+                     modify.x.axis=F)
+{
+  dfx <- getExperiment(object, model.id=model.id,
+                       treatment.only=treatment.only, max.time=max.time,
+                       vol.normal=vol.normal, return.list = FALSE,
+                       concurrent.time = concurrent.time)
+  if(is.null(dfx$dose))
+  {
+    warning("no dose infromation present! assuming dose = 1")
+    dfx$dose <- 1
+  }
 
+  do <- dfx[, c("model.id", "time", "dose")]
+  model.order <- unique(do$model.id)
+
+  do$model.n <- as.numeric(factor(as.character(do$model.id), levels = model.order))
+  do$color <- ifelse(do$dose==0, fill.col[1], fill.col[2])
+
+  doplt <- .plotDose(do, point.shape, point.size, point.color, line.size,
+                     line.color, modify.x.axis)
+  return(doplt)
+}
+######--------------------------------------------------------------------------
 
 #' Plot batch data
 #'
-#' Plot data for a \code{batch.id} or experiment design.
+#' Plot data for a batch.id, experiment design or model.id
 #'
 #' @param object Xeva object.
 #' @param batch Batch name or experiment design list.
@@ -171,10 +225,10 @@ plotPDX <- function(object, batch=NULL,
                     impute.value=TRUE, concurrent.time=FALSE,
                     control.col = "#e41a1c", treatment.col = "#377eb8",
                     title="", xlab = "Time", ylab = "Volume",
-                    log.y=FALSE, #drug.name=NULL,
-                    SE.plot = c("all", "none", "errorbar", "ribbon"),
+                    log.y=FALSE, SE.plot = c("all", "none", "errorbar", "ribbon"),
                     aspect.ratio=c(1, NULL),
-                    minor.line.size=0.5, major.line.size=0.7)
+                    minor.line.size=0.5, major.line.size=0.7#,dose.plot=FALSE
+                    )
 {
   if(!is.null(model.id))
   {
@@ -183,9 +237,10 @@ plotPDX <- function(object, batch=NULL,
                          vol.normal=vol.normal, return.list = FALSE,
                          concurrent.time = concurrent.time)
 
-    .plotMultipalModels(dfx, color=model.color, major.line.size=major.line.size,
-                        aspect.ratio=aspect.ratio)
-
+    plt <- .plotMultipalModels(dfx, color=model.color,
+                               major.line.size=major.line.size,
+                               aspect.ratio=aspect.ratio)
+    plt
   } else
   {
     plotBatch(object, batch=batch, patient.id=patient.id, drug=drug,

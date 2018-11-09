@@ -4,39 +4,39 @@
 \alias{response}
 \title{compute response}
 \usage{
-response(object, model.id = NULL, batch = NULL, res.measure = c("angle",
-  "mRECIST", "AUC", "angle", "abc"), treatment.only = TRUE, max.time = NULL,
-  impute.value = TRUE, min.time = 10, concurrent.time = TRUE,
-  vol.normal = F, verbose = TRUE)
+response(object, model.id = NULL, batch = NULL, res.measure = c("mRECIST",
+  "slope", "AUC", "angle", "abc", "TGI"), treatment.only = FALSE,
+  max.time = NULL, impute.value = TRUE, min.time = 10,
+  concurrent.time = TRUE, vol.normal = FALSE, verbose = TRUE)
 }
 \arguments{
-\item{object}{Xeva object}
+\item{object}{Xeva object.}
 
-\item{model.id}{model id for which response to be computed}
+\item{model.id}{\code{model.id} for which the durg response is to be computed.}
 
-\item{batch}{batch id or experiment design for which response to be computed}
+\item{batch}{\code{batch.id} or experiment design for which the drug response is to be computed.}
 
-\item{res.measure}{response measure}
+\item{res.measure}{Drug response measure.}
 
-\item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
+\item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
-\item{max.time}{maximum time for data}
+\item{max.time}{Maximum time for data.}
 
-\item{impute.value}{default \code{FALSE}. If TRUE will impute the values}
+\item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing values.}
 
-\item{min.time}{default \strong{10} days. Used for \emph{mRECIST} computation}
+\item{min.time}{Default \strong{10} days. Used for \emph{mRECIST} computation.}
 
-\item{concurrent.time}{default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point}
+\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
 
-\item{vol.normal}{default \code{TRUE} will use}
+\item{vol.normal}{Default \code{FALSE} will use}
 
-\item{verbose}{default \code{TRUE} will print infromation}
+\item{verbose}{Default \code{TRUE} will print information.}
 }
 \value{
-returns model or batch response object
+Returns model or batch drug response object.
 }
 \description{
-\code{response} computes response of a PDX model or batch
+\code{response} Computes the drug response of a PDX model or batch.
 }
 \examples{
 data(brca)

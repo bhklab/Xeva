@@ -26,14 +26,14 @@ XevaSet <- setClass(
 #' @param drug A \code{data.frame} containing the annotations for all the drugs
 #'   profiled in the dataset, across all data types.
 #' @param experiment A \code{data.frame} containing all experiment information.
-#' @param expDesign
-#' @param modelSensitivity
-#' @param batchSensitivity
+#' @param expDesign a list containing name of the batch, control and treatment model.id
+#' @param modelSensitivity data.fram containg sensitivity for each model
+#' @param batchSensitivity data.fram containg sensitivity for each batch
 #' @param molecularProfiles A \code{list} of \code{ExpressionSet} objects containing
 #'   different molecular profiles.
-#' @param modToBiobaseMap
+#' @param modToBiobaseMap a data.fram containg model.id corresponding Biobase object id and name of the molecularProfiles
 #'
-#' @return  Returns Xeva object.
+#' @return  Returns Xeva object
 #'
 #' @examples
 #' NULL
@@ -93,7 +93,7 @@ setMethod(
   {
     msg <-
       sprintf(
-        "Xeva-set name: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
+        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
         slot(object, "annotation")$name,
         slot(object, "annotation")$dateCreated,
         length(slot(object, "experiment")),
@@ -105,3 +105,5 @@ setMethod(
     cat(msg)
   }
 )
+
+

@@ -4,11 +4,11 @@
 \name{pdxe}
 \alias{pdxe}
 \title{Example dataset with 1x1x1 experiment design}
-\format{A Xeva object with 1x1x1 experiment design and moleculer data}
+\format{A Xeva object with 1x1x1 experiment design and molecular data.}
 \usage{
 data(pdxe)
 }
 \description{
-This is PDXE dataset without microarray data.
+This is the PDXE dataset without microarray data.
 }
 \keyword{datasets}

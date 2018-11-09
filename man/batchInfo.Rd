@@ -8,30 +8,30 @@ batchInfo(object, batch = NULL, model.id = NULL, model.id.type = c("any",
   "control", "treatment"))
 }
 \arguments{
-\item{object}{xeva object}
+\item{object}{The Xeva object from which batch information is obtained.}
 
-\item{batch}{name of the batch. Default \code{NULL}}
+\item{batch}{Name of the batch. Default \code{NULL}.}
 
-\item{model.id}{model id for which need to be searched in the batches. Default \code{NULL}}
+\item{model.id}{Model ID for which need to be searched in the batches. Default \code{NULL}.}
 
-\item{model.id.type}{type of the model id in a batch. See details}
+\item{model.id.type}{Type of the model ID in a batch. See the Details section below.}
 }
 \value{
-A \code{Vector} with batch names
+A \code{Vector} with batch names.
 }
 \description{
-Get batch information from a Xeva dataset. By default it will return the names of all the batch present in the data-set.
-\code{model.id} is specified, will return all batch names conting that model.id
+Get batch information from a Xeva dataset. By default it will return the names of all the batches present in the dataset.
+If \code{model.id} is specified, this function will return all batch names containing that \code{model.id}.
 }
 \details{
-By default it will return the names of all the batch present in the
-data-set. If batch specified it will retun the experiment design (control
-and treatment model ids) of that perticular batch. If model.id is specified
-it will return names of all the batches where this perticuler model.id is present.
+By default this function will return the names of all the batches present in the
+dataset. If a batch specified, it will return the experiment design (control
+and treatment model IDs) of that particular batch. If \code{model.id} is specified,
+it will return the names of all the batches where this particuler \code{model.id} is present.
 
-For model.id.type the default value \code{'any'} will return all batch ids
-where given model id is present in any arm (control or treatment) of the
-batch. It can be restriceted to look only for treatment (or control) arm by
+For \code{model.id.type}, the default value \code{'any'} will return all the batch IDs
+where the given model ID is present in any arm (ie. control or treatment) of the
+batch. It can also be restricted to look only for treatment (or control) arm by
 specifying the type.
 }
 \examples{
@@ -39,10 +39,10 @@ data(brca)
 ##to get all the batch names
 batch.name <- batchInfo(brca)
 
-##to get an specific batch
+##to get a specific batch
 batch.design <- batchInfo(brca, batch=batch.name[1])
 
-##to get all the batchs where a model.id is present
+##to get all the batches where a model.id is present
 batchInfo(brca, model.id="X.6047.uned")
 
 }

@@ -8,29 +8,29 @@ summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
   sensitivity.measure = NULL, unique.model = TRUE, batch = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet}}
+\item{object}{The \code{XevaSet}.}
 
-\item{drug}{Name of the drug}
+\item{drug}{Name of the drug.}
 
-\item{mDataType}{\code{character}, which one of the molecular data types is needed}
+\item{mDataType}{\code{character}, where one of the molecular data types is needed.}
 
-\item{tissue}{default \code{NULL} will return all across all tissue}
+\item{tissue}{Default \code{NULL} will return all tissue types.}
 
-\item{sensitivity.measure}{default \code{NULL} will return all sensitivity measure}
+\item{sensitivity.measure}{Default \code{NULL} will return all sensitivity measures.}
 
-\item{unique.model}{default TRUE will return only one sequncing id, in case where one model id mapes to several sequencing ids}
+\item{unique.model}{Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.}
 }
 \value{
-A \code{ExpressionSet} where sample names are model.id and sensitivity measure will be present in pData
+An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 }
 \description{
 summarizeMolecularProfiles
 }
 \details{
 \itemize{
-\item {If a sequencing sample belong to multipal models, summarizeMolecularProfiles
-will creat saperate column for each model. }
-\item {All the models without the moleculer data will be removed from the output expression set.}
+\item {If a sequencing sample belongs to multiple models, \code{summarizeMolecularProfiles}
+will create a separate column for each model.}
+\item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
 }
 }
 \examples{

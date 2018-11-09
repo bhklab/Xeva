@@ -12,10 +12,10 @@
 data(PDXMI)
 }
 \description{
-A dataset containing PDX models minimal information (PDX-MI) standard and corresponding  Xeva variable.
+A dataset containing PDX models minimal information (PDX-MI) standard and corresponding Xeva variable.
 }
 \details{
-For details about PDX-MI see:
+For details about PDX-MI, see:
 
 Meehan, Terrence F., et al. "PDX-MI: minimal information for patient-derived tumor xenograft models." Cancer research 77.21 (2017): e62-e66.
 }

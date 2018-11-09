@@ -6,6 +6,7 @@ model_response_class <- function(name, value=NA, fit=NA)
   return(mr)
 }
 
+#' @export
 print.modelResponse <- function(mr)
 {
   z <- sprintf("%s = %f\n", mr$name, mr$value)
@@ -13,18 +14,26 @@ print.modelResponse <- function(mr)
 }
 
 
-batch_response_class <- function(name, value=NA, control=NA, treatment=NA)
+batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL)
 {
   br <- structure(list(name=name, value=value, control=control, treatment=treatment),
                  class = "batchResponse")
   return(br)
 }
 
+#' @export
 print.batchResponse <- function(br)
 {
-  z <- sprintf("%s = %f\ncontrol = %f\ntreatment = %f\n", br$name, br$value,
-               br$control$value, br$treatment$value)
-  cat(z)
+  #z <- sprintf("%s = %f\ncontrol = %f\ntreatment = %f\n", br$name, br$value,
+  #             br$control$value, br$treatment$value)
+  cat(sprintf("%s = %f\n", br$name, br$value))
+
+  if(!is.null(br$control))
+  { cat(sprintf("control = %f\n", br$control$value)) }
+
+  if(!is.null(br$treatment))
+  { cat(sprintf("treatment = %f\n", br$treatment$value)) }
+
 }
 
 
@@ -47,8 +56,8 @@ print.batchResponse <- function(br)
 #' data(brca)
 #' brca  <- setResponse(brca, res.measure = c("mRECIST"))
 #' @export
-setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle", "abc"),
-                        min.time=10, treatment.only=TRUE, max.time=NULL,
+setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
+                        min.time=10, treatment.only=FALSE, max.time=NULL,
                         vol.normal=TRUE, impute.value=TRUE, concurrent.time =TRUE,
                         verbose=TRUE)
 {
@@ -139,7 +148,23 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     }
   }
 
+###--------compute TGI for batch ---------------------------------------------
+
+  if("TGI" %in% res.measure)
+  {
+    sen$batch[, c("TGI")] <- NA
+    for(bid in batchInfo(object))
+    {
+      sl <- response(object, batch = bid, res.measure="TGI",
+                     treatment.only=treatment.only, max.time=max.time,
+                     impute.value=impute.value, min.time=min.time,
+                     concurrent.time=concurrent.time, verbose=verbose)
+      sen$batch[bid, c("TGI")] <- sl$value
+    }
+  }
+
   ##--------------code for batch level mR --------------------------------------
+  ##----------------------------------------------------------------------------
 
   slot(object, "sensitivity") <- sen
   return(object)
@@ -158,7 +183,7 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
 #' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
 #' @param max.time Maximum time for data.
-#' @param vol.normal Default \code{TRUE} will use
+#' @param vol.normal Default \code{FALSE} will use
 #' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
 #' @param verbose Default \code{TRUE} will print information.
@@ -178,9 +203,10 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #' @export
 response <- function(object, model.id=NULL,
                      batch=NULL,
-                     res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
-                     treatment.only=TRUE, max.time=NULL, impute.value=TRUE,
-                     min.time=10, concurrent.time =TRUE, vol.normal=F,
+                     #res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
+                     res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
+                     treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
+                     min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
                      verbose=TRUE)
 {
   if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
@@ -190,7 +216,7 @@ response <- function(object, model.id=NULL,
                      "best.average.response", "best.average.response.time",
                      "slope", "AUC")
 
-  batch.measure <- c("angle")
+  batch.measure <- c("angle", "abc", "TGI")
 
   ##------------- for model ----------------------------------------------------
   if(!is.null(model.id))
@@ -260,6 +286,12 @@ response <- function(object, model.id=NULL,
       rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume)
       return(rtx)
     }
-  }
 
+    ###--------compute abc for batch ---------------------------------------------
+    if(res.measure=="TGI")
+    {
+      rtx <- TGI(contr.volume, treat.volume)
+      return(rtx)
+    }
+  }
 }

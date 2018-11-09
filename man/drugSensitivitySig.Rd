@@ -2,7 +2,7 @@
 % Please edit documentation in R/drug_Sensitivity_Signature.R
 \name{drugSensitivitySig}
 \alias{drugSensitivitySig}
-\title{drugSensitivitySig}
+\title{Shows drug sensitivity values}
 \usage{
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   features = NULL, model.ids = NULL, model2bidMap = NULL,
@@ -11,35 +11,35 @@ drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   verbose = TRUE)
 }
 \arguments{
-\item{object}{The \code{Xeva} dataset}
+\item{object}{The \code{Xeva} dataset.}
 
-\item{drug}{Name of the drug}
+\item{drug}{Name of the drug.}
 
-\item{mDataType}{molecular data type}
+\item{mDataType}{Molecular data type.}
 
-\item{molData}{External data matrix. Rows as features and columns as samples}
+\item{molData}{External data matrix. Rows as features and columns as samples.}
 
-\item{features}{which  molecular data fetures to use. Default \code{NULL} will use all fetures}
+\item{features}{Set which molecular data features to use. Default \code{NULL} will use all features.}
 
-\item{model.ids}{which model.id to use from the dataset. Default \code{NULL} will use all model.id}
+\item{model.ids}{Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.}
 
-\item{model2bidMap}{a datafram with model.id and biobase.id. Default \code{NULL} will use internal mapping}
+\item{model2bidMap}{A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.}
 
-\item{sensitivity.measure}{Name of the sensitivity measure}
+\item{sensitivity.measure}{Name of the sensitivity measure.}
 
-\item{fit}{Default \code{lm}. Name of the model to be fitted. Options are "lm", "maxCor", "gam"}
+\item{fit}{Default \code{lm}. Name of the model to be fitted. Options are \code{lm}, \code{maxCor}, and \code{gam}.}
 
-\item{type}{Tissue type. Default is NULL which will use \code{'tissue'} from \code{object}}
+\item{type}{Tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.}
 }
 \value{
-A datafram with fetures and values
+A \code{data.frame} with features and values.
 }
 \description{
-Given a Xeva object, and drug name it will return sensitivity value for all the genes/fetures
+Given a Xeva object and drug name, this function will return sensitivity values for all the genes/features.
 }
 \details{
-A matrix of values can be directly passed to molData. \code{fit} can be "lm", "maxCor" or "gam".
-In case where a model.id map to multipal biobase.id the first biobase.id in the datafram will be used.
+A matrix of values can be directly passed to molData. \code{fit} can be \code{lm}, \code{maxCor}, or \code{gam}.
+In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 }
 \examples{
 data(pdxe)

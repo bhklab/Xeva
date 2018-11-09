@@ -8,10 +8,10 @@ Generic for modelInfo method}
 modelInfo(object, mDataType = NULL)
 }
 \arguments{
-\item{object}{The \code{XevaSet} to retrieve drug info from}
+\item{object}{The \code{XevaSet} to retrieve drug information from.}
 }
 \value{
-a \code{data.frame} with the model annotations
+A \code{data.frame} with the model annotations.
 }
 \description{
 modelInfo Generic

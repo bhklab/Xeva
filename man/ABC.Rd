@@ -3,28 +3,28 @@
 \name{ABC}
 \alias{ABC}
 \title{area between curves
-compute area between two time-volume curves}
+Computes the area between two time-volume curves.}
 \usage{
 ABC(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
   treat.volume = NULL)
 }
 \arguments{
-\item{contr.time}{time vector for control}
+\item{contr.time}{Time vector for control.}
 
-\item{contr.volume}{volume vector for control}
+\item{contr.volume}{Volume vector for control.}
 
-\item{treat.time}{time vector for treatment}
+\item{treat.time}{Time vector for treatment.}
 
-\item{treat.volume}{volume vector for treatment}
+\item{treat.volume}{Volume vector for treatment.}
 
 \item{degree}{default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians}
 }
 \value{
-returns batch response object
+Returns batch response object.
 }
 \description{
 area between curves
-compute area between two time-volume curves
+Computes the area between two time-volume curves.
 }
 \examples{
 contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)

@@ -2,20 +2,20 @@
 % Please edit documentation in R/access_slot_drug.R
 \name{drugInfo}
 \alias{drugInfo}
-\title{get drug information
-get drug information slot}
+\title{Get drug information
+Get the drug information slot from a {XevaSet} object.}
 \usage{
 drugInfo(object)
 }
 \arguments{
-\item{object}{The \code{XevaSet} to retrieve drug info from}
+\item{object}{The \code{XevaSet} to retrieve drug information from.}
 }
 \value{
-a \code{data.frame} with the drug annotations
+A \code{data.frame} with the drug annotations.
 }
 \description{
-get drug information
-get drug information slot
+Get drug information
+Get the drug information slot from a {XevaSet} object.
 }
 \examples{
 data(brca)

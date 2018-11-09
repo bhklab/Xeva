@@ -10,20 +10,26 @@ createXevaSet(name, model = data.frame(), drug = data.frame(),
   molecularProfiles = list(), modToBiobaseMap = data.frame())
 }
 \arguments{
-\item{name}{a \code{character} string detailing the name of the dataset}
+\item{name}{A \code{character} string detailing the name of the dataset.}
 
-\item{model}{a \code{data.frame} containg the annotations for all models used
-in the experiment}
+\item{model}{A \code{data.frame} containing the annotations for all the models used
+in the experiment.}
 
-\item{drug}{a \code{data.frame} containg the annotations for all the drugs
-profiled in the data set, across all data types}
+\item{drug}{A \code{data.frame} containing the annotations for all the drugs
+profiled in the dataset, across all data types.}
 
-\item{experiment}{a \code{data.frame} containg all experiment information}
+\item{experiment}{A \code{data.frame} containing all experiment information.}
 
-\item{molecularProfiles}{a \code{list} of ExpressionSet objects containing
-different molecular profiles}
+\item{expDesign}{a list containing name of the batch, control and treatment model.id}
 
-\item{modToBiobaseMap}{}
+\item{modelSensitivity}{data.fram containg sensitivity for each model}
+
+\item{batchSensitivity}{data.fram containg sensitivity for each batch}
+
+\item{molecularProfiles}{A \code{list} of \code{ExpressionSet} objects containing
+different molecular profiles.}
+
+\item{modToBiobaseMap}{a data.fram containg model.id corresponding Biobase object id and name of the molecularProfiles}
 }
 \value{
 Returns Xeva object

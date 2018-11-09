@@ -7,19 +7,19 @@
 mRECIST(time, volume, min.time = 10, return.detail = FALSE)
 }
 \arguments{
-\item{time}{Value of best response}
+\item{time}{Value of best response.}
 
-\item{volume}{Value of best average response}
+\item{volume}{Value of best average response.}
 
-\item{min.time}{minimum time after which tumore volume will be considered}
+\item{min.time}{Minimum time after which tumor volume will be considered.}
 
-\item{return.detail}{default \code{FALSE}. If \code{TRUE} will return all intermediate values}
+\item{return.detail}{Default \code{FALSE}. If \code{TRUE}, return all intermediate values.}
 }
 \value{
-Returns the mRECIST
+Returns the mRECIST.
 }
 \description{
-\code{mRECIST} returns the mRECIST for given volume response
+\code{mRECIST} Returns the mRECIST for given volume response.
 }
 \examples{
 time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)

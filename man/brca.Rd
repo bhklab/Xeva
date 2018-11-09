@@ -3,12 +3,12 @@
 \docType{data}
 \name{brca}
 \alias{brca}
-\title{breast cancer dataset from PDXE}
-\format{A Xeva object of PDXE breast cancer dataset}
+\title{Breast cancer dataset from PDXE}
+\format{A Xeva object of the PDXE breast cancer dataset.}
 \usage{
 data(brca)
 }
 \description{
-breast cancer dataset from PDXE
+Breast cancer dataset from PDXE.
 }
 \keyword{datasets}

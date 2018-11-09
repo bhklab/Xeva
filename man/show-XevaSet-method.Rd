@@ -4,11 +4,11 @@
 \name{show,XevaSet-method}
 \alias{show,XevaSet-method}
 \title{A method to display object
-for "show" setGeneric is already defined}
+for "show" setGeneric is already defined.}
 \usage{
 \S4method{show}{XevaSet}(object)
 }
 \description{
 A method to display object
-for "show" setGeneric is already defined
+for "show" setGeneric is already defined.
 }

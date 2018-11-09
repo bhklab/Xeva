@@ -2,37 +2,37 @@
 % Please edit documentation in R/response_matrixs.R
 \name{setResponse}
 \alias{setResponse}
-\title{\code{setResponse} sets response of an Xeva object}
+\title{\code{setResponse} sets response of an Xeva object.}
 \usage{
-setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
-  "abc"), min.time = 10, treatment.only = TRUE, max.time = NULL,
+setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle", "abc",
+  "TGI"), min.time = 10, treatment.only = FALSE, max.time = NULL,
   vol.normal = TRUE, impute.value = TRUE, concurrent.time = TRUE,
   verbose = TRUE)
 }
 \arguments{
-\item{object}{Xeva object}
+\item{object}{Xeva object.}
 
-\item{res.measure}{response measure, multipal measure allowed}
+\item{res.measure}{Response measure; multiple measures are allowed.}
 
-\item{min.time}{default \strong{10} days. Used for \emph{mRECIST} computation}
+\item{min.time}{Default \strong{10} days. Used for \emph{mRECIST} computation.}
 
-\item{treatment.only}{Default \code{FALSE}. If TRUE give data only for non-zero dose periode (if dose data avalible)}
+\item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
-\item{max.time}{maximum time for data}
+\item{max.time}{Maximum time for data.}
 
-\item{vol.normal}{default \code{TRUE} will use}
+\item{vol.normal}{Default \code{TRUE} will use}
 
-\item{impute.value}{default \code{FALSE}. If TRUE will impute the values}
+\item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing values.}
 
-\item{concurrent.time}{default \code{FALSE}. If TRUE will cut the batch data such that control and treatment will end at same time point}
+\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
 
-\item{verbose}{default \code{TRUE} will print infromation}
+\item{verbose}{Default \code{TRUE} will print information}
 }
 \value{
-returns updated Xeva object
+Returns updated Xeva object.
 }
 \description{
-\code{setResponse} sets response of an Xeva object
+\code{setResponse} sets response of an Xeva object.
 }
 \examples{
 data(brca)
