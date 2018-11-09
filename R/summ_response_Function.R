@@ -76,23 +76,23 @@
 #####================= summarizeResponse ==================
 #' Summarize Response of PDXs
 #'
-#' Summarize Response of PDXs.
+#' This function summarizes the drug response information of PDXs.
 #'
-#' @param object The \code{XevaSet}
-#' @param response.measure \code{character} . Which response measure to use? Use the responseMeasures function to find out what measures are available for each Xeva set.
-#' @param group.by default \code{patient.id}. How the models should be grouped togather. See details
-#' @param summary.stat which summary method to use if multipal ids were found
-#' @param batch.name a vector of batch names. Default NULL will return all batchs
-#' @return a \code{matrix} with rows as drug names, coulmn as \code{group.by} and each cell contains \code{response.measure} for the pair.
+#' @param object The \code{XevaSet} object.
+#' @param response.measure \code{character} indicating which response measure to use. Use the \code{responseMeasures} function to find out what measures are available for each \code{XevaSet}.
+#' @param group.by Default \code{patient.id}. Dictates how the models should be grouped together. See details below.
+#' @param summary.stat Dictates which summary method to use if multiple IDs are found.
+#' @param batch.name A \code{vector} of batch names. Default \code{NULL} will return all batches.
+#' @return A \code{matrix} with rows as drug names, column as \code{group.by}. Each cell contains \code{response.measure} for the pair.
 #'
 #' @details
-#' There can be two types of response measure
+#' There can be two types of drug response measure.
 #' \itemize{
-#' \item{per model response : One response value for each Model, e.g. mRECIST_recomputed for each model}
-#' \item{per batch response : One response value for each Batch, e.g. angle between treatment and control groups}
+#' \item{Per model response: One response value for each Model, eg. \code{mRECIST_recomputed} for each model.}
+#' \item{Per batch response: One response value for each Batch, eg. \code{angle} between treatment and control groups.}
 #' }
-#' In case of \code{per model response} output columns will be \code{model.id} (or group.by).
-#' For \code{per batch response} \code{group.by} value can be \code{"batch.name"} .
+#' For the \code{per model response} output, columns will be \code{model.id} (or \code{group.by}).
+#' For the \code{per batch response} output, the \code{group.by} value can be \code{"batch.name"}.
 #'
 #' @examples
 #' data(brca)

@@ -1,17 +1,17 @@
 #' Example dataset with 1x1x1 experiment design
 #'
-#' This is PDXE dataset without microarray data.
+#' This is the PDXE dataset without microarray data.
 #'
-#' @format A Xeva object with 1x1x1 experiment design and moleculer data
+#' @format A Xeva object with 1x1x1 experiment design and molecular data.
 #' @usage data(pdxe)
 "pdxe"
 
 
-#' breast cancer dataset from PDXE
+#' Breast cancer dataset from PDXE
 #'
-#' breast cancer dataset from PDXE
+#' Breast cancer dataset from PDXE.
 #'
-#' @format A Xeva object of PDXE breast cancer dataset
+#' @format A Xeva object of the PDXE breast cancer dataset.
 #' @usage data(brca)
 "brca"
 
@@ -21,9 +21,9 @@
 
 #' PDX-MI data
 #'
-#' A dataset containing PDX models minimal information (PDX-MI) standard and corresponding  Xeva variable.
+#' A dataset containing PDX models minimal information (PDX-MI) standard and corresponding Xeva variable.
 #'
-#' For details about PDX-MI see:
+#' For details about PDX-MI, see:
 #'
 #' Meehan, Terrence F., et al. "PDX-MI: minimal information for patient-derived tumor xenograft models." Cancer research 77.21 (2017): e62-e66.
 #'

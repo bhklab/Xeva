@@ -2,17 +2,17 @@
 #'
 #' Get sensitivity for an Xeva object
 #' @description
-#' Given a Xeva object, it will return sensitivity datafram
+#' Given a Xeva object, it will return a \code{data.frame} detailing sensitivity information.
 #'
 #' @examples
 #' data(brca)
 #' head(sensitivity(brca, type="batch"))
 #' head(sensitivity(brca, type="model"))
-#' @param object The \code{Xeva} dataset
-#' @param type sensitivity type (either model or batch)
-#' @param sensitivity.measure Name of the sensitivity.measure. Default \code{NULL}, will return all
+#' @param object The \code{Xeva} dataset.
+#' @param type Sensitivity type (either model or batch).
+#' @param sensitivity.measure Name of the \code{sensitivity.measure}. Default \code{NULL} will return all sensitivity measures.
 #'
-#' @return a \code{data.fram} with model or batch id and sensitivity values
+#' @return A \code{data.frame} with model or batch ID and sensitivity values.
 #' @export
 sensitivity <- function(object, type=c("model", "batch"), sensitivity.measure=NULL)
 {

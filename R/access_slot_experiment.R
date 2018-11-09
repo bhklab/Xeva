@@ -30,17 +30,17 @@
 ##-----------------------------------------------------------------------------------------------------
 ##-----------------------------------------------------------------------------------------------------
 ##----- select model.id based on drug, tissue -----------------------------------------------------
-#' To select model ids based on drug name and/or tissue
+#' To select model IDs based on drug name and/or tissue type.
 #' @examples
 #' data(brca)
 #' selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
 #' selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
-#' @param object The \code{XevaSet}
-#' @param drug Name of the \code{drug}
-#' @param drug.match.exact Default \code{TRUE}
-#' @param tissue Tumor type. Default \code{NULL}
+#' @param object The \code{XevaSet}.
+#' @param drug Name of the \code{drug}.
+#' @param drug.match.exact Default \code{TRUE}.
+#' @param tissue Tumor type. Default \code{NULL}.
 #'
-#' @return a \code{vector} with the matched model.ids
+#' @return A \code{vector} with the matched \code{model.id}s.
 #'
 setGeneric(name = "selectModelIds",
            def = function(object,

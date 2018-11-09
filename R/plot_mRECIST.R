@@ -168,19 +168,19 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 ##============================================================================
 #' To plot mRECIST values
 #'
-#' \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}
+#' \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}.
 #'
-#' @param mat The mRECIST matrix where rows are drugs and columns are patient
-#' @param control.name name of the control
-#' @param control.col color of the control
-#' @param drug.col color of the drug names
-#' @param colPalette color palette for mRECIST values
-#' @param name title of the plot
-#' @param sort if matrix should be sorted before ploting
-#' @param row_fontsize size of the row name font
-#' @param col_fontsize size of the column name font
-#' @param draw_plot default TRUE will plot the figure. If FALSE will return an object
-#' @return plot
+#' @param mat The mRECIST matrix where rows are drugs and columns are patients.
+#' @param control.name Name of the control.
+#' @param control.col Color of the control.
+#' @param drug.col Color of the drug names.
+#' @param colPalette Color palette for mRECIST values.
+#' @param name Title of the plot.
+#' @param sort If matrix should be sorted before plotting.
+#' @param row_fontsize Size of the row name font.
+#' @param col_fontsize Size of the column name font.
+#' @param draw_plot Default \code{TRUE} will plot the figure. If \code{FALSE}, return an object.
+#' @return mRECIST plot.
 #' @examples
 #' data(brca)
 #' ## select lung cancer pdxe data

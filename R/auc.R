@@ -7,11 +7,11 @@
 
 
 #' area under the curve
-#' \code{AUC} returns area under the curve
+#' \code{AUC} Returns area under the curve
 #'
-#' @param time vector of time
-#' @param volume first vector of volume
-#' @return  returns angle and \code{slope} object
+#' @param time A \code{vector} of time points recorded for the experiment.
+#' @param volume First \code{vector} of volume.
+#' @return  Returns \code{angle} and \code{slope} object.
 #' @examples
 #' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' volume1<- time * tan(30*pi/180)
@@ -35,14 +35,14 @@ AUC <- function(time, volume)
 }
 
 #' area between curves
-#' compute area between two time-volume curves
+#' Computes the area between two time-volume curves.
 #'
-#' @param contr.time time vector for control
-#' @param contr.volume volume vector for control
-#' @param treat.time time vector for treatment
-#' @param treat.volume volume vector for treatment
+#' @param contr.time Time vector for control.
+#' @param contr.volume Volume vector for control.
+#' @param treat.time Time vector for treatment.
+#' @param treat.volume Volume vector for treatment.
 #' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
-#' @return returns batch response object
+#' @return Returns batch response object.
 #' @examples
 #' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' contr.volume<- contr.time * tan(60*pi/180)

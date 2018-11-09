@@ -1,4 +1,4 @@
-##---- functions to acess experiment slot --------
+##---- functions to access experiment slot --------
 
 drugMatchFun <- function(drug, objPDX, exact.match)
 {

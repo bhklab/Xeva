@@ -26,8 +26,8 @@
 #' data(brca)
 #' mid <- modelInfo(brca)
 #' head(mid)
-#' @param object The \code{XevaSet} to retrieve drug info from
-#' @return a \code{data.frame} with the model annotations
+#' @param object The \code{XevaSet} to retrieve drug information from.
+#' @return A \code{data.frame} with the model annotations.
 setGeneric(name = "modelInfo", def = function(object, mDataType=NULL) {standardGeneric("modelInfo")} )
 
 #' @export

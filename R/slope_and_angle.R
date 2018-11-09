@@ -1,11 +1,11 @@
 #' Computes slope
 #'
-#' \code{slope} returns the slope for given time and volume data
+#' \code{slope} returns the slope for given time and volume data.
 #'
-#' @param time vector of time
-#' @param volume vector of volume
-#' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
-#' @return  returns the slope and a fit object
+#' @param time A \code{vector} of time.
+#' @param volume A \code{vector} of volume.
+#' @param degree Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.
+#' @return Returns the slope and a \code{fit} object.
 #' @examples
 #' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
@@ -37,14 +37,14 @@ slope <- function(time, volume, degree=TRUE)
 
 
 #' compute angle
-#' computes angle between two time-volume curves
+#' Computes the angle between two time-volume curves.
 #'
-#' @param contr.time time vector for control
-#' @param contr.volume volume vector for control
-#' @param treat.time time vector for treatment
-#' @param treat.volume volume vector for treatment
-#' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
-#' @return returns batch response object
+#' @param contr.time Time vector for control.
+#' @param contr.volume Volume vector for control.
+#' @param treat.time Time vector for treatment.
+#' @param treat.volume Volume vector for treatment.
+#' @param degree Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.
+#' @return Returns batch response object.
 #' @examples
 #' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' contr.volume<- contr.time * tan(60*pi/180)

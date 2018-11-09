@@ -43,13 +43,13 @@
 ######################################################################
 #' Computes the mRECIST
 #'
-#' \code{mRECIST} returns the mRECIST for given volume response
+#' \code{mRECIST} Returns the mRECIST for given volume response.
 #'
-#' @param time Value of best response
-#' @param volume Value of best average response
-#' @param min.time minimum time after which tumore volume will be considered
-#' @param return.detail default \code{FALSE}. If \code{TRUE} will return all intermediate values
-#' @return  Returns the mRECIST
+#' @param time Value of best response.
+#' @param volume Value of best average response.
+#' @param min.time Minimum time after which tumor volume will be considered.
+#' @param return.detail Default \code{FALSE}. If \code{TRUE}, return all intermediate values.
+#' @return  Returns the mRECIST.
 #' @examples
 #' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
