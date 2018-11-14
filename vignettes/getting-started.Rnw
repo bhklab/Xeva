@@ -37,7 +37,7 @@ Xeva requires that several packages be installed. All dependencies are available
 #biocLite('Xeva')
 @
 
-Package can also be install directly form github using devtools:
+The package can also be installed directly form GitHub using devtools:
 
 <<githubInst, results='hide', message=FALSE, eval=FALSE>>=
 #install devtools if required
@@ -121,13 +121,13 @@ Here, for the batch named \textit{X-1004.binimetinib}, we can see that the contr
 \section{Visualizing PDX Growth Curve}
 
 Xeva provides a function to plot time vs. tumor volume data for individual models as well as for individual batches. These data can be plotted by using the name of the batch:
-<< plot1, fig.cap="Tumor growth curve for a batch of control and treated PDXs", out.width='4in', fig.wide=TRUE>>=
+<< plot1, fig.cap="Tumor growth curves for a batch of control and treated PDXs", out.width='4in', fig.wide=TRUE>>=
 plotPDX(brca, batch = "X-4567.BKM120")
 @
 
 
 You can choose to see different aspects of this visualization. For example, we can plot normalized volume; we can also change the colors of the lines:
-<<pdxplot2, fig.cap="Tumor growth curve for a batch of control and treated PDX. Here, the volume is normalized and plots are truncated at 40 days", out.width='4in', fig.wide=TRUE>>=
+<<pdxplot2, fig.cap="Tumor growth curves for a batch of control and treated PDXs. Here, the volume is normalized and plots are truncated at 40 days", out.width='4in', fig.wide=TRUE>>=
 plotPDX(brca, batch = "X-4567.BKM120", vol.normal = T, control.col = "#a6611a",
         treatment.col = "#018571", major.line.size = 1, max.time = 40)
 @
@@ -135,7 +135,7 @@ plotPDX(brca, batch = "X-4567.BKM120", vol.normal = T, control.col = "#a6611a",
 
 Data can also be visualized at the patient level by specifying \texttt{patient.id}:
 %%##X-2344, X-1004, X-3078 and X-5975
-<<pdxplot3, fig.cap="Tumor growth curve for a batch of control and treated PDX generated using patient ID and drug name", out.width='4in', fig.wide=TRUE>>=
+<<pdxplot3, fig.cap="Tumor growth curves for a batch of control and treated PDXs generated using patient ID and drug name", out.width='4in', fig.wide=TRUE>>=
 plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
 @
 
