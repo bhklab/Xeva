@@ -148,23 +148,6 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
 ##--- add oncoplot at the bottam of waterfall plot ---------
 .add_OncoplotAt_bottam <- function()
 {
-  library(ggplot2)
-  library(gridExtra)
-  pMain <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_point()
-  pTop <- ggplot(mtcars, aes(x = wt)) +
-    geom_histogram()
-  pRight <- ggplot(mtcars, aes(x = mpg)) +
-    geom_histogram() + coord_flip()
-  pEmpty <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_blank() +
-    theme(axis.text = element_blank(),
-          axis.title = element_blank(),
-          line = element_blank(),
-          panel.background = element_blank())
-
-  grid.arrange(pMain, pRight,pTop, pEmpty,
-               ncol = 2, nrow = 2, widths = c(3, 1), heights = c(3, 1))
 
 }
 

@@ -108,12 +108,16 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   colorX = unlist(colPalette[colnames(rcDF$colSt)])
   colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column", axis = TRUE,
                                         gp = gpar(fill = colorX))
-  column_ha = HeatmapAnnotation(barplot = colBar)
+  column_ha = HeatmapAnnotation(barplot = colBar, height = unit(2, "cm"),
+                                show_annotation_name = FALSE)
 
   colorX = unlist(colPalette[colnames(rcDF$rowSt)])
   rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
-                                        axis_side = "top", gp = gpar(fill = colorX))
-  row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"))
+                                        #axis_side = "top",
+                                        axis_param = list(side = "top"),
+                                        gp = gpar(fill = colorX))
+  row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"),
+                         show_annotation_name = FALSE)
   return(list(colPlt= column_ha, rowPlt= row_ha))
 }
 
@@ -235,7 +239,9 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   maxRWN <- rownames(mat)[nchar(rownames(mat))==max(nchar(rownames(mat)))][1]
   rwSide <- grobWidth(textGrob(maxRWN)) + unit(0, "mm")
   pltX <- ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
-                 top_annotation = sidePlt$colPlt, top_annotation_height = unit(2, "cm"),
+                 top_annotation = sidePlt$colPlt,
+                 #top_annotation_height = unit(2, "cm"),
+
                  cluster_rows = FALSE, cluster_columns = FALSE,
                  show_row_dend = FALSE, show_row_names = TRUE,
                  row_names_side = "left", row_names_max_width = rwSide,
@@ -254,11 +260,14 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   if(draw_plot==TRUE)
   {
     colVec <- unlist(colPalette)[names(colPalette)]
-    HLeg <- legendGrob(names(colPalette), pch=22,
-                    gp=gpar(col = colVec, fill = colVec))
+    #HLeg <- legendGrob(names(colPalette), pch=22,gp=gpar(col = colVec, fill = colVec))
+
+    HLeg <- Legend(at = names(colPalette), title = "", legend_gp = gpar(col = colVec, fill = colVec))
+
     #padding = unit(c(0.01, 0.01, 0.01, 0.01), "npc")
     padding = unit(c(2,2,2,2), "mm")
     draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
+
   } else{ return(pltX)}
 
 }

@@ -13,7 +13,6 @@ BiocStyle::latex()
 \affil[3]{Department of Computer Science, University of Toronto, Toronto, Canada}
 \affil[4]{Vector Institute, Toronto, Ontario, Canada}
 \affil[5]{Ontario Institute for Cancer Research, Toronto, Ontario, Canada}
-
 \date{\today}
 
 \begin{document}

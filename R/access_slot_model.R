@@ -86,7 +86,7 @@ setMethod( f=modelInfo, signature="XevaSet",
 #' @param unique Default \code{TRUE}. If unique=FALSE output will be mapped to input
 #' @return a \code{data.fram} with id and mapped id
 #' @keywords internal
-#####export
+#' @export
 mapModelSlotIds <- function(object, id, id.name, map.to="all", unique=TRUE)
 {
   id <- c(as.character(id))

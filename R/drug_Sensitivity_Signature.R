@@ -140,7 +140,7 @@ setMethod(f= "drugSensitivitySig",
   rtLx <- list()
   drugIx <- c(drug)[1]
 
-  if(verbose==TRUE){printf("Running for drug %s\n\n", drugIx)}
+  if(verbose==TRUE){cat(sprintf("Running for drug %s\n\n", drugIx))}
   mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
                                    collapse.by="mean", model.ids, mDataType,
                                    model2bidMap)
@@ -159,7 +159,7 @@ setMethod(f= "drugSensitivitySig",
   {
     if(length(tissue) == 1)
     {
-      printf("setting 'tissue' = %s for all models", tissue[1])
+      cat(sprintf("setting 'tissue' = %s for all models", tissue[1]))
       tt <- rep(tissue[1], nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
