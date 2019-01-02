@@ -281,29 +281,3 @@ extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
   return(Vi)
 }
 
-
-
-
-
-
-
-
-# multiplyBy3
-#' This is an example of an internal function called \code{multiplyBy3()}
-#'
-#' Sometimes you want internal functions as part of an R Package built with
-#' RStudio and roxygen2, but you don't want .Rd files created for them
-#' or to have them be visible in the help document following the build process
-#'
-#' @keywords internal
-#'
-#' @param base_num The number to multiply by three
-#'
-#' @import jsonlite
-#'
-#' @return Returns a numeric vector
-#'
-multiplyBy3 <- function(base_number) {
-  stopifnot(is.numeric(base_number))
-  return(base_number * 3)
-}

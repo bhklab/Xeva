@@ -1,3 +1,4 @@
+%\VignetteEngine{knitr::knitr}
 \documentclass{article}
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=
@@ -6,10 +7,12 @@ BiocStyle::latex()
 
 \title{The Xeva User's Guide}
 \author[1,2]{Arvind Mer}
-\author[1,2,3]{Benjamin Haibe-Kains}
+\author[1,2,3,4,5]{Benjamin Haibe-Kains}
 \affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto, Canada}
 \affil[2]{Department of Medical Biophysics, University of Toronto, Toronto, Canada}
 \affil[3]{Department of Computer Science, University of Toronto, Toronto, Canada}
+\affil[4]{Vector Institute, Toronto, Ontario, Canada}
+\affil[5]{Ontario Institute for Cancer Research, Toronto, Ontario, Canada}
 
 \date{\today}
 
