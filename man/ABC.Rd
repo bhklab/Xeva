@@ -16,8 +16,6 @@ ABC(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
 \item{treat.time}{Time vector for treatment.}
 
 \item{treat.volume}{Volume vector for treatment.}
-
-\item{degree}{default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians}
 }
 \value{
 Returns batch response object.
@@ -35,5 +33,7 @@ par(pty="s")
 xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
 plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)
 lines(treat.time, treat.volume, type = "b")
-polygon(c(treat.time, rev(treat.time)), c(contr.volume, rev(treat.volume)), col = "#fa9fb5", border = NA)
+polygon(c(treat.time, rev(treat.time)), c(contr.volume, rev(treat.volume)),
+        col = "#fa9fb5", border = NA)
+
 }

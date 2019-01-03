@@ -22,14 +22,18 @@
 #' modelInfo Generic
 #' Generic for modelInfo method
 #'
+#' @param object Xeva object
+#' @param mDataType Molecular data type.
+#'
 #' @examples
 #' data(brca)
 #' mid <- modelInfo(brca)
 #' head(mid)
-#' @param object The \code{XevaSet} to retrieve drug information from.
+#'
 #' @return A \code{data.frame} with the model annotations.
 setGeneric(name = "modelInfo", def = function(object, mDataType=NULL) {standardGeneric("modelInfo")} )
 
+#' @rdname modelInfo
 #' @export
 setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object, mDataType=NULL)
@@ -86,7 +90,8 @@ setMethod( f=modelInfo, signature="XevaSet",
 #' @param unique Default \code{TRUE}. If unique=FALSE output will be mapped to input
 #' @return a \code{data.fram} with id and mapped id
 #' @keywords internal
-#' @export
+#' @noRd
+### @export
 mapModelSlotIds <- function(object, id, id.name, map.to="all", unique=TRUE)
 {
   id <- c(as.character(id))

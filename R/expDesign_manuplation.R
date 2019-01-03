@@ -26,6 +26,9 @@
 setGeneric(name = "addExperimentalDesign",
            def = function(object, treatment=NULL, control=NULL, batch.id=NULL,replace=FALSE)
                           {standardGeneric("addExperimentalDesign")} )
+
+
+#' @rdname addExperimentalDesign
 #' @export
 setMethod( f=addExperimentalDesign,
            signature=c(object="XevaSet"),

@@ -86,7 +86,11 @@
 #' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
 #' @param sensitivity.measure Name of the sensitivity measure.
 #' @param fit Default \code{lm}. Name of the model to be fitted. Options are \code{lm}, \code{maxCor}, and \code{gam}.
-#' @param type Tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
+#' @param standardize Default \code{SD}. Name of the method to use for data standardization befor fitting.
+#' @param nthread number of threads
+#' @param tissue tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
+#' @param verbose Default \code{TRUE} will show information
+#'
 #' @return A \code{data.frame} with features and values.
 #'
 #' @examples
@@ -111,6 +115,7 @@ setGeneric(name = "drugSensitivitySig",
             {standardGeneric("drugSensitivitySig")}
           )
 
+#' @rdname drugSensitivitySig
 #' @export
 setMethod(f= "drugSensitivitySig",
           signature=c("XevaSet"),
@@ -227,6 +232,7 @@ setMethod(f= "drugSensitivitySig",
 #' @import parallel
 #' @import doSNOW
 #' @import foreach
+#' @importFrom stats setNames
 .runFit <- function(x, y, fit = c("lm", "maxCor", "gam"), nthread=1,
                     type=NULL, standardize='SD', verbose=TRUE)
 {
@@ -260,13 +266,13 @@ setMethod(f= "drugSensitivitySig",
 
   ##---------------------------------------------------------------------
     #library(doSNOW)
+  i=0
     cl <- makeCluster(nthread)
     registerDoSNOW(cl)
     result <- foreach (i=colnames(x),
                        .final = function(i) {setNames(i, colnames(x))},
                        .export=c(".nonLinerFits")) %dopar%
     { .nonLinerFits(x[,i], y, fit = fit )}
-
 
     stopCluster(cl)
 

@@ -52,9 +52,10 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 #'           tissue="BRCA", model.id=names(model.type), model.type= model.type)
 #'
 #' @param object The \code{XevaSet} object
-#' @param drug Name of the drug
 #' @param res.measure PDX model drug response measure
+#' @param drug Name of the drug
 #' @param group.by Group drug response data
+#' @param summary.stat How to summarize multiple values
 #' @param tissue Tissue type
 #' @param model.id Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models
 #' @param model.type Type of model, such as mutated or wild type
@@ -63,6 +64,7 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 #' @param yname Name for the y-axis
 #' @param title Title of the plot
 #' @param sort Default \code{TRUE} will sort the data
+#'
 #' @export
 #' @import ggplot2
 waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,

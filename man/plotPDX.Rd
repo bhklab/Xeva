@@ -26,7 +26,15 @@ plotBatch(object, batch = NULL, patient.id = NULL, drug = NULL,
 
 \item{batch}{Batch name or experiment design list.}
 
-\item{drug}{Default \code{NULL} will extract drug name from data.}
+\item{patient.id}{Patient id from the \code{XevaSet}. Default \code{NULL}.}
+
+\item{drug}{Name of the drug. Default \code{NULL}.}
+
+\item{model.id}{One or multiple model.id. Default \code{NULL}.}
+
+\item{model.color}{Color for \code{model.id}. Default \code{NULL}.}
+
+\item{control.name}{Name of the control sample.}
 
 \item{max.time}{Maximum time point of the plot. Default \code{NULL} will plot complete data.}
 
@@ -71,6 +79,6 @@ plotPDX(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"))
 plotPDX(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
 expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
              control=c("X.6047.uned"))
-plotBatch(brca, batch=expDesign, vol.normal=T)
-plotBatch(brca, batch=expDesign, vol.normal=F, SE.plot = "errorbar")
+plotBatch(brca, batch=expDesign, vol.normal=TRUE)
+plotBatch(brca, batch=expDesign, vol.normal=FALSE, SE.plot = "errorbar")
 }

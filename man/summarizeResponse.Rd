@@ -13,11 +13,15 @@ summarizeResponse(object, response.measure = "mRECIST", model.id = NULL,
 
 \item{response.measure}{\code{character} indicating which response measure to use. Use the \code{responseMeasures} function to find out what measures are available for each \code{XevaSet}.}
 
+\item{model.id}{The \code{model.id} for which data is required.}
+
+\item{batch.id}{A \code{vector} of batch names. Default \code{NULL} will return all batches.}
+
 \item{group.by}{Default \code{patient.id}. Dictates how the models should be grouped together. See details below.}
 
 \item{summary.stat}{Dictates which summary method to use if multiple IDs are found.}
 
-\item{batch.name}{A \code{vector} of batch names. Default \code{NULL} will return all batches.}
+\item{tissue}{Name of the tissue. Default \code{NULL}}
 }
 \value{
 A \code{matrix} with rows as drug names, column as \code{group.by}. Each cell contains \code{response.measure} for the pair.
@@ -37,4 +41,5 @@ For the \code{per batch response} output, the \code{group.by} value can be \code
 \examples{
 data(brca)
 brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+
 }

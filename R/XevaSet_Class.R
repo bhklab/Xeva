@@ -85,7 +85,9 @@ createXevaSet <- function(name,
 
 #' A method to display object
 #' for "show" setGeneric is already defined.
+#' @param object a xeva object
 #' @import methods
+#' @noRd
 setMethod(
   f = "show",
   signature = "XevaSet",

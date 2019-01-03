@@ -19,6 +19,8 @@ summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
 \item{sensitivity.measure}{Default \code{NULL} will return all sensitivity measures.}
 
 \item{unique.model}{Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.}
+
+\item{batch}{Name of the batch. Default \code{NULL}.}
 }
 \value{
 An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.

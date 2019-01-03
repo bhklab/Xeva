@@ -36,5 +36,5 @@ Returns updated Xeva object.
 }
 \examples{
 data(brca)
-brca  <- setResponse(brca, res.measure = c("mRECIST"))
+\dontrun{ brca  <- setResponse(brca, res.measure = c("mRECIST")) }
 }

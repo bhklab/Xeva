@@ -80,9 +80,12 @@
 #'
 #' @param object The \code{XevaSet} object.
 #' @param response.measure \code{character} indicating which response measure to use. Use the \code{responseMeasures} function to find out what measures are available for each \code{XevaSet}.
+#' @param model.id The \code{model.id} for which data is required.
+#' @param batch.id A \code{vector} of batch names. Default \code{NULL} will return all batches.
 #' @param group.by Default \code{patient.id}. Dictates how the models should be grouped together. See details below.
 #' @param summary.stat Dictates which summary method to use if multiple IDs are found.
-#' @param batch.name A \code{vector} of batch names. Default \code{NULL} will return all batches.
+#' @param tissue Name of the tissue. Default \code{NULL}
+#'
 #' @return A \code{matrix} with rows as drug names, column as \code{group.by}. Each cell contains \code{response.measure} for the pair.
 #'
 #' @details
@@ -97,12 +100,12 @@
 #' @examples
 #' data(brca)
 #' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+#'
 #' @export
 summarizeResponse <- function(object, response.measure = "mRECIST",
                               model.id=NULL, batch.id=NULL,
                               group.by="patient.id",
-                              summary.stat=c(";", "mean", "median"),
-                              tissue=NULL)
+                              summary.stat=c(";", "mean", "median"), tissue=NULL)
 {
   summary.stat <- c(summary.stat)[1]
 
@@ -124,9 +127,3 @@ summarizeResponse <- function(object, response.measure = "mRECIST",
     return(mat)
   }
 }
-
-
-
-
-
-

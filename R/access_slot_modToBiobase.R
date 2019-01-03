@@ -9,7 +9,8 @@
 #' @param mDataType Data type for which ids to be retrive. Default \code{NULL} will return full datafram
 #' @return a \code{data.frame} with the model.id and biobase.id
 #' @keywords internal
-#@export
+#' @noRd
+##### @export
 model2BiobaseIdMap <- function(object, mDataType=NULL)
 {
   idMap <- slot(object, "modToBiobaseMap")

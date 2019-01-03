@@ -168,6 +168,7 @@ getIndex <- function(inVec, indxOf)
 #' L = c("A", NA, "B", NA, NA, "C")
 #' pasteWithoutNA(L, collapse = " + ")
 #' @keywords internal
+#' @noRd
 pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
 
 ##------------------------------------------------------------------------------------------
@@ -185,6 +186,7 @@ pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = c
 #' df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
 #' pasteColTogather(df, collapse = " + ")
 #' @keywords internal
+#' @noRd
 pasteColTogather <- function(df, collapse = " + ")
 {
   apply(df, 1, pasteWithoutNA, collapse =collapse)
@@ -216,7 +218,7 @@ pasteColTogather <- function(df, collapse = " + ")
 #' b <- c(2, 3, 4)
 #' symmetricSetDiff(a, b)
 #' @keywords internal
-## @export
+#' @noRd
 symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }
 
 ##-------------------
@@ -228,6 +230,7 @@ symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }
 #' msg <- sprintf("data frame is:\n%s", printAndCapture(df))
 #' warning(msg)
 #' @keywords internal
+#' @noRd
 ## @export
 printAndCapture <- function(x)
 {
@@ -247,6 +250,7 @@ printAndCapture <- function(x)
 #' data(cars)
 #' removeZeroVar(cars, varCutoff=0)
 #' @keywords internal
+#' @noRd
 ## @export
 removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 {

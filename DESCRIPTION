@@ -6,20 +6,24 @@ Author: Arvind Mer, Benjamin Haibe-Kains
 Maintainer: Arvind Mer <amer@uhnresearch.ca>
 Description: Contains set of functions to perform analysis of patient-derived xenograft (PDX) data.
 License: Artistic-2.0
+Encoding: UTF-8
 RoxygenNote: 6.0.1
 LazyData: true
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown
 Imports:
   methods,
+  stats,
+  utils,
   BBmisc,
   Biobase,
   plyr,
   stringr,
+  graphics, 
+  grDevices,
   ggplot2,
   ComplexHeatmap (>= 1.99.4),
   reshape2,
-  grDevices,
   PharmacoGx,
   foreach,
   parallel,
@@ -28,3 +32,6 @@ Imports:
   acepack,
   mgcv,
   Rmisc
+Depends: R (>= 3.4)
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification, Cancer, Biomarker, Drug
+BugReports: https://github.com/bhklab/Xeva/issues

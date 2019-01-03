@@ -33,8 +33,11 @@
 #' To select model IDs based on drug name and/or tissue type.
 #' @examples
 #' data(brca)
-#' selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
-#' selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
+#' df = selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
+#' head(df)
+#' df2 = selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
+#' head(df2)
+#'
 #' @param object The \code{XevaSet}.
 #' @param drug Name of the \code{drug}.
 #' @param drug.match.exact Default \code{TRUE}.
@@ -48,6 +51,7 @@ setGeneric(name = "selectModelIds",
                           tissue=NULL)
            {standardGeneric("selectModelIds")} )
 
+#' @rdname selectModelIds
 #' @export
 setMethod( f=selectModelIds, signature="XevaSet",
            definition=function(object,
@@ -99,6 +103,7 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #' @return  Prints object, model or batch information.
 #'
 #' @examples
+#' \dontrun{
 #' data(brca)
 #' print(brca)
 #'
@@ -107,8 +112,9 @@ setMethod( f=selectModelIds, signature="XevaSet",
 #'
 #' # to print a batch
 #' print(brca, id = "X-1004.BGJ398")
+#' }
 #' @keywords internal
-#### @export
+#' @noRd
 print.XevaSet <- function(object, id=NULL)
 {
   if(is.null(id))

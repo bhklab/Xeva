@@ -41,8 +41,9 @@ AUC <- function(time, volume)
 #' @param contr.volume Volume vector for control.
 #' @param treat.time Time vector for treatment.
 #' @param treat.volume Volume vector for treatment.
-#' @param degree default \code{TRUE} will give angle in Degree and \code{FALSE} will return Radians
+#'
 #' @return Returns batch response object.
+#'
 #' @examples
 #' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' contr.volume<- contr.time * tan(60*pi/180)
@@ -52,8 +53,9 @@ AUC <- function(time, volume)
 #' xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
 #' plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)
 #' lines(treat.time, treat.volume, type = "b")
-#' polygon(c(treat.time, rev(treat.time)), c(contr.volume, rev(treat.volume)), col = "#fa9fb5", border = NA)
-
+#' polygon(c(treat.time, rev(treat.time)), c(contr.volume, rev(treat.volume)),
+#'         col = "#fa9fb5", border = NA)
+#'
 #' @export
 ABC <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volume=NULL)
 {

@@ -70,10 +70,12 @@ sensitivity <- function(object, type=c("model", "batch"), sensitivity.measure=NU
 #'
 #' @return a \code{Xeva} object with updated with updated sensitivity
 #' @keywords internal
+#' @noRd
 setGeneric(name= "setSensitivity", def = function(object, type, name, value)
   {standardGeneric("setSensitivity")} )
 
 #' @keywords internal
+#' @noRd
 ####@export
 setMethod( f="setSensitivity",
            signature= signature(object="XevaSet"),

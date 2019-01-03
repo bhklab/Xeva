@@ -14,6 +14,9 @@
   return(rtx)
 }
 
+#' @import grDevices
+#' @import stats
+#' @import utils
 .smoothCurve <- function(trDF, tsDF, x, y, approx.method = "approx")
 {
   lmdf <- data.frame(X = trDF[, x], Y = trDF[, y])
@@ -392,6 +395,9 @@
 #' @param object The \code{XevaSet} object.
 #' @param model.id The \code{model.id} for which data is required, multiple IDs are allowed.
 #' @param batch Batch name from the \code{XevaSet} or experiment design.
+#' @param patient.id Patient id from the \code{XevaSet}. Default \code{NULL}.
+#' @param drug Name of the drug.
+#' @param control.name Default \code{NULL}.
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
 #' @param max.time Maximum time for data.
 #' @param vol.normal Default \code{TRUE} will use
@@ -401,13 +407,19 @@
 #'
 #' @examples
 #' data(brca)
+#'
+#' \dontrun{
 #' getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
+#'
 #' getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
+#'
 #' getExperiment(brca, batch="X-6047.paclitaxel", treatment.only=TRUE)
+#'
 #' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
 #'
 #' getExperiment(brca, batch=ed)
+#' }
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(
@@ -429,6 +441,7 @@ setGeneric(
   }
 )
 
+#' @rdname getExperiment
 #' @export
 setMethod(
   f = getExperiment,

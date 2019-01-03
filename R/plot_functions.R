@@ -122,9 +122,9 @@
 .plotDose <- function(do, point.shape=21, point.size=5, point.color="black",
                      line.size=4, line.color="black", modify.x.axis=TRUE)
 {
-  plt <- ggplot(do, aes(x=time, y=model.id))
+  plt <- ggplot(do, aes_string(x="time", y="model.id"))
   plt <- plt + geom_point(size=0)
-  plt <- plt + geom_hline(aes(yintercept = model.n), do, size=line.size, color=line.color)
+  plt <- plt + geom_hline(aes_string(yintercept = "model.n"), do, size=line.size, color=line.color)
   plt <- plt + geom_point(fill=do$color,shape=point.shape, size=point.size, color=point.color)
 
   if(modify.x.axis==TRUE)
@@ -143,10 +143,17 @@
 #'
 #' @param object Xeva object.
 #' @param model.id one or multiple model.id
-#' @param max.time Maximum time point of the plot. Default \code{NULL} will plot complete data.
-#' @param treatment.only Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.
-#' @param vol.normal Default \code{FALSE}. If \code{TRUE}, volume will be normalized.
-#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point.
+#' @param max.time Maximum time point of the plot. Default \code{NULL} will plot complete data
+#' @param treatment.only Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment
+#' @param vol.normal Default \code{FALSE}. If \code{TRUE}, volume will be normalized
+#' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point
+#' @param point.shape shape of the point
+#' @param point.size size of the point
+#' @param line.size size of the line
+#' @param point.color color for point
+#' @param line.color color for line
+#' @param fill.col a vector with color to fill
+#' @param modify.x.axis Default \code{FALSE}
 #'
 #' @return A ggplot2 plot
 #'
@@ -189,6 +196,11 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
 #'
 #' @param object Xeva object.
 #' @param batch Batch name or experiment design list.
+#' @param patient.id Patient id from the \code{XevaSet}. Default \code{NULL}.
+#' @param drug Name of the drug. Default \code{NULL}.
+#' @param model.id One or multiple model.id. Default \code{NULL}.
+#' @param model.color Color for \code{model.id}. Default \code{NULL}.
+#' @param control.name Name of the control sample.
 #' @param max.time Maximum time point of the plot. Default \code{NULL} will plot complete data.
 #' @param treatment.only Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.
 #' @param vol.normal Default \code{FALSE}. If \code{TRUE}, volume will be normalized.
@@ -200,7 +212,6 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
 #' @param xlab Title of the x-axis.
 #' @param ylab Title of the y-axis.
 #' @param log.y Default \code{FALSE}. If \code{TRUE}, y-axis will be log-transformed.
-#' @param drug Default \code{NULL} will extract drug name from data.
 #' @param SE.plot Plot type. Default \code{"all"} will plot all plots and average curves. Possible values are \code{"all"}, \code{"none"}, \code{"errorbar"}, and \code{"ribbon"}.
 #' @param aspect.ratio Default \code{1} will create a plot of equal width and height.
 #' @param minor.line.size Line size for minor lines. Default \code{0.5}.
@@ -215,8 +226,8 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
 #' plotPDX(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
 #' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
 #'              control=c("X.6047.uned"))
-#' plotBatch(brca, batch=expDesign, vol.normal=T)
-#' plotBatch(brca, batch=expDesign, vol.normal=F, SE.plot = "errorbar")
+#' plotBatch(brca, batch=expDesign, vol.normal=TRUE)
+#' plotBatch(brca, batch=expDesign, vol.normal=FALSE, SE.plot = "errorbar")
 #' @export
 plotPDX <- function(object, batch=NULL,
                     patient.id=NULL, drug=NULL, model.id=NULL, model.color=NULL,
@@ -227,7 +238,8 @@ plotPDX <- function(object, batch=NULL,
                     title="", xlab = "Time", ylab = "Volume",
                     log.y=FALSE, SE.plot = c("all", "none", "errorbar", "ribbon"),
                     aspect.ratio=c(1, NULL),
-                    minor.line.size=0.5, major.line.size=0.7#,dose.plot=FALSE
+                    minor.line.size=0.5, major.line.size=0.7
+                    #,dose.plot=FALSE
                     )
 {
   if(!is.null(model.id))
@@ -259,7 +271,7 @@ plotPDX <- function(object, batch=NULL,
 }
 
 #' @rdname plotPDX
-#### @export
+#' @export
 plotBatch <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL,
                       max.time=NULL, treatment.only=FALSE, vol.normal=FALSE,
                       impute.value=TRUE,

@@ -1,3 +1,4 @@
+#' @import utils
 .pdxMI_data <- function()
 {
   data(PDXMI)

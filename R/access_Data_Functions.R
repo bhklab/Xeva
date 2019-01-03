@@ -46,7 +46,7 @@ getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tissue=NULL)
 }
 
 
-getTreatmentControlForModel <- function(model.idx)
+getTreatmentControlForModel <- function(model.idx, model)
 {
   batchID = model[model$model.id ==model.idx, "batch"]
   return(model[model$batch==batchID, c("model.id", "batch", "exp.type")])
@@ -80,7 +80,7 @@ getTreatmentControlX <- function(expSlot, objNames, model)
   rdf = data.frame()
   for(model.idx in objNames)
   {
-    tc = getTreatmentControlForModel(model.idx)
+    tc = getTreatmentControlForModel(model.idx, model)
     tc$drug.join.name = sapply(expSlot[tc$model.id], "[[", c("drug", "join.name"))
     rdf = rbind(rdf, tc)
   }

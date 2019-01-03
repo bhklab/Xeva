@@ -19,6 +19,8 @@ waterfall(object, res.measure, drug = NULL, group.by = NULL,
 
 \item{group.by}{Group drug response data}
 
+\item{summary.stat}{How to summarize multiple values}
+
 \item{tissue}{Tissue type}
 
 \item{model.id}{Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models}

@@ -6,34 +6,37 @@ model_response_class <- function(name, value=NA, fit=NA)
   return(mr)
 }
 
+#' Print the model response
+#' @param x modelResponse object
+#' @param ... Other arguments
 #' @export
-print.modelResponse <- function(mr)
+print.modelResponse <- function(x, ...)
 {
-  z <- sprintf("%s = %f\n", mr$name, mr$value)
+  z <- sprintf("%s = %f\n", x$name, x$value)
   cat(z)
 }
 
 
-batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL)
+batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL, ...)
 {
   br <- structure(list(name=name, value=value, control=control, treatment=treatment),
                  class = "batchResponse")
   return(br)
 }
 
+#' Print the batch response
+#' @param x batchResponse object
+#' @param ... Other arguments
 #' @export
-print.batchResponse <- function(br)
+print.batchResponse <- function(x, ...)
 {
-  #z <- sprintf("%s = %f\ncontrol = %f\ntreatment = %f\n", br$name, br$value,
-  #             br$control$value, br$treatment$value)
-  cat(sprintf("%s = %f\n", br$name, br$value))
+  cat(sprintf("%s = %f\n", x$name, x$value))
 
-  if(!is.null(br$control))
-  { cat(sprintf("control = %f\n", br$control$value)) }
+  if(!is.null(x$control))
+  { cat(sprintf("control = %f\n", x$control$value)) }
 
-  if(!is.null(br$treatment))
-  { cat(sprintf("treatment = %f\n", br$treatment$value)) }
-
+  if(!is.null(x$treatment))
+  { cat(sprintf("treatment = %f\n", x$treatment$value)) }
 }
 
 
@@ -54,7 +57,7 @@ print.batchResponse <- function(br)
 #'
 #' @examples
 #' data(brca)
-#' brca  <- setResponse(brca, res.measure = c("mRECIST"))
+#' \dontrun{ brca  <- setResponse(brca, res.measure = c("mRECIST")) }
 #' @export
 setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
                         min.time=10, treatment.only=FALSE, max.time=NULL,

@@ -15,13 +15,27 @@ dosePlot(object, model.id, max.time = NULL, treatment.only = FALSE,
 
 \item{model.id}{one or multiple model.id}
 
-\item{max.time}{Maximum time point of the plot. Default \code{NULL} will plot complete data.}
+\item{max.time}{Maximum time point of the plot. Default \code{NULL} will plot complete data}
 
-\item{treatment.only}{Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment.}
+\item{treatment.only}{Default \code{FALSE}. Given full data \code{treatment.only=TRUE} will plot data only during treatment}
 
-\item{vol.normal}{Default \code{FALSE}. If \code{TRUE}, volume will be normalized.}
+\item{vol.normal}{Default \code{FALSE}. If \code{TRUE}, volume will be normalized}
 
-\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point.}
+\item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at the same time point}
+
+\item{point.shape}{shape of the point}
+
+\item{point.size}{size of the point}
+
+\item{line.size}{size of the line}
+
+\item{point.color}{color for point}
+
+\item{line.color}{color for line}
+
+\item{fill.col}{a vector with color to fill}
+
+\item{modify.x.axis}{Default \code{FALSE}}
 }
 \value{
 A ggplot2 plot

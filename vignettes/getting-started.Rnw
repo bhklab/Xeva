@@ -1,4 +1,5 @@
 %\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{The Xeva User's Guide}
 \documentclass{article}
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=

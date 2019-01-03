@@ -36,14 +36,17 @@
   return(expDesign)
 }
 
+#' Print the pdx batch
+#' @param x pdxBatch object
+#' @param ... Other arguments
 #' @export
-print.pdxBatch <- function(b)
+print.pdxBatch <- function(x, ...)
 {
-  if(is.null(b$control))  { b$control  <- "NA"}
-  if(is.null(b$treatment)){ b$treatment<- "NA"}
-  txt <- sprintf("name = %s\ncontrol = %s\ntreatment = %s\n", b$batch.name,
-                 paste0(b$control, collapse = ", "),
-                 paste0(b$treatment, collapse = ", "))
+  if(is.null(x$control))  { x$control  <- "NA"}
+  if(is.null(x$treatment)){ x$treatment<- "NA"}
+  txt <- sprintf("name = %s\ncontrol = %s\ntreatment = %s\n", x$batch.name,
+                 paste0(x$control, collapse = ", "),
+                 paste0(x$treatment, collapse = ", "))
   cat(txt)
 }
 

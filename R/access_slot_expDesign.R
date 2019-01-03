@@ -44,8 +44,8 @@
 
 #' Get batch information
 #'
-#' Get batch information from a Xeva dataset. By default it will return the names of all the batches present in the dataset.
-#' If \code{model.id} is specified, this function will return all batch names containing that \code{model.id}.
+#' Get batch information from a Xeva dataset.
+#'
 #' @param object The Xeva object from which batch information is obtained.
 #' @param batch Name of the batch. Default \code{NULL}.
 #' @param model.id Model ID for which need to be searched in the batches. Default \code{NULL}.
@@ -73,9 +73,14 @@
 #' batchInfo(brca, model.id="X.6047.uned")
 #'
 #' @return A \code{Vector} with batch names.
-setGeneric(name= "batchInfo", def = function(object, batch=NULL, model.id=NULL,
-                                             model.id.type=c("any", "control", "treatment"))
+#'
+#' @name batchInfo
+setGeneric(name= "batchInfo",
+           def = function(object, batch=NULL, model.id=NULL,
+                          model.id.type=c("any", "control", "treatment"))
 {standardGeneric("batchInfo")} )
+
+#' @rdname batchInfo
 #' @export
 setMethod( f="batchInfo",
            signature=c(object = "XevaSet"),
@@ -119,7 +124,7 @@ setMethod( f="batchInfo",
                  bt <- slot(object, "expDesign")[[bn]]
                  if(is.null(bt))
                  {
-                   msg <- sprintf("batch name %s not present\nuse batchInfo(object) to see all batch names", batch.name)
+                   msg <- sprintf("batch name %s not present\nuse batchInfo(object) to see all batch names", bn)
                    stop(msg)
                  }
                  btRTX[[bn]] <- bt
