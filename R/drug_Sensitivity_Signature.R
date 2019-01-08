@@ -251,7 +251,8 @@ setMethod(f= "drugSensitivitySig",
   ##----------------------------------------------------------------------
   if(fit=="lm")
   {
-    rr <- PharmacoGx:::rankGeneDrugSensitivity(data= x,
+    #rr <- PharmacoGx:::rankGeneDrugSensitivity(
+    rr <- rankGeneDrugSensitivity(data= x,
                                                drugpheno= y,
                                                type= type, #batch=batch,
                                                single.type=FALSE,
