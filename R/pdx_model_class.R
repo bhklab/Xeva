@@ -1,10 +1,6 @@
 #' @import utils
 .pdxMI_data <- function()
 {
-  #data("PDXMI")
-  #Xeva::PDXMI
-  #return(PDXMI)
-  #return(Xeva::PDXMI)
   structure(list(Module = c("Clinical/patient", "Clinical/patient",
                             "Clinical/patient", "Clinical/patient", "Clinical/patient", "Clinical/patient",
                             "Clinical/patient", "Clinical/patient", "Clinical/patient", "Clinical/patient",

@@ -28,16 +28,15 @@ library(Xeva)
 
 \section{Introduction}
 
-The Xeva package provides efficient and powerful functions for patient-drived xenograft (PDX) based pharmacogenomic data analysis.
+The Xeva package provides efficient and powerful functions for patient-drived xenograft (PDX) based pharmacogenomic data analysis \cite{MerXeva}.
 
 \section{Installation and Settings}
 
 Xeva requires that several packages be installed. All dependencies are available from CRAN or Bioconductor:
 
 <<get_lib, results='hide', message=FALSE, eval=FALSE>>=
-##package not yet on bioconductor
-#source('http://bioconductor.org/biocLite.R')
-#biocLite('Xeva')
+source('http://bioconductor.org/biocLite.R')
+biocLite('Xeva')
 @
 
 The package can also be installed directly form GitHub using devtools:
@@ -183,4 +182,10 @@ waterfall(brca, drug="BYL719", res.measure="best.average.response",
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \bibliography{getting-started}
+
+\newpage
+\section{SessionInfo}
+<<sess,>>=
+sessionInfo()
+@
 \end{document}
