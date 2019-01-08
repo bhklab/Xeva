@@ -3,7 +3,7 @@ Type: Package
 Title: Analysis of patient-derived xenograft (PDX) data
 Version: 1.0.0
 Author: Arvind Mer, Benjamin Haibe-Kains
-Maintainer: Arvind Mer <amer@uhnresearch.ca>
+Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains set of functions to perform analysis of patient-derived xenograft (PDX) data.
 License: Artistic-2.0
 Encoding: UTF-8
