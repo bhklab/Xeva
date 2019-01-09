@@ -31,7 +31,8 @@ Imports:
   doSNOW,
   acepack,
   mgcv,
-  Rmisc
+  Rmisc,
+  grid
 Depends: R (>= 3.6)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification, Cancer, Biomarker, Drug
 BugReports: https://github.com/bhklab/Xeva/issues
