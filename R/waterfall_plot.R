@@ -98,7 +98,7 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   {stop(sprintf("%s is not a numeric response\n", res.measure))}
 
   vx <- data.frame(x=names(vl), y=vl, type=drug, col="#cc4c02",
-                   stringsAsFactors = F)
+                   stringsAsFactors = FALSE)
   vx <- vx[!is.na(vx$y), ]; vx <- vx[!is.na(vx$x), ]
   rownames(vx) <- as.character(vx$x)
 
@@ -148,9 +148,9 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
 ##------------------------------------------------------------------------------
 ###--------------------
 ##--- add oncoplot at the bottam of waterfall plot ---------
-.add_OncoplotAt_bottam <- function()
-{
-
-}
+# .add_OncoplotAt_bottam <- function()
+# {
+#
+# }
 
 

@@ -55,7 +55,7 @@
   if( .checkUnqLength(batchSensitivity$batch.name)==FALSE)
   {stop("batch names are not unique")}
   rownames(batchSensitivity) <- as.character(batchSensitivity$batch.name)
-  batchSensitivity <- batchSensitivity[names(expDesign), ,drop=F]
+  batchSensitivity <- batchSensitivity[names(expDesign), ,drop=FALSE]
 
   ##--------------------------------------------------------------------------------
   if(class(modelSensitivity)!="data.frame" | class(batchSensitivity)!="data.frame")

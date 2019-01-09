@@ -24,7 +24,7 @@
   if (approx.method == "lm")
   {
     lmod <- lm(Y ~ X, data = lmdf)
-    tsDF[, y] <- predict(lmod, prdf, se.fit = F)
+    tsDF[, y] <- predict(lmod, prdf, se.fit = FALSE)
   }
 
   if (approx.method == "approx")
@@ -48,7 +48,7 @@
         nrow = length(t2imp),
         ncol = ncol(dw)
       ),
-      stringsAsFactors = F)
+      stringsAsFactors = FALSE)
     colnames(nwRws) <- colnames(dw)
     nwRws$time <- t2imp
     nwRws$model.id <- dw$model.id[1]

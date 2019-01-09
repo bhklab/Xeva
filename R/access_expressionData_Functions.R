@@ -168,14 +168,14 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
       bat2mods <- rbind(bat2mods, data.frame(batch.name=expdi$batch.name,
                                              model.id=expdi$control,
                                              exp.type="control",
-                                             stringsAsFactors = F))
+                                             stringsAsFactors = FALSE))
     }
     if(!is.null(expdi$treatment))
     {
       bat2mods <- rbind(bat2mods, data.frame(batch.name=expdi$batch.name,
                                              model.id=expdi$treatment,
                                              exp.type="treatment",
-                                             stringsAsFactors = F))
+                                             stringsAsFactors = FALSE))
     }
   }
   return(bat2mods)

@@ -166,7 +166,7 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
                      point.shape=21, point.size=3, line.size=4,
                      point.color="#878787", line.color="#bababa",
                      fill.col=c("#f5f5f5", "#E55100"),
-                     modify.x.axis=F)
+                     modify.x.axis=FALSE)
 {
   dfx <- getExperiment(object, model.id=model.id,
                        treatment.only=treatment.only, max.time=max.time,

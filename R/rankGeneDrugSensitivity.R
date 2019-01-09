@@ -257,6 +257,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
 
 ###### import PharmacoGx
+#' @import doParallel
 #' @import parallel
 rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type = FALSE,
           standardize = "SD", nthread = 1, verbose = FALSE)
