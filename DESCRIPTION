@@ -17,22 +17,16 @@ Imports:
   utils,
   BBmisc,
   Biobase,
-  plyr,
-  stringr,
-  graphics, 
   grDevices,
   ggplot2,
   ComplexHeatmap (>= 1.99.4),
-  reshape2,
-  PharmacoGx,
   foreach,
   parallel,
   doParallel,
   doSNOW,
   acepack,
   mgcv,
-  Rmisc,
-  grid
+  Rmisc
 Depends: R (>= 3.4)
-biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification, Cancer, Biomarker, Drug
+biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues
