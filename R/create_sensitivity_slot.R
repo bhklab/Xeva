@@ -58,7 +58,8 @@
   batchSensitivity <- batchSensitivity[names(expDesign), ,drop=FALSE]
 
   ##--------------------------------------------------------------------------------
-  if(class(modelSensitivity)!="data.frame" | class(batchSensitivity)!="data.frame")
+  #if(class(modelSensitivity)!="data.frame" | class(batchSensitivity)!="data.frame")
+  if(is(modelSensitivity, "data.frame")==FALSE | is(batchSensitivity, "data.frame")==FALSE)
   {stop("slot class error")}
 
   rtx <- list(model = modelSensitivity,
