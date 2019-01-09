@@ -1,9 +1,9 @@
 Package: Xeva
 Type: Package
 Title: Analysis of patient-derived xenograft (PDX) data
-Version: 1.0.0
+Version: 0.99.0
 Author: Arvind Mer, Benjamin Haibe-Kains
-Maintainer: Arvind Mer <amer@uhnresearch.ca>
+Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
 Description: Contains set of functions to perform analysis of patient-derived xenograft (PDX) data.
 License: Artistic-2.0
 Encoding: UTF-8
@@ -31,7 +31,8 @@ Imports:
   doSNOW,
   acepack,
   mgcv,
-  Rmisc
+  Rmisc,
+  grid
 Depends: R (>= 3.4)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification, Cancer, Biomarker, Drug
 BugReports: https://github.com/bhklab/Xeva/issues
