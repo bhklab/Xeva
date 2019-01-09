@@ -1,10 +1,10 @@
-#' Example dataset with 1x1x1 experiment design
-#'
-#' This is the PDXE dataset without microarray data.
-#'
-#' @format A Xeva object with 1x1x1 experiment design and molecular data.
-#' @usage data(pdxe)
-"pdxe"
+# # Example dataset with 1x1x1 experiment design
+# #
+# # This is the PDXE dataset without microarray data.
+# #
+# # @format A Xeva object with 1x1x1 experiment design and molecular data.
+# # @usage data(pdxe)
+# "pdxe"
 
 
 #' Breast cancer dataset from PDXE

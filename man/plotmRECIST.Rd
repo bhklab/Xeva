@@ -37,7 +37,6 @@ mRECIST plot.
 }
 \examples{
 data(brca)
-## select lung cancer pdxe data
 brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 plotmRECIST(brca.mr, control.name = "untreated")
 }

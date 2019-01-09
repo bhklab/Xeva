@@ -56,11 +56,8 @@ A matrix of values can be directly passed to molData. \code{fit} can be \code{lm
 In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 }
 \examples{
-data(pdxe)
-## select BRCA samples
-mid <- modelInfo(pdxe)[modelInfo(pdxe)$tissue=="BRCA", ]
-senSig <- drugSensitivitySig(object=pdxe, drug="tamoxifen",
+data(brca)
+senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
                              mDataType="RNASeq", features=1:5,
-                             model.ids = mid$model.id,
                              sensitivity.measure="slope", fit = "lm")
 }
