@@ -248,16 +248,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   return(rest)
 }
 
-
-
-
-
 ## End
-
-
-
-
-
 ###### import PharmacoGx
 #' @import doParallel
 #' @import parallel
@@ -327,7 +318,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
       rest <- list(matrix(NA, nrow = ncol(data), ncol = length(nc),
                           dimnames = list(colnames(data), nc)))
       res <- c(res, rest)
-      browser()
+      #browser()
     }
     else {
       splitix <- parallel::splitIndices(nx = ncol(data),
