@@ -28,6 +28,6 @@ Imports:
   mgcv,
   Rmisc,
   grid
-Depends: R (>= 3.4)
+Depends: R (>= 3.6)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues
