@@ -130,7 +130,7 @@ plotPDX(brca, batch = "X-4567.BKM120")
 
 You can choose to see different aspects of this visualization. For example, we can plot normalized volume; we can also change the colors of the lines:
 <<pdxplot2, fig.cap="Tumor growth curves for a batch of control and treated PDXs. Here, the volume is normalized and plots are truncated at 40 days", out.width='4in', fig.wide=TRUE>>=
-plotPDX(brca, batch = "X-4567.BKM120", vol.normal = T, control.col = "#a6611a",
+plotPDX(brca, batch = "X-4567.BKM120", vol.normal = TRUE, control.col = "#a6611a",
         treatment.col = "#018571", major.line.size = 1, max.time = 40)
 @
 
