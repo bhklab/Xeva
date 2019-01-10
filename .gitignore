@@ -15,13 +15,11 @@ vignettes/*concordance.tex
 vignettes/*.toc
 vignettes/*.tex
 vignettes/*.pdf
+vignettes/*.blb
 
 
 ##ignore vignette tmp files
-vignettes/tmp.tex
-vignettes/tmp.pdf
-vignettes/tmp.Rnw
-vignettes/tmp-blx.bib
+vignettes/tmp*
 vignettes/.*
 vignettes/=.*
 vignettes/Roger.save
