@@ -113,8 +113,8 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
   colorX = unlist(colPalette[colnames(rcDF$rowSt)])
   rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
-                                        #axis_side = "top",
-                                        axis_param = list(side = "top"),
+                                        axis_side = "top",
+                                        #axis_param = list(side = "top"),
                                         gp = gpar(fill = colorX))
   row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"),
                          show_annotation_name = FALSE)
