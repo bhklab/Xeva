@@ -19,7 +19,7 @@ Imports:
   Biobase,
   grDevices,
   ggplot2,
-  ComplexHeatmap,
+  ComplexHeatmap (>= 1.17.1),
   foreach,
   parallel,
   doParallel,
