@@ -9,14 +9,14 @@
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   features = NULL, model.ids = NULL, model2bidMap = NULL,
   sensitivity.measure = "slope", fit = c("lm", "maxCor", "gam"),
-  standardize = c("SD", "rescale", "none"), nthread = 1, tissue = NULL,
-  verbose = TRUE)
+  standardize = c("SD", "rescale", "none"), nthread = 1,
+  tissue = NULL, verbose = TRUE)
 
 \S4method{drugSensitivitySig}{XevaSet}(object, drug, mDataType = NULL,
   molData = NULL, features = NULL, model.ids = NULL,
   model2bidMap = NULL, sensitivity.measure = "slope", fit = c("lm",
-  "maxCor", "gam"), standardize = c("SD", "rescale", "none"), nthread = 1,
-  tissue = NULL, verbose = TRUE)
+  "maxCor", "gam"), standardize = c("SD", "rescale", "none"),
+  nthread = 1, tissue = NULL, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset.}

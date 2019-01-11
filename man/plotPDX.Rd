@@ -8,10 +8,11 @@
 plotPDX(object, batch = NULL, patient.id = NULL, drug = NULL,
   model.id = NULL, model.color = NULL, control.name = NULL,
   max.time = NULL, treatment.only = FALSE, vol.normal = FALSE,
-  impute.value = TRUE, concurrent.time = FALSE, control.col = "#e41a1c",
-  treatment.col = "#377eb8", title = "", xlab = "Time", ylab = "Volume",
-  log.y = FALSE, SE.plot = c("all", "none", "errorbar", "ribbon"),
-  aspect.ratio = c(1, NULL), minor.line.size = 0.5, major.line.size = 0.7)
+  impute.value = TRUE, concurrent.time = FALSE,
+  control.col = "#e41a1c", treatment.col = "#377eb8", title = "",
+  xlab = "Time", ylab = "Volume", log.y = FALSE, SE.plot = c("all",
+  "none", "errorbar", "ribbon"), aspect.ratio = c(1, NULL),
+  minor.line.size = 0.5, major.line.size = 0.7)
 
 plotBatch(object, batch = NULL, patient.id = NULL, drug = NULL,
   control.name = NULL, max.time = NULL, treatment.only = FALSE,

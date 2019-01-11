@@ -6,7 +6,8 @@
 \usage{
 plotmRECIST(mat, control.name = NA, control.col = "#238b45",
   drug.col = "black", colPalette = NULL, name = "Drug & Models",
-  sort = TRUE, row_fontsize = 12, col_fontsize = 12, draw_plot = TRUE)
+  sort = TRUE, row_fontsize = 12, col_fontsize = 12,
+  draw_plot = TRUE)
 }
 \arguments{
 \item{mat}{The mRECIST matrix where rows are drugs and columns are patients.}

@@ -6,8 +6,8 @@
 \alias{batchInfo,XevaSet-method}
 \title{Get batch information}
 \usage{
-batchInfo(object, batch = NULL, model.id = NULL, model.id.type = c("any",
-  "control", "treatment"))
+batchInfo(object, batch = NULL, model.id = NULL,
+  model.id.type = c("any", "control", "treatment"))
 
 \S4method{batchInfo}{XevaSet}(object, batch = NULL, model.id = NULL,
   model.id.type = c("any", "control", "treatment"))

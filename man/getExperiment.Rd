@@ -7,15 +7,16 @@
 \title{For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
 containing all the data stored in the experiment slot.}
 \usage{
-getExperiment(object, model.id = NULL, batch = NULL, patient.id = NULL,
-  drug = NULL, control.name = NULL, treatment.only = FALSE,
-  max.time = NULL, vol.normal = FALSE, return.list = FALSE,
-  impute.value = FALSE, concurrent.time = FALSE)
-
-\S4method{getExperiment}{XevaSet}(object, model.id = NULL, batch = NULL,
+getExperiment(object, model.id = NULL, batch = NULL,
   patient.id = NULL, drug = NULL, control.name = NULL,
   treatment.only = FALSE, max.time = NULL, vol.normal = FALSE,
   return.list = FALSE, impute.value = FALSE, concurrent.time = FALSE)
+
+\S4method{getExperiment}{XevaSet}(object, model.id = NULL,
+  batch = NULL, patient.id = NULL, drug = NULL,
+  control.name = NULL, treatment.only = FALSE, max.time = NULL,
+  vol.normal = FALSE, return.list = FALSE, impute.value = FALSE,
+  concurrent.time = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet} object.}

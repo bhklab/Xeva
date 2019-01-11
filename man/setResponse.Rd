@@ -4,10 +4,10 @@
 \alias{setResponse}
 \title{\code{setResponse} sets response of an Xeva object.}
 \usage{
-setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle", "abc",
-  "TGI"), min.time = 10, treatment.only = FALSE, max.time = NULL,
-  vol.normal = TRUE, impute.value = TRUE, concurrent.time = TRUE,
-  verbose = TRUE)
+setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
+  "abc", "TGI"), min.time = 10, treatment.only = FALSE,
+  max.time = NULL, vol.normal = TRUE, impute.value = TRUE,
+  concurrent.time = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object.}
