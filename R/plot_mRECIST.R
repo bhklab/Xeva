@@ -101,22 +101,42 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   return(list(rowSt=cldf, colSt=rwdf))
 }
 
+
+.complexHeatMapVersionCompatibility <- function()
+{
+  cpv <- as.character(packageVersion("ComplexHeatmap"))
+  compareVersion(cpv, "1.20.0")
+}
 .creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
   rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
 
   colorX = unlist(colPalette[colnames(rcDF$colSt)])
-  colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column", axis = TRUE,
-                                        gp = gpar(fill = colorX))
-  column_ha = HeatmapAnnotation(barplot = colBar, height = unit(2, "cm"),
+
+  colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column", axis = TRUE, gp = grid::gpar(fill = colorX))
+
+  column_ha = ComplexHeatmap::HeatmapAnnotation(barplot = colBar, height = grid::unit(2, "cm"),
                                 show_annotation_name = FALSE)
 
   colorX = unlist(colPalette[colnames(rcDF$rowSt)])
-  rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
-                                        axis_side = "top",
-                                        #axis_param = list(side = "top"),
-                                        gp = gpar(fill = colorX))
-  row_ha = rowAnnotation(row_anno_barplot=rowbar, width = unit(2, "cm"),
+
+  #rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
+  #                                      axis_side = "top",
+  #                                      #axis_param = list(side = "top"),
+  #                                      gp = gpar(fill = colorX))
+
+
+  rowbar = tryCatch({
+                     ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
+                                        axis_side = "top", gp = grid::gpar(fill = colorX))
+    }, error = function(e) {
+    ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
+                                 axis_param = list(side = "top"), gp = grid::gpar(fill = colorX))
+
+      })
+
+
+  row_ha = ComplexHeatmap::rowAnnotation(row_anno_barplot=rowbar, width = grid::unit(2, "cm"),
                          show_annotation_name = FALSE)
   return(list(colPlt= column_ha, rowPlt= row_ha))
 }
@@ -192,6 +212,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 #' @export
 #' @import ComplexHeatmap
 #' @import grid
+#' @importFrom grid gpar
 plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col="black",
                         colPalette = NULL, name = "Drug & Models", sort=TRUE,
                         row_fontsize=12, col_fontsize=12, draw_plot=TRUE)
