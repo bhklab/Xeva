@@ -29,16 +29,16 @@ getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tissue=NULL)
   if(!(is.null(drug)))
   {
     drug = c(toupper(drug))
-    objIndx[["Drug"]] = sapply(expSlot, drugMatchFun, drug=drug, exact.match=drug.exact.match)
+    objIndx[["Drug"]] = vapply(expSlot, drugMatchFun, drug=drug, exact.match=drug.exact.match)
   }
 
   if(!(is.null(tissue)))
   {
-    objIndx[["tissue"]] = sapply(expSlot, tumorTypeMatchFun, tissue=tissue)
+    objIndx[["tissue"]] = vapply(expSlot, tumorTypeMatchFun, tissue=tissue)
   }
 
   rtIndx = apply( do.call(cbind.data.frame, objIndx), 1, all )
-  #rtName = sapply(expSlot, "[[", "model.id")[rtIndx]
+  #rtName = vapply(expSlot, "[[", "model.id")[rtIndx]
   rtName = names(expSlot)[rtIndx]
 
   #return(expSlot[rtIndx])
@@ -55,7 +55,7 @@ getTreatmentControlForModel <- function(model.idx, model)
 
 getTreatmentControlX <- function(expSlot, objNames, model)
 {
-  drgNames  = unique(sapply(expSlot[objNames], "[[", c("drug", "join.name")))
+  drgNames  = unique(vapply(expSlot[objNames], "[[", c("drug", "join.name")))
   tretBatch = unique(model[model$drug.join.name%in% drgNames,  "batch"])
 
   rtx=list()
@@ -81,7 +81,7 @@ getTreatmentControlX <- function(expSlot, objNames, model)
   for(model.idx in objNames)
   {
     tc = getTreatmentControlForModel(model.idx, model)
-    tc$drug.join.name = sapply(expSlot[tc$model.id], "[[", c("drug", "join.name"))
+    tc$drug.join.name = vapply(expSlot[tc$model.id], "[[", c("drug", "join.name"))
     rdf = rbind(rdf, tc)
   }
 
@@ -101,7 +101,7 @@ getTreatmentControlX <- function(expSlot, objNames, model)
 
 getExpDesign <- function(objNames, expDesign)
 {
-  expDesIndx = sapply(expDesign, function(x){
+  expDesIndx = vapply(expDesign, function(x){
                       if( length(intersect(objNames, c(x$treatment,x$control) ))>0)
                       {return(TRUE)}
                       return(FALSE) })

@@ -148,7 +148,7 @@ getIndex <- function(inVec, indxOf)
 ## This will convert all factor type columns to character columns
 .factor2char <- function(df)
 {
-  i <- sapply(df, is.factor)
+  i <- vapply(df, is.factor)
   df[i] <- lapply(df[i], as.character)
   return(df)
 }

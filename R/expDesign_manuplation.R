@@ -46,7 +46,7 @@ setMethod( f=addExperimentalDesign,
                 }
               }
 
-             allBatchName <- sapply(slot(object, "expDesign"), '[[', "batch.name")
+             allBatchName <- vapply(slot(object, "expDesign"), '[[', "batch.name")
              if(!is.null(batch.id))
              {
                if(is.element(batch.id, allBatchName)==TRUE)

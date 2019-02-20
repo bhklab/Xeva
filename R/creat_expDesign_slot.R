@@ -19,7 +19,7 @@
   }
 
   ##------- setting name -----------------
-  bnam <- sapply(expDesign, "[[", "batch.name")
+  bnam <- vapply(expDesign, "[[", "batch.name")
   bnamDup <- bnam[duplicated(bnam)]
   if(length(bnamDup)>0)
   {

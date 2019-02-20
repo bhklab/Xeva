@@ -276,7 +276,7 @@ setMethod(f= "drugSensitivitySig",
     if(fit == "maxCor")
     {
       rtx <- data.frame(feature= colnames(x),
-                        maxCor = sapply(result, function(i) i[1,1]))
+                        maxCor = vapply(result, function(i) i[1,1]))
     }
 
     if(fit == "gam")
@@ -298,7 +298,7 @@ setMethod(f= "drugSensitivitySig",
          ##------- generalized additive model  -------------
          "gam" = { g <- mgcv::gam(y ~ s(x))
                    val <- mgcv::summary.gam(g)
-                   value <- sapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
+                   value <- vapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
          value <- NA
          )
 

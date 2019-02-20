@@ -82,7 +82,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   colnames(rxt) = nColVal
   for(I in 1:length(inLst))
   {
-    rx = sapply(nColVal, function(x){ w= inLst[[I]][[x]]
+    rx = vapply(nColVal, function(x){ w= inLst[[I]][[x]]
                                       if(is.null(w))
                                         {return(NA)} else{return(w)} })
     rxt[I,] = rx[nColVal]
@@ -223,7 +223,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     colPalette <- .mRcolPalette(unqMat)
   } else
   {
-    colPre <- sapply(unqMat, function(x) is.null(colPalette[[x]]))
+    colPre <- vapply(unqMat, function(x) is.null(colPalette[[x]]))
     if(any(colPre)==TRUE)
     {
       colAbName <- names(colPre[colPre==TRUE])

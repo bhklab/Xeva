@@ -83,7 +83,7 @@ oncoPrintX = function(mat, get_type = function(x) x,
     all_type = all_type[grepl("\\S", all_type)]
 
     mat_list = lapply(all_type, function(type) {
-      m = sapply(mat, function(x) type %in% get_type(x))
+      m = vapply(mat, function(x) type %in% get_type(x))
       dim(m) = dim(mat)
       dimnames(m) = dimnames(mat)
       m
@@ -103,11 +103,11 @@ oncoPrintX = function(mat, get_type = function(x) x,
       x
     })
 
-    if(length(unique(sapply(mat_list, nrow))) > 1) {
+    if(length(unique(vapply(mat_list, nrow))) > 1) {
       stop("All matrix in 'mat_list' should have same number of rows.")
     }
 
-    if(length(unique(sapply(mat_list, ncol))) > 1) {
+    if(length(unique(vapply(mat_list, ncol))) > 1) {
       stop("All matrix in 'mat_list' should have same number of columns.")
     }
   } else {

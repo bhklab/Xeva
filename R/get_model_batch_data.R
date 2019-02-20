@@ -163,7 +163,7 @@
   {
     expDig <- list(expDig)
   }
-  names(expDig) <- sapply(expDig, "[[", "batch.name")
+  names(expDig) <- vapply(expDig, "[[", "batch.name")
   return(expDig)
 }
 
@@ -171,7 +171,7 @@
 .collapseRplicate <- function(inLst, var = "volume")
 {
   if (is.null(names(inLst))) {
-    names(inLst) <- sapply(inLst, function(x) {
+    names(inLst) <- vapply(inLst, function(x) {
       x$model.id[1]
     })
   }
@@ -181,7 +181,7 @@
   rd <- data.frame()
   for (t in timeAll)
   {
-    vx <- unlist(sapply(inLst, function(x) {
+    vx <- unlist(vapply(inLst, function(x) {
       x[x$time == t, var]
     }))
     vx <- vx[!is.na(vx)]

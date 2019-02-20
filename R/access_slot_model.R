@@ -8,7 +8,7 @@
   modNotPres <- setdiff(modI$model.id, rtx$model.id)
   rtx <- rbind(rtx, modI[modNotPres, ])
 
-  colnames(rtx) <- sapply(colnames(rtx), function(x)
+  colnames(rtx) <- vapply(colnames(rtx), function(x)
                           {
                             if(is.element(x, orgColNames)==FALSE)
                             { x <- sprintf("%s.%s", x,bid)}
@@ -39,7 +39,7 @@ setMethod( f=modelInfo, signature="XevaSet",
            definition=function(object, mDataType=NULL)
            {
              modI <- slot(object,name="model")
-             drgMod <- sapply(slot(object,name="experiment"), function(mod)
+             drgMod <- vapply(slot(object,name="experiment"), function(mod)
                               {
                                 slot(mod,name="drug")[["join.name"]]
                               })
