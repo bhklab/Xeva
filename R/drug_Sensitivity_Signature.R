@@ -261,47 +261,47 @@ setMethod(f= "drugSensitivitySig",
     return(rr)
   }
 
-  ##---------------------------------------------------------------------
-    #library(doSNOW)
-  i=0
-    cl <- makeCluster(nthread)
-    registerDoSNOW(cl)
-    result <- foreach (i=colnames(x),
-                       .final = function(i) {setNames(i, colnames(x))},
-                       .export=c(".nonLinerFits")) %dopar%
-    { .nonLinerFits(x[,i], y, fit = fit )}
-
-    stopCluster(cl)
-
-    if(fit == "maxCor")
-    {
-      rtx <- data.frame(feature= colnames(x),
-                        maxCor = vapply(result, function(i) i[1,1]))
-    }
-
-    if(fit == "gam")
-    {
-      rtx <- .convertListToDataFram(result)
-      rtx$feature <- rownames(rtx)
-      rtx <- .reorderCol(rtx, "feature", 1)
-    }
-    return(rtx)
+  # ##---------------------------------------------------------------------
+  #   #library(doSNOW)
+  # i=0
+  #   cl <- makeCluster(nthread)
+  #   registerDoSNOW(cl)
+  #   result <- foreach (i=colnames(x),
+  #                      .final = function(i) {setNames(i, colnames(x))},
+  #                      .export=c(".nonLinerFits")) %dopar%
+  #   { .nonLinerFits(x[,i], y, fit = fit )}
+  #
+  #   stopCluster(cl)
+  #
+  #   if(fit == "maxCor")
+  #   {
+  #     rtx <- data.frame(feature= colnames(x),
+  #                       maxCor = vapply(result, function(i) i[1,1]))
+  #   }
+  #
+  #   if(fit == "gam")
+  #   {
+  #     rtx <- .convertListToDataFram(result)
+  #     rtx$feature <- rownames(rtx)
+  #     rtx <- .reorderCol(rtx, "feature", 1)
+  #   }
+  #   return(rtx)
 }
 
 
-.nonLinerFits <- function(x, y, fit)
-{
-  switch(fit,
-         ##--------- Maximal correlation ---------
-         "maxCor" = { argmax <- acepack::ace(x, y)
-                      value <- stats::cor(argmax$tx, argmax$ty)},
-         ##------- generalized additive model  -------------
-         "gam" = { g <- mgcv::gam(y ~ s(x))
-                   val <- mgcv::summary.gam(g)
-                   value <- vapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
-         value <- NA
-         )
-
-  return(value)
-}
+# .nonLinerFits <- function(x, y, fit)
+# {
+#   switch(fit,
+#          ##--------- Maximal correlation ---------
+#          "maxCor" = { argmax <- acepack::ace(x, y)
+#                       value <- stats::cor(argmax$tx, argmax$ty)},
+#          ##------- generalized additive model  -------------
+#          "gam" = { g <- mgcv::gam(y ~ s(x))
+#                    val <- mgcv::summary.gam(g)
+#                    value <- vapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
+#          value <- NA
+#          )
+#
+#   return(value)
+# }
 

@@ -7,7 +7,7 @@
 {
   name.Rows = names(inLst)
   if(is.null(name.Rows))
-  { name.Rows= 1:length(inLst)}
+  { name.Rows= seq_along(inLst)}
 
   name.Cols = unique(unlist(lapply(inLst, names)))
   if(is.null(name.Cols))
@@ -19,7 +19,7 @@
   for(rx in name.Rows)
   {
     v = inLst[[rx]]
-    if(is.null(names(v))){names(v) = 1:length(v)}
+    if(is.null(names(v))){names(v) = seq_along(v)}
     rd[rx, names(v)] = unlist(v, use.names = TRUE)[names(v)]
   }
   return(rd)
@@ -143,15 +143,15 @@ getIndex <- function(inVec, indxOf)
   return(df[,newCN])
 }
 
-##------------------------------------------------------------------------------------------
-##---------------Convert data.frame columns from factors to characters ---------------------
+##--------------------------------------------------------------
+##----Convert data.frame columns from factors to characters ----
 ## This will convert all factor type columns to character columns
-.factor2char <- function(df)
-{
-  i <- vapply(df, is.factor)
-  df[i] <- lapply(df[i], as.character)
-  return(df)
-}
+# .factor2char <- function(df)
+# {
+#   i <- vapply(df, is.factor)
+#   df[i] <- lapply(df[i], as.character)
+#   return(df)
+# }
 
 ##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------
@@ -269,7 +269,7 @@ removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 ##------------------------------------------------------------------------------
 extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 {
-  inVIndx= 1:length(inVec)
+  inVIndx= seq_along(inVec)
   stIndx = min(inVIndx[inVec!=start.tag])
 
   V2 = inVec[stIndx:length(inVec)]

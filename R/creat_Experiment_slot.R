@@ -12,7 +12,7 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   drug = list("join.name" = unique(exp.mod.dg$drug))
   if(length(drgColName.No)>1)
   {
-    drug.N <- vapply(drgColName.No, function(x){unique(exp.mod.dg[,x])  })
+    drug.N <- vapply(drgColName.No, function(x){unique(exp.mod.dg[,x])}, FUN.VALUE = character(1))
     drug.N <- drug.N[!is.na(drug.N)]
     drug[["names"]] = as.list(drug.N)
   }
@@ -53,7 +53,7 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   rtxData$body.weight<- as.numeric(rtxData$body.weight)
   rtxData$date  <- as.Date(rtxData$date)
 
-  rtxData[ ,doseColsNames]<- vapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])} )
+  rtxData[ ,doseColsNames]<- vapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])}, FUN.VALUE = numeric(1) )
 
   rtxData <- BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
 
@@ -202,7 +202,7 @@ experimentSlotfromDf <- function(experiment)
   }
 
   #mod.ids <- unlist(vapply(expSlot , "[[" , "model.id" ))
-  mod.ids <- vapply(expSlot, function(mod){ slot(mod, "model.id")}  )
+  mod.ids <- vapply(expSlot, function(mod){slot(mod, "model.id")}, FUN.VALUE = character(1))
 
   if(length(mod.ids) != length(unique(mod.ids)))
   {

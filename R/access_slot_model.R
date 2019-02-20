@@ -13,7 +13,7 @@
                             if(is.element(x, orgColNames)==FALSE)
                             { x <- sprintf("%s.%s", x,bid)}
                             return(x)
-                          })
+                          }, FUN.VALUE = character(1))
   return(rtx)
 }
 
@@ -40,9 +40,8 @@ setMethod( f=modelInfo, signature="XevaSet",
            {
              modI <- slot(object,name="model")
              drgMod <- vapply(slot(object,name="experiment"), function(mod)
-                              {
-                                slot(mod,name="drug")[["join.name"]]
-                              })
+                              { slot(mod,name="drug")[["join.name"]] },
+                              FUN.VALUE = character(1))
 
              modI$drug <- drgMod[ modI$model.id ]
 

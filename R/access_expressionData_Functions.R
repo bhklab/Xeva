@@ -159,7 +159,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
   }
 
   bat2mods <- data.frame()
-  for(i in 1:length(expDig))
+  for(i in seq_along(expDig))
   {
     expdi <- expDig[[i]]
 

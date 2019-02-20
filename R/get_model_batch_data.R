@@ -163,17 +163,20 @@
   {
     expDig <- list(expDig)
   }
-  names(expDig) <- vapply(expDig, "[[", "batch.name")
+
+  #names(expDig) <- vapply(expDig, "[[", "batch.name")
+  names(expDig) <- unlist(lapply(expDig, "[[", "batch.name"))
+
   return(expDig)
 }
 
 ## collapse time-vol data based on expDesign
 .collapseRplicate <- function(inLst, var = "volume")
 {
-  if (is.null(names(inLst))) {
-    names(inLst) <- vapply(inLst, function(x) {
-      x$model.id[1]
-    })
+  if (is.null(names(inLst)))
+  {
+    names(inLst) <- vapply(inLst, function(x)
+      {x$model.id[1]}, FUN.VALUE = character(1))
   }
   timeAll <- sort(unique(unlist(lapply(
     inLst, "[[", "time"
@@ -181,9 +184,7 @@
   rd <- data.frame()
   for (t in timeAll)
   {
-    vx <- unlist(vapply(inLst, function(x) {
-      x[x$time == t, var]
-    }))
+    vx <- unlist(lapply(inLst, function(x) {x[x$time == t, var] }))
     vx <- vx[!is.na(vx)]
     vz <- as.list(Rmisc::STDERR(vx))
     rd <-
@@ -288,7 +289,7 @@
           impute.value = impute.value,
           vol.normal = vol.normal
         )
-      for (ci in 1:length(dfp$control))
+      for (ci in seq_along(dfp$control))
       {
         dfp$control[[ci]]$exp.type <- "control"
       }
@@ -307,7 +308,7 @@
           impute.value = impute.value,
           vol.normal = vol.normal
         )
-      for (ti in 1:length(dfp$treatment))
+      for (ti in seq_along(dfp$treatment))
       {
         dfp$treatment[[ti]]$exp.type <- "treatment"
       }
@@ -334,7 +335,7 @@
         dfp$batch <- dfp$batch[dfp$batch$time <= min(tx),]
         if (!is.null(dfp$control))
         {
-          for (ci in 1:length(dfp$control))
+          for (ci in seq_along(dfp$control))
           {
             dfp$control[[ci]] <-
               dfp$control[[ci]][dfp$control[[ci]]$time <= min(tx), ]
@@ -343,7 +344,7 @@
 
         if (!is.null(dfp$treatment))
         {
-          for (ci in 1:length(dfp$treatment))
+          for (ci in seq_along(dfp$treatment))
           {
             dfp$treatment[[ci]] <-
               dfp$treatment[[ci]][dfp$treatment[[ci]]$time <= min(tx), ]

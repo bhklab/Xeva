@@ -29,7 +29,8 @@ getModels <- function(expSlot, drug=NULL, drug.exact.match=TRUE, tissue=NULL)
   if(!(is.null(drug)))
   {
     drug = c(toupper(drug))
-    objIndx[["Drug"]] = vapply(expSlot, drugMatchFun, drug=drug, exact.match=drug.exact.match)
+    objIndx[["Drug"]] = vapply(expSlot, drugMatchFun, drug=drug,
+                               exact.match=drug.exact.match)
   }
 
   if(!(is.null(tissue)))
@@ -66,10 +67,11 @@ getTreatmentControlX <- function(expSlot, objNames, model)
       Lx = list(drug.join.name = drgI,
                 batch = batI)
       Lx$treatment = unique(model[model$drug.join.name == drgI &
-                        model$batch == batI &
-                        model$exp.type == "treatment", "model.id"] )
+                                    model$batch == batI &
+                                    model$exp.type == "treatment", "model.id"] )
 
-      Lx$control = unique(model[model$batch == batI & model$exp.type == "control", "model.id"] )
+      Lx$control = unique(model[model$batch == batI &
+                                model$exp.type == "control", "model.id"] )
 
       namx = sprintf("%s.%s", drgI, batI)
       rtx[[namx]]= Lx
@@ -81,19 +83,18 @@ getTreatmentControlX <- function(expSlot, objNames, model)
   for(model.idx in objNames)
   {
     tc = getTreatmentControlForModel(model.idx, model)
-    tc$drug.join.name = vapply(expSlot[tc$model.id], "[[", c("drug", "join.name"))
+    tc$drug.join.name = vapply(expSlot[tc$model.id], "[[",
+                               c("drug", "join.name"))
     rdf = rbind(rdf, tc)
   }
 
   rdf = unique(rdf)
-  #tretID = rdf[rdf$exp.type=="treatment", "model.id"]
   drgeID = unique(rdf[rdf$exp.type=="treatment", "drug.join.name"])
   rtx = list()
   for(drI in drgeID)
   {
     rdf[rdf$drug.join.name==drI, ]
   }
-
 
   return(rtx)
 }
@@ -102,19 +103,9 @@ getTreatmentControlX <- function(expSlot, objNames, model)
 getExpDesign <- function(objNames, expDesign)
 {
   expDesIndx = vapply(expDesign, function(x){
-                      if( length(intersect(objNames, c(x$treatment,x$control) ))>0)
-                      {return(TRUE)}
-                      return(FALSE) })
+    if( length(intersect(objNames, c(x$treatment,x$control) ))>0)
+    {return(TRUE)}
+    return(FALSE) }, FUN.VALUE = logical(1) )
   expDesName = names(expDesign)[expDesIndx]
   return(expDesign[expDesName])
 }
-
-
-
-
-
-
-
-
-
-

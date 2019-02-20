@@ -3,7 +3,8 @@
 .tumorVolumeChange <- function(volume)
 {
   Vini <- volume[1]
-  return(vapply(volume, function(vt){ 100*(vt-Vini)/Vini }) )
+
+  return(vapply(volume, function(vt){ 100*(vt-Vini)/Vini }, FUN.VALUE = numeric(1)) )
 }
 
 .avgResponse <- function(volume.change)

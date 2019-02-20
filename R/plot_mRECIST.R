@@ -7,8 +7,8 @@ getTestMat = function()
   mat[3,] = c("CR;PR;CR","SD;PD;PD;SD", "PD;PD", "PR")
   mat[4,] = c("PR","CR", "SD", "PR")
   mat[5,] = c("CR","SD;SD", "PR;PD", "SD")
-  rownames(mat)=paste0("Drug", 1:dim(mat)[1])
-  colnames(mat)=paste0("Sample", 1:dim(mat)[2])
+  rownames(mat)=paste0("Drug", seq_len(dim(mat)[1]) )
+  colnames(mat)=paste0("Sample", seq_len(dim(mat)[2]) )
   mat
 }
 
@@ -50,7 +50,8 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   cordXY = getCellBoxCordi(x0,x1, y0, y1, N)
   cordXY$x = unit(cordXY$x,"npc"); cordXY$y = unit(cordXY$y,"npc")
   grid.polygon(x = cordXY$x, y = cordXY$y,
-               id = rep(1:(N+1), each = 4),
+               #id = rep(1:(N+1), each = 4),
+               id = rep(seq_len(N+1), each = 4),
                gp = gpar(fill = c(NA, filCol),
                          col = "#f0f0f0")
                          #col = backgroundCol) #NA)
@@ -62,14 +63,14 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 .calculatRowColStat <- function(mat, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
   cltab = list()
-  for(I in 1:dim(mat)[1])
+  for(I in seq_len(dim(mat)[1]))
   {
     C = unlist(lapply(mat[I,], .splitValue, splitBy=splitBy))
     cltab[[I]] = as.vector(table(C), mode = "list")
   }
 
   rwtab = list()
-  for(I in 1:dim(mat)[2])
+  for(I in seq_len(dim(mat)[2]))
   {
     R = unlist(lapply(mat[,I], .splitValue, splitBy=splitBy))
     rwtab[[I]] = as.vector(table(R), mode = "list")
@@ -77,17 +78,18 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
   creatDataFram <- function(inLst)
   {
-  nColVal = unique(unlist(lapply(inLst, names)))
-  rxt = data.frame(matrix(NA, nrow = length(inLst), ncol=length(nColVal)))
-  colnames(rxt) = nColVal
-  for(I in 1:length(inLst))
-  {
-    rx = vapply(nColVal, function(x){ w= inLst[[I]][[x]]
+    nColVal = unique(unlist(lapply(inLst, names)))
+    rxt = data.frame(matrix(NA, nrow = length(inLst), ncol=length(nColVal)))
+    colnames(rxt) = nColVal
+    for(I in seq_along(inLst))
+    {
+      rx = vapply(nColVal, function(x){w= inLst[[I]][[x]]
                                       if(is.null(w))
-                                        {return(NA)} else{return(w)} })
-    rxt[I,] = rx[nColVal]
-  }
-  return(rxt)
+                                      {return(NA)} else{return(w)} },
+                  FUN.VALUE = numeric(1))
+      rxt[I,] = rx[nColVal]
+    }
+    return(rxt)
   }
   rwdf = creatDataFram(rwtab)
   cldf = creatDataFram(cltab)
@@ -223,7 +225,8 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     colPalette <- .mRcolPalette(unqMat)
   } else
   {
-    colPre <- vapply(unqMat, function(x) is.null(colPalette[[x]]))
+    colPre <- vapply(unqMat, function(x) is.null(colPalette[[x]]),
+                     FUN.VALUE = logical(1))
     if(any(colPre)==TRUE)
     {
       colAbName <- names(colPre[colPre==TRUE])

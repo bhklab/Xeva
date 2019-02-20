@@ -35,8 +35,9 @@ The Xeva package provides efficient and powerful functions for patient-drived xe
 Xeva requires that several packages be installed. All dependencies are available from CRAN or Bioconductor:
 
 <<get_lib, results='hide', message=FALSE, eval=FALSE>>=
-source('http://bioconductor.org/biocLite.R')
-biocLite('Xeva')
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("Xeva", version = "3.8")
 @
 
 The package can also be installed directly form GitHub using devtools:

@@ -59,7 +59,7 @@ subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
 
   expDesign <- slot(object, "expDesign")
   expDeNew <- list()
-  for(i in 1:length(expDesign))
+  for(i in seq_along(expDesign))
   {
     bn <- expDesign[[i]]$batch.name
     tr <- expDesign[[i]]$treatment

@@ -46,10 +46,9 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")
 
-  drugpheno <- data.frame(vapply(drugpheno, function(x) {
-    if (!is.factor(x)) {
-      x[is.infinite(x)] <- NA
-    }
+  drugpheno <- data.frame(sapply(drugpheno, function(x)
+  {
+    if (!is.factor(x)) { x[is.infinite(x)] <- NA }
     return(list(x))
   }, USE.NAMES=FALSE), check.names=FALSE)
 
@@ -309,7 +308,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
     nc <- c("estimate", "se", "n", "tstat", "fstat", "pvalue",
             "df", "fdr")
   }
-  for (ll in 1:length(ltype)) {
+  for (ll in seq_along(ltype)) {
     iix <- !is.na(type) & is.element(type, ltype[[ll]])
     ccix <- rowSums(!is.na(data)) > 0 | rowSums(!is.na(drugpheno)) >
       0 | is.na(type) | is.na(batch)
@@ -323,7 +322,7 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
     else {
       splitix <- parallel::splitIndices(nx = ncol(data),
                                         ncl = nthread)
-      splitix <- splitix[vapply(splitix, length) > 0]
+      splitix <- splitix[sapply(splitix, length) > 0]
       mcres <- parallel::mclapply(splitix, function(x,
                                                     data, type, batch, drugpheno, standardize) {
         res <- t(apply(data[, x, drop = FALSE], 2, geneDrugSensitivity,
