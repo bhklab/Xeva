@@ -102,11 +102,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 }
 
 
-.complexHeatMapVersionCompatibility <- function()
-{
-  cpv <- as.character(packageVersion("ComplexHeatmap"))
-  compareVersion(cpv, "1.20.0")
-}
+
 .creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
 {
   rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
