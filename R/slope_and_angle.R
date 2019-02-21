@@ -85,7 +85,7 @@ angle <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.vol
     tre <- slope(treat.time, treat.volume, degree= degree)
   }
 
-  #if(class(con)=="modelResponse" & class(tre)=="modelResponse")
+  #if(c#lass(con)=="modelResponse" & c#lass(tre)=="modelResponse") ##old Class command
   ang <- con$value - tre$value
   rtx <- batch_response_class(name="angle", value=ang, control=con, treatment=tre)
   return(rtx)

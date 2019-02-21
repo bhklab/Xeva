@@ -96,7 +96,7 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   { stop(sprintf("No valid value of %s present in dataset (or tissue subset)",
                  res.measure))}
 
-  #if(class(vl)!="numeric")
+  #if(c#lass(vl)!="numeric") ##old class
   if(!is(vl, "numeric"))
   {stop(sprintf("%s is not a numeric response\n", res.measure))}
 
@@ -124,7 +124,7 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
 
   if(length(unique(vx$type))>1)
   {
-    #if(class(type.color)!="list")
+    #if(c#lass(type.color)!="list") ##old class
     if(!is(type.color, "list"))
     {
       type.color <- as.list(rainbow(length(unique(vx$type))))

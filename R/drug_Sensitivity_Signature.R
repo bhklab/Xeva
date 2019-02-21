@@ -234,7 +234,6 @@ setMethod(f= "drugSensitivitySig",
                     type=NULL, standardize='SD', verbose=TRUE)
 {
   fit = fit[1]
-  #if(class(x)!= "matrix")
   if(is(x, "matrix")==FALSE)
   { stop("x must be a matrix") }
 
