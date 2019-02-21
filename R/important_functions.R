@@ -143,16 +143,6 @@ getIndex <- function(inVec, indxOf)
   return(df[,newCN])
 }
 
-##--------------------------------------------------------------
-##----Convert data.frame columns from factors to characters ----
-## This will convert all factor type columns to character columns
-# .factor2char <- function(df)
-# {
-#   i <- vapply(df, is.factor)
-#   df[i] <- lapply(df[i], as.character)
-#   return(df)
-# }
-
 ##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------
 #' paste a vector elements togather while removing NA

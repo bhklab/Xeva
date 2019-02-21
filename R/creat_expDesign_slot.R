@@ -19,7 +19,7 @@
   }
 
   ##------- setting name -----------------
-  bnam <- vapply(expDesign, "[[", "batch.name")
+  bnam <- sapply(expDesign, "[[", "batch.name")
   bnamDup <- bnam[duplicated(bnam)]
   if(length(bnamDup)>0)
   {
@@ -39,6 +39,7 @@
 #' Print the pdx batch
 #' @param x pdxBatch object
 #' @param ... Other arguments
+#' @return prints pdxBatch
 #' @export
 print.pdxBatch <- function(x, ...)
 {

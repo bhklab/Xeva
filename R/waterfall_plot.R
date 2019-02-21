@@ -65,6 +65,8 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 #' @param title Title of the plot
 #' @param sort Default \code{TRUE} will sort the data
 #'
+#' @return waterfall plot in ggplot2
+#'
 #' @export
 #' @import ggplot2
 waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
@@ -94,7 +96,8 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   { stop(sprintf("No valid value of %s present in dataset (or tissue subset)",
                  res.measure))}
 
-  if(class(vl)!="numeric")
+  #if(class(vl)!="numeric")
+  if(!is(vl, "numeric"))
   {stop(sprintf("%s is not a numeric response\n", res.measure))}
 
   vx <- data.frame(x=names(vl), y=vl, type=drug, col="#cc4c02",
@@ -121,7 +124,8 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
 
   if(length(unique(vx$type))>1)
   {
-    if(class(type.color)!="list")
+    #if(class(type.color)!="list")
+    if(!is(type.color, "list"))
     {
       type.color <- as.list(rainbow(length(unique(vx$type))))
       names(type.color) <- unique(vx$type)

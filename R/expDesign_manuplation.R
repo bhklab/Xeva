@@ -15,7 +15,7 @@
 #' @examples
 #' data(brca)
 #' brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
-#' control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
+#'         control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
 #'
 #' @param object The \code{Xeva} dataset.
 #' @param treatment The \code{model.id} of treatment.
@@ -46,7 +46,8 @@ setMethod( f=addExperimentalDesign,
                 }
               }
 
-             allBatchName <- vapply(slot(object, "expDesign"), '[[', "batch.name")
+             #allBatchName <- vapply(slot(object, "expDesign"), '[[', "batch.name")
+             allBatchName <- vapply(slot(object, "expDesign"), function(x){x$batch.name}, FUN.VALUE = character(1))
              if(!is.null(batch.id))
              {
                if(is.element(batch.id, allBatchName)==TRUE)

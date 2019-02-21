@@ -8,15 +8,14 @@
 \usage{
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   features = NULL, model.ids = NULL, model2bidMap = NULL,
-  sensitivity.measure = "slope", fit = c("lm", "maxCor", "gam"),
-  standardize = c("SD", "rescale", "none"), nthread = 1,
-  tissue = NULL, verbose = TRUE)
+  sensitivity.measure = "slope", fit = c("lm"), standardize = c("SD",
+  "rescale", "none"), nthread = 1, tissue = NULL, verbose = TRUE)
 
 \S4method{drugSensitivitySig}{XevaSet}(object, drug, mDataType = NULL,
   molData = NULL, features = NULL, model.ids = NULL,
-  model2bidMap = NULL, sensitivity.measure = "slope", fit = c("lm",
-  "maxCor", "gam"), standardize = c("SD", "rescale", "none"),
-  nthread = 1, tissue = NULL, verbose = TRUE)
+  model2bidMap = NULL, sensitivity.measure = "slope", fit = c("lm"),
+  standardize = c("SD", "rescale", "none"), nthread = 1,
+  tissue = NULL, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset.}
@@ -35,7 +34,7 @@ drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
 
 \item{sensitivity.measure}{Name of the sensitivity measure.}
 
-\item{fit}{Default \code{lm}. Name of the model to be fitted. Options are \code{lm}, \code{maxCor}, and \code{gam}.}
+\item{fit}{Default \code{lm}.}
 
 \item{standardize}{Default \code{SD}. Name of the method to use for data standardization befor fitting.}
 

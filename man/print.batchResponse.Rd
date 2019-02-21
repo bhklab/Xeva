@@ -11,6 +11,9 @@
 
 \item{...}{Other arguments}
 }
+\value{
+prints the batchResponse
+}
 \description{
 Print the batch response
 }

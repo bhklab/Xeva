@@ -9,6 +9,7 @@ model_response_class <- function(name, value=NA, fit=NA)
 #' Print the model response
 #' @param x modelResponse object
 #' @param ... Other arguments
+#' @return prints the modelResponse
 #' @export
 print.modelResponse <- function(x, ...)
 {
@@ -27,6 +28,7 @@ batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL, .
 #' Print the batch response
 #' @param x batchResponse object
 #' @param ... Other arguments
+#' @return prints the batchResponse
 #' @export
 print.batchResponse <- function(x, ...)
 {

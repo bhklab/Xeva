@@ -11,6 +11,9 @@
 
 \item{...}{Other arguments}
 }
+\value{
+prints pdxBatch
+}
 \description{
 Print the pdx batch
 }

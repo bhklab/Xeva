@@ -32,6 +32,6 @@ Add a new experimental design in the \code{expDesign} slot.
 \examples{
 data(brca)
 brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
-control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
+        control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
 
 }

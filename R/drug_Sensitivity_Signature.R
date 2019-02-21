@@ -85,7 +85,7 @@
 #' @param model.ids Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.
 #' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
 #' @param sensitivity.measure Name of the sensitivity measure.
-#' @param fit Default \code{lm}. Name of the model to be fitted. Options are \code{lm}, \code{maxCor}, and \code{gam}.
+#' @param fit Default \code{lm}.
 #' @param standardize Default \code{SD}. Name of the method to use for data standardization befor fitting.
 #' @param nthread number of threads
 #' @param tissue tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
@@ -106,7 +106,7 @@ setGeneric(name = "drugSensitivitySig",
                           mDataType=NULL, molData=NULL, features=NULL,
                           model.ids=NULL, model2bidMap = NULL,
                           sensitivity.measure="slope",
-                          fit = c("lm", "maxCor", "gam"),
+                          fit = c("lm"),
                           standardize=c("SD", "rescale", "none"),
                           nthread=1, tissue=NULL, verbose=TRUE)
             {standardGeneric("drugSensitivitySig")}
@@ -120,7 +120,7 @@ setMethod(f= "drugSensitivitySig",
                                mDataType=NULL, molData=NULL, features=NULL,
                                model.ids=NULL, model2bidMap = NULL,
                                sensitivity.measure="slope",
-                               fit = c("lm", "maxCor", "gam"),
+                               fit = c("lm"),
                                standardize=c("SD", "rescale", "none"),
                                nthread=1, tissue=NULL, verbose=TRUE)
   {
@@ -230,7 +230,7 @@ setMethod(f= "drugSensitivitySig",
 #' @import doSNOW
 #' @import foreach
 #' @importFrom stats setNames
-.runFit <- function(x, y, fit = c("lm", "maxCor", "gam"), nthread=1,
+.runFit <- function(x, y, fit = c("lm"), nthread=1,
                     type=NULL, standardize='SD', verbose=TRUE)
 {
   fit = fit[1]
@@ -260,48 +260,6 @@ setMethod(f= "drugSensitivitySig",
     rr <- .reorderCol(rr, "feature", 1)
     return(rr)
   }
-
-  # ##---------------------------------------------------------------------
-  #   #library(doSNOW)
-  # i=0
-  #   cl <- makeCluster(nthread)
-  #   registerDoSNOW(cl)
-  #   result <- foreach (i=colnames(x),
-  #                      .final = function(i) {setNames(i, colnames(x))},
-  #                      .export=c(".nonLinerFits")) %dopar%
-  #   { .nonLinerFits(x[,i], y, fit = fit )}
-  #
-  #   stopCluster(cl)
-  #
-  #   if(fit == "maxCor")
-  #   {
-  #     rtx <- data.frame(feature= colnames(x),
-  #                       maxCor = vapply(result, function(i) i[1,1]))
-  #   }
-  #
-  #   if(fit == "gam")
-  #   {
-  #     rtx <- .convertListToDataFram(result)
-  #     rtx$feature <- rownames(rtx)
-  #     rtx <- .reorderCol(rtx, "feature", 1)
-  #   }
-  #   return(rtx)
 }
 
-
-# .nonLinerFits <- function(x, y, fit)
-# {
-#   switch(fit,
-#          ##--------- Maximal correlation ---------
-#          "maxCor" = { argmax <- acepack::ace(x, y)
-#                       value <- stats::cor(argmax$tx, argmax$ty)},
-#          ##------- generalized additive model  -------------
-#          "gam" = { g <- mgcv::gam(y ~ s(x))
-#                    val <- mgcv::summary.gam(g)
-#                    value <- vapply(c("r.sq", "dev.expl"), function(i) val[[i]]) },
-#          value <- NA
-#          )
-#
-#   return(value)
-# }
 

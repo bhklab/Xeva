@@ -37,6 +37,9 @@ waterfall(object, res.measure, drug = NULL, group.by = NULL,
 
 \item{sort}{Default \code{TRUE} will sort the data}
 }
+\value{
+waterfall plot in ggplot2
+}
 \description{
 waterfall plot
 Creates waterfall plot for a given drug.

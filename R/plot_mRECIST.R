@@ -225,8 +225,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     colPalette <- .mRcolPalette(unqMat)
   } else
   {
-    colPre <- vapply(unqMat, function(x) is.null(colPalette[[x]]),
-                     FUN.VALUE = logical(1))
+    colPre <- vapply(unqMat, function(x) is.null(colPalette[[x]]), FUN.VALUE = logical(1))
     if(any(colPre)==TRUE)
     {
       colAbName <- names(colPre[colPre==TRUE])

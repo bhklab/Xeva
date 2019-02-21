@@ -11,6 +11,9 @@
 
 \item{...}{Other arguments}
 }
+\value{
+prints the modelResponse
+}
 \description{
 Print the model response
 }
