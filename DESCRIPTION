@@ -8,7 +8,6 @@ Description: Contains set of functions to perform analysis of patient-derived xe
 License: Artistic-2.0
 Encoding: UTF-8
 RoxygenNote: 6.1.1
-LazyData: true
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown
 Imports:
