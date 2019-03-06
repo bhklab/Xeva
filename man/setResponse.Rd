@@ -2,39 +2,51 @@
 % Please edit documentation in R/response_matrixs.R
 \name{setResponse}
 \alias{setResponse}
-\title{\code{setResponse} sets response of an Xeva object.}
+\title{set PDX response}
 \usage{
 setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
-  "abc", "TGI"), min.time = 10, treatment.only = FALSE,
+  "abc", "TGI", "lmm"), min.time = 10, treatment.only = FALSE,
   max.time = NULL, vol.normal = TRUE, impute.value = TRUE,
   concurrent.time = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object.}
 
-\item{res.measure}{Response measure; multiple measures are allowed.}
+\item{res.measure}{Response measure, multiple measures are allowed. See \code{Details} below}
 
-\item{min.time}{Default \strong{10} days. Used for \emph{mRECIST} computation.}
+\item{min.time}{Minimum number of days for \emph{mRECIST} computation. Default \strong{10} days.}
 
 \item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
-\item{max.time}{Maximum time for data.}
+\item{max.time}{Maximum number of days to consider for analysis. Data byond this will be discarded. Default \code{NULL} takes full data.}
 
-\item{vol.normal}{Default \code{TRUE} will use}
+\item{vol.normal}{Default \code{TRUE} will use normalize volume.}
 
-\item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing values.}
+\item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing volume values.}
 
 \item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
 
-\item{verbose}{Default \code{TRUE} will print information}
+\item{verbose}{Default \code{TRUE} will print information.}
 }
 \value{
 Returns updated Xeva object.
 }
 \description{
-\code{setResponse} sets response of an Xeva object.
+\code{setResponse} sets response of all PDXs in an Xeva object.
+}
+\details{
+At present fellowing response measure are implemented
+\itemize{
+\item mRECIST Computes mRECIST for indivial PDX model
+\item slope Computes slope of the fitted indivial PDX curve
+\item AUC  Computes area under a PDX curve for indivial PDX model
+\item angle Computes angle between treatment and control PDX curves
+\item abc Computes area between the treatment and control PDX curves
+\item TGI Computes  tumor growth inhibition using treatment and control PDX curves
+\item lmm Computes linear mixed model (lmm) statistics for a PDX batch
+}
 }
 \examples{
 data(brca)
-\dontrun{ brca  <- setResponse(brca, res.measure = c("mRECIST")) }
+brca  <- setResponse(brca, res.measure = c("mRECIST"), verbose=FALSE)
 }

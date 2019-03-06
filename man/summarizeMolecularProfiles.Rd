@@ -2,7 +2,7 @@
 % Please edit documentation in R/access_expressionData_Functions.R
 \name{summarizeMolecularProfiles}
 \alias{summarizeMolecularProfiles}
-\title{summarizeMolecularProfiles}
+\title{summarize molecular profiles}
 \usage{
 summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
   sensitivity.measure = NULL, unique.model = TRUE, batch = NULL)
@@ -26,7 +26,7 @@ summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
 An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 }
 \description{
-summarizeMolecularProfiles
+This function serves to get molecular profiles from a \code{XevaSet} object.
 }
 \details{
 \itemize{

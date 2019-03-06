@@ -1,14 +1,14 @@
 .addlinetoplot <- function(dt, x, y, col='red', lty="dotted", alpha=1, size=0.5)
 {
   list(
-    geom_line( data=dt, aes_string(x=x, y=y), color=col, linetype=lty, alpha=alpha, size=size),
-    #geom_point(data=dt, aes_string(x=x, y=y), color=col,size=0.5, shape=21, fill="white")
+    geom_line( data=dt, aes_string(x=x, y=y), color=col, linetype=lty,
+               alpha=alpha, size=size),
     geom_point(data=dt, aes_string(x=x, y=y), color=col, shape=20, alpha=alpha)
   )
 }
 
 #' @import ggplot2
-.plotModelErrorBar <- function(dfp, control.col = "#6baed6", treatment.col="#fc8d59",
+.plotModelErrorBar <- function(dfp,control.col="#6baed6",treatment.col="#fc8d59",
                               title="", xlab = "Time", ylab = "Volume",
                               log.y=FALSE, drgName="",
                               SE.plot = c("all","none","errorbar", "ribbon"),
@@ -51,11 +51,13 @@
       {
         if(SE.plot == "errorbar")
         {
-          plt <- plt + geom_errorbar(aes_string(ymin = "lower", ymax = "upper"), width=0.25)
+          plt <- plt + geom_errorbar(aes_string(ymin = "lower", ymax = "upper"),
+                                     width=0.25)
         }
         if(SE.plot == "ribbon")
         {
-          plt <- plt + geom_ribbon(aes_string(ymin ="lower", ymax ="upper", fill ="exp.type"),
+          plt <- plt + geom_ribbon(aes_string(ymin ="lower", ymax ="upper",
+                                              fill ="exp.type"),
                                    linetype=0,  alpha = 0.25)
         }
       }
@@ -78,8 +80,8 @@
     }
   }
 
-  plt <- plt + geom_point(data=df, aes_string(x="time", y="mean", color= "exp.type"),
-                          #size=1,
+  plt <- plt + geom_point(data=df, aes_string(x="time", y="mean",
+                                              color= "exp.type"),
                           shape=21, fill="white")
 
   tcCol <- c("control" = control.col, "treatment" = treatment.col)
@@ -87,7 +89,8 @@
   if(SE.plot == "ribbon")
   { plt <- plt + scale_fill_manual(values=tcCol) }
   plt <- .ggplotEmptyTheme(plt)
-  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = drgName, fill=drgName)
+  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = drgName,
+                    fill=drgName)
   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
   plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
   if(!is.null(aspect.ratio))
@@ -97,9 +100,9 @@
   return(plt)
 }
 
-######--------------------------------------------------------------------------
 #' @import ggplot2
-.plotMultipalModels <- function(dfx, color=NULL, major.line.size=1, aspect.ratio=NULL)
+.plotMultipalModels <- function(dfx, color=NULL, major.line.size=1,
+                                aspect.ratio=NULL)
 {
   plt <- ggplot(dfx, aes_string(x="time", y="volume", color= "model.id"))
   plt <- plt + geom_line(linetype = 1, size=major.line.size)+ geom_point()
@@ -117,15 +120,17 @@
 
 }
 
-######--------------------------------------------------------------------------
+
 #' @import ggplot2
 .plotDose <- function(do, point.shape=21, point.size=5, point.color="black",
                      line.size=4, line.color="black", modify.x.axis=TRUE)
 {
   plt <- ggplot(do, aes_string(x="time", y="model.id"))
   plt <- plt + geom_point(size=0)
-  plt <- plt + geom_hline(aes_string(yintercept = "model.n"), do, size=line.size, color=line.color)
-  plt <- plt + geom_point(fill=do$color,shape=point.shape, size=point.size, color=point.color)
+  plt <- plt + geom_hline(aes_string(yintercept = "model.n"), do,
+                          size=line.size, color=line.color)
+  plt <- plt + geom_point(fill=do$color,shape=point.shape, size=point.size,
+                          color=point.color)
 
   if(modify.x.axis==TRUE)
   {
@@ -238,9 +243,7 @@ plotPDX <- function(object, batch=NULL,
                     title="", xlab = "Time", ylab = "Volume",
                     log.y=FALSE, SE.plot = c("all", "none", "errorbar", "ribbon"),
                     aspect.ratio=c(1, NULL),
-                    minor.line.size=0.5, major.line.size=0.7
-                    #,dose.plot=FALSE
-                    )
+                    minor.line.size=0.5, major.line.size=0.7)
 {
   if(!is.null(model.id))
   {
@@ -262,7 +265,7 @@ plotPDX <- function(object, batch=NULL,
               concurrent.time=concurrent.time,
               control.col = control.col, treatment.col=treatment.col,
               title=title, xlab = xlab, ylab = ylab,
-              log.y=log.y, #drug.name=drug.name,
+              log.y=log.y,
               SE.plot =SE.plot,
               aspect.ratio=aspect.ratio,
               minor.line.size=minor.line.size, major.line.size=major.line.size)

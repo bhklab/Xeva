@@ -57,6 +57,6 @@ In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \
 \examples{
 data(brca)
 senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-                             mDataType="RNASeq", features=1:5,
+                             mDataType="RNASeq", features=c(1,2,3,4,5),
                              sensitivity.measure="slope", fit = "lm")
 }

@@ -1,5 +1,3 @@
-
-
 .getSensitivityVal <- function(object, sensitivity.measure, mdf, drug, collapse.by="mean")
 {
   senType <- "model"
@@ -13,7 +11,8 @@
   modNotPresent <- setdiff(mdfI$model.id, rownames(sensitivity(object, senType)))
   if(length(modNotPresent)>0)
   {
-    msg1 <- sprintf("models not present in sensitivity slot:\n%s\n", paste(modNotPresent, collapse = "\n"))
+    msg1 <- sprintf("models not present in sensitivity slot:\n%s\n",
+                    paste(modNotPresent, collapse = "\n"))
     warning(msg1)
     mdfI <- mdfI[!(mdfI$model.id %in% modNotPresent), ]
   }
@@ -53,7 +52,7 @@
   }
   mdf[,"biobase.id"] <- NA
 
-  for(I in 1:nrow(mdf))
+  for(I in seq_len(nrow(mdf)))
   {
     bid <- model2bidMap[model2bidMap$model.id==mdf[I, "model.id"], "biobase.id"]
     if(length(bid)==0){ bid <- NA }
@@ -63,11 +62,13 @@
   mdf <- mdf[ as.character(mdf[,"biobase.id"]) %in% colnames(molData),]
   if(nrow(mdf)==0)
   {
-    msg <- sprintf("No '%s' ids are comman in molecular data and experimental data", mDataType)
+    msg <- sprintf("No '%s' ids are comman in molecular data and experimental data",
+                   mDataType)
     stop(msg)
   }
 
-  mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug, collapse.by=collapse.by)
+  mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug,
+                             collapse.by=collapse.by)
   return(mdfI)
 }
 
@@ -96,7 +97,7 @@
 #' @examples
 #' data(brca)
 #' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-#'                              mDataType="RNASeq", features=1:5,
+#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
 #'                              sensitivity.measure="slope", fit = "lm")
 #' @details A matrix of values can be directly passed to molData. \code{fit} can be \code{lm}, \code{maxCor}, or \code{gam}.
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
@@ -149,7 +150,8 @@ setMethod(f= "drugSensitivitySig",
 
   if(nrow(mdfI)<2)
   {
-      msg <- sprintf("Too few samples for drug %s\nNumber of samples %d", drugIx, nrow(mdfI))
+      msg <- sprintf("Too few samples for drug %s\nNumber of samples %d",
+                     drugIx, nrow(mdfI))
       stop(msg)
   }
 
@@ -225,11 +227,6 @@ setMethod(f= "drugSensitivitySig",
 
 
 ####-------------------------------------------------------------------------
-
-#' @import parallel
-#' @import doSNOW
-#' @import foreach
-#' @importFrom stats setNames
 .runFit <- function(x, y, fit = c("lm"), nthread=1,
                     type=NULL, standardize='SD', verbose=TRUE)
 {
@@ -238,7 +235,7 @@ setMethod(f= "drugSensitivitySig",
   { stop("x must be a matrix") }
 
   if(is.null(colnames(x)))
-  { colnames(x) <- 1:ncol(x) }
+  { colnames(x) <- seq_len(ncol(x)) }
 
   if(standardize=="SD"){ x <- scale(x)[,]}
   if(standardize=="rescale"){ x <- as.matrix(apply(x,2, .normalize01))}
@@ -246,7 +243,6 @@ setMethod(f= "drugSensitivitySig",
   ##----------------------------------------------------------------------
   if(fit=="lm")
   {
-    #rr <- PharmacoGx:::rankGeneDrugSensitivity(
     rr <- rankGeneDrugSensitivity(data= x,
                                                drugpheno= y,
                                                type= type, #batch=batch,
@@ -260,5 +256,4 @@ setMethod(f= "drugSensitivitySig",
     return(rr)
   }
 }
-
 

@@ -24,7 +24,8 @@ Imports:
   doParallel,
   doSNOW,
   Rmisc,
-  grid
-Depends: R (>= 3.6)
+  grid,
+  nlme
+Depends: R (>= 3.5)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues

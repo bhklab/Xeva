@@ -95,7 +95,6 @@ createXevaModelClass <- function()
 PDXmodClass <- createXevaModelClass()
 
 
-## @export
 #' @import methods
 setMethod(f="show",
           signature="pdxModel",

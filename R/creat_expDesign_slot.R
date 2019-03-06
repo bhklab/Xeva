@@ -19,7 +19,10 @@
   }
 
   ##------- setting name -----------------
-  bnam <- sapply(expDesign, "[[", "batch.name")
+  ###bnam <- xapply(expDesign, "[[", "batch.name")
+  bnam <- c()
+  for(i in expDesign){bnam <- c(bnam, i[["batch.name"]])}
+
   bnamDup <- bnam[duplicated(bnam)]
   if(length(bnamDup)>0)
   {
@@ -50,9 +53,3 @@ print.pdxBatch <- function(x, ...)
                  paste0(x$treatment, collapse = ", "))
   cat(txt)
 }
-
-
-
-
-
-

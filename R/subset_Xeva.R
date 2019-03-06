@@ -109,7 +109,3 @@ subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
   }
   return(object)
 }
-
-
-
-

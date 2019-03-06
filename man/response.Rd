@@ -2,13 +2,13 @@
 % Please edit documentation in R/response_matrixs.R
 \name{response}
 \alias{response}
-\title{compute response}
+\title{compute PDX response}
 \usage{
 response(object, model.id = NULL, batch = NULL,
-  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
-  treatment.only = FALSE, max.time = NULL, impute.value = TRUE,
-  min.time = 10, concurrent.time = TRUE, vol.normal = FALSE,
-  verbose = TRUE)
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI",
+  "lmm"), treatment.only = FALSE, max.time = NULL,
+  impute.value = TRUE, min.time = 10, concurrent.time = TRUE,
+  vol.normal = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object.}
@@ -17,7 +17,7 @@ response(object, model.id = NULL, batch = NULL,
 
 \item{batch}{\code{batch.id} or experiment design for which the drug response is to be computed.}
 
-\item{res.measure}{Drug response measure.}
+\item{res.measure}{Drug response measure. See \code{Details} below}
 
 \item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
@@ -37,7 +37,19 @@ response(object, model.id = NULL, batch = NULL,
 Returns model or batch drug response object.
 }
 \description{
-\code{response} Computes the drug response of a PDX model or batch.
+\code{response} Computes the drug response of an individual PDX model or batch.
+}
+\details{
+At present fellowing response measure are implemented
+\itemize{
+\item mRECIST Computes mRECIST for indivial PDX model
+\item slope Computes slope of the fitted indivial PDX curve
+\item AUC  Computes area under a PDX curve for indivial PDX model
+\item angle Computes angle between treatment and control PDX curves
+\item abc Computes area between the treatment and control PDX curves
+\item TGI Computes tumor growth inhibition using treatment and control PDX curves
+\item lmm Computes linear mixed model (lmm) statistics for a PDX batch
+}
 }
 \examples{
 data(brca)

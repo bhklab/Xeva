@@ -1,5 +1,3 @@
-##to for datafram to Exp slot
-
 creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 {
   rtx <- list()
@@ -7,7 +5,7 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 
   rtx$model.id = unique(exp.mod.dg$model.id)
 
-  drgColName.No = colnames(exp.mod.dg)[grep("drug\\.",colnames(exp.mod.dg))]
+  drgColName.No = colnames(exp.mod.dg)[grep("drug",colnames(exp.mod.dg))]
 
   drug = list("join.name" = unique(exp.mod.dg$drug))
   if(length(drgColName.No)>1)
@@ -19,7 +17,7 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
 
   rtx$drug = drug
 
-  ##------------ set extra col -----------------------------------------------------
+  ##------------ set extra col ------------------------------------
   if(!is.null(extraCol))
   {
     for(ec in c(extraCol))
@@ -31,7 +29,6 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
     }
   }
 
-  ##-------------------------------------------------------------------------
   doseColsNames <- c("dose", gsub("drug", "dose", names(rtx$drug$names)))
   dataColName <- c("time", "volume", "width","length",
                   doseColsNames, "body.weight", "date", "comment")
@@ -43,9 +40,10 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
       }
   }
 
-  ##---- should we add dose.1 + dose.2 .... to dose
-  rtxData <- data.frame(lapply(exp.mod.dg[,dataColName], as.character), stringsAsFactors=FALSE)
-  ##------ change column type for each column -----------------------------------------------
+  ##---- add dose.1 + dose.2 .... to dose
+  rtxData <- data.frame(lapply(exp.mod.dg[,dataColName], as.character),
+                        stringsAsFactors=FALSE)
+  ##------ change column type for each column ---------------------------
   rtxData$time  <- as.numeric(rtxData$time)
   rtxData$volume<- as.numeric(rtxData$volume)
   rtxData$width <- as.numeric(rtxData$width)
@@ -53,44 +51,54 @@ creatListFromDF <- function(exp.mod.dg, extraCol=NULL)
   rtxData$body.weight<- as.numeric(rtxData$body.weight)
   rtxData$date  <- as.Date(rtxData$date)
 
-  rtxData[ ,doseColsNames]<- vapply(doseColsNames, function(x){as.numeric(rtxData[ ,x])}, FUN.VALUE = numeric(1) )
-
-  rtxData <- BBmisc::sortByCol(rtxData , dataColName, asc = rep(TRUE, length(dataColName)))
-
-  ##------ remove all cols which are NA -----------
-  #rtxData <- rtxData[, colSums(is.na(rtxData)) != nrow(rtxData)]
-
+  for(doseCi in doseColsNames)
+  {
+    rtxData[ ,doseCi] <- as.numeric(rtxData[ ,doseCi])
+  }
+  rtxData <- BBmisc::sortByCol(rtxData , dataColName,
+                               asc = rep(TRUE, length(dataColName)))
   rtx$data<- rtxData
-
   return(rtx)
 }
 
+## list of PDXMI variables
+## Source
+## Meehan, Terrence F., et al. "PDX-MI: minimal information for patient-derived
+## tumor xenograft models." Cancer research 77.21 (2017): e62-e66.
+## http://cancerres.aacrjournals.org/lookup/doi/10.1158/0008-5472.CAN-17-0582
 modelClassS4Vars <- function()
 {
   return(
     c("model.id", "drug", "data", "treatment.type", "treatment.target",
       "patient.id", "patient.sex", "patient.age", "patient.diagnosis",
-      "patient.consent.to.share.data", "patient.ethnicity", "patient.current.treatment.drug",
+      "patient.consent.to.share.data", "patient.ethnicity",
+      "patient.current.treatment.drug",
       "patient.current.treatment.protocol", "patient.prior.treatment.protocol",
       "patient.response.to.prior.treatment", "patient.virology.status",
 
-      "tumor.id", "tumor.tissue.of.origin", "tumor.primary.metastasis.recurrence",
+      "tumor.id", "tumor.tissue.of.origin",
+      "tumor.primary.metastasis.recurrence",
       "tumor.specimen.tissue", "tumor.tissue.histology", "tumor.tumor.grade",
-      "tumor.disease.stage", "tumor.specific.markers", "tumor.fom.untreated.patient",
+      "tumor.disease.stage", "tumor.specific.markers",
+      "tumor.fom.untreated.patient",
       "tumor.original.sample.type", "tumor.from.existing.pdx.model",
 
-      "model.submitter.pdx.id", "model.mouse.strain.source", "model.strain.immune.system.humanized",
-      "model.type.of.humanization", "model.tumor.preparation", "model.injection.type.and.site",
+      "model.submitter.pdx.id", "model.mouse.strain.source",
+      "model.strain.immune.system.humanized",
+      "model.type.of.humanization", "model.tumor.preparation",
+      "model.injection.type.and.site",
       "model.mouse.treatment.for.engraftment", "model.engraftment.rate",
       "model.engraftment.time",
 
       "model.tumor.characterization.technology",
-      "model.tumor.confirmed.not.to.be.of.mouse.origin", "model.response.to.standard.of.care",
+      "model.tumor.confirmed.not.to.be.of.mouse.origin",
+      "model.response.to.standard.of.care",
       "model.animal.health.status", "model.passage.qa.performed",
 
       "model.treatment.passage", "model.treatment.protocol",
       "model.treatment.response", "model.tumor.omics",
-      "model.development.of.metastases.in.strain", "model.doubling.time.of.tumor",
+      "model.development.of.metastases.in.strain",
+      "model.doubling.time.of.tumor",
 
       "pdx.model.availability", "governance.restriction.for.distribution",
       "id.publication.data")
@@ -100,7 +108,8 @@ modelClassS4Vars <- function()
 makePDXModClassS4 <- function(exp.mod.dg, extraCol)
 {
   pdxS3 <- creatListFromDF(exp.mod.dg, extraCol=extraCol)
-  pdxS4 <- PDXmodClass(model.id = pdxS3$model.id, drug = pdxS3$drug, data=pdxS3$data)
+  pdxS4 <- PDXmodClass(model.id = pdxS3$model.id, drug = pdxS3$drug,
+                       data=pdxS3$data)
 
   pS4SlN<- modelClassS4Vars()
 
@@ -126,11 +135,9 @@ makePDXModClassS4 <- function(exp.mod.dg, extraCol)
 }
 
 
-## @export
 experimentSlotfromDf <- function(experiment)
 {
-  clnm <- .getColumnsDF() ## change this Define all columns in function getColumnsDF and use it
-
+  clnm <- .getColumnsDF()
   drugColsName <- colnames(experiment)[grep("drug",colnames(experiment))]
 
   requredCols = c("model.id", "time", "volume", drugColsName)
@@ -192,7 +199,7 @@ experimentSlotfromDf <- function(experiment)
 
 
   expSlot = list()
-  for (i in 1:dim(u.modDrg.id)[1])
+  for (i in seq_len(dim(u.modDrg.id)[1]))
   {
     exp.mod.dg <- subset(experiment,
                      experiment$model.id== u.modDrg.id[i, "model.id"] &
@@ -206,11 +213,11 @@ experimentSlotfromDf <- function(experiment)
 
   if(length(mod.ids) != length(unique(mod.ids)))
   {
-    msg <- sprintf("These model.id are repeated\n%s", paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
+    msg <- sprintf("These model.id are repeated\n%s",
+                   paste(mod.ids[table(mod.ids)!=1], collapse = ', '))
     stop(msg)
   }
   names(expSlot) <- mod.ids
 
   return(expSlot)
 }
-

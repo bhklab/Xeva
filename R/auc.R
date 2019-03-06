@@ -28,10 +28,8 @@
 AUC <- function(time, volume)
 {
   auc <- .trapz_AUC(time, volume)
-
   rtx <- model_response_class(name = "auc", value = auc)
   return(rtx)
-  #return(auc)
 }
 
 #' area between curves

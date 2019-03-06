@@ -1,3 +1,50 @@
+getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
+                              control.name=NULL)
+{
+  if(all(c(is.null(batch), is.null(patient.id), is.null(drug), is.null(control.name))))
+  {  stop("all variables NULL") }
+
+  if(!is.null(batch))
+  {
+    if(is.character(batch))
+    {
+      bt <- slot(object, "expDesign")[[batch]]
+      if(is.null(bt))
+      {
+        msg <- sprintf("batch name %s not present in object", batch)
+        stop(msg)
+      }
+      return(bt)
+    }
+
+    if(is.list(batch))
+    {
+      if(!"batch.name" %in% names(batch))
+      { stop(sprintf("'batch.name' is required")) }
+
+      if(is.null(batch$treatment) & is.null(batch$control))
+      { stop(sprintf("'treatment' and 'control' both can't be NULL")) }
+
+      allMod <- c(batch$treatment, batch$control)
+      modNotPr <- setdiff(allMod, rownames(modelInfo(object)))
+      if(length(modNotPr)>0)
+      {
+        stop(sprintf("model.id not present in dataset: %s", paste(modNotPr, collapse = ", ")))
+      }
+
+      return(batch)
+    }
+  } else {
+    mid <- modelInfo(object)
+    mid <- mid[mid$patient.id==patient.id, ]
+    rtx <- list(name=patient.id)
+    rtx$treatment <- mid[mid$drug==drug, "model.id"]
+    if(!is.null(control.name))
+    { rtx$control <- mid[mid$drug==control.name, "model.id"]}
+    return(rtx)
+  }
+}
+
 .normalizeVolume <- function(X)
 {
   if (is.na(X[1]) == TRUE)
@@ -154,8 +201,6 @@
     return(rtx)
   }
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
 
 .reformatExpDesig <- function(expDig)
 {
@@ -163,14 +208,11 @@
   {
     expDig <- list(expDig)
   }
-
-  #names(expDig) <- vapply(expDig, "[[", "batch.name")
   names(expDig) <- unlist(lapply(expDig, "[[", "batch.name"))
 
   return(expDig)
 }
 
-## collapse time-vol data based on expDesign
 .collapseRplicate <- function(inLst, var = "volume")
 {
   if (is.null(names(inLst)))
@@ -271,8 +313,7 @@
            drug.name = TRUE,
            concurrent.time = FALSE)
   {
-    expDig <-
-      getBatchFormatted(object, batch, patient.id, drug, control.name)
+    expDig <- getBatchFormatted(object, batch, patient.id, drug, control.name)
     expDig <- .reformatExpDesig(expDig)[[1]]
 
     dfp <- list()
@@ -285,7 +326,6 @@
           treatment.only = treatment.only,
           max.time = max.time,
           return.list = TRUE,
-          #return.list,
           impute.value = impute.value,
           vol.normal = vol.normal
         )
@@ -304,7 +344,6 @@
           treatment.only = treatment.only,
           max.time = max.time,
           return.list = TRUE,
-          #return.list,
           impute.value = impute.value,
           vol.normal = vol.normal
         )
@@ -387,11 +426,10 @@
     return(rtx)
   }
 
-##------------------------------------------------------------------------------
-##------------------------------------------------------------------------------
 ##----- get experiment data in flat data.fram ----------------------------------
-#' For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
-#' containing all the data stored in the experiment slot.
+#' Get PDX experiment data
+#'
+#' For a given \code{model.id}, \code{getExperiment} will
 #'
 #' @param object The \code{XevaSet} object.
 #' @param model.id The \code{model.id} for which data is required, multiple IDs are allowed.
@@ -409,7 +447,6 @@
 #' @examples
 #' data(brca)
 #'
-#' \dontrun{
 #' getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
 #'
 #' getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
@@ -420,7 +457,6 @@
 #'              control=c("X.6047.uned"))
 #'
 #' getExperiment(brca, batch=ed)
-#' }
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(

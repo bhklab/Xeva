@@ -26,6 +26,3 @@ model2BiobaseIdMap <- function(object, mDataType=NULL)
   rownames(idMap) <- NULL
   return(idMap)
 }
-
-
-

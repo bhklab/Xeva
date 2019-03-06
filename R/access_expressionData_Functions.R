@@ -9,7 +9,6 @@
 #' @examples
 #' data(brca)
 #' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
-#' @export
 getMolecularProfiles <- function(object, data.type)
 {
   if(is.element(data.type, names(slot(object, "molecularProfiles")))==FALSE)
@@ -62,13 +61,12 @@ getMolecularProfiles <- function(object, data.type)
     }
     stop(msg)
   }
-  #return(modIn)
   return(list(data=modIn, bioName=bioName))
 }
 #####================= Summarize Molecular Profiles ==================
-#' summarizeMolecularProfiles
+#' summarize molecular profiles
 #'
-#' summarizeMolecularProfiles
+#' This function serves to get molecular profiles from a \code{XevaSet} object.
 #'
 #' @param object The \code{XevaSet}.
 #' @param drug Name of the drug.
@@ -141,7 +139,6 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
   if(senType=="batch")
   {
     stop("not implemented yet")
-    #batch_SummarizeMolProfiles()
   }
 
 }
@@ -154,7 +151,6 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
 
   if(!is.null(batchName))
   {
-    #expDig <- expDesign(object, batchName)
     expDig <- batchInfo(object, batch = batchName)
   }
 
@@ -180,80 +176,3 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
   }
   return(bat2mods)
 }
-
-# batch_SummarizeMolProfiles <- function()
-# {
-#   #if(is.null(batch)) # & is.null(expDig))
-#   #{
-#   #  sm <- sensitivity(object, type = senType, sensitivity.measure = sensitivity.measure)
-#   #}
-#
-#   #if(!is.null(batchName))
-#   #{
-#   #  sm <- sensitivity(object, type = senType, sensitivity.measure = sensitivity.measure)
-#   #  sm <- sm[sm$batch.name %in% batchName, ]
-#   #}
-#
-#   sm <- sensitivity(object, type = senType, sensitivity.measure = sensitivity.measure)
-#   if(is.character(batch))
-#   { sm <- sm[sm$batch.name %in% batch, ] }
-#
-#   if(is.null(batchName) & !is.null(expDig))
-#   {
-#     #Get time var data and compute angle etc.
-#     stop("not implemented yet")
-#   }
-#
-#   if(is.null(sensitivity.measure))
-#   { sensitivity.measure <- colnames(sm)[!(colnames(sm) %in% c("model.id", "batch.name"))] }
-#
-#   btDF <- .batch2DataFram(object, sm$batch.name)
-#   btDF[, sensitivity.measure] <- NA
-#   unqBtach <- intersect(sm$batch.name, unique(btDF$batch.name))
-#   for(bn in unqBtach)
-#   {
-#     btDF[btDF$batch.name==bn, sensitivity.measure] <- sm[sm$batch.name==bn, sensitivity.measure]
-#   }
-#
-#   modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tissue=tissue,
-#                                unique.model=unique.model)
-#   modIn <- modInX$data; bioName <- modInX$bioName
-#
-#   commanMod <- intersect(btDF$model.id, modIn$model.id)
-#   if(length(commanMod)==0)
-#   {
-#     msg <- sprintf("No model present for given batch, drug and tissue type")
-#     stop(msg)
-#   }
-#
-#   bdf <- merge(btDF, modIn, by.x = "model.id", by.y="model.id")
-#   bdf <- bdf[!is.na(bdf[,bioName]), ]
-#   rownames(bdf) <- paste0("R", 1:nrow(bdf))
-#
-#   bt2bid <- data.frame()
-#   for(bn in unique(bdf$batch.name))
-#   {
-#     v <- bdf[bdf$batch.name==bn, ]
-#     for(I in 1:nrow(v))
-#     {
-#       if(nrow(bt2bid)==0)
-#       { bt2bid <- rbind(bt2bid, v[I,])}
-#       if(!(v[I, bioName] %in% bt2bid[, bioName]))
-#       { bt2bid <- rbind(bt2bid, v[I,]) }
-#     }
-#   }
-#
-#   bt2bid[, bioName] <- as.character(bt2bid[, bioName])
-#   rownames(bt2bid) <- make.names(bt2bid[, bioName], unique = T)
-#
-#   molP <- getMolecularProfiles(object, mDataType)
-#   molP <- molP[, bt2bid[, bioName]]
-#   colnames(molP) <- rownames(bt2bid)
-#   rownames(Biobase::pData(molP)) <- rownames(bt2bid)
-#   pd <- Biobase::pData(molP)
-#   for(i in colnames(bt2bid))
-#   { pd[,i] <- bt2bid[,i] }
-#   Biobase::pData(molP) <- pd
-#   return(molP)
-#
-# }

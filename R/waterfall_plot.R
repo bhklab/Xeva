@@ -96,7 +96,6 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   { stop(sprintf("No valid value of %s present in dataset (or tissue subset)",
                  res.measure))}
 
-  #if(c#lass(vl)!="numeric") ##old class
   if(!is(vl, "numeric"))
   {stop(sprintf("%s is not a numeric response\n", res.measure))}
 
@@ -120,11 +119,12 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   }
 
   if(length(unique(vx$type))==1)
-  { vx$col <- rep(type.color, nrow(vx))[1:nrow(vx)] }
+  {
+    vx$col <- rep(type.color, nrow(vx))[seq_len(nrow(vx))]
+  }
 
   if(length(unique(vx$type))>1)
   {
-    #if(c#lass(type.color)!="list") ##old class
     if(!is(type.color, "list"))
     {
       type.color <- as.list(rainbow(length(unique(vx$type))))
@@ -146,15 +146,3 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
                        legend.name, show.legend, sort=sort)
   return(plt)
 }
-
-
-
-##------------------------------------------------------------------------------
-###--------------------
-##--- add oncoplot at the bottam of waterfall plot ---------
-# .add_OncoplotAt_bottam <- function()
-# {
-#
-# }
-
-

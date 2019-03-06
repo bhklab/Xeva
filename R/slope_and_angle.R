@@ -27,6 +27,7 @@ slope <- function(time, volume, degree=TRUE)
 
   fit <- lm(volume~time +0, df)
   ang <- atan(coef(fit)[["time"]])
+  ##----old way to compute angle ---
   #z <- sum(df$time*df$volume) / (sqrt(sum(df$time * df$time)) * sqrt(sum(df$volume * df$volume)) )
   #ang <- acos(z)
   if(degree==TRUE) { ang <- ang*180/base::pi }

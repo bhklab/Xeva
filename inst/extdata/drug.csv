@@ -1,0 +1,3 @@
+"drug.id","standard.name","treatment.target","treatment.type"
+"binimetinib","binimetinib","MAP2K1,MAP2K2,MAPK","single"
+"untreated","untreated","UNKNOWN,Untreated","single"

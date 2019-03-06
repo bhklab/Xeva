@@ -1,38 +1,8 @@
-##-- this will convert list to data.fram -------
-# v <- 1:3; names(v) <- LETTERS[1:3]
-# inLst <- list(x=v, y=v*10)
-# .convertListToDataFram(inLst)
-## @export
-.convertListToDataFram <- function(inLst)
-{
-  name.Rows = names(inLst)
-  if(is.null(name.Rows))
-  { name.Rows= seq_along(inLst)}
-
-  name.Cols = unique(unlist(lapply(inLst, names)))
-  if(is.null(name.Cols))
-  { name.Cols = 1:max(unlist(lapply(inLst, length))) }
-
-  rd = data.frame(matrix(NA, nrow = length(name.Rows), ncol = length(name.Cols)))
-  rownames(rd) = name.Rows
-  colnames(rd) = name.Cols
-  for(rx in name.Rows)
-  {
-    v = inLst[[rx]]
-    if(is.null(names(v))){names(v) = seq_along(v)}
-    rd[rx, names(v)] = unlist(v, use.names = TRUE)[names(v)]
-  }
-  return(rd)
-}
-
-###-------------------------------------------------------------------------------------
-###-------------------------------------------------------------------------------------
-##------ given a list of datafram it will give a new datafram --------------------------
-# x <- data.frame(a=1:3, b= LETTERS[1:3])
-# y <- data.frame(a=(1:3)*10, b= letters[1:3])
-# inLst <- list(x=x, y=y)
-# .rbindListOfDataframs(inLst)
-## @export
+## given a list of datafram it will give a new datafram
+## x <- data.frame(a=1:3, b= LETTERS[1:3])
+## y <- data.frame(a=(1:3)*10, b= letters[1:3])
+## inLst <- list(x=x, y=y)
+## .rbindListOfDataframs(inLst)
 .rbindListOfDataframs<- function(inList)
 {
   allColNames = lapply(inList, colnames)
@@ -57,8 +27,7 @@
   RTz = cbind(rtx1, rtx2)
   return(RTz)
 }
-###-------------------------------------------------------------------------------------
-###-------------------------------------------------------------------------------------
+
 
 ##---- gives index of element in vector
 ##---- also works for NA
@@ -85,7 +54,7 @@ getIndex <- function(inVec, indxOf)
     ml[[r]] <- cl
   }
 
-  for(I in 1:nrow(df))
+  for(I in seq_len(nrow(df)))
   {
     v <- ml[[df[I, row.var]]][[df[I, col.var]]]
     ml[[df[I, row.var]]][[df[I, col.var]]] <- c(v, df[I, value]) #vx
@@ -128,13 +97,13 @@ getIndex <- function(inVec, indxOf)
   return(in.list)
 }
 
-##------------------------------------------------------------------------------------------
-##---------------remove NA col--------------------------------------------------------------
+##---------------------------------------------------------------------------
+##---------------remove NA col-----------------------------------------------
 .removeNAcol <- function(df)
 { return(df[, !apply(is.na(df), 2, all)]) }
 
-##------------------------------------------------------------------------------------------
-##---------------reorder column ------------------------------------------------------------
+##------------------------------------------------------------------------
+##---------------reorder column ------------------------------------------
 
 .reorderCol <- function(df, columnName, newIndx)
 {
@@ -143,40 +112,32 @@ getIndex <- function(inVec, indxOf)
   return(df[,newCN])
 }
 
-##------------------------------------------------------------------------------------------
-##------------------------------------------------------------------------------------------
-#' paste a vector elements togather while removing NA
-#'
-#' \code{pasteWithoutNA} paste a vector elements togather while removing NA
-#'
-#' @param L A vector with values and NA
-#' @param collapse Collapse string default " + "
-#'
-#' @return  Returns an string with vector values paste togather
-#'
-#' @examples
-#' L = c("A", NA, "B", NA, NA, "C")
-#' pasteWithoutNA(L, collapse = " + ")
-#' @keywords internal
-#' @noRd
+##-------------------------------------------------------------------------
+##-------------------------------------------------------------------------
+## paste a vector elements togather while removing NA
+## \code{pasteWithoutNA} paste a vector elements togather while removing NA
+## @param L A vector with values and NA
+## @param collapse Collapse string default " + "
+## @return  Returns an string with vector values paste togather
+## @examples
+## L = c("A", NA, "B", NA, NA, "C")
+## pasteWithoutNA(L, collapse = " + ")
 pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
 
-##------------------------------------------------------------------------------------------
-##------------------------------------------------------------------------------------------
-#' paste a data.frame columns togather while removing NA
-#'
-#' \code{pasteColTogather} paste a data.frame columns togather while removing NA
-#'
-#' @param df A data.frame
-#' @param collapse Collapse string default " + "
-#'
-#' @return  Returns an vector of strings where column values paste togather
-#'
-#' @examples
-#' df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
-#' pasteColTogather(df, collapse = " + ")
-#' @keywords internal
-#' @noRd
+##-----------------------------------------------------------------------
+##-----------------------------------------------------------------------
+# paste a data.frame columns togather while removing NA
+#
+# \code{pasteColTogather} paste a data.frame columns togather while removing NA
+#
+# @param df A data.frame
+# @param collapse Collapse string default " + "
+#
+# @return  Returns an vector of strings where column values paste togather
+#
+# @examples
+# df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
+# pasteColTogather(df, collapse = " + ")
 pasteColTogather <- function(df, collapse = " + ")
 {
   apply(df, 1, pasteWithoutNA, collapse =collapse)
@@ -188,40 +149,18 @@ pasteColTogather <- function(df, collapse = " + ")
   plt +  ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
                         panel.grid.minor = ggplot2::element_blank(),
                         panel.background = ggplot2::element_blank(),
-                        legend.key=element_blank(),   ##removes legend background
+                        legend.key=element_blank(), ##removes legend background
                         axis.line = ggplot2::element_line(colour = "black"))
 }
 
-
-
-#' Symmetric set differences
-#'
-#' \code{symmetricSetDiff} give symmetric set differences. Symmetric set difference (disjunctive union), of two sets is the set of elements which are not in their intersection.
-#'
-#' @param a vector
-#' @param b vector
-#'
-#' @return  Returns a vector
-#'
-#' @examples
-#' a <- c(1, 2, 3)
-#' b <- c(2, 3, 4)
-#' symmetricSetDiff(a, b)
-#' @keywords internal
-#' @noRd
-symmetricSetDiff <- function(a,b){ unique(c(setdiff(a,b), setdiff(b,a))) }
-
 ##-------------------
-#' Function to print data.frame in massage
-#'
-#' \code{printAndCapture} prints data.frame in stop or warning functions
-#' @examples
-#' df <- data.frame(a=1:5, b=11:15)
-#' msg <- sprintf("data frame is:\n%s", printAndCapture(df))
-#' warning(msg)
-#' @keywords internal
-#' @noRd
-## @export
+# Function to print data.frame in massage
+#
+# \code{printAndCapture} prints data.frame in stop or warning functions
+# @examples
+# df <- data.frame(a=1:5, b=11:15)
+# msg <- sprintf("data frame is:\n%s", printAndCapture(df))
+# warning(msg)
 printAndCapture <- function(x)
 {
   paste(capture.output(print(x)), collapse = "\n")
@@ -233,15 +172,11 @@ printAndCapture <- function(x)
 
 ###------------------------------
 ##-------------------
-#' Function to remove low variance features
-#'
-#' Function to remove low variance features
-#' @examples
-#' data(cars)
-#' removeZeroVar(cars, varCutoff=0)
-#' @keywords internal
-#' @noRd
-## @export
+## Function to remove low variance features
+## Function to remove low variance features
+## @examples
+## data(cars)
+## removeZeroVar(cars, varCutoff=0)
 removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 {
   dfR <- apply(df,2, stats::var)
@@ -256,7 +191,7 @@ removeZeroVar <- function(df, varCutoff=0, sort=TRUE)
 
 
 
-##------------------------------------------------------------------------------
+
 extractBetweenTags <- function(inVec, start.tag=0, end.tag=0)
 {
   inVIndx= seq_along(inVec)

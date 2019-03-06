@@ -3,12 +3,17 @@
 \docType{data}
 \name{brca}
 \alias{brca}
-\title{Breast cancer dataset from PDXE}
-\format{A Xeva object of the PDXE breast cancer dataset.}
+\title{PDXE breast cancer dataset}
+\format{An object of class \code{XevaSet} of length 1.}
+\source{
+\url{https://www.nature.com/articles/nm.3954?draft=journal}
+}
 \usage{
 data(brca)
 }
 \description{
-Breast cancer dataset from PDXE.
+A Xeva object containing only breast cancer PDXs from the PDXE dataset
+For details about PDX-MI, see:
+Gao et al. High-throughput screening using patient-derived tumor xenografts to predict clinical trial drug response. Nature medicine, 21(11):1318, 2015.
 }
 \keyword{datasets}

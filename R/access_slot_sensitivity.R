@@ -95,7 +95,8 @@ setMethod( f="setSensitivity",
                } else
                {
                  slot(object, "sensitivity")[[type]][, name] <- NA
-                 slot(object, "sensitivity")[[type]][, name] <- value[rownames(slot(object, "sensitivity")[[type]])]
+                 slot(object, "sensitivity")[[type]][, name] <-
+                   value[rownames(slot(object, "sensitivity")[[type]])]
                }
              } else
              {

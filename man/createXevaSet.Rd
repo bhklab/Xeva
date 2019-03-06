@@ -38,7 +38,25 @@ Returns Xeva object
 A constructor to create XevaSet. Only objects returned by this constructor
 are expected to work with the XevaSet methods.
 }
+\details{
+This function creates a XevaSet object. It takes different model
+infromation and genomic data as input. For detailed discription of all
+varaibles please see Xeva vignette section \strong{"Creating new Xeva object"}
+}
 \examples{
-NULL
+## read raw data files containg PDX experiment information and genomic data
+model = read.csv(system.file("extdata", "model.csv", package = "Xeva"))
+drug = read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
+experiment= read.csv(system.file("extdata", "experiments.csv", package = "Xeva"))
+expDesign=readRDS(system.file("extdata", "batch_list.rds", package = "Xeva"))
+RNASeq=readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))
+modToBiobaseMap=read.csv(system.file("extdata", "modelToExpressionMap.csv", package = "Xeva"))
+
+## create Xeva object
+xeva.set = createXevaSet(name="example xevaSet", model=model, drug=drug,
+                         experiment=experiment, expDesign=expDesign,
+                         molecularProfiles=list(RNASeq = RNASeq),
+                         modToBiobaseMap = modToBiobaseMap)
+print(xeva.set)
 
 }

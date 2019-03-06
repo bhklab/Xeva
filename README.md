@@ -16,3 +16,9 @@ Integrative Pharmacogenomics Analysis of Patient Derived Xenografts. Mer AS, Ba-
 library(devtools)
 devtools::install_github("bhklab/Xeva")
 ```
+- To install from Bioconductor
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("Xeva", version = "3.8")
+```

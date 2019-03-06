@@ -1,5 +1,3 @@
-##--- to calculate mRECIST --------
-
 .tumorVolumeChange <- function(volume)
 {
   Vini <- volume[1]
@@ -33,7 +31,6 @@
 
   if(dim(exdfMinAge)[1]==0)
   {
-    #exdfMinAge <- exdf
     return(rtz)
   }
 
@@ -94,7 +91,7 @@ mRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 
     if(!is.na(best.response) & !is.na(best.average.response))
     {
-      ####---- the order of mRecist assignment is really important ----------
+      ####---- the order of mRecist assignment is important ----------
       mRecist <- "PD"
 
       if(best.response <  35 & best.average.response <  30)

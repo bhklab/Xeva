@@ -35,9 +35,10 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   return(list(x=XV, y=YV))
 }
 
-.custom_cell_fun <- function(x, y, w, h, value, colPalette, backgroundCol, splitBy=";", sort=TRUE)
+.custom_cell_fun <- function(x, y, w, h, value, colPalette, backgroundCol,
+                             splitBy=";", sort=TRUE)
 {
-  factR = 01.0#950 #0.95
+  factR = 01.0
   wr=w*0.5*factR;   hr=h*0.5*factR
   x0=x-wr; x1=x+wr; y0=y-hr; y1=y+hr
   x0=convertX(x0, "npc", valueOnly = TRUE)
@@ -50,12 +51,9 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
   cordXY = getCellBoxCordi(x0,x1, y0, y1, N)
   cordXY$x = unit(cordXY$x,"npc"); cordXY$y = unit(cordXY$y,"npc")
   grid.polygon(x = cordXY$x, y = cordXY$y,
-               #id = rep(1:(N+1), each = 4),
                id = rep(seq_len(N+1), each = 4),
                gp = gpar(fill = c(NA, filCol),
-                         col = "#f0f0f0")
-                         #col = backgroundCol) #NA)
-               )
+                         col = "#f0f0f0"))
 }
 
 
@@ -105,15 +103,18 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
 
 
-.creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE, scaleCol=TRUE)
+.creatSideBarPlot <- function(mat, colPalette, splitBy=";", scaleRow=TRUE,
+                              scaleCol=TRUE)
 {
   rcDF = .calculatRowColStat(mat, splitBy, scaleRow=scaleRow, scaleCol=scaleCol)
 
   colorX = unlist(colPalette[colnames(rcDF$colSt)])
 
-  colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column", axis = TRUE, gp = grid::gpar(fill = colorX))
+  colBar = ComplexHeatmap::anno_barplot(rcDF$colSt, which = "column",
+                                        axis = TRUE, gp = grid::gpar(fill = colorX))
 
-  column_ha = ComplexHeatmap::HeatmapAnnotation(barplot = colBar, height = grid::unit(2, "cm"),
+  column_ha = ComplexHeatmap::HeatmapAnnotation(barplot = colBar,
+                                                height = grid::unit(2, "cm"),
                                 show_annotation_name = FALSE)
 
   colorX = unlist(colPalette[colnames(rcDF$rowSt)])
@@ -141,7 +142,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 
 .sortPlotMat <- function(mat, controlD, control.col, drug.col)
 {
-  ##-------first sort by number of NA -----------------------------------
+  ##-------first sort by number of NA --------------------------
   rowNa <- apply(mat, 1, function(x)sum(is.na(x)))
   colNa <- apply(mat, 2, function(x)sum(is.na(x)))
   mat <- mat[names(sort(rowNa)), names(sort(colNa))]
@@ -251,15 +252,13 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   backgroundCol = "gray"
   bgCol = rep(backgroundCol, length(nameSpc))
   splitBy <- ";"
-  sortCellValue = TRUE #FALSE
+  sortCellValue = TRUE
   sidePlt <- .creatSideBarPlot(mat, colPalette, splitBy=splitBy, scaleRow=FALSE, scaleCol=FALSE)
 
   maxRWN <- rownames(mat)[nchar(rownames(mat))==max(nchar(rownames(mat)))][1]
   rwSide <- grobWidth(textGrob(maxRWN)) + unit(0, "mm")
   pltX <- ComplexHeatmap::Heatmap(mat, name = name, col=bgCol,
                  top_annotation = sidePlt$colPlt,
-                 #top_annotation_height = unit(2, "cm"),
-
                  cluster_rows = FALSE, cluster_columns = FALSE,
                  show_row_dend = FALSE, show_row_names = TRUE,
                  row_names_side = "left", row_names_max_width = rwSide,
@@ -278,11 +277,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
   if(draw_plot==TRUE)
   {
     colVec <- unlist(colPalette)[names(colPalette)]
-    #HLeg <- legendGrob(names(colPalette), pch=22,gp=gpar(col = colVec, fill = colVec))
-
     HLeg <- Legend(at = names(colPalette), title = "", legend_gp = gpar(col = colVec, fill = colVec))
-
-    #padding = unit(c(0.01, 0.01, 0.01, 0.01), "npc")
     padding = unit(c(2,2,2,2), "mm")
     draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
 

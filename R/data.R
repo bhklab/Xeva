@@ -1,23 +1,19 @@
-# # Example dataset with 1x1x1 experiment design
-# #
-# # This is the PDXE dataset without microarray data.
-# #
-# # @format A Xeva object with 1x1x1 experiment design and molecular data.
-# # @usage data(pdxe)
-# "pdxe"
-
-
-#' Breast cancer dataset from PDXE
+#' PDXE breast cancer dataset
 #'
-#' Breast cancer dataset from PDXE.
+#' A Xeva object containing only breast cancer PDXs from the PDXE dataset
+#' For details about PDX-MI, see:
+#' Gao et al. High-throughput screening using patient-derived tumor xenografts to predict clinical trial drug response. Nature medicine, 21(11):1318, 2015.
+#' @source \url{https://www.nature.com/articles/nm.3954?draft=journal}
 #'
-#' @format A Xeva object of the PDXE breast cancer dataset.
 #' @usage data(brca)
 "brca"
 
-
-#PDXMI <- readRDS("~/CXP/PDX_MI_data/PDX-MI_table.Rda")
-#devtools::use_data(PDXMI, overwrite = T)
+#' Example PDX dataset
+#'
+#' A Xeva object containing anonymize PDX data with replicates. Each batch have 5 replicats.
+#'
+#' @usage data(repdx)
+"repdx"
 
 #' PDX-MI data
 #'
@@ -30,3 +26,5 @@
 #' @source \url{http://cancerres.aacrjournals.org/lookup/doi/10.1158/0008-5472.CAN-17-0582}
 #' @usage data(PDXMI)
 "PDXMI"
+
+

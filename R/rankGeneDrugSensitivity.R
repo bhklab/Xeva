@@ -44,13 +44,20 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   standardize <- match.arg(standardize)
 
-  colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")
-
-  drugpheno <- data.frame(sapply(drugpheno, function(x)
+  #colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")
+  colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
+  #drugpheno <- data.frame(sapply(drugpheno, function(x)
+  #{
+  #  if (!is.factor(x)) { x[is.infinite(x)] <- NA }
+  #  return(list(x))
+  #}, USE.NAMES=FALSE), check.names=FALSE)
+  drugpheno <- data.frame(vapply(drugpheno, function(x)
   {
     if (!is.factor(x)) { x[is.infinite(x)] <- NA }
     return(list(x))
-  }, USE.NAMES=FALSE), check.names=FALSE)
+  }, FUN.VALUE = list(1), USE.NAMES=FALSE),
+  check.names=FALSE)
+
 
 
   ccix <- complete.cases(x, type, batch, drugpheno)
@@ -59,8 +66,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(length(table(drugpheno)) > 2){
     if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
-      rest <- lapply(1:ncol(drugpheno), function(i){
-
+      #rest <- lapply(1:ncol(drugpheno), function(i){
+      rest <- lapply(seq_len(ncol(drugpheno)), function(i){
         est <- paste("estimate", i, sep=".")
         se <-  paste("se", i, sep=".")
         tstat <- paste("tstat", i, sep=".")
@@ -110,7 +117,9 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     xx <- x[ccix]
   }
   if(ncol(drugpheno)>1){
-    ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
+    #ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
+    ff0 <- paste("cbind(", paste(paste("drugpheno", seq_len(ncol(drugpheno)), sep="."), collapse=","), ")", sep="")
+
   } else {
     ff0 <- sprintf("drugpheno.1")
   }
@@ -209,7 +218,8 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     } else {
       if(ncol(drugpheno)>1){
         rrc <- summary(stats::manova(rr1))
-        rest <- lapply(1:ncol(drugpheno), function(i) {
+        #rest <- lapply(1:ncol(drugpheno), function(i) {
+        rest <- lapply(seq_len(ncol(drugpheno)), function(i) {
           est <- paste("estimate", i, sep=".")
           se <-  paste("se", i, sep=".")
           tstat <- paste("tstat", i, sep=".")
@@ -288,7 +298,8 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
   nn <- sum(ccix)
   if (!any(unlist(lapply(drugpheno, is.factor)))) {
     if (ncol(drugpheno) > 1) {
-      nc <- lapply(1:ncol(drugpheno), function(i) {
+      #nc <- lapply(1:ncol(drugpheno), function(i) {
+      nc <- lapply(seq_len(ncol(drugpheno)), function(i) {
         est <- paste("estimate", i, sep = ".")
         se <- paste("se", i, sep = ".")
         tstat <- paste("tstat", i, sep = ".")
@@ -320,7 +331,8 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
     else {
       splitix <- parallel::splitIndices(nx = ncol(data),
                                         ncl = nthread)
-      splitix <- splitix[sapply(splitix, length) > 0]
+      #splitix <- splitix[sapply(splitix, length) > 0]
+      splitix <- splitix[vapply(splitix, length, FUN.VALUE = numeric(1)) > 0]
       mcres <- parallel::mclapply(splitix, function(x,
                                                     data, type, batch, drugpheno, standardize) {
         res <- t(apply(data[, x, drop = FALSE], 2, geneDrugSensitivity,

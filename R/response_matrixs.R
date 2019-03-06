@@ -43,25 +43,38 @@ print.batchResponse <- function(x, ...)
 
 
 
-#' \code{setResponse} sets response of an Xeva object.
+#' set PDX response
+#'
+#' \code{setResponse} sets response of all PDXs in an Xeva object.
 #'
 #' @param object Xeva object.
-#' @param res.measure Response measure; multiple measures are allowed.
-#' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
+#' @param res.measure Response measure, multiple measures are allowed. See `Details` below
+#' @param min.time Minimum number of days for \emph{mRECIST} computation. Default \strong{10} days.
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
-#' @param max.time Maximum time for data.
-#' @param vol.normal Default \code{TRUE} will use
-#' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
+#' @param max.time Maximum number of days to consider for analysis. Data byond this will be discarded. Default \code{NULL} takes full data.
+#' @param vol.normal Default \code{TRUE} will use normalize volume.
+#' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing volume values.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
-#' @param verbose Default \code{TRUE} will print information
+#' @param verbose Default \code{TRUE} will print information.
 #'
 #' @return  Returns updated Xeva object.
 #'
+#' @details At present fellowing response measure are implemented
+#' * mRECIST Computes mRECIST for indivial PDX model
+#' * slope Computes slope of the fitted indivial PDX curve
+#' * AUC  Computes area under a PDX curve for indivial PDX model
+#' * angle Computes angle between treatment and control PDX curves
+#' * abc Computes area between the treatment and control PDX curves
+#' * TGI Computes  tumor growth inhibition using treatment and control PDX curves
+#' * lmm Computes linear mixed model (lmm) statistics for a PDX batch
+#' @md
+#'
 #' @examples
 #' data(brca)
-#' \dontrun{ brca  <- setResponse(brca, res.measure = c("mRECIST")) }
+#' brca  <- setResponse(brca, res.measure = c("mRECIST"), verbose=FALSE)
 #' @export
-setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
+setResponse <- function(object,
+                        res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
                         min.time=10, treatment.only=FALSE, max.time=NULL,
                         vol.normal=TRUE, impute.value=TRUE, concurrent.time =TRUE,
                         verbose=TRUE)
@@ -115,9 +128,6 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     }
   }
 
-  ###--------compute doubling time ---------------------------------------------
-
-
   ##----------------------------------------------------------------------------
   ##-----------------for batch -------------------------------------------------
 
@@ -125,7 +135,6 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
   if("angle" %in% res.measure)
   {
     sen$batch[, c("slope.control", "slope.treatment", "angle")] <- NA
-    #for(bid in batchNames(object))
     for(bid in batchInfo(object))
     {
       sl <- response(object, batch = bid, res.measure="angle",
@@ -141,7 +150,6 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
   if("abc" %in% res.measure)
   {
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
-    #for(bid in batchNames(object))
     for(bid in batchInfo(object))
     {
       sl <- response(object, batch = bid, res.measure="abc",
@@ -153,8 +161,7 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     }
   }
 
-###--------compute TGI for batch ---------------------------------------------
-
+  ###--------compute TGI for batch ---------------------------------------------
   if("TGI" %in% res.measure)
   {
     sen$batch[, c("TGI")] <- NA
@@ -168,6 +175,19 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
     }
   }
 
+  ###--------compute lmm for batch ---------------------------------------------
+  if("lmm" %in% res.measure)
+  {
+    sen$batch[, c("lmm")] <- NA
+    for(bid in batchInfo(object))
+    {
+      sl <- response(object, batch = bid, res.measure="lmm",
+                     treatment.only=treatment.only, max.time=max.time,
+                     impute.value=impute.value, min.time=min.time,
+                     concurrent.time=concurrent.time, verbose=verbose)
+      sen$batch[bid, c("lmm")] <- sl$value
+    }
+  }
   ##--------------code for batch level mR --------------------------------------
   ##----------------------------------------------------------------------------
 
@@ -177,12 +197,12 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 
 
 
-#' compute response
+#' compute PDX response
 #'
-#' \code{response} Computes the drug response of a PDX model or batch.
+#' \code{response} Computes the drug response of an individual PDX model or batch.
 #'
 #' @param object Xeva object.
-#' @param res.measure Drug response measure.
+#' @param res.measure Drug response measure. See `Details` below
 #' @param model.id \code{model.id} for which the durg response is to be computed.
 #' @param batch \code{batch.id} or experiment design for which the drug response is to be computed.
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
@@ -195,6 +215,16 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #'
 #' @return  Returns model or batch drug response object.
 #'
+#' @details At present fellowing response measure are implemented
+#' * mRECIST Computes mRECIST for indivial PDX model
+#' * slope Computes slope of the fitted indivial PDX curve
+#' * AUC  Computes area under a PDX curve for indivial PDX model
+#' * angle Computes angle between treatment and control PDX curves
+#' * abc Computes area between the treatment and control PDX curves
+#' * TGI Computes tumor growth inhibition using treatment and control PDX curves
+#' * lmm Computes linear mixed model (lmm) statistics for a PDX batch
+#' @md
+#'
 #' @examples
 #' data(brca)
 #' response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
@@ -206,22 +236,14 @@ setResponse <- function(object, res.measure=c("mRECIST", "slope", "AUC", "angle"
 #' response(brca, batch=ed, res.measure="angle")
 #'
 #' @export
-response <- function(object, model.id=NULL,
-                     batch=NULL,
-                     #res.measure=c("angle", "mRECIST", "AUC", "angle", "abc"),
-                     res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI"),
+response <- function(object, model.id=NULL, batch=NULL,
+                     res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
                      treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
                      min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
                      verbose=TRUE)
 {
   if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
   { stop("'model.id', 'batch' all NULL") }
-
-  model.measure <- c("mRECIST", "best.response", "best.response.time",
-                     "best.average.response", "best.average.response.time",
-                     "slope", "AUC")
-
-  batch.measure <- c("angle", "abc", "TGI")
 
   ##------------- for model ----------------------------------------------------
   if(!is.null(model.id))
@@ -253,6 +275,7 @@ response <- function(object, model.id=NULL,
     }
 
   }
+
 
   ##-----------------for batch -------------------------------------------------
   if(is.null(model.id))
@@ -296,6 +319,13 @@ response <- function(object, model.id=NULL,
     if(res.measure=="TGI")
     {
       rtx <- TGI(contr.volume, treat.volume)
+      return(rtx)
+    }
+
+    ###--------compute lmm for batch ---------------------------------------------
+    if(res.measure=="lmm")
+    {
+      rtx <- lmm(dl$model)
       return(rtx)
     }
   }

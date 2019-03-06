@@ -32,6 +32,7 @@ By default this function will return the names of all the batches present in the
 dataset. If a batch specified, it will return the experiment design (control
 and treatment model IDs) of that particular batch. If \code{model.id} is specified,
 it will return the names of all the batches where this particuler \code{model.id} is present.
+If both \code{batch} and \code{model.id} are specified, \code{batch} will take precedent.
 
 For \code{model.id.type}, the default value \code{'any'} will return all the batch IDs
 where the given model ID is present in any arm (ie. control or treatment) of the

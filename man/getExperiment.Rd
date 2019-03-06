@@ -4,8 +4,7 @@
 \name{getExperiment}
 \alias{getExperiment}
 \alias{getExperiment,XevaSet-method}
-\title{For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
-containing all the data stored in the experiment slot.}
+\title{Get PDX experiment data}
 \usage{
 getExperiment(object, model.id = NULL, batch = NULL,
   patient.id = NULL, drug = NULL, control.name = NULL,
@@ -47,13 +46,11 @@ getExperiment(object, model.id = NULL, batch = NULL,
 a \code{data.fram} will all the the values stored in experiment slot
 }
 \description{
-For a given  \code{model.id}, \code{getExperiment} will return a \code{data.frame}
-containing all the data stored in the experiment slot.
+For a given \code{model.id}, \code{getExperiment} will
 }
 \examples{
 data(brca)
 
-\dontrun{
 getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
 
 getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
@@ -64,6 +61,5 @@ ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
              control=c("X.6047.uned"))
 
 getExperiment(brca, batch=ed)
-}
 
 }
