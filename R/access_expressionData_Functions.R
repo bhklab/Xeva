@@ -64,7 +64,7 @@ getMolecularProfiles <- function(object, data.type)
   return(list(data=modIn, bioName=bioName))
 }
 #####================= Summarize Molecular Profiles ==================
-#' summarize molecular profiles
+#' Summarize molecular profiles
 #'
 #' This function serves to get molecular profiles from a \code{XevaSet} object.
 #'

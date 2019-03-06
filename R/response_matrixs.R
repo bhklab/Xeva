@@ -202,23 +202,23 @@ setResponse <- function(object,
 #' \code{response} Computes the drug response of an individual PDX model or batch.
 #'
 #' @param object Xeva object.
-#' @param res.measure Drug response measure. See `Details` below
 #' @param model.id \code{model.id} for which the durg response is to be computed.
 #' @param batch \code{batch.id} or experiment design for which the drug response is to be computed.
+#' @param res.measure Drug response measure. See `Details` below
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
-#' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
 #' @param max.time Maximum time for data.
-#' @param vol.normal Default \code{FALSE} will use
 #' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
+#' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
+#' @param vol.normal Default \code{FALSE} will use
 #' @param verbose Default \code{TRUE} will print information.
 #'
 #' @return  Returns model or batch drug response object.
 #'
-#' @details At present fellowing response measure are implemented
-#' * mRECIST Computes mRECIST for indivial PDX model
-#' * slope Computes slope of the fitted indivial PDX curve
-#' * AUC  Computes area under a PDX curve for indivial PDX model
+#' @details At present the following response measures are implemented
+#' * mRECIST Computes mRECIST for individual PDX models
+#' * slope Computes slope of the fitted individual PDX curves
+#' * AUC  Computes area under a PDX curve for individual PDX models
 #' * angle Computes angle between treatment and control PDX curves
 #' * abc Computes area between the treatment and control PDX curves
 #' * TGI Computes tumor growth inhibition using treatment and control PDX curves

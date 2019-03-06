@@ -1,4 +1,4 @@
-## given a list of datafram it will give a new datafram
+## given a list of data frames it will give a new data frame
 ## x <- data.frame(a=1:3, b= LETTERS[1:3])
 ## y <- data.frame(a=(1:3)*10, b= letters[1:3])
 ## inLst <- list(x=x, y=y)
@@ -114,11 +114,11 @@ getIndex <- function(inVec, indxOf)
 
 ##-------------------------------------------------------------------------
 ##-------------------------------------------------------------------------
-## paste a vector elements togather while removing NA
-## \code{pasteWithoutNA} paste a vector elements togather while removing NA
-## @param L A vector with values and NA
-## @param collapse Collapse string default " + "
-## @return  Returns an string with vector values paste togather
+## paste vector elements together while removing NAs
+## \code{pasteWithoutNA} paste vector elements together while removing NAs
+## @param L A vector with values and NAs
+## @param collapse Collapse string, default "+"
+## @return  Returns a string with vector values pasted together
 ## @examples
 ## L = c("A", NA, "B", NA, NA, "C")
 ## pasteWithoutNA(L, collapse = " + ")
@@ -131,7 +131,7 @@ pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = c
 # \code{pasteColTogather} paste a data.frame columns togather while removing NA
 #
 # @param df A data.frame
-# @param collapse Collapse string default " + "
+# @param collapse Collapse string, default "+"
 #
 # @return  Returns an vector of strings where column values paste togather
 #
@@ -154,7 +154,7 @@ pasteColTogather <- function(df, collapse = " + ")
 }
 
 ##-------------------
-# Function to print data.frame in massage
+# Function to print data.frame in message
 #
 # \code{printAndCapture} prints data.frame in stop or warning functions
 # @examples

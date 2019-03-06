@@ -261,7 +261,7 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
       {
         txt <-
           sprintf(
-            "multipal drugs for batch (in control arm), will colleps by ;\nDrugs are %s\n",
+            "multiple drugs for batch (in control arm), will collapse by ;\nDrugs are %s\n",
             paste0(drugAll, collapse = ",")
           )
         warning(txt)
@@ -286,7 +286,7 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
       {
         txt <-
           sprintf(
-            "multipal drugs for batch (in treatment arm), will colleps by ;\nDrugs are %s\n",
+            "multiple drugs for batch (in treatment arm), will collapse by ;\nDrugs are %s\n",
             paste0(drugAll, collapse = ",")
           )
         warning(txt)

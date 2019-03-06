@@ -62,7 +62,7 @@
   mdf <- mdf[ as.character(mdf[,"biobase.id"]) %in% colnames(molData),]
   if(nrow(mdf)==0)
   {
-    msg <- sprintf("No '%s' ids are comman in molecular data and experimental data",
+    msg <- sprintf("No '%s' ids are common in molecular data and experimental data",
                    mDataType)
     stop(msg)
   }
@@ -171,11 +171,11 @@ setMethod(f= "drugSensitivitySig",
   if(length(tissue) > 1)
   {
       if(length(tissue)!= nrow(mdfI))
-      {stop("length of type should be equeal to length of models")}
+      {stop("length of type should be equal to length of models")}
 
       if(is.null(names(tissue)))
       {
-        msg <- sprintf("'tissue' have no names. Plese provide a named list")
+        msg <- sprintf("'tissue' has no names. Please provide a named list")
         stop(msg)
       }
 

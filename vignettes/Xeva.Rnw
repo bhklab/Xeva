@@ -146,8 +146,8 @@ plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
 
 
 
-\section{Replicate based PDX experiment}
-Xeva can also handel replicate based experiment design. The datasets included in the package also contains replicate based PDX experimetns. To plot replicate based data:
+\section{Replicate-based PDX experiments}
+Xeva can also handle replicate-based experiment design. The datasets included in the package also contain replicate-based PDX experiments. To plot replicate-based data:
 <<repplot1, fig.cap="Tumor growth curves for a batch of control and treated PDXs with replicates", out.width='4in', fig.wide=TRUE>>=
 data("repdx")
 plotPDX(repdx, vol.normal = TRUE, batch = "P1")
@@ -199,16 +199,16 @@ waterfall(brca, drug="BYL719", res.measure="best.average.response",
 @
 
 \section{Creating new Xeva object}
-Using the \textit{createXevaSet} new Xeva object can be created. The different components that are needed by the function is as fellowes-
+New Xeva objects can be created using \textit{createXevaSet}. The different components that are needed by the function is as follows:
 
 
 \begin{description}
 \setlength\itemsep{2em}
 
 \item[model]
-A data.frame containig \textbf{model.id} and other relaevent
-model information such as tissue type origin patient id and passage information.
-All \textbf{PDXMI} variables can be inserted in this data.frame.
+A data.frame containing \textbf{model.id} and other relevant
+model information, such as tissue of origin, patient ID, and passage information.
+All \textbf{PDXMI} variables can be inserted into this data.frame.
 A required column in the data.frame is \textbf{model.id}.
 An example of the \textbf{model} can be found in the package as:
 <<x1>>=
@@ -217,18 +217,18 @@ head(model)
 @
 
 \item[drug]
-A data.frame containg information about the drugs used in the experimetns.
+A data.frame containing information about the drugs used in the experiments.
 The required column is \textbf{drug.id}.
 An example of the \textbf{drug} can be found in the package as:
 <<x2>>=
-drug = read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
+drug=read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
 head(drug)
 @
 
 \item[experiment]
-A data.frame with time vs. tumore volumn infroamtion.
-The required columns are \textbf{model.id}, \textbf{time}, \textbf{volume} and \textbf{drug}.
-Other avaliable information such as dose amount and mouse weight can be specified as column of this data.frame .
+A data.frame with time vs. tumor volume information.
+The required columns are \textbf{model.id}, \textbf{time}, \textbf{volume}, and \textbf{drug}.
+Other avaliable information such as dose amount and mouse weight can be specified as columns of this data.frame .
 An example of the \textbf{experiment} can be found in the package as:
 <<x3>>=
 experiment=read.csv(system.file("extdata","experiments.csv",package="Xeva"))
@@ -236,7 +236,7 @@ head(experiment)
 @
 
 \item[expDesign]
-This is a R \textbf{list} object that contains the batch information.
+This is an R \textbf{list} object that contains the batch information.
 Each element of the list should have 3 components \textbf{batch.name},
 \textbf{treatment} and \textbf{control}.
 The model.ids in the treatment and control must be present in \textbf{model} variable described earlier.
@@ -247,17 +247,17 @@ expDesign[[1]]
 @
 
 \item[molecularProfiles]
-This list contains all the moleculer data such as RNAseq or mutation information.
-Each element of this list should contin \textbf{ExpressionSet} object.
-An example of such object is:
+This list contains all the molecular data such as RNAseq or mutation information.
+Each element of this list should contain an \textbf{ExpressionSet} object.
+An example of such an object is:
 <<x5>>=
 RNASeq=readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))
 print(RNASeq)
 @
 
 \item[modToBiobaseMap]
-It is a data.frame which contains mapping between PDX model.id and the molecularProfiles sample names.
-It requires 3 variables \textbf{model.id}, \textbf{biobase.id} and \textbf{mDataType}.
+A data.frame which contains mapping between the PDX model.id and the molecularProfiles sample names.
+It requires 3 variables: \textbf{model.id}, \textbf{biobase.id}, and \textbf{mDataType}.
 An example of modToBiobaseMap is:
 <<x6>>=
 modToBiobaseMap=read.csv(system.file("extdata","modelToExpressionMap.csv",

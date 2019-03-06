@@ -108,13 +108,13 @@ waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
   {
     vx <- vx[vx$x%in%model.id, ]
     if(nrow(vx)==0)
-    { msg <- sprintf("given model.id are not present in the objcect\n") }
+    { msg <- sprintf("given model.id are not present in the object\n") }
   }
 
   if(!is.null(model.type))
   {
     if(is.null(model.id))
-    { stop("specifying 'model.id' is nesseary for 'model.type'") }
+    { stop("specifying 'model.id' is necessary for 'model.type'") }
     vx[model.id, "type"] <- model.type
   }
 

@@ -179,7 +179,7 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
                        concurrent.time = concurrent.time)
   if(is.null(dfx$dose))
   {
-    warning("no dose infromation present! assuming dose = 1")
+    warning("no dose information present! assuming dose = 1")
     dfx$dose <- 1
   }
 

@@ -175,12 +175,12 @@ XevaSet <- setClass(
 #' @param drug A \code{data.frame} containing the annotations for all the drugs
 #'   profiled in the dataset, across all data types.
 #' @param experiment A \code{data.frame} containing all experiment information.
-#' @param expDesign a list containing name of the batch, control and treatment model.id
-#' @param modelSensitivity data.fram containg sensitivity for each model
-#' @param batchSensitivity data.fram containg sensitivity for each batch
+#' @param expDesign A list containing name of the batch, control and treatment model.id
+#' @param modelSensitivity A \code{data.frame} containing sensitivity for each model
+#' @param batchSensitivity A \code{data.frame} containing sensitivity for each batch
 #' @param molecularProfiles A \code{list} of \code{ExpressionSet} objects containing
 #'   different molecular profiles.
-#' @param modToBiobaseMap a data.fram containg model.id corresponding Biobase object id and name of the molecularProfiles
+#' @param modToBiobaseMap A \code{data.frame} containing model.id corresponding Biobase object id and name of the molecularProfiles
 #'
 #' @return  Returns Xeva object
 #'
@@ -248,7 +248,7 @@ createXevaSet <- function(name,
 
 #' A method to display object
 #' for "show" setGeneric is already defined.
-#' @param object a xeva object
+#' @param object A Xeva object
 #' @import methods
 #' @noRd
 setMethod(

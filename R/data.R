@@ -10,7 +10,7 @@
 
 #' Example PDX dataset
 #'
-#' A Xeva object containing anonymize PDX data with replicates. Each batch have 5 replicats.
+#' A Xeva object containing anonymous PDX data with replicates. Each batch has 5 replicates.
 #'
 #' @usage data(repdx)
 "repdx"

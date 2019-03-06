@@ -1,6 +1,6 @@
 ##====copy from PharmacoGx
 
-#### Copyright Benjamin Haibe Kains, adapted from the genefu package
+#### Copyright Benjamin Haibe-Kains, adapted from the genefu package
 
 `rescale` <-
   function(x, na.rm=FALSE, q=0) {

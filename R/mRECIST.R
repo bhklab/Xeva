@@ -91,7 +91,7 @@ mRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
 
     if(!is.na(best.response) & !is.na(best.average.response))
     {
-      ####---- the order of mRecist assignment is important ----------
+      ####---- the order of mRECIST assignment is important ----------
       mRecist <- "PD"
 
       if(best.response <  35 & best.average.response <  30)
