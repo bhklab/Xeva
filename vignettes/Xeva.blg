@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: Xeva.aux
+The style file: /home/arvind/.R/x86_64-pc-linux-gnu-library/3.4/BiocStyle/resources/tex/unsrturl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: XevaBiblio.bib
+You've used 2 entries,
+            2522 wiz_defined-function locations,
+            582 strings with 5420 characters,
+and the built_in function-call counts, 902 in all, are:
+= -- 66
+> -- 71
+< -- 0
++ -- 23
+- -- 21
+* -- 74
+:= -- 165
+add.period$ -- 7
+call.type$ -- 2
+change.case$ -- 2
+chr.to.int$ -- 0
+cite$ -- 2
+duplicate$ -- 19
+empty$ -- 72
+format.name$ -- 21
+if$ -- 218
+int.to.chr$ -- 0
+int.to.str$ -- 2
+missing$ -- 2
+newline$ -- 14
+num.names$ -- 2
+pop$ -- 12
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 55
+stack$ -- 0
+substring$ -- 12
+swap$ -- 6
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 3
+width$ -- 3
+write$ -- 27
