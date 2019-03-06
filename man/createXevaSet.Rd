@@ -20,16 +20,16 @@ profiled in the dataset, across all data types.}
 
 \item{experiment}{A \code{data.frame} containing all experiment information.}
 
-\item{expDesign}{a list containing name of the batch, control and treatment model.id}
+\item{expDesign}{A list containing name of the batch, control and treatment model.id}
 
-\item{modelSensitivity}{data.fram containg sensitivity for each model}
+\item{modelSensitivity}{A \code{data.frame} containing sensitivity for each model}
 
-\item{batchSensitivity}{data.fram containg sensitivity for each batch}
+\item{batchSensitivity}{A \code{data.frame} containing sensitivity for each batch}
 
 \item{molecularProfiles}{A \code{list} of \code{ExpressionSet} objects containing
 different molecular profiles.}
 
-\item{modToBiobaseMap}{a data.fram containg model.id corresponding Biobase object id and name of the molecularProfiles}
+\item{modToBiobaseMap}{A \code{data.frame} containing model.id corresponding Biobase object id and name of the molecularProfiles}
 }
 \value{
 Returns Xeva object

@@ -2,7 +2,7 @@
 % Please edit documentation in R/access_expressionData_Functions.R
 \name{summarizeMolecularProfiles}
 \alias{summarizeMolecularProfiles}
-\title{summarize molecular profiles}
+\title{Summarize molecular profiles}
 \usage{
 summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
   sensitivity.measure = NULL, unique.model = TRUE, batch = NULL)

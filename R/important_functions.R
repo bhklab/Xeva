@@ -122,26 +122,10 @@ getIndex <- function(inVec, indxOf)
 ## @examples
 ## L = c("A", NA, "B", NA, NA, "C")
 ## pasteWithoutNA(L, collapse = " + ")
-pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)], collapse = collapse)}
+pasteWithoutNA <- function(L, collapse = " + "){paste(L[!is.na(L)],
+                                                      collapse = collapse)}
 
-##-----------------------------------------------------------------------
-##-----------------------------------------------------------------------
-# paste a data.frame columns togather while removing NA
-#
-# \code{pasteColTogather} paste a data.frame columns togather while removing NA
-#
-# @param df A data.frame
-# @param collapse Collapse string, default "+"
-#
-# @return  Returns an vector of strings where column values paste togather
-#
-# @examples
-# df = data.frame(x= 1:6, y = c("A", NA, "B", NA, NA, "C"))
-# pasteColTogather(df, collapse = " + ")
-pasteColTogather <- function(df, collapse = " + ")
-{
-  apply(df, 1, pasteWithoutNA, collapse =collapse)
-}
+
 
 ##------------------------------------------------------------------------
 ##--- this will creat empty theme for ggplot -----------------------------

@@ -52,6 +52,16 @@ plotPDX(brca, batch = "X-4567.BKM120", vol.normal = TRUE, control.col = "#a6611a
 ## ----pdxplot3, fig.cap="Tumor growth curves for a batch of control and treated PDXs generated using patient ID and drug name", out.width='4in', fig.wide=TRUE----
 plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
 
+## ----repplot1, fig.cap="Tumor growth curves for a batch of control and treated PDXs with replicates", out.width='4in', fig.wide=TRUE----
+data("repdx")
+plotPDX(repdx, vol.normal = TRUE, batch = "P1")
+
+## ----repplot2, fig.cap="Errorbar visualization for tumor growth curves of a PDX batch", out.width='4in', fig.wide=TRUE----
+plotPDX(repdx, batch = "P3", SE.plot = "errorbar")
+
+## ----repplot3, fig.cap="Ribbon visualization for tumor growth curves of a PDX batch", out.width='4in', fig.wide=TRUE----
+plotPDX(repdx, batch = "P4", vol.normal = TRUE,  SE.plot = "ribbon")
+
 ## ----l4--------------------------------------------------------------------
 brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
 brca.mr[1:5, 1:4]
@@ -78,7 +88,7 @@ model=read.csv(system.file("extdata", "model.csv", package = "Xeva"))
 head(model)
 
 ## ----x2--------------------------------------------------------------------
-drug = read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
+drug=read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
 head(drug)
 
 ## ----x3--------------------------------------------------------------------
