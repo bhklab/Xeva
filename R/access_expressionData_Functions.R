@@ -9,6 +9,7 @@
 #' @examples
 #' data(brca)
 #' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
+#' @export
 getMolecularProfiles <- function(object, data.type)
 {
   if(is.element(data.type, names(slot(object, "molecularProfiles")))==FALSE)
