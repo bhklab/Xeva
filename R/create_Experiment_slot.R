@@ -161,7 +161,7 @@ experimentSlotfromDf <- function(experiment)
   if(length(doseColsName)==0)
   {
     msg = sprintf("No dose column found\n")
-    warning(msg)
+    #warning(msg)
   }
 
   standardCols <- unique(unlist(c(requredCols, doseColsName, "width","length",
