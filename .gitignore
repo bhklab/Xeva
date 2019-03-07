@@ -16,7 +16,8 @@ vignettes/*.toc
 vignettes/*.tex
 vignettes/*.pdf
 vignettes/*.blb
-
+vignettes/*.R
+vignettes/*.bbl
 
 ##ignore vignette tmp files
 vignettes/tmp*
