@@ -26,6 +26,6 @@ Imports:
   grid,
   nlme,
   PharmacoGx
-Depends: R (>= 3.6)
+Depends: R (>= 3.5)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues

@@ -212,7 +212,7 @@ compute_association <-
               feature = gn,
               ci = res[[gn]]$cindex,
               p.value = res[[gn]]$p.value,
-              stringsAsFactors = F
+              stringsAsFactors = FALSE
             )
           )
         }
@@ -237,7 +237,7 @@ compute_association <-
               feature = gn,
               cor = res[[gn]]$cor,
               p.value = res[[gn]]$p.value,
-              stringsAsFactors = F
+              stringsAsFactors = FALSE
             )
           )
         }
