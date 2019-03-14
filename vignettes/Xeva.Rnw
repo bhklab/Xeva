@@ -217,9 +217,9 @@ response(repdx, batch="P1", res.measure="lmm")
 
 
 \section{Gene-drug association}
-The main aim of the pharmacogenomic experiemts is to find biomarkers for drug response prediction.
-Xeva package provides \textbf{\textcolor{red}{drugSensitivitySig}} function to compute univariate association between PDX's moleculer data (such as gene expression) and response to a drug (gene-drug association). In the example bellow, we are computing the association between gene expression (RNASeq)
-and slope of the PDXs for the drug `tamoxifen` using leanir regression (lm).
+The main aim of the pharmacogenomic experiments is to find biomarkers for drug response prediction.
+The Xeva package provides the \textbf{\textcolor{red}{drugSensitivitySig}} function to compute the univariate association between PDX's molecular data (such as gene expression) and response to a drug (gene-drug association). In the example bellow, we are computing the association between gene expression (RNASeq)
+and slope of the PDXs for the drug `tamoxifen` using linear regression (lm).
 
 <<biomarker1>>=
 data(brca)
@@ -228,14 +228,14 @@ drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
 @
 
 In this above example we took only 5 features (genes), however this can be
-extended for any number of genes. For the large analysis, function also provides
-out of box parall computation. User can set number of cores using the parameter
+extended for any number of genes. For larger analyses, this function also provides
+out of box parallel computation. Users can set the number of cores using the parameter
 \textbf{\textcolor{red}{nthread}} in the function.
 
-User can choose different sensitivity measures of the PDX response for the
-association analysis by setting the paramert \textbf{\textcolor{red}{sensitivity.measure}}.
-For example, bellow we use \textit{\textcolor{red}{best.average.response}} as
-the PDXs reponse matrix in the association analysis:
+Users can choose different sensitivity measures of the PDX response for the
+association analysis by setting the parameter \textbf{\textcolor{red}{sensitivity.measure}}.
+For example, below we use \textit{\textcolor{red}{best.average.response}} as
+the PDX's response matrix in the association analysis:
 <<biomarker2>>=
 data(brca)
 drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
@@ -244,9 +244,9 @@ drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
 @
 
 
-For the drug-gene association analysis, user can also choose a different method
-of association calcuation (such as concordance index, Pearson or Spearman
-correlation) by setting the paramert \textit{\textcolor{red}{fit}}.
+For the drug-gene association analysis, users can also choose a different method
+of association calculation (such as concordance index, Pearson or Spearman
+correlation) by setting the parameter \textit{\textcolor{red}{fit}}.
 <<biomarker3, warning=FALSE>>=
 data(brca)
 drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
