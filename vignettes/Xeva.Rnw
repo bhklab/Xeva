@@ -198,6 +198,63 @@ waterfall(brca, drug="BYL719", res.measure="best.average.response",
 
 @
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In Xeva we have implemented differnece matrix to compute PDX response.
+The Xeva function \textbf{\textcolor{red}{\hl{response}}} provides a unified interface for this purpose.
+In the example below we compute the angle between treatment and control PDXs
+
+<<response1>>=
+data("repdx")
+response(repdx, batch="P1", res.measure="angle")
+@
+
+A function for linear mixed-effects model (lmm) has also been implemented.
+<<response2>>=
+data("repdx")
+response(repdx, batch="P1", res.measure="lmm")
+@
+
+
+
+\section{Gene-drug association}
+The main aim of the pharmacogenomic experiemts is to find biomarkers for drug response prediction.
+Xeva package provides \textbf{\textcolor{red}{drugSensitivitySig}} function to compute univariate association between PDX's moleculer data (such as gene expression) and response to a drug (gene-drug association). In the example bellow, we are computing the association between gene expression (RNASeq)
+and slope of the PDXs for the drug `tamoxifen` using leanir regression (lm).
+
+<<biomarker1>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5), sensitivity.measure="slope", fit="lm")
+@
+
+In this above example we took only 5 features (genes), however this can be
+extended for any number of genes. For the large analysis, function also provides
+out of box parall computation. User can set number of cores using the parameter
+\textbf{\textcolor{red}{nthread}} in the function.
+
+User can choose different sensitivity measures of the PDX response for the
+association analysis by setting the paramert \textbf{\textcolor{red}{sensitivity.measure}}.
+For example, bellow we use \textit{\textcolor{red}{best.average.response}} as
+the PDXs reponse matrix in the association analysis:
+<<biomarker2>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5),
+                   sensitivity.measure="best.average.response", fit = "lm")
+@
+
+
+For the drug-gene association analysis, user can also choose a different method
+of association calcuation (such as concordance index, Pearson or Spearman
+correlation) by setting the paramert \textit{\textcolor{red}{fit}}.
+<<biomarker3, warning=FALSE>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5),
+                   sensitivity.measure="best.average.response", fit="pearson")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Creating new Xeva object}
 New Xeva objects can be created using \textit{createXevaSet}. The different components that are needed by the function is as follows:
 
