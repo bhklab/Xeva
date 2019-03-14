@@ -4,6 +4,7 @@
 .Ruserdata
 .Rbuildignore
 Xeva.Rproj
+R/.DS_Store
 
 ##ignore vignette files
 vignettes/*.aux
