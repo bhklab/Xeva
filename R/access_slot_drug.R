@@ -3,13 +3,13 @@
 #'
 #' @examples
 #' data(brca)
-#' head(drugInfo(brca))
+#' head(drugInform(brca))
 #' @param object The \code{XevaSet} to retrieve drug information from.
 #' @return A \code{data.frame} with the drug annotations.
-setGeneric(name = "drugInfo", def = function(object) {standardGeneric("drugInfo")} )
+setGeneric(name = "drugInform", def = function(object) {standardGeneric("drugInform")} )
 
-#' @rdname drugInfo
+#' @rdname drugInform
 #' @export
-setMethod( f=drugInfo, signature="XevaSet",
+setMethod( f=drugInform, signature="XevaSet",
            definition=function(object)
              { slot(object, "drug") } )

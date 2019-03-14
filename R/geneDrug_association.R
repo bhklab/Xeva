@@ -135,6 +135,7 @@ getCor <- function(p, q, method = c("pearson", "spearman"))
 
 #' @import doParallel
 #' @import parallel
+#' @import PharmacoGx
 compute_association <-
   function(x,
            y,
@@ -164,16 +165,21 @@ compute_association <-
 
     if (fit == "lm")
     {
-      rr <- rankGeneDrugSensitivity(
-        data = x,
-        drugpheno = y,
-        type = type,
-        batch = rep("batch", length(y)),
-        single.type = FALSE,
-        standardize = standardize,
-        nthread = nthread,
-        verbose = verbose
-      )
+      # rr <- rankGeneDrugSensitivity(
+      #   data = x,
+      #   drugpheno = y,
+      #   type = type,
+      #   batch = rep("batch", length(y)),
+      #   single.type = FALSE,
+      #   standardize = standardize,
+      #   nthread = nthread,
+      #   verbose = verbose
+      # )
+
+      rr <- PharmacoGx:::rankGeneDrugSensitivity(data = x, drugpheno = y,
+                                                 type = type,
+        batch = rep("batch", length(y)), single.type = FALSE,
+        standardize = standardize, nthread = nthread, verbose = verbose )
 
       rr <- data.frame(rr[[1]], stringsAsFactors = FALSE)
       rr$feature <- colnames(x)
