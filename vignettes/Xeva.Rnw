@@ -199,7 +199,7 @@ waterfall(brca, drug="BYL719", res.measure="best.average.response",
 @
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In Xeva we have implemented differnece matrix to compute PDX response.
+In Xeva we have implemented difference matrix to compute PDX response.
 The Xeva function \textbf{\textcolor{red}{\hl{response}}} provides a unified interface for this purpose.
 In the example below we compute the angle between treatment and control PDXs
 
