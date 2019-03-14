@@ -6,8 +6,8 @@
 \usage{
 setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
   "abc", "TGI", "lmm"), min.time = 10, treatment.only = FALSE,
-  max.time = NULL, vol.normal = TRUE, impute.value = TRUE,
-  concurrent.time = TRUE, verbose = TRUE)
+  max.time = NULL, vol.normal = FALSE, impute.value = TRUE,
+  concurrent.time = TRUE, log.volume = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object.}
@@ -20,11 +20,13 @@ setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
 
 \item{max.time}{Maximum number of days to consider for analysis. Data byond this will be discarded. Default \code{NULL} takes full data.}
 
-\item{vol.normal}{Default \code{TRUE} will use normalize volume.}
+\item{vol.normal}{If TRUE it will will normalize the volume. Default \code{FALSE}}
 
 \item{impute.value}{Default \code{FALSE}. If \code{TRUE}, impute the missing volume values.}
 
 \item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
+
+\item{log.volume}{If TRUE log of the volume will be used for response calculation. Default \code{FALSE}}
 
 \item{verbose}{Default \code{TRUE} will print information.}
 }
