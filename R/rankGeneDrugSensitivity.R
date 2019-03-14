@@ -44,21 +44,24 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 
   standardize <- match.arg(standardize)
 
-  #colnames(drugpheno) <- paste("drugpheno", 1:ncol(drugpheno), sep=".")
   colnames(drugpheno) <- paste("drugpheno", seq_len(ncol(drugpheno)), sep=".")
-  #drugpheno <- data.frame(sapply(drugpheno, function(x)
+
+  #if(1==1)
   #{
-  #  if (!is.factor(x)) { x[is.infinite(x)] <- NA }
-  #  return(list(x))
-  #}, USE.NAMES=FALSE), check.names=FALSE)
+  #  drugpheno <- data.frame(sapply(drugpheno, function(x)
+  #  {
+  #   if (!is.factor(x)) { x[is.infinite(x)] <- NA }
+  #   return(list(x))
+  #  }, USE.NAMES=FALSE), check.names=FALSE)
+  #}
+
+  ####---- to replace the sapply -----------
   drugpheno <- data.frame(vapply(drugpheno, function(x)
-  {
-    if (!is.factor(x)) { x[is.infinite(x)] <- NA }
-    return(list(x))
-  }, FUN.VALUE = list(1), USE.NAMES=FALSE),
-  check.names=FALSE)
-
-
+    {
+      if (!is.factor(x)) { x[is.infinite(x)] <- NA }
+      return(list(x))
+    }, FUN.VALUE = list(1), USE.NAMES=TRUE),
+    check.names=FALSE)
 
   ccix <- complete.cases(x, type, batch, drugpheno)
   nn <- sum(ccix)
@@ -66,7 +69,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
   if(length(table(drugpheno)) > 2){
     if(ncol(drugpheno)>1){
       ##### FIX NAMES!!!
-      #rest <- lapply(1:ncol(drugpheno), function(i){
       rest <- lapply(seq_len(ncol(drugpheno)), function(i){
         est <- paste("estimate", i, sep=".")
         se <-  paste("se", i, sep=".")
@@ -117,7 +119,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     xx <- x[ccix]
   }
   if(ncol(drugpheno)>1){
-    #ff0 <- paste("cbind(", paste(paste("drugpheno", 1:ncol(drugpheno), sep="."), collapse=","), ")", sep="")
     ff0 <- paste("cbind(", paste(paste("drugpheno", seq_len(ncol(drugpheno)), sep="."), collapse=","), ")", sep="")
 
   } else {
@@ -218,7 +219,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
     } else {
       if(ncol(drugpheno)>1){
         rrc <- summary(stats::manova(rr1))
-        #rest <- lapply(1:ncol(drugpheno), function(i) {
         rest <- lapply(seq_len(ncol(drugpheno)), function(i) {
           est <- paste("estimate", i, sep=".")
           se <-  paste("se", i, sep=".")
@@ -239,19 +239,6 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
       }
     }
 
-
-    #    rest <- c("estimate"=rr$coefficients["x", "Estimate"], "se"=rr$coefficients["x", "Std. Error"], "n"=nn, "tsat"=rr$coefficients["x", "t value"], "fstat"=rrc$F[2], "pvalue"=rrc$'Pr(>F)'[2])
-
-    #   names(rest) <- c("estimate", "se", "n", "tstat", "fstat", "pvalue")
-
-    ## add tissue type/cell line statistics
-    #     if(length(sort(unique(type))) > 1) {
-    #       rr <- summary(rr0)
-    #       ttype <- c("type.fstat"=rr$fstatistic["value"], "type.pvalue"=pf(q=rr$fstatistic["value"], df1=rr$fstatistic["numdf"], df2=rr$fstatistic["dendf"], lower.tail=FALSE))
-    #       names(ttype) <- c("type.fstat", "type.pvalue")
-    #     } else { ttype <- c("type.fstat"=NA, "type.pvalue"=NA) }
-    #     rest <- c(rest, ttype)
-    ## add model
     if(model) { rest <- list("stats"=rest, "model"=rr1) }
   }
   return(rest)
@@ -262,7 +249,7 @@ geneDrugSensitivity <- function(x, type, batch, drugpheno, interaction.typexgene
 #' @import doParallel
 #' @import parallel
 rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type = FALSE,
-          standardize = "SD", nthread = 1, verbose = FALSE)
+                                     standardize = "SD", nthread = 1, verbose = FALSE)
 {
   if (nthread != 1) {
     availcore <- parallel::detectCores()
@@ -298,7 +285,6 @@ rankGeneDrugSensitivity <- function (data, drugpheno, type, batch, single.type =
   nn <- sum(ccix)
   if (!any(unlist(lapply(drugpheno, is.factor)))) {
     if (ncol(drugpheno) > 1) {
-      #nc <- lapply(1:ncol(drugpheno), function(i) {
       nc <- lapply(seq_len(ncol(drugpheno)), function(i) {
         est <- paste("estimate", i, sep = ".")
         se <- paste("se", i, sep = ".")

@@ -52,9 +52,10 @@ print.batchResponse <- function(x, ...)
 #' @param min.time Minimum number of days for \emph{mRECIST} computation. Default \strong{10} days.
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
 #' @param max.time Maximum number of days to consider for analysis. Data byond this will be discarded. Default \code{NULL} takes full data.
-#' @param vol.normal Default \code{TRUE} will use normalize volume.
+#' @param vol.normal If TRUE it will will normalize the volume. Default \code{FALSE}
 #' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing volume values.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
+#' @param log.volume If TRUE log of the volume will be used for response calculation. Default \code{FALSE}
 #' @param verbose Default \code{TRUE} will print information.
 #'
 #' @return  Returns updated Xeva object.
@@ -76,8 +77,8 @@ print.batchResponse <- function(x, ...)
 setResponse <- function(object,
                         res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
                         min.time=10, treatment.only=FALSE, max.time=NULL,
-                        vol.normal=TRUE, impute.value=TRUE, concurrent.time =TRUE,
-                        verbose=TRUE)
+                        vol.normal=FALSE, impute.value=TRUE, concurrent.time =TRUE,
+                        log.volume=FALSE, verbose=TRUE)
 {
   sen <- slot(object, "sensitivity")
 
@@ -93,7 +94,9 @@ setResponse <- function(object,
       mr <- response(object, model.id=mid, res.measure="mRECIST",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE, verbose=verbose)
+                     concurrent.time=FALSE,
+                     vol.normal=vol.normal,
+                     log.volume=log.volume, verbose=verbose)
       for(si in vl2compute)
       { sen$model[mid, si] <- mr[[si]] }
     }
@@ -108,7 +111,9 @@ setResponse <- function(object,
       sl <- response(object, model.id=mid, res.measure="slope",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE, verbose=verbose)
+                     concurrent.time=FALSE,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
       sen$model[mid, "slope"] <- sl$value #$slope
     }
   }
@@ -123,7 +128,9 @@ setResponse <- function(object,
       auc <- response(object, model.id=mid, res.measure="AUC",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE, verbose=verbose)
+                     concurrent.time=FALSE,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
       sen$model[mid, "AUC"] <- auc$value
     }
   }
@@ -140,7 +147,9 @@ setResponse <- function(object,
       sl <- response(object, batch = bid, res.measure="angle",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time, verbose=verbose)
+                     concurrent.time=concurrent.time,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
       sen$batch[bid, c("slope.control", "slope.treatment", "angle")] <-
         c(sl$control$value, sl$treatment$value, sl$value)
     }
@@ -155,7 +164,9 @@ setResponse <- function(object,
       sl <- response(object, batch = bid, res.measure="abc",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time, verbose=verbose)
+                     concurrent.time=concurrent.time,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
       sen$batch[bid, c("auc.control", "auc.treatment", "abc")] <-
         c(sl$control$value, sl$treatment$value, sl$value)
     }
@@ -170,7 +181,9 @@ setResponse <- function(object,
       sl <- response(object, batch = bid, res.measure="TGI",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time, verbose=verbose)
+                     concurrent.time=concurrent.time,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
       sen$batch[bid, c("TGI")] <- sl$value
     }
   }
@@ -184,7 +197,9 @@ setResponse <- function(object,
       sl <- response(object, batch = bid, res.measure="lmm",
                      treatment.only=treatment.only, max.time=max.time,
                      impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time, verbose=verbose)
+                     concurrent.time=concurrent.time,
+                     vol.normal=vol.normal,
+                     log.volume=log.volume, verbose=verbose)
       sen$batch[bid, c("lmm")] <- sl$value
     }
   }
@@ -210,7 +225,8 @@ setResponse <- function(object,
 #' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
 #' @param min.time Default \strong{10} days. Used for \emph{mRECIST} computation.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
-#' @param vol.normal Default \code{FALSE} will use
+#' @param vol.normal If TRUE it will normalize the volume. Default \code{FALSE}.
+#' @param log.volume If TRUE log of the volume will be used for response calculation. Default \code{FALSE}
 #' @param verbose Default \code{TRUE} will print information.
 #'
 #' @return  Returns model or batch drug response object.
@@ -240,7 +256,7 @@ response <- function(object, model.id=NULL, batch=NULL,
                      res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
                      treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
                      min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
-                     verbose=TRUE)
+                     log.volume=FALSE, verbose=TRUE)
 {
   if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
   { stop("'model.id', 'batch' all NULL") }
@@ -250,7 +266,7 @@ response <- function(object, model.id=NULL, batch=NULL,
   {
     dl <- getExperiment(object, model.id=model.id[1], treatment.only=treatment.only,
                         max.time=max.time, vol.normal=vol.normal,
-                        impute.value=impute.value)
+                        log.volume=log.volume, impute.value=impute.value)
 
     ###--------compute mRECIST -------------------------------------------------
     if(any(c("mRECIST", "best.response", "best.average.response") %in% res.measure))

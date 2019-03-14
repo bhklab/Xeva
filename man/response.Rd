@@ -8,7 +8,7 @@ response(object, model.id = NULL, batch = NULL,
   res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI",
   "lmm"), treatment.only = FALSE, max.time = NULL,
   impute.value = TRUE, min.time = 10, concurrent.time = TRUE,
-  vol.normal = FALSE, verbose = TRUE)
+  vol.normal = FALSE, log.volume = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{object}{Xeva object.}
@@ -29,7 +29,9 @@ response(object, model.id = NULL, batch = NULL,
 
 \item{concurrent.time}{Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.}
 
-\item{vol.normal}{Default \code{FALSE} will use}
+\item{vol.normal}{If TRUE it will normalize the volume. Default \code{FALSE}.}
+
+\item{log.volume}{If TRUE log of the volume will be used for response calculation. Default \code{FALSE}}
 
 \item{verbose}{Default \code{TRUE} will print information.}
 }

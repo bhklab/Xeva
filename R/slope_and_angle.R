@@ -23,7 +23,7 @@ slope <- function(time, volume, degree=TRUE)
   df <- df[is.finite(df$volume),]
 
   df$time  <- df$time- df$time[1]
-  df$volume<- df$volume- df$volume[1]
+  df$volume<- df$volume-df$volume[1]
 
   fit <- lm(volume~time +0, df)
   ang <- atan(coef(fit)[["time"]])

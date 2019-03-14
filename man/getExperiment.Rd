@@ -9,13 +9,14 @@
 getExperiment(object, model.id = NULL, batch = NULL,
   patient.id = NULL, drug = NULL, control.name = NULL,
   treatment.only = FALSE, max.time = NULL, vol.normal = FALSE,
-  return.list = FALSE, impute.value = FALSE, concurrent.time = FALSE)
+  log.volume = FALSE, return.list = FALSE, impute.value = FALSE,
+  concurrent.time = FALSE)
 
 \S4method{getExperiment}{XevaSet}(object, model.id = NULL,
   batch = NULL, patient.id = NULL, drug = NULL,
   control.name = NULL, treatment.only = FALSE, max.time = NULL,
-  vol.normal = FALSE, return.list = FALSE, impute.value = FALSE,
-  concurrent.time = FALSE)
+  vol.normal = FALSE, log.volume = FALSE, return.list = FALSE,
+  impute.value = FALSE, concurrent.time = FALSE)
 }
 \arguments{
 \item{object}{The \code{XevaSet} object.}
@@ -28,13 +29,15 @@ getExperiment(object, model.id = NULL, batch = NULL,
 
 \item{drug}{Name of the drug.}
 
-\item{control.name}{Default \code{NULL}.}
+\item{control.name}{Name of drug used as control. Default \code{NULL}.}
 
 \item{treatment.only}{Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).}
 
 \item{max.time}{Maximum time for data.}
 
-\item{vol.normal}{Default \code{TRUE} will use}
+\item{vol.normal}{If TRUE it will normalize the volume. Default \code{FALSE}.}
+
+\item{log.volume}{If TRUE log of the volume will be used. Default \code{FALSE}.}
 
 \item{return.list}{Default \code{FALSE} will return a \code{data.frame}.}
 

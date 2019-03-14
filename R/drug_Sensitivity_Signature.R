@@ -73,7 +73,7 @@
 }
 
 ##====== drugSensitivitySig for one drug ==========================
-#' Shows drug sensitivity values
+#' get drug sensitivity values
 #'
 #' @description
 #' Given a Xeva object and drug name, this function will return sensitivity values for all the genes/features.
@@ -86,8 +86,8 @@
 #' @param model.ids Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.
 #' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
 #' @param sensitivity.measure Name of the sensitivity measure.
-#' @param fit Default \code{lm}.
-#' @param standardize Default \code{SD}. Name of the method to use for data standardization befor fitting.
+#' @param fit Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman' . Default \code{lm}.
+#' @param standardize Default \code{SD}. Name of the method to use for data standardization before fitting.
 #' @param nthread number of threads
 #' @param tissue tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
 #' @param verbose Default \code{TRUE} will show information
@@ -99,32 +99,32 @@
 #' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
 #'                              mDataType="RNASeq", features=c(1,2,3,4,5),
 #'                              sensitivity.measure="slope", fit = "lm")
-#' @details A matrix of values can be directly passed to molData. \code{fit} can be \code{lm}, \code{maxCor}, or \code{gam}.
+#'
+#' ## example to compute the Pearson correlation between gene expression and PDX response
+#' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
+#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
+#'                              sensitivity.measure="slope", fit = "pearson")
+#'
+#' @details Method to compute association can be specified by \code{fit}. It can be one of the:
+#' \itemize{
+#' \item{"lm" for linear models}
+#' \item{"CI" for concordance index}
+#' \item{"pearson" for Pearson correlation}
+#' \item{"spearman" for Spearman correlation}
+#' }
+#'
+#' A matrix of values can be directly passed to molData.
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 #'
-setGeneric(name = "drugSensitivitySig",
-           def = function(object, drug,
-                          mDataType=NULL, molData=NULL, features=NULL,
-                          model.ids=NULL, model2bidMap = NULL,
-                          sensitivity.measure="slope",
-                          fit = c("lm"),
-                          standardize=c("SD", "rescale", "none"),
-                          nthread=1, tissue=NULL, verbose=TRUE)
-            {standardGeneric("drugSensitivitySig")}
-          )
-
-#' @rdname drugSensitivitySig
 #' @export
-setMethod(f= "drugSensitivitySig",
-          signature=c("XevaSet"),
-          definition=function(object, drug,
+drugSensitivitySig <- function(object, drug,
                                mDataType=NULL, molData=NULL, features=NULL,
                                model.ids=NULL, model2bidMap = NULL,
                                sensitivity.measure="slope",
-                               fit = c("lm"),
+                               fit = c("lm", "CI", "pearson", "spearman"),
                                standardize=c("SD", "rescale", "none"),
                                nthread=1, tissue=NULL, verbose=TRUE)
-  {
+{
   if(is.null(mDataType)& is.null(molData))
   {
     stop("'mDataType' and 'molData' both can't be NULL ")
@@ -140,25 +140,23 @@ setMethod(f= "drugSensitivitySig",
   if(is.null(model2bidMap))
   {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
 
-  rtLx <- list()
   drugIx <- c(drug)[1]
 
   if(verbose==TRUE){cat(sprintf("Running for drug %s\n\n", drugIx))}
   mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
-                                   collapse.by="mean", model.ids, mDataType,
-                                   model2bidMap)
+                                 collapse.by="mean", model.ids, mDataType,
+                                 model2bidMap)
 
   if(nrow(mdfI)<2)
   {
-      msg <- sprintf("Too few samples for drug %s\nNumber of samples %d",
-                     drugIx, nrow(mdfI))
-      stop(msg)
+    msg <- sprintf("Too few samples for drug %s\nNumber of samples %d",
+                   drugIx, nrow(mdfI))
+    stop(msg)
   }
 
   if(is.null(features))
   { features <- rownames(molData)}
 
-  ##---------------------------------------------------------------
   if(!is.null(tissue))
   {
     if(length(tissue) == 1)
@@ -168,8 +166,8 @@ setMethod(f= "drugSensitivitySig",
       names(tt) <- mdfI$model.id
     }
 
-  if(length(tissue) > 1)
-  {
+    if(length(tissue) > 1)
+    {
       if(length(tissue)!= nrow(mdfI))
       {stop("length of type should be equal to length of models")}
 
@@ -179,7 +177,7 @@ setMethod(f= "drugSensitivitySig",
         stop(msg)
       }
 
-    tt <- tissue
+      tt <- tissue
     }
   } else
   {
@@ -209,51 +207,12 @@ setMethod(f= "drugSensitivitySig",
     msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
     warning(msg1)
   }
-
-  rtx <- .runFit(x = x,
-                 y = mdfI[,sensitivity.measure],
-                 fit = fit[1],
-                 nthread= nthread, type=mdfI[, "tissue"],
-                 standardize=standardize[1], verbose=verbose)
+  rtx <-compute_association(x, y = mdfI[,sensitivity.measure],
+                            fit = fit[1], nthread= nthread, type=mdfI[, "tissue"],
+                            standardize=standardize[1], verbose=verbose)
 
   rtx$drug <- drugIx
-  rownames(rtx) <- NULL
   rtx <- .reorderCol(rtx, "drug", 2)
-  rtLx<- .appendToList(rtLx, rtx)
-  rtDF <- do.call("rbind", rtLx)
-  rownames(rtDF) <- NULL
-  return(rtDF)
-  })
-
-
-####-------------------------------------------------------------------------
-.runFit <- function(x, y, fit = c("lm"), nthread=1,
-                    type=NULL, standardize='SD', verbose=TRUE)
-{
-  fit = fit[1]
-  if(is(x, "matrix")==FALSE)
-  { stop("x must be a matrix") }
-
-  if(is.null(colnames(x)))
-  { colnames(x) <- seq_len(ncol(x)) }
-
-  if(standardize=="SD"){ x <- scale(x)[,]}
-  if(standardize=="rescale"){ x <- as.matrix(apply(x,2, .normalize01))}
-
-  ##----------------------------------------------------------------------
-  if(fit=="lm")
-  {
-    rr <- rankGeneDrugSensitivity(data= x,
-                                               drugpheno= y,
-                                               type= type, #batch=batch,
-                                               single.type=FALSE,
-                                               standardize=standardize,
-                                               nthread=nthread,
-                                               verbose=verbose)
-    rr <- data.frame(rr[[1]], stringsAsFactors = FALSE)
-    rr$feature <- colnames(x)
-    rr <- .reorderCol(rr, "feature", 1)
-    return(rr)
-  }
+  rownames(rtx) <- NULL
+  return(rtx)
 }
-

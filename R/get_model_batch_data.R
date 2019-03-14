@@ -135,8 +135,8 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
       mod.data <- mod.data[tretIndx,]
     }
 
-    mod.data$volume.normal <- NA
     mod.data$volume.normal <- .normalizeVolume(mod.data$volume)
+
     return(mod.data)
   }
 
@@ -148,6 +148,7 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
            return.list = TRUE,
            impute.value = FALSE,
            vol.normal = FALSE,
+           log.volume=FALSE,
            var = "volume")
   {
     rtx <- list()
@@ -178,6 +179,13 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
       for (i in names(rtx))
       {
         miD <- rtx[[i]]
+
+        if(log.volume==TRUE)
+        {
+          miD$volume <- log(miD$volume+1)
+          miD$volume.normal <- .normalizeVolume(miD$volume)
+        }
+
         if (vol.normal == TRUE)
         {
           miD$volume.raw <- miD$volume
@@ -310,6 +318,7 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
            return.list = TRUE,
            impute.value = FALSE,
            vol.normal = FALSE,
+           log.volume =FALSE,
            drug.name = TRUE,
            concurrent.time = FALSE)
   {
@@ -327,7 +336,8 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
           max.time = max.time,
           return.list = TRUE,
           impute.value = impute.value,
-          vol.normal = vol.normal
+          vol.normal = vol.normal,
+          log.volume =log.volume
         )
       for (ci in seq_along(dfp$control))
       {
@@ -345,7 +355,8 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
           max.time = max.time,
           return.list = TRUE,
           impute.value = impute.value,
-          vol.normal = vol.normal
+          vol.normal = vol.normal,
+          log.volume =log.volume
         )
       for (ti in seq_along(dfp$treatment))
       {
@@ -436,10 +447,11 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
 #' @param batch Batch name from the \code{XevaSet} or experiment design.
 #' @param patient.id Patient id from the \code{XevaSet}. Default \code{NULL}.
 #' @param drug Name of the drug.
-#' @param control.name Default \code{NULL}.
+#' @param control.name Name of drug used as control. Default \code{NULL}.
 #' @param treatment.only Default \code{FALSE}. If \code{TRUE}, give data for non-zero dose periods only (if dose data are available).
 #' @param max.time Maximum time for data.
-#' @param vol.normal Default \code{TRUE} will use
+#' @param vol.normal If TRUE it will normalize the volume. Default \code{FALSE}.
+#' @param log.volume If TRUE log of the volume will be used. Default \code{FALSE}.
 #' @param return.list Default \code{FALSE} will return a \code{data.frame}.
 #' @param impute.value Default \code{FALSE}. If \code{TRUE}, impute the missing values.
 #' @param concurrent.time Default \code{FALSE}. If \code{TRUE}, cut the batch data such that control and treatment will end at same time point.
@@ -470,6 +482,7 @@ setGeneric(
                  treatment.only = FALSE,
                  max.time = NULL,
                  vol.normal = FALSE,
+                 log.volume = FALSE,
                  return.list = FALSE,
                  impute.value = FALSE,
                  concurrent.time = FALSE)
@@ -492,6 +505,7 @@ setMethod(
                         treatment.only = FALSE,
                         max.time = NULL,
                         vol.normal = FALSE,
+                        log.volume = FALSE,
                         return.list = FALSE,
                         impute.value = FALSE,
                         concurrent.time = FALSE)
@@ -512,7 +526,8 @@ setMethod(
         max.time = max.time,
         return.list = return.list,
         impute.value = impute.value,
-        vol.normal = vol.normal
+        vol.normal = vol.normal,
+        log.volume =log.volume
       )
 
       if (!is.null(max.time))
@@ -534,6 +549,7 @@ setMethod(
         return.list = return.list,
         impute.value = impute.value,
         vol.normal = vol.normal,
+        log.volume =log.volume,
         concurrent.time = concurrent.time
       )
     }
