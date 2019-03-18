@@ -1,12 +1,12 @@
 availableXevaSet <- function()
 {
-  #path <- url("https://www.pmgenomics.ca/bhklab/sites/default/files/downloads/PSets.csv")
   path <- "/home/arvind/CXP/Xeva_dataset/data/XevaObjects/XevaSets/XevaSet.csv"
   x <- read.csv(path, sep = ",", stringsAsFactors = F)
 
   return(x)
 }
 
+#' @import downloader
 getXevaSet <- function(dw.url, saveDir = file.path(".", "XevaSet"),
                        XevaSetFileName = NULL, verbose = TRUE)
 {
