@@ -7,8 +7,8 @@
 drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
   features = NULL, model.ids = NULL, model2bidMap = NULL,
   sensitivity.measure = "slope", fit = c("lm", "CI", "pearson",
-  "spearman"), standardize = c("SD", "rescale", "none"), nthread = 1,
-  tissue = NULL, verbose = TRUE)
+  "spearman", NA), standardize = c("SD", "rescale", "none"),
+  nthread = 1, tissue = NULL, verbose = TRUE)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset.}
@@ -27,7 +27,7 @@ drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
 
 \item{sensitivity.measure}{Name of the sensitivity measure.}
 
-\item{fit}{Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman' . Default \code{lm}.}
+\item{fit}{Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. If 'NA' only the data will be return. Default \code{lm}.}
 
 \item{standardize}{Default \code{SD}. Name of the method to use for data standardization before fitting.}
 
@@ -51,6 +51,8 @@ Method to compute association can be specified by \code{fit}. It can be one of t
 \item{"pearson" for Pearson correlation}
 \item{"spearman" for Spearman correlation}
 }
+
+If fit is set to NA, processed data (an ExpressionSet) will be returned.
 
 A matrix of values can be directly passed to molData.
 In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.

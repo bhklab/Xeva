@@ -72,6 +72,22 @@
   return(mdfI)
 }
 
+#' @import methods
+#' @import Biobase
+.getExpressionSet <- function(tx, y, sensitivity.measure, tissue=NULL)
+{
+  pd <- data.frame(name=colnames(tx), stringsAsFactors = FALSE)
+  rownames(pd) <- as.character(pd$name)
+  pd[, sensitivity.measure] <- y
+  if(!is.null(tissue))
+  { pd$tissue <- tissue }
+
+  eSet <- Biobase::ExpressionSet(assayData=as.matrix(tx),
+                        phenoData=new("AnnotatedDataFrame",
+                                      data=data.frame(pd)))
+  return(eSet)
+}
+
 ##====== drugSensitivitySig for one drug ==========================
 #' get drug sensitivity values
 #'
@@ -86,7 +102,7 @@
 #' @param model.ids Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.
 #' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
 #' @param sensitivity.measure Name of the sensitivity measure.
-#' @param fit Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman' . Default \code{lm}.
+#' @param fit Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. If 'NA' only the data will be return. Default \code{lm}.
 #' @param standardize Default \code{SD}. Name of the method to use for data standardization before fitting.
 #' @param nthread number of threads
 #' @param tissue tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
@@ -113,6 +129,8 @@
 #' \item{"spearman" for Spearman correlation}
 #' }
 #'
+#' If fit is set to NA, processed data (an ExpressionSet) will be returned.
+#'
 #' A matrix of values can be directly passed to molData.
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 #'
@@ -121,7 +139,7 @@ drugSensitivitySig <- function(object, drug,
                                mDataType=NULL, molData=NULL, features=NULL,
                                model.ids=NULL, model2bidMap = NULL,
                                sensitivity.measure="slope",
-                               fit = c("lm", "CI", "pearson", "spearman"),
+                               fit = c("lm", "CI", "pearson", "spearman", NA),
                                standardize=c("SD", "rescale", "none"),
                                nthread=1, tissue=NULL, verbose=TRUE)
 {
@@ -196,8 +214,6 @@ drugSensitivitySig <- function(object, drug,
   }
 
   mdfI[, "tissue"] <- tt[mdfI$model.id]
-  ## -------------------------------------------------------------------------
-
   x <- t(molData[features, mdfI$biobase.id])
   x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
 
@@ -207,6 +223,15 @@ drugSensitivitySig <- function(object, drug,
     msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
     warning(msg1)
   }
+
+  if(is.na(fit[1]))
+  {
+    eSet <- .getExpressionSet(t(x), y= mdfI[,sensitivity.measure],
+                              sensitivity.measure=sensitivity.measure,
+                              tissue=mdfI[, "tissue"])
+    return(eSet)
+  }
+
   rtx <-compute_association(x, y = mdfI[,sensitivity.measure],
                             fit = fit[1], nthread= nthread, type=mdfI[, "tissue"],
                             standardize=standardize[1], verbose=verbose)

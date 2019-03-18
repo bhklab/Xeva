@@ -165,17 +165,6 @@ compute_association <-
 
     if (fit == "lm")
     {
-      # rr <- rankGeneDrugSensitivity(
-      #   data = x,
-      #   drugpheno = y,
-      #   type = type,
-      #   batch = rep("batch", length(y)),
-      #   single.type = FALSE,
-      #   standardize = standardize,
-      #   nthread = nthread,
-      #   verbose = verbose
-      # )
-
       rr <- PharmacoGx:::rankGeneDrugSensitivity(data = x, drugpheno = y,
                                                  type = type,
         batch = rep("batch", length(y)), single.type = FALSE,
