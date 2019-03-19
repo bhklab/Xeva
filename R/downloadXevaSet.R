@@ -1,7 +1,7 @@
 availableXevaSet <- function()
 {
   path <- "https://www.pmgenomics.ca/bhklab/sites/default/files/downloads/XevaSets/XevaSet.csv"
-  x <- read.csv(path, sep = ",", stringsAsFactors = F)
+  x <- read.csv(path, sep = ",", stringsAsFactors = FALSE)
   return(x)
 }
 
@@ -34,9 +34,9 @@ getXevaSet <- function(dw.url, saveDir = file.path(".", "XevaSet"),
 #' analysis tools provided in Xeva.
 #'
 #' @examples
-#' library(Xeva)
 #' downloadXevaSet()
 #' ##to download a dataset
+#' #library(Xeva)
 #' #PDXE_BRCA = downloadXevaSet(name="PDXE_BRCA", saveDir="XevaSet")
 #'
 #' @param name Character string, the name of the XevaSet to download.
