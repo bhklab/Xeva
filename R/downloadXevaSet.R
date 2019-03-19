@@ -1,8 +1,7 @@
 availableXevaSet <- function()
 {
-  path <- "/home/arvind/CXP/Xeva_dataset/data/XevaObjects/XevaSets/XevaSet.csv"
+  path <- "https://www.pmgenomics.ca/bhklab/sites/default/files/downloads/XevaSets/XevaSet.csv"
   x <- read.csv(path, sep = ",", stringsAsFactors = F)
-
   return(x)
 }
 
