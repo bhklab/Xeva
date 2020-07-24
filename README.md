@@ -7,7 +7,9 @@ One of the key challenges in cancer precision medicine is finding robust biomark
 
 ## Citation
 
-Integrative Pharmacogenomics Analysis of Patient Derived Xenografts. Mer AS, Ba-alawi W, Smirnov P, Wang YX, Brew B, Ortmann J, Tsao MS, Cescon DW, Goldenberg A, Haibe-Kains B. BioRxiv 2018, doi: https://doi.org/10.1101/471227
+Mer, Arvind S., Wail Ba-Alawi, Petr Smirnov, Yi X. Wang, Ben Brew, Janosch Ortmann, Ming-Sound Tsao, David W. Cescon, Anna Goldenberg, and Benjamin Haibe-Kains. "Integrative pharmacogenomics analysis of patient-derived xenografts." Cancer research 79, no. 17 (2019): 4539-4550.
+doi: http://dx.doi.org/10.1158/0008-5472.CAN-19-0349
+
 
 ## How to install
 
