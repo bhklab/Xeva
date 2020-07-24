@@ -195,7 +195,9 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
                      line.color, modify.x.axis)
   return(doplt)
 }
-######--------------------------------------------------------------------------
+
+
+
 
 #' Plot batch data
 #'
