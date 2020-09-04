@@ -1,22 +1,9 @@
-# library(nlme)
-#
-# repdx <- readRDS("~/CXP/Xeva_dataset/data/LungPDX_Xeva.rds")
-# save(repdx)
-#
-#
-# x <- sample(1000)
-# devtools::use_data(repdx)
-#
-#
-# d <- getExperiment(lpdx, batch = "P1")
-# data=d$model
-
-
 #' linear mixed model
 #'
 #' Comput the linear mixed model (lmm) statistics for a PDX batch
 #'
-#' @param data a data.frame containg a batch data
+#' @param data a data.frame containing a batch data
+#' @param log.volume FALSE if volume is raw, TRUE if volume is in log
 #' @return Returns a fit object
 #'
 #' @details The input data.frame (data) must contain these columns: model.id, volume, time, exp.type
@@ -24,11 +11,11 @@
 #' @examples
 #' data(repdx)
 #' data <- getExperiment(repdx, batch = "P1")$model
-#' lmm(data)
+#' lmm(data, log.volume=FALSE)
 #'
 #' @export
 #' @import nlme
-lmm <- function(data)
+lmm <- function(data, log.volume)
 {
   if(any(!c("model.id", "volume", "time", "exp.type")%in% colnames(data)))
   {
@@ -36,7 +23,20 @@ lmm <- function(data)
     stop(msg)
   }
 
-  fit <- lme(log(volume)~time*exp.type, data=data, random= ~1|model.id)
+  if(!log.volume %in% c(TRUE, FALSE))
+  {
+    msg="log.volume should be either TRUE if volume is in log or FALSE if volume is raw"
+    stop(msg)
+  }
+
+  if(log.volume==FALSE)
+  {
+    minvol <- min(data$volume)
+    if(minvol<=0){data$volume <- data$volume + abs(minvol) + 1}
+    data$volume <- log(data$volume)
+  }
+
+  fit <- lme(volume~time*exp.type, data=data, random= ~1|model.id)
   fit$value <- as.numeric(fit$coefficients$fixed[4])
   return(fit)
 }

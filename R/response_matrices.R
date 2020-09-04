@@ -230,7 +230,8 @@ setResponse <- function(object,
                      impute.value=impute.value, min.time=min.time,
                      concurrent.time=concurrent.time,
                      vol.normal=vol.normal,
-                     log.volume=log.volume, verbose=verbose)
+                     log.volume=log.volume,
+                     verbose=verbose)
       sen$batch[bid, c("lmm")] <- sl$value
     }
   }
@@ -372,7 +373,17 @@ response <- function(object, model.id=NULL, batch=NULL,
     ###--------compute lmm for batch ---------------------------------------------
     if(res.measure=="lmm")
     {
-      rtx <- lmm(dl$model)
+      rtx <- list(value=NA)
+      exp.type <- unique(dl$model$exp.type)
+      if(length(exp.type)==2 &
+         "control" %in% exp.type &
+         "treatment" %in% exp.type)
+      {
+        rtx <- lmm(dl$model, log.volume)
+      } else
+      {
+        warning("'control' or 'treatment' missing from exp.type or batch")
+      }
       return(rtx)
     }
   }
