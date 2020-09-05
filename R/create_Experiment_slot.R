@@ -108,8 +108,12 @@ modelClassS4Vars <- function()
 makePDXModClassS4 <- function(exp.mod.dg, extraCol)
 {
   pdxS3 <- .createListFromDF(exp.mod.dg, extraCol=extraCol)
+  extraInfo <- list()
+  if(!is.null(extraCol))
+  { extraInfo <- pdxS3[extraCol] }
+
   pdxS4 <- PDXmodClass(model.id = pdxS3$model.id, drug = pdxS3$drug,
-                       data=pdxS3$data)
+                       data=pdxS3$data, other=extraInfo)
 
   pS4SlN<- modelClassS4Vars()
 
