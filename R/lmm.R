@@ -6,12 +6,17 @@
 #' @param log.volume FALSE if volume is raw, TRUE if volume is in log
 #' @return Returns a fit object
 #'
-#' @details The input data.frame (data) must contain these columns: model.id, volume, time, exp.type
+#' @details The input data.frame (data) must contain these columns: 'model.id', 'volume', 'time', 'exp.type'.
+#' Lower value from lmm function indicates better response.
+#'
 #'
 #' @examples
 #' data(repdx)
 #' data <- getExperiment(repdx, batch = "P1")$model
 #' lmm(data, log.volume=FALSE)
+#'
+#' data3 <- getExperiment(repdx, batch = "P3")$model
+#' lmm(data3, log.volume=FALSE)
 #'
 #' @export
 #' @import nlme

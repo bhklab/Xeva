@@ -55,5 +55,6 @@ plot data for dose in model.id
 }
 \examples{
 data(brca)
-dosePlot(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"), fill.col=c("#f5f5f5", "#993404"))
+dosePlot(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"),
+         fill.col=c("#f5f5f5", "#993404"))
 }

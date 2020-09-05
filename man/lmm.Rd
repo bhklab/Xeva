@@ -4,10 +4,12 @@
 \alias{lmm}
 \title{linear mixed model}
 \usage{
-lmm(data)
+lmm(data, log.volume)
 }
 \arguments{
-\item{data}{a data.frame containg a batch data}
+\item{data}{a data.frame containing a batch data}
+
+\item{log.volume}{FALSE if volume is raw, TRUE if volume is in log}
 }
 \value{
 Returns a fit object
@@ -16,11 +18,15 @@ Returns a fit object
 Comput the linear mixed model (lmm) statistics for a PDX batch
 }
 \details{
-The input data.frame (data) must contain these columns: model.id, volume, time, exp.type
+The input data.frame (data) must contain these columns: 'model.id', 'volume', 'time', 'exp.type'.
+Lower value from lmm function indicates better response.
 }
 \examples{
 data(repdx)
 data <- getExperiment(repdx, batch = "P1")$model
-lmm(data)
+lmm(data, log.volume=FALSE)
+
+data3 <- getExperiment(repdx, batch = "P3")$model
+lmm(data3, log.volume=FALSE)
 
 }
