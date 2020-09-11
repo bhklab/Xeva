@@ -167,7 +167,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
                                        sensitivity.measure=NULL, unique.model=TRUE,
                                        batch=NULL)
 {
-  warning("summarizeMolecularProfiles has been deprecated, please use summarise ")
+  warning("summarizeMolecularProfiles has been deprecated, please use summarizePDX ")
   summarizePDX(object, drug, mDataType, tissue,
             sensitivity.measure, unique.model,
             batch)
