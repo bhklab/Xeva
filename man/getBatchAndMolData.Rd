@@ -17,7 +17,7 @@ getBatchAndMolData(
 )
 }
 \description{
-data(brca)
-object=brca; mDataType="RNASeq"; drug="BGJ398"; tissue=NULL; unique.model=TRUE
+object=readRDS("~/CXP/XG/TNBC_analysis/data/TNBC_XevaObj_04Sept20.rds")
+mDataType="RNASeq"; drug="TAXOL"; tissue=NULL; unique.model=TRUE
 senType="batch"; sensitivity.measure="abc"
 }

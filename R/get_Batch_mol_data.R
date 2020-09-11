@@ -20,6 +20,10 @@
 #' data(brca)
 #' object=brca; mDataType="RNASeq"; drug="BGJ398"; tissue=NULL; unique.model=TRUE
 #' senType="batch"; sensitivity.measure="abc"
+#'
+#' object=readRDS("~/CXP/XG/TNBC_analysis/data/TNBC_XevaObj_04Sept20.rds")
+#' mDataType="RNASeq"; drug="TAXOL"; tissue=NULL; unique.model=TRUE
+#' senType="batch"; sensitivity.measure="abc"
 
 getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
                                senType, sensitivity.measure)
@@ -35,8 +39,7 @@ getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
   bsmat=data.frame()
   for(i in 1:nrow(sm))
   {
-    bid = sm$batch.name[i]
-    rt = .batchID2biobaseID(object, bid, modIn)
+    rt = .batchID2biobaseID(object, sm$batch.name[i], modIn)
     if(rt[[1]]==TRUE)
     {
       for(q in 1:nrow(rt[[2]]))
@@ -46,13 +49,8 @@ getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
   }
 
   biobID2sen <- unique(bsmat[,c(bioName, "batch.name")])
-  rmCol= setdiff(colnames(bsmat), colnames(biobID2sen))
-  biobID2sen[, rmCol] <- NA
-  #biobID2sen <- data.frame(matrix(NA, nrow = length(unique(bsmat[,bioName])),
-  #                                ncol = ncol(bsmat)), stringsAsFactors = F)
-  #colnames(biobID2sen) <- colnames(bsmat)
-  #biobID2sen[,bioName] <- unique(bsmat[,bioName])
-  otherCol <- setdiff(colnames(biobID2sen), c(bioName, "batch.name"))
+  otherCol <- setdiff(colnames(bsmat), colnames(biobID2sen))
+  biobID2sen[, otherCol] <- NA
 
   for(i in 1:nrow(biobID2sen))
   {
@@ -67,7 +65,7 @@ getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
     }
   }
 
-  rownames(biobID2sen) <- biobID2sen[, bioName]
+  rownames(biobID2sen) <- NULL
 
   molP <- getMolecularProfiles(object, mDataType)
   molP <- molP[, biobID2sen[, bioName]]

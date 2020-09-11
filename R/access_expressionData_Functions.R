@@ -64,35 +64,11 @@ getMolecularProfiles <- function(object, data.type)
   }
   return(list(data=modIn, bioName=bioName))
 }
+
 #####================= Summarize Molecular Profiles ==================
-#' Summarize molecular profiles
-#'
-#' This function serves to get molecular profiles from a \code{XevaSet} object.
-#'
-#' @param object The \code{XevaSet}.
-#' @param drug Name of the drug.
-#' @param mDataType \code{character}, where one of the molecular data types is needed.
-#' @param tissue Default \code{NULL} will return all tissue types.
-#' @param sensitivity.measure Default \code{NULL} will return all sensitivity measures.
-#' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
-#' @param batch Name of the batch. Default \code{NULL}.
-#' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
-#'
-#' @examples
-#' data(brca)
-#' pacRNA <- summarizeMolecularProfiles(brca, drug="paclitaxel", mDataType="RNASeq",
-#'                                      tissue= "BRCA", sensitivity.measure="mRECIST")
-#' print(pacRNA)
-#' @details
-#' \itemize{
-#' \item {If a sequencing sample belongs to multiple models, \code{summarizeMolecularProfiles}
-#' will create a separate column for each model.}
-#' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
-#' }
-#' @export
-summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
-                                       sensitivity.measure=NULL, unique.model=TRUE,
-                                       batch=NULL)
+.summarizeMolecularANDSens <- function(object, drug, mDataType, tissue=NULL,
+          sensitivity.measure=NULL, unique.model=TRUE,
+          batch=NULL)
 {
   senType <- NULL
   if(is.null(sensitivity.measure))
@@ -110,7 +86,8 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
 
   if(is.null(senType))
   {
-    msg <- sprintf("sensitivity measure '%s' not present in model or batch sensitivity", sensitivity.measure)
+    msg<-sprintf("sensitivity measure '%s' not present in model or batch sensitivity",
+                 sensitivity.measure)
     stop(msg)
   }
   ##----------------------------------------------------------------------------
@@ -122,7 +99,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
     { sensitivity.measure <- colnames(sm)[!(colnames(sm) %in% c("model.id", "batch.name"))] }
 
     modInX <- .modelID2biobaseID(object, mDataType, drug=drug, tissue=tissue,
-                                unique.model=unique.model)
+                                 unique.model=unique.model)
     modIn <- modInX$data; bioName <- modInX$bioName
 
     modIn[,c(sensitivity.measure)] <- sm[modIn$model.id, c(sensitivity.measure)]
@@ -143,7 +120,57 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
                                senType, sensitivity.measure)
     return(molP)
   }
+}
 
+
+#' Summarize molecular profiles and drug response data
+#'
+#' This function serves to get molecular profiles from a \code{XevaSet} object.
+#'
+#' @param object The \code{XevaSet}.
+#' @param drug Name of the drug.
+#' @param mDataType \code{character}, where one of the molecular data types is needed.
+#' @param tissue Default \code{NULL} will return all tissue types.
+#' @param sensitivity.measure Default \code{NULL} will return all sensitivity measures.
+#' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
+#' @param batch Name of the batch. Default \code{NULL}.
+#' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
+#'
+#' @examples
+#' data(brca)
+#' pacRNA <- summarizePDX(brca, drug="paclitaxel", mDataType="RNASeq",
+#'                     tissue= "BRCA", sensitivity.measure="mRECIST")
+#' print(pacRNA)
+#' @details
+#' \itemize{
+#' \item {If a sequencing sample belongs to multiple models, this function
+#' will create a separate column for each model.}
+#' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
+#' }
+#' @export
+setGeneric("summarizePDX", function(object, ...) standardGeneric("summarizePDX"))
+setMethod('summarizePDX',
+          signature=signature(object = "XevaSet"),
+          definition=function(object, drug, mDataType, tissue=NULL,
+                              sensitivity.measure=NULL, unique.model=TRUE,
+                              batch=NULL)
+          {
+            .summarizeMolecularANDSens(object, drug, mDataType, tissue,
+                                      sensitivity.measure, unique.model,
+                                      batch)
+          })
+
+
+#' @rdname summarizePDX
+#' @export
+summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
+                                       sensitivity.measure=NULL, unique.model=TRUE,
+                                       batch=NULL)
+{
+  warning("summarizeMolecularProfiles has been deprecated, please use summarise ")
+  summarizePDX(object, drug, mDataType, tissue,
+            sensitivity.measure, unique.model,
+            batch)
 }
 
 

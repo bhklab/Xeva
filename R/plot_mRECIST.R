@@ -202,6 +202,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 #' @param sort If matrix should be sorted before plotting.
 #' @param row_fontsize Size of the row name font.
 #' @param col_fontsize Size of the column name font.
+#' @param legend_title Title for the legend.
 #' @param draw_plot Default \code{TRUE} will plot the figure. If \code{FALSE}, return an object.
 #' @return mRECIST plot.
 #' @examples
@@ -214,7 +215,8 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 #' @importFrom grid gpar
 plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col="black",
                         colPalette = NULL, name = "Drug & Models", sort=TRUE,
-                        row_fontsize=12, col_fontsize=12, draw_plot=TRUE)
+                        row_fontsize=12, col_fontsize=12, legend_title="Response",
+                        draw_plot=TRUE)
 {
   control.name = c(control.name)
 
@@ -275,7 +277,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
                  , right_annotation = sidePlt$rowPlt )
 
   colVec <- unlist(colPalette)[names(colPalette)]
-  HLeg <- Legend(at = names(colPalette), title = "",
+  HLeg <- Legend(at = names(colPalette), title = legend_title,
                  legend_gp = gpar(col = colVec, fill = colVec))
 
   if(draw_plot==TRUE)

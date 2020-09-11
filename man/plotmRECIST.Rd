@@ -14,6 +14,7 @@ plotmRECIST(
   sort = TRUE,
   row_fontsize = 12,
   col_fontsize = 12,
+  legend_title = "Response",
   draw_plot = TRUE
 )
 }
@@ -35,6 +36,8 @@ plotmRECIST(
 \item{row_fontsize}{Size of the row name font.}
 
 \item{col_fontsize}{Size of the column name font.}
+
+\item{legend_title}{Title for the legend.}
 
 \item{draw_plot}{Default \code{TRUE} will plot the figure. If \code{FALSE}, return an object.}
 }
