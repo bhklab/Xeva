@@ -138,7 +138,7 @@ getMolecularProfiles <- function(object, data.type)
 #'
 #' @examples
 #' data(brca)
-#' pacRNA <- summarizePDX(brca, drug="paclitaxel", mDataType="RNASeq",
+#' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
 #'                     tissue= "BRCA", sensitivity.measure="mRECIST")
 #' print(pacRNA)
 #' @details
@@ -148,8 +148,8 @@ getMolecularProfiles <- function(object, data.type)
 #' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
 #' }
 #' @export
-setGeneric("summarizePDX", function(object, ...) standardGeneric("summarizePDX"))
-setMethod('summarizePDX',
+setGeneric("summarizeData", function(object, ...) standardGeneric("summarizeData"))
+setMethod('summarizeData',
           signature=signature(object = "XevaSet"),
           definition=function(object, drug, mDataType, tissue=NULL,
                               sensitivity.measure=NULL, unique.model=TRUE,
@@ -161,14 +161,14 @@ setMethod('summarizePDX',
           })
 
 
-#' @rdname summarizePDX
+#' @rdname summarizeData
 #' @export
 summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
                                        sensitivity.measure=NULL, unique.model=TRUE,
                                        batch=NULL)
 {
-  warning("summarizeMolecularProfiles has been deprecated, please use summarizePDX ")
-  summarizePDX(object, drug, mDataType, tissue,
+  warning("summarizeMolecularProfiles has been deprecated, please use summarizeData ")
+  summarizeData(object, drug, mDataType, tissue,
             sensitivity.measure, unique.model,
             batch)
 }

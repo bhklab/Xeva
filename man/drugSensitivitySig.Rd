@@ -7,16 +7,12 @@
 drugSensitivitySig(
   object,
   drug,
-  mDataType = NULL,
-  molData = NULL,
-  features = NULL,
-  model.ids = NULL,
-  model2bidMap = NULL,
-  sensitivity.measure = "slope",
-  fit = c("lm", "CI", "pearson", "spearman", NA),
+  sensitivity.measure,
+  mDataType,
   standardize = c("SD", "rescale", "none"),
+  features = NULL,
+  fit = c("lm", "CI", "pearson", "spearman"),
   nthread = 1,
-  tissue = NULL,
   verbose = TRUE
 )
 }
@@ -25,25 +21,17 @@ drugSensitivitySig(
 
 \item{drug}{Name of the drug.}
 
-\item{mDataType}{Molecular data type.}
-
-\item{molData}{External data matrix. Rows as features and columns as samples.}
-
-\item{features}{Set which molecular data features to use. Default \code{NULL} will use all features.}
-
-\item{model.ids}{Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.}
-
-\item{model2bidMap}{A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.}
-
 \item{sensitivity.measure}{Name of the sensitivity measure.}
 
-\item{fit}{Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. If 'NA' only the data will be return. Default \code{lm}.}
+\item{mDataType}{Molecular data type.}
 
 \item{standardize}{Default \code{SD}. Name of the method to use for data standardization before fitting.}
 
-\item{nthread}{number of threads}
+\item{features}{Set which molecular data features to use. Default \code{NULL} will use all features.}
 
-\item{tissue}{tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.}
+\item{fit}{Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. Default \code{lm}.}
+
+\item{nthread}{number of threads}
 
 \item{verbose}{Default \code{TRUE} will show information}
 }
@@ -70,12 +58,12 @@ In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \
 \examples{
 data(brca)
 senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-                             mDataType="RNASeq", features=c(1,2,3,4,5),
+                             mDataType="RNASeq",
                              sensitivity.measure="slope", fit = "lm")
 
 ## example to compute the Pearson correlation between gene expression and PDX response
 senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-                             mDataType="RNASeq", features=c(1,2,3,4,5),
+                             mDataType="RNASeq",
                              sensitivity.measure="slope", fit = "pearson")
 
 }

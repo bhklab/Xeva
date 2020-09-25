@@ -96,16 +96,12 @@
 #'
 #' @param object The \code{Xeva} dataset.
 #' @param drug Name of the drug.
-#' @param mDataType Molecular data type.
-#' @param molData External data matrix. Rows as features and columns as samples.
-#' @param features Set which molecular data features to use. Default \code{NULL} will use all features.
-#' @param model.ids Set which \code{model.id} to use from the dataset. Default \code{NULL} will use all \code{model.id}s.
-#' @param model2bidMap A \code{data.frame} with \code{model.id} and \code{biobase.id}. Default \code{NULL} will use internal mapping.
 #' @param sensitivity.measure Name of the sensitivity measure.
-#' @param fit Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. If 'NA' only the data will be return. Default \code{lm}.
+#' @param mDataType Molecular data type.
 #' @param standardize Default \code{SD}. Name of the method to use for data standardization before fitting.
+#' @param features Set which molecular data features to use. Default \code{NULL} will use all features.
+#' @param fit Association method to use, can be 'lm', 'CI', 'pearson' or 'spearman'. Default \code{lm}.
 #' @param nthread number of threads
-#' @param tissue tissue type. Default \code{NULL} uses \code{'tissue'} from \code{object}.
 #' @param verbose Default \code{TRUE} will show information
 #'
 #' @return A \code{data.frame} with features and values.
@@ -113,12 +109,12 @@
 #' @examples
 #' data(brca)
 #' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
+#'                              mDataType="RNASeq",
 #'                              sensitivity.measure="slope", fit = "lm")
 #'
 #' ## example to compute the Pearson correlation between gene expression and PDX response
 #' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
+#'                              mDataType="RNASeq",
 #'                              sensitivity.measure="slope", fit = "pearson")
 #'
 #' @details Method to compute association can be specified by \code{fit}. It can be one of the:
@@ -135,7 +131,57 @@
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 #'
 #' @export
-drugSensitivitySig <- function(object, drug,
+#' @import Biobase
+drugSensitivitySig <- function(object, drug, sensitivity.measure,
+                               mDataType,
+                               standardize=c("SD", "rescale", "none"),
+                               features=NULL,
+                               fit = c("lm", "CI", "pearson", "spearman"),
+                               nthread=1, verbose=TRUE)
+{
+  df <- summarizeData(object, drug=drug, mDataType=mDataType,
+                      sensitivity.measure=sensitivity.measure)
+
+  if(!is.null(features))
+  {
+    if(any(!features %in% featureNames(df)))
+    {
+      stop("features are missing in mDataType")
+    }
+    df <- df[features, ]
+  }
+
+  sm <- pData(df)[, sensitivity.measure]
+  nonNAsample <- sampleNames(df)[!is.na(sm)]
+
+  if(length(nonNAsample)==0)
+  { stop("no sample with non NA sensitivity.measure") }
+
+  if(verbose==TRUE)
+  {
+    cat(sprintf("Running for %d samples with non NA sensitivity.measure\n",
+                length(nonNAsample)))
+  }
+
+
+  df <- df[, nonNAsample]
+  x <- t(exprs(df))
+  x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
+  y <- pData(df)[, sensitivity.measure]
+
+  rtx <-compute_association(x, y, fit = fit[1], nthread= nthread,
+                            #type=mdfI[, "tissue"],
+                            standardize=standardize[1], verbose=verbose)
+
+  rtx$drug <- drug
+  rtx <- .reorderCol(rtx, "drug", 2)
+  rownames(rtx) <- NULL
+  return(rtx)
+}
+
+
+
+drugSensitivitySig_old <- function(object, drug,
                                mDataType=NULL, molData=NULL, features=NULL,
                                model.ids=NULL, model2bidMap = NULL,
                                sensitivity.measure="slope",

@@ -32,13 +32,10 @@
   doseColsNames <- c("dose", gsub("drug", "dose", names(rtx$drug$names)))
   dataColName <- c("time", "volume", "width","length",
                   doseColsNames, "body.weight", "date", "comment")
-  for (w in dataColName)
-  {
-      if(is.element(w, colnames(exp.mod.dg))==FALSE)
-      {
-        exp.mod.dg[,w] <- NA
-      }
-  }
+  dataColName <- unique(c(dataColName, colnames(exp.mod.dg)))
+
+  naCols <- setdiff(dataColName, colnames(exp.mod.dg))
+  exp.mod.dg[, naCols] <- NA
 
   ##---- add dose.1 + dose.2 .... to dose
   rtxData <- data.frame(lapply(exp.mod.dg[,dataColName], as.character),
@@ -55,8 +52,8 @@
   {
     rtxData[ ,doseCi] <- as.numeric(rtxData[ ,doseCi])
   }
-  rtxData <- BBmisc::sortByCol(rtxData , dataColName,
-                               asc = rep(TRUE, length(dataColName)))
+
+  rtxData <- BBmisc::sortByCol(rtxData , "time", asc = TRUE)
   rtx$data<- rtxData
   return(rtx)
 }
@@ -113,7 +110,7 @@ makePDXModClassS4 <- function(exp.mod.dg, extraCol)
   { extraInfo <- pdxS3[extraCol] }
 
   pdxS4 <- PDXmodClass(model.id = pdxS3$model.id, drug = pdxS3$drug,
-                       data=pdxS3$data, other=extraInfo)
+                       data=pdxS3$data, meta=extraInfo)
 
   pS4SlN<- modelClassS4Vars()
 
@@ -212,7 +209,6 @@ experimentSlotfromDf <- function(experiment)
     expSlot[[i]] <- makePDXModClassS4(exp.mod.dg, extraCol=extraCol)
   }
 
-  #mod.ids <- unlist(vapply(expSlot , "[[" , "model.id" ))
   mod.ids <- vapply(expSlot, function(mod){slot(mod, "model.id")}, FUN.VALUE = character(1))
 
   if(length(mod.ids) != length(unique(mod.ids)))

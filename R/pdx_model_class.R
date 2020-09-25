@@ -74,7 +74,7 @@ createXevaModelClass <- function()
   names(pdxmiPrototype) <- names(pdxmiVar)
   ##----------------------------------------------------------------------------
   xevaVar <- list(model.id = "character", drug = "list", data="data.frame",
-                  other="list",
+                  meta="list",
                   treatment.type = "character",
                   treatment.target="character")
 

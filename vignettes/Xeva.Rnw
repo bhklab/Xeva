@@ -162,7 +162,75 @@ plotPDX(repdx, batch = "P4", vol.normal = TRUE,  SE.plot = "ribbon")
 @
 
 
-\section{PDX Model Drug Response}
+\section{PDX Model Drug Response}  \label{response}
+
+%%%%%%%%%%%%%%%%%%%
+\subsection{PDX response calcuation}
+In Xeva, we have implemented several response metrics.
+There are two kinds of response metrics available:
+
+\begin{enumerate}
+	\item Model response: This type of response is computed for any individual PDX model.
+	Examples include how fast a PDX model is growing or how long the PDX survives.
+	Such response does not take into account the control PDX as it is computed for an individual PDX model.
+	In this category the following metrics can be computed:
+    \begin{enumerate}
+    	\item mRECIST and associated metrics best.response (BR), best.average.response (BAR).
+    	mRECIST divides response into 4 categories  \cite{MerXeva}.
+      	\begin{itemize}
+      	\item complete response (CR): BR < -95\% and BAR < -40\%
+      	\item partial response (PR): BR < -50\% and BAR < -20\%
+      	\item stable disease (SD): BR < 35\% and BAR < 30\%
+      	\item progressive disease (PD): not otherwise categorized
+      	\end{itemize}
+
+      \item slope is defined as angle of PDX volume curve.
+      \item AUC (area under the curve) represents area covered by PDX curve per day (AUC divided by time).
+    \end{enumerate}
+
+    \item Batch response: This type of response is computed by taking into account models in control and treatment group. In this category the following metrics can be computed:
+    \begin{enumerate}
+    \item Angle between treatment and control PDXs
+    \item abc (area between the curves) is computed as difference in AUC of control and treatment.
+    \item TGI (tumor growth inhibition)
+    \item lmm (linear mix model)
+    \end{enumerate}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%
+
+In Xeva we have provided a unified function \textbf{\textcolor{red}{\hl{response}}}
+to compute all different response metrics.
+Functions for individual response metrics are also available for use (see documention of the package for details).
+To compute mRECIST of a model:
+
+<<res1>>=
+response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
+@
+
+Similarly, TGI (a batch level response) can be computed as:
+<<res2>>=
+response(brca, batch="X-6047.paclitaxel", res.measure="TGI")
+@
+
+
+\subsection{Setting response for XevaSet} \label{setresponse}
+In a newly created Xevaset, one has to compute the response for all models and
+batches before using it for analysis. This can be done easily using the \textbf{\textcolor{red}{\hl{setResponse}}}  function.
+In this example we are computing mRECIST for all models and getting an updated
+XevaSet (which contains mRECIST values):
+
+<<resSet1, warning = FALSE, message=FALSE >>=
+brca  <- setResponse(brca, res.measure = "mRECIST", verbose=FALSE)
+@
+
+Next we update the object by computing the TGI as:
+<<resSet2, warning = FALSE, message=FALSE>>=
+brca  <- setResponse(brca, res.measure = "TGI", verbose=FALSE)
+@
+
+
+\subsection{Visualizing PDX response}
 Xeva can effectively summarize PDX drug response data. Here we summarize the \textbf{mRECIST} values for the models in our dataset:
 
 <<l4>>=
@@ -187,7 +255,7 @@ It is useful to color the bars of your waterfall plot by genomic properties.
 Here we create a waterfall plot for drug BYL719 and color it based on the mutation status of the CDK13 gene.
 First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
 <<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
-mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
+mut <- summarizeData(brca,drug = "BYL719", mDataType="mutation")
 model.type <- Biobase::exprs(mut)["CDK13", ]
 model.type[grepl("Mut", model.type)] <- "mutation"
 model.type[model.type!="mutation"] <- "wild type"
@@ -334,8 +402,14 @@ print(xeva.set)
 @
 
 
+Once you have created a new XevaSet you can compute PDX response using the function `setResponse`
+and update your object.
 
+<<createXevaSet2>>=
+xeva.set  <- setResponse(xeva.set, res.measure = c("mRECIST"), verbose=FALSE)
+@
 
+For more details see \ref{response} and \ref{setresponse}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \bibliography{XevaBiblio}
