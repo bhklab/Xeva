@@ -64,6 +64,7 @@ senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
 ## example to compute the Pearson correlation between gene expression and PDX response
 senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
                              mDataType="RNASeq",
-                             sensitivity.measure="slope", fit = "pearson")
+                             sensitivity.measure="slope", fit = "pearson",
+                             features=c(1,2,3,4,5,6))
 
 }

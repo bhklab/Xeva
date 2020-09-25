@@ -115,7 +115,8 @@
 #' ## example to compute the Pearson correlation between gene expression and PDX response
 #' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
 #'                              mDataType="RNASeq",
-#'                              sensitivity.measure="slope", fit = "pearson")
+#'                              sensitivity.measure="slope", fit = "pearson",
+#'                              features=c(1,2,3,4,5,6))
 #'
 #' @details Method to compute association can be specified by \code{fit}. It can be one of the:
 #' \itemize{
@@ -144,10 +145,6 @@ drugSensitivitySig <- function(object, drug, sensitivity.measure,
 
   if(!is.null(features))
   {
-    if(any(!features %in% featureNames(df)))
-    {
-      stop("features are missing in mDataType")
-    }
     df <- df[features, ]
   }
 
