@@ -165,7 +165,7 @@ plotPDX(repdx, batch = "P4", vol.normal = TRUE,  SE.plot = "ribbon")
 \section{PDX Model Drug Response}  \label{response}
 
 %%%%%%%%%%%%%%%%%%%
-\subsection{PDX response calcuation}
+\subsection{PDX response calculation}
 In Xeva, we have implemented several response metrics.
 There are two kinds of response metrics available:
 
@@ -194,6 +194,7 @@ There are two kinds of response metrics available:
     \item abc (area between the curves) is computed as difference in AUC of control and treatment.
     \item TGI (tumor growth inhibition)
     \item lmm (linear mix model)
+    \item bmRECIST (batch level mRECIST, computed separately for control and treatment arm)
     \end{enumerate}
 \end{enumerate}
 

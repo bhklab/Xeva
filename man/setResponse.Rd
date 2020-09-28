@@ -6,7 +6,7 @@
 \usage{
 setResponse(
   object,
-  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm", "bmRECIST"),
   min.time = 10,
   treatment.only = TRUE,
   max.time = NULL,
@@ -54,6 +54,7 @@ At present fellowing response measure are implemented
 \item abc Computes area between the treatment and control PDX curves
 \item TGI Computes  tumor growth inhibition using treatment and control PDX curves
 \item lmm Computes linear mixed model (lmm) statistics for a PDX batch
+\item bmRECIST Computes mRECIST for control and treatment arms of a PDX batch
 }
 }
 \examples{

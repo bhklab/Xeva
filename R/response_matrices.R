@@ -43,8 +43,16 @@ model_response_class <- function(name, value=NA, fit=NA)
 #' @export
 print.modelResponse <- function(x, ...)
 {
+  if(x$name=="mRECIST")
+  {
+    z <- sprintf("mRECIST = %s\nBest average response = %3.4f\nBest response = %3.4f\n",
+                 x$fit$mRECIST, x$fit$best.average.response, x$fit$best.response)
+    cat(z)
+  } else
+  {
   z <- sprintf("%s = %f\n", x$name, x$value)
   cat(z)
+  }
 }
 
 
@@ -62,13 +70,25 @@ batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL, .
 #' @export
 print.batchResponse <- function(x, ...)
 {
-  cat(sprintf("%s = %f\n", x$name, x$value))
+  if(x$name=="bmRECIST")
+  {
+    #cat(sprintf("%s\n%s\n", x$name, x$value))
+    cat(sprintf("%s\n", x$name))
+    if(!is.null(x$control))
+    { cat(sprintf("control = %s\n", x$control$value)) }
+    if(!is.null(x$treatment))
+    { cat(sprintf("treatment = %s\n", x$treatment$value)) }
 
-  if(!is.null(x$control))
-  { cat(sprintf("control = %f\n", x$control$value)) }
+  } else
+  {
+    cat(sprintf("%s = %f\n", x$name, x$value))
 
-  if(!is.null(x$treatment))
-  { cat(sprintf("treatment = %f\n", x$treatment$value)) }
+    if(!is.null(x$control))
+    { cat(sprintf("control = %f\n", x$control$value)) }
+
+    if(!is.null(x$treatment))
+    { cat(sprintf("treatment = %f\n", x$treatment$value)) }
+  }
 }
 
 
@@ -98,6 +118,7 @@ print.batchResponse <- function(x, ...)
 #' * abc Computes area between the treatment and control PDX curves
 #' * TGI Computes  tumor growth inhibition using treatment and control PDX curves
 #' * lmm Computes linear mixed model (lmm) statistics for a PDX batch
+#' * bmRECIST Computes mRECIST for control and treatment arms of a PDX batch
 #' @md
 #'
 #' @examples
@@ -105,7 +126,8 @@ print.batchResponse <- function(x, ...)
 #' brca  <- setResponse(brca, res.measure = c("mRECIST"), verbose=FALSE)
 #' @export
 setResponse <- function(object,
-                        res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+                        res.measure=c("mRECIST", "slope", "AUC",
+                                      "angle", "abc", "TGI", "lmm", "bmRECIST"),
                         min.time=10, treatment.only=TRUE, max.time=NULL,
                         vol.normal=FALSE, impute.value=TRUE, concurrent.time =TRUE,
                         log.volume=FALSE, verbose=TRUE)
@@ -128,7 +150,7 @@ setResponse <- function(object,
                      vol.normal=vol.normal,
                      log.volume=log.volume, verbose=verbose)
       for(si in vl2compute)
-      { sen$model[mid, si] <- mr[[si]] }
+      { sen$model[mid, si] <- mr$fit[[si]] }
     }
   }
 
@@ -237,6 +259,35 @@ setResponse <- function(object,
   }
   ##--------------code for batch level mR --------------------------------------
   ##----------------------------------------------------------------------------
+  ###--------compute bmRECIST for batch ---------------------------------------------
+  if("bmRECIST" %in% res.measure)
+  {
+    mrvars <- c("mRECIST", "best.response", #"best.response.time",
+                "best.average.response" #, "best.average.response.time"
+                )
+    var.control  <- paste0(mrvars, ".control")
+    var.treatment<- paste0(mrvars, ".treatment")
+
+    sen$batch[, c(var.control, var.treatment)] <- NA
+    for(bid in batchInfo(object))
+    {
+      sl <- response(object, batch = bid, res.measure="bmRECIST",
+                     treatment.only=treatment.only, max.time=max.time,
+                     impute.value=impute.value, min.time=min.time,
+                     concurrent.time=concurrent.time,
+                     vol.normal=vol.normal, log.volume=log.volume,
+                     verbose=verbose)
+
+      for(va in mrvars)
+      {
+        vac <- paste0(va, ".control")
+        sen$batch[bid, vac] <- sl$control$fit[[va]]
+
+        vat <- paste0(va, ".treatment")
+        sen$batch[bid, vat] <- sl$control$fit[[va]]
+      }
+    }
+  }
 
   slot(object, "sensitivity") <- sen
   return(object)
@@ -271,6 +322,7 @@ setResponse <- function(object,
 #' * abc Computes area between the treatment and control PDX curves
 #' * TGI Computes tumor growth inhibition using treatment and control PDX curves
 #' * lmm Computes linear mixed model (lmm) statistics for a PDX batch
+#' * bmRECIST Computes mRECIST for control and treatment arms of a PDX batch
 #' @md
 #'
 #' @examples
@@ -285,7 +337,8 @@ setResponse <- function(object,
 #'
 #' @export
 response <- function(object, model.id=NULL, batch=NULL,
-                     res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+                     res.measure=c("mRECIST", "slope", "AUC",
+                                   "angle", "abc", "TGI", "lmm", "bmRECIST"),
                      treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
                      min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
                      log.volume=FALSE, verbose=TRUE)
@@ -304,7 +357,7 @@ response <- function(object, model.id=NULL, batch=NULL,
     if(any(c("mRECIST", "best.response", "best.average.response") %in% res.measure))
     {
       if(verbose==TRUE) {cat(sprintf("computing mRECIST for %s\n", model.id))}
-      mr <- mRECIST(dl$time, dl$volume, min.time=min.time, return.detail=TRUE)
+      mr <- mRECIST(dl$time, dl$volume, min.time=min.time)#, return.detail=TRUE)
       return(mr)
     }
 
@@ -386,5 +439,13 @@ response <- function(object, model.id=NULL, batch=NULL,
       }
       return(rtx)
     }
+
+    ###--------compute bmRECIST for batch ---------------------------------------------
+    if(res.measure=="bmRECIST")
+    {
+      rtx <- bmRECIST(contr.time, contr.volume, treat.time,treat.volume, min.time=10)
+      return(rtx)
+    }
+
   }
 }

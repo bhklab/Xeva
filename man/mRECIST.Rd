@@ -4,7 +4,7 @@
 \alias{mRECIST}
 \title{Computes the mRECIST}
 \usage{
-mRECIST(time, volume, min.time = 10, return.detail = FALSE)
+mRECIST(time, volume, min.time = 10)
 }
 \arguments{
 \item{time}{Value of best response.}
@@ -12,8 +12,6 @@ mRECIST(time, volume, min.time = 10, return.detail = FALSE)
 \item{volume}{Value of best average response.}
 
 \item{min.time}{Minimum time after which tumor volume will be considered.}
-
-\item{return.detail}{Default \code{FALSE}. If \code{TRUE}, return all intermediate values.}
 }
 \value{
 Returns the mRECIST.

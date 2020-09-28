@@ -43,6 +43,16 @@
   return(rtz)
 }
 
+
+empty_model_response_class_mRECIST <- function()
+{
+  exdf <- list()
+  exdf[c("volume.change", "average.response", "best.response", "best.response.time",
+         "best.average.response", "best.average.response.time", "mRECIST")] <- NA
+
+  model_response_class(name = "mRECIST", value = NA, fit=exdf)
+}
+
 ######################################################################
 #' Computes the mRECIST
 #'
@@ -51,14 +61,15 @@
 #' @param time Value of best response.
 #' @param volume Value of best average response.
 #' @param min.time Minimum time after which tumor volume will be considered.
-#' @param return.detail Default \code{FALSE}. If \code{TRUE}, return all intermediate values.
+#### @param return.detail Default \code{FALSE}. If \code{TRUE}, return all intermediate values.
 #' @return  Returns the mRECIST.
 #' @examples
 #' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
 #' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
 #' mRECIST(time, volume, min.time=10, return.detail=FALSE)
 #' @export
-mRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
+mRECIST <- function(time, volume, min.time=10 #, return.detail=FALSE
+                    )
 {
   if(volume[1]==0) {volume <- volume + 1}
 
@@ -107,8 +118,62 @@ mRECIST <- function(time, volume, min.time=10, return.detail=FALSE)
     }
   }
 
-  if(return.detail==FALSE)
-  {return(exdf$mRECIST)}
+  #if(return.detail==FALSE)
+  #{return(exdf$mRECIST)}
+  #return(exdf)
 
-  return(exdf)
+  mr <- empty_model_response_class_mRECIST()
+  mr$value <- exdf$mRECIST
+  mr$fit <- exdf
+  return(mr)
+}
+
+
+#' compute mRECIST for a batch
+#' Computes the mRECIST for a batch.
+#'
+#' @param contr.time Time vector for control.
+#' @param contr.volume Volume vector for control.
+#' @param treat.time Time vector for treatment.
+#' @param treat.volume Volume vector for treatment.
+#' @param min.time Minimum time after which tumor volume will be considered.
+#'
+#' @return Returns batch response object.
+#' @examples
+#' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' contr.volume<- contr.time * tan(60*pi/180)
+#' treat.volume<- treat.time * tan(15*pi/180)
+#' bmr <- bmRECIST(contr.time, contr.volume, treat.time, treat.volume)
+#' print(bmr)
+#' @export
+bmRECIST <- function(contr.time=NULL, contr.volume=NULL,
+                     treat.time=NULL, treat.volume=NULL,
+                     min.time=10)
+{
+  con <- tre <- empty_model_response_class_mRECIST()
+
+  if(!is.null(contr.time) & !is.null(contr.volume))
+  {
+    if(length(contr.volume)!=length(contr.time))
+    {
+      msg <- sprintf("contr.time and contr.volume should have same length")
+      stop(msg)
+    }
+    con <- mRECIST(contr.time, contr.volume, min.time=min.time)
+  }
+
+
+  if(!is.null(treat.time) & !is.null(treat.volume))
+  {
+    if(length(treat.volume)!=length(treat.time))
+    {
+      msg <- sprintf("treat.time and treat.volume should have same length")
+      stop(msg)
+    }
+    tre <- mRECIST(treat.time, treat.volume, min.time=min.time)
+  }
+
+  v <- sprintf("control = %s, treatment = %s", con$value, tre$value)
+  rtx <- batch_response_class(name="bmRECIST", value=v, control=con, treatment=tre)
+  return(rtx)
 }
