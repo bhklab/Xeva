@@ -268,16 +268,28 @@ setMethod(
   signature = "XevaSet",
   definition = function(object)
   {
+    modSen <- colnames(slot(object, "sensitivity")$model)
+    modSentxt <- ""
+    if(length(modSen)>1)
+    { modSentxt <- paste0(modSen[modSen!="model.id"], collapse = ", ") }
+
+    batSen <- colnames(slot(object, "sensitivity")$batch)
+    batSentxt <- ""
+    if(length(batSen)>1)
+    { batSentxt <- paste0(batSen[batSen!="batch.name"], collapse = ", ") }
+
     msg <-
       sprintf(
-        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
+        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\nSensitivity\nmodel:%s\nbatch:%s\n",
         slot(object, "annotation")$name,
         slot(object, "annotation")$dateCreated,
         length(slot(object, "experiment")),
         nrow(slot(object, "drug")),
         paste(names(slot(
           object, "molecularProfiles"
-        )), collapse = ", ")
+        )), collapse = ", "),
+        modSentxt,
+        batSentxt
       )
     cat(msg)
   }
