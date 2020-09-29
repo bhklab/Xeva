@@ -1,6 +1,7 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{The Xeva User's Guide}
 \documentclass{article}
+\usepackage{tcolorbox}
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
@@ -198,6 +199,23 @@ There are two kinds of response metrics available:
     \end{enumerate}
 \end{enumerate}
 
+
+\begin{tcolorbox}[fonttitle=\sffamily\bfseries\large,
+%colframe=red!75!black,
+title=Note: mRECIST and bmRECIST]
+The response metric \textbf{mRECIST} can only be computed for a single PDX model at a time.
+Moreover for a treatment model it doesn't take into account corresponding control models.
+Response for all individual models in a batch can be extracted using \textit{summarizeResponse} function (also see \ref{visRes}).
+We have implemented \textbf{bmRECIST}  which is the mRECIST for a batch.
+This is simply \textbf{mRECIST} computed on the average time-volume curve
+(from multiple PDX models).
+In this setting we compute \textbf{mRECIST} separately for treatment and control arm.
+These ouputs are represented as \textit{mRECIST.control} and \textit{mRECIST.treatment}
+in the sensitivity slot.
+At present it is not possible to combine \textit{mRECIST.control} and \textit{mRECIST.treatment} in one single metric. However we are working on this and  will update the Xeva code in future with such metric.
+
+\end{tcolorbox}
+
 %%%%%%%%%%%%%%%%
 
 In Xeva we have provided a unified function \textbf{\textcolor{red}{\hl{response}}}
@@ -231,11 +249,19 @@ brca  <- setResponse(brca, res.measure = "TGI", verbose=FALSE)
 @
 
 
-\subsection{Visualizing PDX response}
-Xeva can effectively summarize PDX drug response data. Here we summarize the \textbf{mRECIST} values for the models in our dataset:
+\subsection{Visualizing PDX response} \label{visRes}
+Xeva can effectively summarize PDX drug response data.
+To get \textbf{mRECIST} for all models in a single batch:
+<<sumresB,  warning = FALSE, message=FALSE>>=
+r <- summarizeResponse(brca,response.measure="mRECIST",batch.id="X-1004.BGJ398")
+head(r)
+@
 
+
+Next we summarize the \textbf{mRECIST} values for the models in our dataset:
 <<l4>>=
-brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
+brca.mr <- summarizeResponse(brca, response.measure="mRECIST",
+                             group.by="patient.id")
 brca.mr[1:5, 1:4]
 @
 

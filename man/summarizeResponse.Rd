@@ -52,4 +52,7 @@ For the \code{per batch response} output, the \code{group.by} value can be \code
 data(brca)
 brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 
+## to get model level response for a batch
+r <- summarizeResponse(brca, response.measure = "mRECIST", batch.id = "X-1004.BGJ398")
+
 }

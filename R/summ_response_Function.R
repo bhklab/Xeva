@@ -32,6 +32,35 @@
   return(mat)
 }
 
+.ModelResponsePerBatch <- function(object, response.measure, batch.id)
+{
+  batch.name <- batchInfo(object)
+  if(!batch.id %in% batch.name){stop("batch.id not present, See batchInfo(object)")}
+
+  batch.design <- batchInfo(object, batch=batch.id)
+
+  rtx <- data.frame()
+  if(length(batch.design[[1]]$control)>0)
+  {
+    rcn <- sensitivity(object, type = "model")[batch.design[[1]]$control,]
+    rcn$type <- "control"
+    rtx <- rbind(rtx, rcn)
+  }
+
+  if(length(batch.design[[1]]$treatment)>0)
+  {
+    rtn <- sensitivity(object, type = "model")[batch.design[[1]]$treatment,]
+    rtn$type <- "treatment"
+    rtx <- rbind(rtx, rtn)
+  }
+  if(nrow(rtx)>0)
+  {
+    rtx$batch.name <- batch.id
+    rtx <- rtx[, c("model.id", "batch.name", "type", response.measure)]
+  }
+
+  return(rtx)
+}
 
 .summarizePerBatchResponse <- function(object, response.measure = NULL,
                                        batch.name=NULL, summarize=FALSE)
@@ -138,6 +167,9 @@
 #' data(brca)
 #' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 #'
+#' ## to get model level response for a batch
+#' r <- summarizeResponse(brca, response.measure = "mRECIST", batch.id = "X-1004.BGJ398")
+#'
 #' @export
 summarizeResponse <- function(object, response.measure = "mRECIST",
                               model.id=NULL, batch.id=NULL,
@@ -151,11 +183,17 @@ summarizeResponse <- function(object, response.measure = "mRECIST",
 
   if(rm.type=="model")
   {
+    if(!is.null(batch.id))
+    {
+      mat <- .ModelResponsePerBatch(object, response.measure, batch.id)
+      return(mat)
+    } else {
     mat <- .summarizePerModelResponse(object, response.measure=response.measure,
                                       model.id=model.id, group.by=group.by,
                                       summary.stat=summary.stat,
                                       tissue=tissue)
     return(mat)
+    }
   }
 
   if(rm.type=="batch")
