@@ -2,7 +2,6 @@
 % Please edit documentation in R/access_slot_expDesign.R
 \name{batchInfo}
 \alias{batchInfo}
-\alias{batchInfo,XevaSet-method}
 \title{Get batch information}
 \usage{
 batchInfo(
@@ -10,18 +9,7 @@ batchInfo(
   batch = NULL,
   model.id = NULL,
   model.id.type = c("any", "control", "treatment"),
-  patient.id = FALSE,
-  drug = FALSE,
-  return.df = FALSE
-)
-
-\S4method{batchInfo}{XevaSet}(
-  object,
-  batch = NULL,
-  model.id = NULL,
-  model.id.type = c("any", "control", "treatment"),
-  patient.id = FALSE,
-  drug = FALSE,
+  other.col = NULL,
   return.df = FALSE
 )
 }
@@ -34,11 +22,11 @@ batchInfo(
 
 \item{model.id.type}{Type of the model ID in a batch. See the Details section below.}
 
+\item{return.df}{If TRUE, will return a data.frame (see the Details). Default \code{FALSE}.}
+
 \item{patient.id}{If TRUE, will return patient.id . Default \code{FALSE}.}
 
 \item{drug}{If TRUE, will return drug . Default \code{FALSE}.}
-
-\item{return.df}{If TRUE, will return a data.frame (see the Details). Default \code{FALSE}.}
 }
 \value{
 A \code{Vector} with batch names.
@@ -69,7 +57,11 @@ batch.name <- batchInfo(brca)
 ##to get a specific batch
 batch.design <- batchInfo(brca, batch=batch.name[1])
 
-##to get all the batches where a model.id is present
-batchInfo(brca, model.id="X.6047.uned")
+##to get all the batches where a model.id is present in control arm
+bn <- batchInfo(brca, model.id="X.6047.uned", model.id.type="control")
+
+##get batch level information with tissue column added
+batch.name <- batchInfo(brca)
+batch.df <- batchInfo(brca, batch=batch.name[1:10], other.col="tissue",return.df = TRUE)
 
 }

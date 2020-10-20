@@ -61,6 +61,7 @@ library(Xeva)
 
 <<biobase, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
 suppressMessages(library(Biobase))
+suppressMessages(library(ggplot2))
 @
 
 Load the dataset you wish to analyze. For the sake of this tutorial, here we load the Novartis PDXE \cite{gao2015high} breast cancer dataset as an example:
@@ -278,19 +279,26 @@ waterfall(brca, drug="binimetinib", res.measure="best.average.response")
 @
 
 
-It is useful to color the bars of your waterfall plot by genomic properties.
-Here we create a waterfall plot for drug BYL719 and color it based on the mutation status of the CDK13 gene.
-First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
+It is useful to color the bars of your waterfall plot by genomic properties. 
+If the color type information is available in `modelInfo`, colored bars can be directly be plotted by specifying name of the column for `type` parameter. 
+Otherwise one can extract a data.frame of response and add a column for `type` and visualize the waterfall plot.
+Here we create a waterfall plot for drug BYL719 and color it based on the mutation status of the CDK13 gene:
 <<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
-mut <- summarizeData(brca,drug = "BYL719", mDataType="mutation")
-model.type <- Biobase::exprs(mut)["CDK13", ]
-model.type[grepl("Mut", model.type)] <- "mutation"
-model.type[model.type!="mutation"] <- "wild type"
-model.color <- list("mutation"="#b2182b", "wild type"="#878787")
-waterfall(brca, drug="BYL719", res.measure="best.average.response",
-          model.id=names(model.type), model.type= model.type,
-          type.color = model.color)
+data(brca)
 
+## extract mutation information
+mut <- summarizeData(brca, drug = "BYL719", mDataType="mutation")
+model.type <- Biobase::exprs(mut)["CDK13", ]
+
+## extract data.frame of response
+df <- summarizeResponse(brca, response.measure = "best.average.response", return.type = "data.frame")
+df <- df[df$drug == "BYL719", ]
+
+## add values to data.frame 
+df$CDK13 <- model.type[df$model.id]
+## now plot the data 
+
+waterfall(df, x="model.id", y="best.average.response", type="CDK13")
 @
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

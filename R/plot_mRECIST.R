@@ -218,11 +218,13 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
                         row_fontsize=12, col_fontsize=12, legend_title="Response",
                         draw_plot=TRUE)
 {
-  control.name = c(control.name)
+  if(!is(mat, "matrix"))
+  {mat <- as.matrix(mat)}
 
-  unqMat <- as.character(unique(unlist(lapply(colnames(mat), function(x) unique(mat[,x]) ))))
+  unqMat <- as.character(unique(as.vector(mat)))
+  unqMat <- unique(unlist(strsplit(unqMat, ";")))
   unqMat <- unqMat[!is.na(unqMat)]
-
+  
   if(is.null(colPalette))
   {
     colPalette <- .mRcolPalette(unqMat)
@@ -238,6 +240,7 @@ plotmRECIST <- function(mat, control.name = NA, control.col="#238b45", drug.col=
     }
   }
 
+  control.name <- c(control.name)
   if(sort==TRUE)
   {
     matRC <-.sortPlotMat(mat, controlD=control.name, control.col=control.col,

@@ -12,7 +12,8 @@ summarizeResponse(
   group.by = "patient.id",
   summary.stat = c(";", "mean", "median"),
   tissue = NULL,
-  summarize.batch = FALSE
+  other.col = NULL,
+  return.type = c("matrix", "data.frame")
 )
 }
 \arguments{
@@ -30,7 +31,9 @@ summarizeResponse(
 
 \item{tissue}{Name of the tissue. Default \code{NULL}}
 
-\item{summarize.batch}{If TRUE, batch response will be summarized as drug patient matrix. Default \code{FALSE}}
+\item{other.col}{Names of other columns to add in the return, if return.type is data.frame}
+
+\item{return.type}{Specify return type, allowed values are 'matrix' or 'data.frame'. Default \code{'matrix'}}
 }
 \value{
 A \code{matrix} with rows as drug names, column as \code{group.by}. Each cell contains \code{response.measure} for the pair.
@@ -46,11 +49,13 @@ There can be two types of drug response measure.
 }
 For the \code{per model response} output, columns will be \code{model.id} (or \code{group.by}).
 For the \code{per batch response} output, the \code{group.by} value can be \code{"batch.name"}.
-\code{summarize.batch = TRUE} will return response as drug patient matrix.
 }
 \examples{
 data(brca)
 brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+
+## to get batch level response
+br <- summarizeResponse(brca, response.measure = "abc", return.type="data.frame")
 
 ## to get model level response for a batch
 r <- summarizeResponse(brca, response.measure = "mRECIST", batch.id = "X-1004.BGJ398")

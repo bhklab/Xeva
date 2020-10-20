@@ -1,148 +1,164 @@
-plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
-                          show.legend, sort=sort)
+#' @import ggplot2
+waterfall.plot <- function(dt, x, y, type, type.color, sort=TRUE, na.value="#878787")
 {
-
-  dt <- data.frame(x=x, y=y, color=color, stringsAsFactors = FALSE)
-  dt <- dt[!is.na(dt$y), ]
-
-  dt[, legend.name] <- type
-
   if(sort==TRUE)
-  { dt <- BBmisc::sortByCol(dt, c("y", legend.name, "x"), asc = FALSE) }
-  dt$x <- factor(dt$x, levels = as.character(dt$x))
-
-  plt <- ggplot(dt, aes_string(x="x", y="y", fill=legend.name))
+  { dt <- BBmisc::sortByCol(dt, c(y, x), asc = c(FALSE, FALSE)) }
+  dt[, x] <- factor(dt[, x], levels = as.character(dt[, x]))
+  
+  plt <- ggplot(dt, aes_string(x=x, y=y, fill=type))
   plt <- plt + geom_bar(stat = "identity")
-
-  colValX <- unique(dt[, c("color", legend.name)])
-  colVal <- as.character(colValX[, "color"])
-  names(colVal)  <- colValX[, legend.name]
-
-  plt <- plt + scale_fill_manual(values=colVal)
+  plt <- plt + scale_fill_manual(values=type.color, na.value=na.value)
+  
   plt <- plt +theme(axis.title.x=element_blank(),
                     axis.text.x=element_blank(),
                     axis.ticks.x=element_blank())
   ##--------- add x axis line ----------------------------
   plt <- plt + geom_hline(yintercept=0, size =0.25)
   plt <- .ggplotEmptyTheme(plt)
-
   ##----remove x axis ------------------
   plt <- plt +theme(axis.title.x=element_blank(), axis.text.x=element_blank(),
                     axis.ticks.x=element_blank(), axis.line.x = element_blank())
-
   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
-  plt <- plt + labs(title = title, y = yname)
-  if(show.legend==FALSE)
-  {
-    plt <- plt + theme(legend.position="none")
-  }
   return(plt)
 }
+
+getColPal <- function(N)
+{
+  pl <- c('#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f')
+  if(N > length(pl)) 
+  { pl <- rainbow(N, alpha=0.9) }
+  return(pl[1:N])
+}
+
+
+getDataForWaterFall <- function(object, res.measure=NULL, drug=NULL, group.by=NULL,
+                                summary.stat = c(";", "mean", "median"),
+                                type=NULL, type.color=NULL)
+{
+  res <- summarizeResponse(object, response.measure = res.measure,
+                           group.by=group.by,
+                           summary.stat=summary.stat,
+                           other.col = type,
+                           return.type = "data.frame")
+  if(!(drug %in% res$drug))
+  { stop(sprintf("drug %s not present in dataset (or tissue subset)", drug))}
+  
+  dt <- res[!is.na(res$drug) & res$drug == drug, ]
+  
+  x <- ifelse("model.id" %in% colnames(dt), "model.id", "batch.name")
+  y <- res.measure
+  
+  if(is.null(type))
+  {
+    type <- "type"
+    dt[, "type"] <- res.measure
+  }
+  
+  if(is.null(type.color)) 
+  { 
+    type.color <- getColPal(length(unique(dt[, type]))) 
+  }
+  
+  if(is.null(names(type.color)))
+  { names(type.color) <-  unique(dt[, type]) }
+  dl <- list(dt=dt, x=x, y=y, type=type, type.color=type.color)
+  return(dl)
+}
+##---------------------------------------
 
 #' waterfall plot
 #' Creates waterfall plot for a given drug.
 #'
 #' @examples
 #' data(brca)
-#' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published")
-#' ## example with model.type where we color the models by TP53 mutation type
-#' mut <- summarizeMolecularProfiles(brca,drug = "binimetinib", mDataType="mutation")
-#' model.type <- Biobase::exprs(mut)["TP53", ]
-#' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published",
-#'           tissue="BRCA", model.id=names(model.type), model.type= model.type)
+#' ##plot best.average.response for all models tested with binimetinib
+#' waterfall(brca, drug="binimetinib", res.measure="best.average.response")
+#' 
+#' ##plot same by taking mean of multiple models of each patient
+#' waterfall(brca, drug="binimetinib", res.measure="best.average.response", 
+#'           group.by = "patient.id", summary.stat = "mean")
 #'
-#' @param object The \code{XevaSet} object
+#' ## plot by specifing color by mutation type
+#' ## extract mutation information
+#' mut <- summarizeData(brca,drug = "binimetinib", mDataType="mutation")
+#' model.type <- Biobase::exprs(mut)["TP53", ]
+#' ## extract data.frame of response
+#' df <- summarizeResponse(brca, response.measure = "best.average.response", return.type = "data.frame")
+#' df <- df[df$drug == "binimetinib", ]
+#' ## add values to data.frame 
+#' df$TP53 <- model.type[df$model.id]
+#' ## now plot the data 
+#' waterfall(df, x="model.id", y="best.average.response", type="TP53")
+#'
+#' @param object The \code{XevaSet} object or a data.frame. See \code{Details}.
 #' @param res.measure PDX model drug response measure
 #' @param drug Name of the drug
 #' @param group.by Group drug response data
-#' @param summary.stat How to summarize multiple values
-#' @param tissue Tissue type
-#' @param model.id Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models
-#' @param model.type Type of model, such as mutated or wild type
-#' @param type.color A list with colors used for each type in the legend
-#' @param legend.name Name of the legend
+#' @param summary.stat How to summarize multiple values. Options are ";", "mean" or "median". See \code{Details}.
+#' @param x,y If object is data.frame, x and y indicates column names of x and y axis
+#' @param type Type for each bar in waterfall (such as mutated or wild type). See Details.
+#' @param type.color A color vector for type
 #' @param yname Name for the y-axis
 #' @param title Title of the plot
 #' @param sort Default \code{TRUE} will sort the data
+#' @param na.value Color for NA values. Default "#878787"
 #'
 #' @return waterfall plot in ggplot2
+#' 
+#' @details The function waterfall can plot from a XevaSet or from a data.frame . 
+#' If a data.frame is specified, x and y parameters must also be specified. 
 #'
 #' @export
 #' @import ggplot2
-waterfall <- function(object, res.measure, drug=NULL, group.by=NULL,
+waterfall <- function(object, res.measure=NULL, drug=NULL, group.by=NULL,
                       summary.stat = c(";", "mean", "median"),
-                      tissue=NULL,
-                      model.id=NULL, model.type= NULL, type.color="#cc4c02",
-                      legend.name=NULL, yname = NULL, title=NULL, sort=TRUE)
+                      x = NULL, y = NULL, 
+                      type=NULL, type.color=NULL, na.value="#878787",
+                      yname = NULL, title=NULL, sort=TRUE)
 {
-  if(is.null(yname)){ yname <- res.measure}
-
-  res <- summarizeResponse(object, response.measure = res.measure,
-                           model.id=model.id,
-                           group.by=group.by,
-                           summary.stat=summary.stat,
-                           tissue=tissue)
-
-  if(is.null(drug))
-  { drug <- unique(rownames(res)) }
-
-  if(!(drug %in% rownames(res)))
-  { stop(sprintf("drug %s not present in dataset (or tissue subset)", drug))}
-
-  vl <- unlist(res[drug, ])
-  validVl <- names(vl)[!is.na(vl)]
-  vl <- vl[validVl]
-  if(length(vl)==0)
-  { stop(sprintf("No valid value of %s present in dataset (or tissue subset)",
-                 res.measure))}
-
-  if(!is(vl, "numeric"))
-  {stop(sprintf("%s is not a numeric response\n", res.measure))}
-
-  vx <- data.frame(x=names(vl), y=vl, type=drug, col="#cc4c02",
-                   stringsAsFactors = FALSE)
-  vx <- vx[!is.na(vx$y), ]; vx <- vx[!is.na(vx$x), ]
-  rownames(vx) <- as.character(vx$x)
-
-  if(!is.null(model.id))
+  summary.stat <- match.arg(summary.stat)
+ 
+  if(is(object, "XevaSet"))
   {
-    vx <- vx[vx$x%in%model.id, ]
-    if(nrow(vx)==0)
-    { msg <- sprintf("given model.id are not present in the object\n") }
+    dl <- getDataForWaterFall(object, res.measure, drug, group.by,
+                                    summary.stat, type, type.color)
+    dt <- dl$dt 
+    x <- dl$x
+    y <- dl$y
+    type <- dl$type
+    type.color <- dl$type.color
   }
-
-  if(!is.null(model.type))
+  
+  if(is(object, "data.frame"))
   {
-    if(is.null(model.id))
-    { stop("specifying 'model.id' is necessary for 'model.type'") }
-    vx[model.id, "type"] <- model.type
-  }
-
-  if(length(unique(vx$type))==1)
-  {
-    vx$col <- rep(type.color, nrow(vx))[seq_len(nrow(vx))]
-  }
-
-  if(length(unique(vx$type))>1)
-  {
-    if(!is(type.color, "list"))
+    dt <- object
+    if(is.null(x)) { stop("for data.frame x value must be defined")}
+    if(is.null(y)) { stop("for data.frame y value must be defined")}
+    
+    if(is.null(type))
     {
-      type.color <- as.list(rainbow(length(unique(vx$type))))
-      names(type.color) <- unique(vx$type)
+      type <- "type"
+      dt[, "type"] <- y
     }
-    vx$col <- unlist(type.color[vx$type])
+    
+    if(is.null(type.color)) 
+    { type.color <- getColPal(length(unique(dt[, type]))) }
+    if(is.null(names(type.color)))
+    { names(type.color) <-  unique(dt[, type]) }
   }
-
-  show.legend <- TRUE
-  if(is.null(legend.name))
-  {
-    legend.name <- "type"
-    if(length(unique(vx$type))==1)
-    {show.legend <- FALSE }
-  }
-
-  vx <- vx[!is.na(vx$x), ]; vx <- vx[!is.na(vx$y), ]
-  plt <- plotWaterFall(x=vx$x, y=vx$y, type=vx$type, color=vx$col, title, yname,
-                       legend.name, show.legend, sort=sort)
-  return(plt)
+  
+  checkCol <- setdiff(c(x, y, type), colnames(dt))
+  if(length(checkCol)>0)
+  { stop(sprintf("%s is not present in data\n", checkCol)) }
+  
+  if(length(type.color) < length(unique(dt[, type])))
+  { stop(sprintf("type.color should be length %d", length(unique(dt[, type])))) }
+  
+  plt <- waterfall.plot(dt, x, y, type, type.color, sort, na.value)
+  if(length(type.color)==1)
+  { plt <- plt + theme(legend.position="none") }
+  if(!is.null(title)) { plt <- plt + labs(title = title)}
+  if(!is.null(title)) { plt <- plt + labs(y = yname) }
+  plt
 }
+

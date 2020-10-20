@@ -163,11 +163,28 @@ drugSensitivitySig <- function(object, drug, sensitivity.measure,
 
   df <- df[, nonNAsample]
   x <- t(exprs(df))
+  allxcol <- ncol(x)
   x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
+  
   y <- pData(df)[, sensitivity.measure]
-
+  
+  if(ncol(x)==0)
+  { stop("no non-zero variance feature left in the data") }
+  
+  if(verbose==TRUE)
+  {
+    if(allxcol-ncol(x) >0)
+    {
+      txt <- sprintf("Removing %d features because of zero variance\n", allxcol-ncol(x))
+      cat(txt)
+    }
+    
+    txt <- sprintf("Running for %d samples with non NA sensitivity.measure and %d features\n",
+                   nrow(x), ncol(x))
+    cat(txt)
+  }
+  
   rtx <-compute_association(x, y, fit = fit[1], nthread= nthread,
-                            #type=mdfI[, "tissue"],
                             standardize=standardize[1], verbose=verbose)
 
   rtx$drug <- drug
@@ -177,110 +194,3 @@ drugSensitivitySig <- function(object, drug, sensitivity.measure,
 }
 
 
-
-drugSensitivitySig_old <- function(object, drug,
-                               mDataType=NULL, molData=NULL, features=NULL,
-                               model.ids=NULL, model2bidMap = NULL,
-                               sensitivity.measure="slope",
-                               fit = c("lm", "CI", "pearson", "spearman", NA),
-                               standardize=c("SD", "rescale", "none"),
-                               nthread=1, tissue=NULL, verbose=TRUE)
-{
-  if(is.null(mDataType)& is.null(molData))
-  {
-    stop("'mDataType' and 'molData' both can't be NULL ")
-  }
-
-  if(is.null(molData))
-  {
-    molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
-  }
-
-  molData <- as.matrix(molData)
-
-  if(is.null(model2bidMap))
-  {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
-
-  drugIx <- c(drug)[1]
-
-  if(verbose==TRUE){cat(sprintf("Running for drug %s\n\n", drugIx))}
-  mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
-                                 collapse.by="mean", model.ids, mDataType,
-                                 model2bidMap)
-
-  if(nrow(mdfI)<2)
-  {
-    msg <- sprintf("Too few samples for drug %s\nNumber of samples %d",
-                   drugIx, nrow(mdfI))
-    stop(msg)
-  }
-
-  if(is.null(features))
-  { features <- rownames(molData)}
-
-  if(!is.null(tissue))
-  {
-    if(length(tissue) == 1)
-    {
-      cat(sprintf("setting 'tissue' = %s for all models", tissue[1]))
-      tt <- rep(tissue[1], nrow(mdfI))
-      names(tt) <- mdfI$model.id
-    }
-
-    if(length(tissue) > 1)
-    {
-      if(length(tissue)!= nrow(mdfI))
-      {stop("length of type should be equal to length of models")}
-
-      if(is.null(names(tissue)))
-      {
-        msg <- sprintf("'tissue' has no names. Please provide a named list")
-        stop(msg)
-      }
-
-      tt <- tissue
-    }
-  } else
-  {
-    if("tissue" %in% colnames(modelInfo(object)))
-    {
-      typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
-                                map.to = "tissue", unique = FALSE)
-      tt <- typeDF[, "tissue"]
-      names(tt) <- typeDF$model.id
-    } else
-    {
-      warning("'tissue' not present in modelInfo, setting tissue = 'tumor' for all models")
-      tt <- rep("tumor", nrow(mdfI))
-      names(tt) <- mdfI$model.id
-    }
-  }
-
-  mdfI[, "tissue"] <- tt[mdfI$model.id]
-  x <- t(molData[features, mdfI$biobase.id])
-  x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
-
-  fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
-  if(fetDiff>0)
-  {
-    msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
-    warning(msg1)
-  }
-
-  if(is.na(fit[1]))
-  {
-    eSet <- .getExpressionSet(t(x), y= mdfI[,sensitivity.measure],
-                              sensitivity.measure=sensitivity.measure,
-                              tissue=mdfI[, "tissue"])
-    return(eSet)
-  }
-
-  rtx <-compute_association(x, y = mdfI[,sensitivity.measure],
-                            fit = fit[1], nthread= nthread, type=mdfI[, "tissue"],
-                            standardize=standardize[1], verbose=verbose)
-
-  rtx$drug <- drugIx
-  rtx <- .reorderCol(rtx, "drug", 2)
-  rownames(rtx) <- NULL
-  return(rtx)
-}

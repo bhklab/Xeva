@@ -7,22 +7,22 @@ Creates waterfall plot for a given drug.}
 \usage{
 waterfall(
   object,
-  res.measure,
+  res.measure = NULL,
   drug = NULL,
   group.by = NULL,
   summary.stat = c(";", "mean", "median"),
-  tissue = NULL,
-  model.id = NULL,
-  model.type = NULL,
-  type.color = "#cc4c02",
-  legend.name = NULL,
+  x = NULL,
+  y = NULL,
+  type = NULL,
+  type.color = NULL,
+  na.value = "#878787",
   yname = NULL,
   title = NULL,
   sort = TRUE
 )
 }
 \arguments{
-\item{object}{The \code{XevaSet} object}
+\item{object}{The \code{XevaSet} object or a data.frame. See \code{Details}.}
 
 \item{res.measure}{PDX model drug response measure}
 
@@ -30,17 +30,15 @@ waterfall(
 
 \item{group.by}{Group drug response data}
 
-\item{summary.stat}{How to summarize multiple values}
+\item{summary.stat}{How to summarize multiple values. Options are ";", "mean" or "median". See \code{Details}.}
 
-\item{tissue}{Tissue type}
+\item{x, y}{If object is data.frame, x and y indicates column names of x and y axis}
 
-\item{model.id}{Indicates which \code{model.id} to plot. Default \code{NULL} will plot all models}
+\item{type}{Type for each bar in waterfall (such as mutated or wild type). See Details.}
 
-\item{model.type}{Type of model, such as mutated or wild type}
+\item{type.color}{A color vector for type}
 
-\item{type.color}{A list with colors used for each type in the legend}
-
-\item{legend.name}{Name of the legend}
+\item{na.value}{Color for NA values. Default "#878787"}
 
 \item{yname}{Name for the y-axis}
 
@@ -55,13 +53,29 @@ waterfall plot in ggplot2
 waterfall plot
 Creates waterfall plot for a given drug.
 }
+\details{
+The function waterfall can plot from a XevaSet or from a data.frame . 
+If a data.frame is specified, x and y parameters must also be specified.
+}
 \examples{
 data(brca)
-waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published")
-## example with model.type where we color the models by TP53 mutation type
-mut <- summarizeMolecularProfiles(brca,drug = "binimetinib", mDataType="mutation")
+##plot best.average.response for all models tested with binimetinib
+waterfall(brca, drug="binimetinib", res.measure="best.average.response")
+
+##plot same by taking mean of multiple models of each patient
+waterfall(brca, drug="binimetinib", res.measure="best.average.response", 
+          group.by = "patient.id", summary.stat = "mean")
+
+## plot by specifing color by mutation type
+## extract mutation information
+mut <- summarizeData(brca,drug = "binimetinib", mDataType="mutation")
 model.type <- Biobase::exprs(mut)["TP53", ]
-waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published",
-          tissue="BRCA", model.id=names(model.type), model.type= model.type)
+## extract data.frame of response
+df <- summarizeResponse(brca, response.measure = "best.average.response", return.type = "data.frame")
+df <- df[df$drug == "binimetinib", ]
+## add values to data.frame 
+df$TP53 <- model.type[df$model.id]
+## now plot the data 
+waterfall(df, x="model.id", y="best.average.response", type="TP53")
 
 }
