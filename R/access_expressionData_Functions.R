@@ -1,4 +1,3 @@
-#####================= getMolecularProfiles ==================
 #' Get molecular profiles from a XevaSet object
 #'
 #' This function serves to get molecular profiles from a \code{XevaSet} object.
