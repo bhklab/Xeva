@@ -381,6 +381,12 @@ response <- function(object, model.id=NULL, batch=NULL,
   ##-----------------for batch -------------------------------------------------
   if(is.null(model.id))
   {
+    if(verbose==TRUE){
+      if(is.character(batch))
+      {bName <- batch} else {bName <- batch$batch.name}
+      cat(sprintf("computing %s for batch %s\n",res.measure, bName))
+    }
+    
     dl <- getExperiment(object, batch=batch,
                         treatment.only=treatment.only, max.time=max.time,
                         vol.normal=vol.normal, impute.value=impute.value,
@@ -396,12 +402,12 @@ response <- function(object, model.id=NULL, batch=NULL,
     if(sum(tInd)>1)
     { treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]}
 
-    if(verbose==TRUE){
-      if(is.character(batch))
-        {bName <- batch} else {bName <- batch$batch.name}
-      cat(sprintf("computing %s for batch %s\n",res.measure, bName))
-
-      }
+    # if(verbose==TRUE){
+    #   if(is.character(batch))
+    #     {bName <- batch} else {bName <- batch$batch.name}
+    #   cat(sprintf("computing %s for batch %s\n",res.measure, bName))
+    # 
+    #   }
     ###--------compute angle for batch -----------------------------------------
     if(res.measure =="angle")
     {
