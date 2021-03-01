@@ -45,20 +45,12 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
   }
 }
 
-.normalizeVolume_old <- function(X)
+
+.normalizeByElement1 <- function(x) 
 {
-  if (is.na(X[1]) == TRUE)
-  {
-    warning("First value not numeric.")
-    return(rep(NA, length(X)))
-  }
-  if (X[1] == 0)
-  {
-    warning("start volume zero, adding 1 to compute volume.normal")
-    X <- X + 1
-  }
-  rtx <- (X - X[1]) / X[1]
-  return(rtx)
+  if(x[1]==0)
+  {x <- x + 1}
+  return((x - x[1])/x[1])
 }
 
 .normalizeVolume <- function(time, volume, atT0)
