@@ -15,16 +15,21 @@
 #' plot(time, volume, type = "b", xlim = xylimit, ylim = xylimit)
 #' abline(lm(volume~time))
 #' @export
-slope <- function(time, volume, degree=TRUE)
+slope <- function(time, volume, degree=TRUE, vol.normal=TRUE)
 {
   df <- data.frame(time=time, volume=volume)
   ##---- remove all non finite (Inf, NA, NaN) data --------------
   df <- df[is.finite(df$time), ]
   df <- df[is.finite(df$volume),]
 
-  df$time  <- df$time- df$time[1]
-  df$volume<- df$volume-df$volume[1]
-
+  #df$time  <- df$time- df$time[1]
+  #df$volume<- df$volume-df$volume[1]
+  if(df$time[1]!=0)
+  { warning("time t0 is not zero")}
+  
+  if(vol.normal==TRUE)
+  { df$volume <- .normalizeByElement1(df$volume) }
+  
   fit <- lm(volume~time +0, df)
   ang <- atan(coef(fit)[["time"]])
   ##----old way to compute angle ---
