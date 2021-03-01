@@ -72,7 +72,6 @@ print.batchResponse <- function(x, ...)
 {
   if(x$name=="bmRECIST")
   {
-    #cat(sprintf("%s\n%s\n", x$name, x$value))
     cat(sprintf("%s\n", x$name))
     if(!is.null(x$control))
     { cat(sprintf("control = %s\n", x$control$value)) }
@@ -343,7 +342,7 @@ response <- function(object, model.id=NULL, batch=NULL,
                      min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
                      log.volume=FALSE, verbose=TRUE)
 {
-  if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
+  if(is.null(model.id) & is.null(batch)) 
   { stop("'model.id', 'batch' all NULL") }
 
   ##------------- for model ----------------------------------------------------
@@ -396,18 +395,29 @@ response <- function(object, model.id=NULL, batch=NULL,
     tInd <- dl$batch$exp.type == "treatment"
 
     contr.time <- contr.volume <- treat.time <- treat.volume <- NULL
+    
+    rtx <- batch_response_class(name=res.measure, value=NA)
+    
     if(sum(cInd)>1)
-    { contr.time <- dl$batch$time[cInd]; contr.volume <- dl$batch$mean[cInd] }
+    { 
+      contr.time <- dl$batch$time[cInd]; contr.volume <- dl$batch$mean[cInd] 
+    } else 
+    {
+      msg <- sprintf("In batch %s\ncontrol not present or only 1 data point for given time, setting response to NA", batch)
+      warning(msg)
+      return(rtx)
+    }
 
     if(sum(tInd)>1)
-    { treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]}
+    { 
+      treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]
+    } else 
+    {
+      msg <- sprintf("In batch %s\ntreatment not present or only 1 data point for given time, setting response to NA", batch)
+      warning(msg)
+      return(rtx)
+    }
 
-    # if(verbose==TRUE){
-    #   if(is.character(batch))
-    #     {bName <- batch} else {bName <- batch$batch.name}
-    #   cat(sprintf("computing %s for batch %s\n",res.measure, bName))
-    # 
-    #   }
     ###--------compute angle for batch -----------------------------------------
     if(res.measure =="angle")
     {
