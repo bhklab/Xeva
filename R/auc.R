@@ -26,10 +26,15 @@
 #' lines(time, volume2, type = "b", col="green")
 #' abline(lm(volume2~time), col="green")
 #' @export
-AUC <- function(time, volume, time.normalize=TRUE)
+AUC <- function(time, volume, time.normalize=TRUE, vol.normal=TRUE)
 {
+  if(vol.normal==TRUE)
+  { volume <- .normalizeByElement1(volume) }
+  
+  if(time[1]!=0)
+  { warning("time t0 is not zero")}
   auc <- .trapz_AUC(time, volume)
-  if(time.normalize==TRUE){auc = auc/max(time)}
+  if(time.normalize==TRUE){auc = auc/(time[length(time)] - time[1])}
   rtx <- model_response_class(name = "auc", value = auc)
   return(rtx)
 }
