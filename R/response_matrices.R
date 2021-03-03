@@ -258,7 +258,7 @@ setResponse <- function(object,
   }
   ##--------------code for batch level mR --------------------------------------
   ##----------------------------------------------------------------------------
-  ###--------compute bmRECIST for batch ---------------------------------------------
+  ###--------compute bmRECIST for batch ----------------------------------------
   if("bmRECIST" %in% res.measure)
   {
     mrvars <- c("mRECIST", "best.response", #"best.response.time",
@@ -400,58 +400,76 @@ response <- function(object, model.id=NULL, batch=NULL,
     
     if(sum(cInd)>1)
     { 
-      contr.time <- dl$batch$time[cInd]; contr.volume <- dl$batch$mean[cInd] 
-    } else 
-    {
-      msg <- sprintf("In batch %s\ncontrol not present or only 1 data point for given time, setting response to NA", batch)
-      warning(msg)
-      return(rtx)
+      contr.time <- dl$batch$time[cInd]
+      contr.volume <- dl$batch$mean[cInd] 
     }
 
     if(sum(tInd)>1)
     { 
       treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]
-    } else 
+    }
+    
+    .checkInputLen <- function(contr.time, contr.volume, treat.time,treat.volume)
     {
-      msg <- sprintf("In batch %s\ntreatment not present or only 1 data point for given time, setting response to NA", batch)
-      warning(msg)
-      return(rtx)
+      rt <- TRUE
+      if(length(contr.time) < 2 | length(contr.volume) < 2 )
+      {
+        msg <- sprintf("In batch %s\ncontrol not present or only 1 data point for given time, setting response to NA", batch)
+        warning(msg)
+        rt <- FALSE
+      }
+      
+      if(length(treat.time) < 2 | length(treat.volume) < 2 )
+      {
+        msg <- sprintf("In batch %s\ntreatment not present or only 1 data point for given time, setting response to NA", batch)
+        warning(msg)
+        rt <- FALSE
+      }
+      return(rt)
     }
 
     ###--------compute angle for batch -----------------------------------------
     if(res.measure =="angle")
     {
-      rtx <- angle(contr.time, contr.volume, treat.time,treat.volume, degree=TRUE)
+      if(.checkInputLen(contr.time, contr.volume, treat.time,treat.volume)==TRUE)
+      {
+        rtx <- angle(contr.time, contr.volume, treat.time,treat.volume, degree=TRUE)
+      }
       return(rtx)
     }
 
     ###--------compute abc for batch ---------------------------------------------
     if(res.measure=="abc")
     {
-      rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume)
+      if(.checkInputLen(contr.time, contr.volume, treat.time,treat.volume)==TRUE)
+      { rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume) }
       return(rtx)
     }
 
     ###--------compute TGI for batch ---------------------------------------------
     if(res.measure=="TGI")
     {
-      rtx <- TGI(contr.volume, treat.volume)
+      if(.checkInputLen(contr.time, contr.volume, treat.time,treat.volume)==TRUE)
+      { rtx <- TGI(contr.volume, treat.volume)}
       return(rtx)
     }
 
     ###--------compute lmm for batch ---------------------------------------------
     if(res.measure=="lmm")
     {
-      rtx <- list(value=NA)
-      exp.type <- unique(dl$model$exp.type)
-      if(length(exp.type)==2 &
-         "control" %in% exp.type &
-         "treatment" %in% exp.type)
+      if(.checkInputLen(contr.time, contr.volume, treat.time,treat.volume)==TRUE)
       {
-        rtx <- lmm(dl$model, log.volume)
-      } else
-      {
-        warning("'control' or 'treatment' missing from exp.type or batch")
+        rtx <- list(value=NA)
+        exp.type <- unique(dl$model$exp.type)
+        if(length(exp.type)==2 &
+           "control" %in% exp.type &
+           "treatment" %in% exp.type)
+        {
+          rtx <- lmm(dl$model, log.volume)
+        } else
+        {
+          warning("'control' or 'treatment' missing from exp.type or batch")
+        }
       }
       return(rtx)
     }
