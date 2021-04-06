@@ -4,7 +4,7 @@
 \alias{slope}
 \title{Computes slope}
 \usage{
-slope(time, volume, degree = TRUE)
+slope(time, volume, degree = TRUE, vol.normal = TRUE)
 }
 \arguments{
 \item{time}{A \code{vector} of time.}

@@ -66,29 +66,70 @@ getMolecularProfiles <- function(object, data.type)
 
 #####================= Summarize Molecular Profiles ==================
 .summarizeMolecularANDSens <- function(object, drug, mDataType, tissue=NULL,
-          sensitivity.measure=NULL, unique.model=TRUE,
-          batch=NULL)
+          sensitivity.measure="all", sen.type=c("batch", "model"),
+          unique.model=TRUE, batch=NULL) 
+######Add options to the main function
 {
-  senType <- NULL
-  if(is.null(sensitivity.measure))
-  { senType <- "model" } else
+  sen.type <- match.arg(sen.type)
+  
+  if(sensitivity.measure=="all")
   {
-    if(sensitivity.measure %in% colnames(slot(object, "sensitivity")$model))
-    {senType <- "model" }
-
-    if(is.null(senType))
+    if(sen.type=="batch")
     {
-      if(sensitivity.measure %in% colnames(slot(object, "sensitivity")$batch))
-      {senType <- "batch" }
+      sm <- colnames(slot(object, "sensitivity")$batch)
+      sensitivity.measure <- sm[sm!="batch.name"]
+      if(length(sensitivity.measure) < 1)
+      { stop("batch sensitivity not avaliable") }
+    } else {
+      sm <- colnames(slot(object, "sensitivity")$model)
+      sensitivity.measure <- sm[sm!="model.id"]
+      if(length(sensitivity.measure) < 1)
+      { stop("model sensitivity not avaliable") }
+    }
+  } else {
+    
+    ms <- sensitivity.measure %in% colnames(slot(object, "sensitivity")$model)
+    bs <- sensitivity.measure %in% colnames(slot(object, "sensitivity")$batch)
+    
+    sen.type <- NA
+    if(sum(ms)==length(sensitivity.measure)){sen.type <- "model" }
+    if(sum(bs)==length(sensitivity.measure)){sen.type <- "batch" }
+    
+    if(is.na(sen.type))
+    {
+      if(sum(c(ms, bs))==0)
+      {
+        msg<-sprintf("sensitivity measure '%s' not present in model or batch sensitivity",
+                     sensitivity.measure)
+        stop(msg)
+      } else {
+        msg<-sprintf("All sensitivity measure should be either model or batch type")
+        stop(msg)
+      }
     }
   }
-
-  if(is.null(senType))
-  {
-    msg<-sprintf("sensitivity measure '%s' not present in model or batch sensitivity",
-                 sensitivity.measure)
-    stop(msg)
-  }
+  
+  senType <- sen.type
+  # senType <- NULL
+  # if(is.null(sensitivity.measure))
+  # { senType <- "batch" } else
+  # {
+  #   if(all(sensitivity.measure %in% colnames(slot(object, "sensitivity")$model)))
+  #   {senType <- "model" }
+  # 
+  #   if(is.null(senType))
+  #   {
+  #     if(all(sensitivity.measure %in% colnames(slot(object, "sensitivity")$batch)))
+  #     {senType <- "batch" }
+  #   }
+  # }
+  # 
+  # if(is.null(senType))
+  # {
+  #   msg<-sprintf("sensitivity measure '%s' not present in model or batch sensitivity",
+  #                sensitivity.measure)
+  #   stop(msg)
+  # }
   ##----------------------------------------------------------------------------
   ##----------------------------------------------------------------------------
   if(senType=="model")
@@ -130,15 +171,29 @@ getMolecularProfiles <- function(object, data.type)
 #' @param drug Name of the drug.
 #' @param mDataType \code{character}, where one of the molecular data types is needed.
 #' @param tissue Default \code{NULL} will return all tissue types.
-#' @param sensitivity.measure Default \code{NULL} will return all sensitivity measures.
+#' @param sensitivity.measure Default \code{'all'} will return all sensitivity measures.
+#' @param sen.type Type of sensitivity measure. Options are 'batch' (default) or 'model' 
 #' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
 #' @param batch Name of the batch. Default \code{NULL}.
+#' 
 #' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 #'
 #' @examples
 #' data(brca)
+#' 
 #' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
 #'                     tissue= "BRCA", sensitivity.measure="mRECIST")
+#' print(pacRNA)
+#' 
+#' #to get all batch level response
+#' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
+#'                     tissue= "BRCA", sensitivity.measure="all")
+#' print(pacRNA)
+#' 
+#' #to get all model level response
+#' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
+#'                     tissue= "BRCA", sensitivity.measure="all",
+#'                     sen.type="model")
 #' print(pacRNA)
 #' @details
 #' \itemize{
@@ -147,29 +202,27 @@ getMolecularProfiles <- function(object, data.type)
 #' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
 #' }
 #' @export
-setGeneric("summarizeData", function(object, ...) standardGeneric("summarizeData"))
+setGeneric("summarizeData", function(object, drug, mDataType, tissue=NULL,
+                                     sensitivity.measure="all", sen.type=c("batch", "model"),
+                                     unique.model=TRUE, batch=NULL) standardGeneric("summarizeData"))
 setMethod('summarizeData',
           signature=signature(object = "XevaSet"),
           definition=function(object, drug, mDataType, tissue=NULL,
-                              sensitivity.measure=NULL, unique.model=TRUE,
-                              batch=NULL)
+                              sensitivity.measure="all", sen.type=c("batch", "model"),
+                              unique.model=TRUE, batch=NULL)
           {
             .summarizeMolecularANDSens(object, drug, mDataType, tissue,
-                                      sensitivity.measure, unique.model,
-                                      batch)
+                                      sensitivity.measure, sen.type,
+                                      unique.model, batch)
           })
 
 
 #' @rdname summarizeData
 #' @export
-summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
-                                       sensitivity.measure=NULL, unique.model=TRUE,
-                                       batch=NULL)
+summarizeMolecularProfiles <- function(...)
 {
   warning("summarizeMolecularProfiles has been deprecated, please use summarizeData ")
-  summarizeData(object, drug, mDataType, tissue,
-            sensitivity.measure, unique.model,
-            batch)
+  summarizeData(...)
 }
 
 

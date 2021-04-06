@@ -5,7 +5,7 @@
 \title{area under the curve
 \code{AUC} Returns area under the curve}
 \usage{
-AUC(time, volume, time.normalize = TRUE)
+AUC(time, volume, time.normalize = TRUE, vol.normal = TRUE)
 }
 \arguments{
 \item{time}{A \code{vector} of time points recorded for the experiment.}

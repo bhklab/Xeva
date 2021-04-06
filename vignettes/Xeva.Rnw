@@ -291,11 +291,12 @@ mut <- summarizeData(brca, drug = "BYL719", mDataType="mutation")
 model.type <- Biobase::exprs(mut)["CDK13", ]
 
 ## extract data.frame of response
-df <- summarizeResponse(brca, response.measure = "best.average.response", return.type = "data.frame")
+df <- summarizeResponse(brca, response.measure = "best.average.response", 
+                        return.type = "data.frame")
 df <- df[df$drug == "BYL719", ]
 
 ## add values to data.frame 
-df$CDK13 <- model.type[df$model.id]
+df$CDK13 <- model.type[df$patient.id]
 ## now plot the data 
 
 waterfall(df, x="model.id", y="best.average.response", type="CDK13")
