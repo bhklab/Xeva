@@ -12,7 +12,7 @@ setResponse(
   max.time = NULL,
   vol.normal = FALSE,
   impute.value = TRUE,
-  concurrent.time = TRUE,
+  concurrent.time = FALSE,
   log.volume = FALSE,
   verbose = TRUE
 )

@@ -128,7 +128,7 @@ setResponse <- function(object,
                         res.measure=c("mRECIST", "slope", "AUC",
                                       "angle", "abc", "TGI", "lmm", "bmRECIST"),
                         min.time=10, treatment.only=TRUE, max.time=NULL,
-                        vol.normal=FALSE, impute.value=TRUE, concurrent.time =TRUE,
+                        vol.normal=FALSE, impute.value=TRUE, concurrent.time =FALSE,
                         log.volume=FALSE, verbose=TRUE)
 {
   sen <- slot(object, "sensitivity")
@@ -339,7 +339,7 @@ response <- function(object, model.id=NULL, batch=NULL,
                      res.measure=c("mRECIST", "slope", "AUC",
                                    "angle", "abc", "TGI", "lmm", "bmRECIST"),
                      treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
-                     min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
+                     min.time=10, concurrent.time =FALSE, vol.normal=FALSE,
                      log.volume=FALSE, verbose=TRUE)
 {
   if(is.null(model.id) & is.null(batch)) 

@@ -13,7 +13,7 @@ response(
   max.time = NULL,
   impute.value = TRUE,
   min.time = 10,
-  concurrent.time = TRUE,
+  concurrent.time = FALSE,
   vol.normal = FALSE,
   log.volume = FALSE,
   verbose = TRUE
