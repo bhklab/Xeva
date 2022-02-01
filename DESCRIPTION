@@ -27,7 +27,8 @@ Imports:
   reshape2,
   nlme,
   PharmacoGx,
-  downloader
+  downloader,
+  SummarizedExperiment
 Depends: R (>= 3.6)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues

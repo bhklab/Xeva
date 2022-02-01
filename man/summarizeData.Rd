@@ -13,7 +13,8 @@ summarizeData(
   sensitivity.measure = "all",
   sen.type = c("batch", "model"),
   unique.model = TRUE,
-  batch = NULL
+  batch = NULL,
+  summarizedExp = FALSE
 )
 
 summarizeMolecularProfiles(...)
@@ -34,6 +35,8 @@ summarizeMolecularProfiles(...)
 \item{unique.model}{Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.}
 
 \item{batch}{Name of the batch. Default \code{NULL}.}
+
+\item{summarizedExp}{If \code{TRUE} will return SummarizedExperiment class object. Default \code{TRUE} will return ExpressionSet.}
 }
 \value{
 An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
@@ -45,7 +48,7 @@ This function serves to get molecular profiles from a \code{XevaSet} object.
 \itemize{
 \item {If a sequencing sample belongs to multiple models, this function
 will create a separate column for each model.}
-\item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
+\item {All models without molecular data will be removed from the output object.}
 }
 }
 \examples{

@@ -175,6 +175,7 @@ getMolecularProfiles <- function(object, data.type)
 #' @param sen.type Type of sensitivity measure. Options are 'batch' (default) or 'model' 
 #' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
 #' @param batch Name of the batch. Default \code{NULL}.
+#' @param summarizedExp If \code{TRUE} will return SummarizedExperiment class object. Default \code{TRUE} will return ExpressionSet.
 #' 
 #' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 #'
@@ -199,21 +200,28 @@ getMolecularProfiles <- function(object, data.type)
 #' \itemize{
 #' \item {If a sequencing sample belongs to multiple models, this function
 #' will create a separate column for each model.}
-#' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
+#' \item {All models without molecular data will be removed from the output object.}
 #' }
+#' @import SummarizedExperiment
 #' @export
 setGeneric("summarizeData", function(object, drug, mDataType, tissue=NULL,
                                      sensitivity.measure="all", sen.type=c("batch", "model"),
-                                     unique.model=TRUE, batch=NULL) standardGeneric("summarizeData"))
+                                     unique.model=TRUE, batch=NULL,
+                                     summarizedExp=FALSE) standardGeneric("summarizeData"))
 setMethod('summarizeData',
           signature=signature(object = "XevaSet"),
           definition=function(object, drug, mDataType, tissue=NULL,
                               sensitivity.measure="all", sen.type=c("batch", "model"),
-                              unique.model=TRUE, batch=NULL)
+                              unique.model=TRUE, batch=NULL, summarizedExp=FALSE)
           {
-            .summarizeMolecularANDSens(object, drug, mDataType, tissue,
+            df <- .summarizeMolecularANDSens(object, drug, mDataType, tissue,
                                       sensitivity.measure, sen.type,
                                       unique.model, batch)
+            if(summarizedExp==TRUE & is(df, "ExpressionSet"))
+            {
+              df <- SummarizedExperiment::makeSummarizedExperimentFromExpressionSet(df)
+            }
+            return(df)
           })
 
 
