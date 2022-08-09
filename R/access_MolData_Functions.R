@@ -67,11 +67,10 @@ getMolecularProfiles <- function(object, data.type)
 #####================= Summarize Molecular Profiles ==================
 .summarizeMolecularANDSens <- function(object, drug, mDataType, tissue=NULL,
           sensitivity.measure="all", sen.type=c("batch", "model"),
-          unique.model=TRUE, batch=NULL) 
-######Add options to the main function
+          unique.model=TRUE, batch=NULL)
 {
   sen.type <- match.arg(sen.type)
-  
+
   if(sensitivity.measure=="all")
   {
     if(sen.type=="batch")
@@ -86,15 +85,15 @@ getMolecularProfiles <- function(object, data.type)
       if(length(sensitivity.measure) < 1)
       { stop("model sensitivity not avaliable") }
     }
-  } else {
-    
+  } else
+    {
     ms <- sensitivity.measure %in% colnames(slot(object, "sensitivity")$model)
     bs <- sensitivity.measure %in% colnames(slot(object, "sensitivity")$batch)
-    
+
     sen.type <- NA
     if(sum(ms)==length(sensitivity.measure)){sen.type <- "model" }
     if(sum(bs)==length(sensitivity.measure)){sen.type <- "batch" }
-    
+
     if(is.na(sen.type))
     {
       if(sum(c(ms, bs))==0)
@@ -108,30 +107,9 @@ getMolecularProfiles <- function(object, data.type)
       }
     }
   }
-  
+
   senType <- sen.type
-  # senType <- NULL
-  # if(is.null(sensitivity.measure))
-  # { senType <- "batch" } else
-  # {
-  #   if(all(sensitivity.measure %in% colnames(slot(object, "sensitivity")$model)))
-  #   {senType <- "model" }
-  # 
-  #   if(is.null(senType))
-  #   {
-  #     if(all(sensitivity.measure %in% colnames(slot(object, "sensitivity")$batch)))
-  #     {senType <- "batch" }
-  #   }
-  # }
-  # 
-  # if(is.null(senType))
-  # {
-  #   msg<-sprintf("sensitivity measure '%s' not present in model or batch sensitivity",
-  #                sensitivity.measure)
-  #   stop(msg)
-  # }
-  ##----------------------------------------------------------------------------
-  ##----------------------------------------------------------------------------
+
   if(senType=="model")
   {
     sm <- sensitivity(object, type = senType, sensitivity.measure = sensitivity.measure)
@@ -172,25 +150,25 @@ getMolecularProfiles <- function(object, data.type)
 #' @param mDataType \code{character}, where one of the molecular data types is needed.
 #' @param tissue Default \code{NULL} will return all tissue types.
 #' @param sensitivity.measure Default \code{'all'} will return all sensitivity measures.
-#' @param sen.type Type of sensitivity measure. Options are 'batch' (default) or 'model' 
+#' @param sen.type Type of sensitivity measure. Options are 'batch' (default) or 'model'
 #' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
 #' @param batch Name of the batch. Default \code{NULL}.
 #' @param summarizedExp If \code{TRUE} will return SummarizedExperiment class object. Default \code{TRUE} will return ExpressionSet.
-#' 
+#'
 #' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
 #'
 #' @examples
 #' data(brca)
-#' 
+#'
 #' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
 #'                     tissue= "BRCA", sensitivity.measure="mRECIST")
 #' print(pacRNA)
-#' 
+#'
 #' #to get all batch level response
 #' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
 #'                     tissue= "BRCA", sensitivity.measure="all")
 #' print(pacRNA)
-#' 
+#'
 #' #to get all model level response
 #' pacRNA <- summarizeData(brca, drug="paclitaxel", mDataType="RNASeq",
 #'                     tissue= "BRCA", sensitivity.measure="all",

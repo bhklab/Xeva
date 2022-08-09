@@ -1,9 +1,9 @@
 
 .batchID2biobaseID <- function(object, bid, modIn)
 {
-  bi = batchInfo(object, batch = bid)
-  allMid = c(bi[[1]]$treatment, bi[[1]]$control)
-  allMid = allMid[allMid %in% as.character(modIn$model.id)]
+  bi <- batchInfo(object, batch = bid)
+  allMid <- c(bi[[1]]$treatment)
+  allMid <- allMid[allMid %in% as.character(modIn$model.id)]
 
   if(length(allMid)>0)
   {
@@ -36,10 +36,10 @@ getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
   if(is.null(sensitivity.measure))
   { sensitivity.measure <- colnames(sm)[!(colnames(sm) %in% c("model.id", "batch.name"))] }
 
-  bsmat=data.frame()
+  bsmat <- data.frame()
   for(i in 1:nrow(sm))
   {
-    rt = .batchID2biobaseID(object, sm$batch.name[i], modIn)
+    rt <- .batchID2biobaseID(object, sm$batch.name[i], modIn)
     if(rt[[1]]==TRUE)
     {
       for(q in 1:nrow(rt[[2]]))
@@ -48,6 +48,11 @@ getBatchAndMolData <- function(object, mDataType, drug, tissue, unique.model,
     }
   }
 
+  if(nrow(bsmat)==0)
+  {
+    msg <- sprintf("Drug %s not present in treatment arm\n", drug)
+    stop(msg)
+  }
   biobID2sen <- unique(bsmat[,c(bioName, "batch.name")])
   otherCol <- setdiff(colnames(bsmat), colnames(biobID2sen))
   biobID2sen[, otherCol] <- NA
