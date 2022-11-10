@@ -283,7 +283,7 @@ setResponse <- function(object,
         sen$batch[bid, vac] <- sl$control$fit[[va]]
 
         vat <- paste0(va, ".treatment")
-        sen$batch[bid, vat] <- sl$control$fit[[va]]
+        sen$batch[bid, vat] <- sl$treatment$fit[[va]]
       }
     }
   }
