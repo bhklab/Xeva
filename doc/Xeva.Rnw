@@ -1,0 +1,342 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{The Xeva User's Guide}
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\makeatletter\renewcommand*{\fps@figure}{h}\makeatother
+
+\title{The Xeva User's Guide}
+\author[1,2]{Arvind Mer}
+\author[1,2,3,4,5]{Benjamin Haibe-Kains}
+\affil[1]{Princess Margaret Cancer Centre, University Health Network, Toronto, Canada}
+\affil[2]{Department of Medical Biophysics, University of Toronto, Toronto, Canada}
+\affil[3]{Department of Computer Science, University of Toronto, Toronto, Canada}
+\affil[4]{Vector Institute, Toronto, Ontario, Canada}
+\affil[5]{Ontario Institute for Cancer Research, Toronto, Ontario, Canada}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+<<options, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+library(Xeva)
+@
+
+\section{Introduction}
+
+The Xeva package provides efficient and powerful functions for patient-drived xenograft (PDX) based pharmacogenomic data analysis \cite{MerXeva}.
+
+\section{Installation and Settings}
+
+Xeva requires that several packages be installed. All dependencies are available from CRAN or Bioconductor:
+
+<<get_lib, results='hide', message=FALSE, eval=FALSE>>=
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("Xeva", version = "3.8")
+@
+
+The package can also be installed directly form GitHub using devtools:
+
+<<githubInst, results='hide', message=FALSE, eval=FALSE>>=
+#install devtools if required
+install.packages("devtools")
+
+#install Xeva as:
+devtools::install_github("bhklab/Xeva")
+@
+
+
+Load Xeva into your current workspace:
+<<l, results='hide', message=FALSE, eval=TRUE>>=
+library(Xeva)
+@
+
+<<biobase, results='hide', message=FALSE, eval=TRUE, echo=FALSE>>=
+suppressMessages(library(Biobase))
+@
+
+Load the dataset you wish to analyze. For the sake of this tutorial, here we load the Novartis PDXE \cite{gao2015high} breast cancer dataset as an example:
+<<l2>>=
+data(brca)
+print(brca)
+@
+
+\section{Definitions}
+Before we further dive into the analysis and visualization, it is important to understand the terminology used in the \Rpackage{Xeva} package.
+In a \textbf{Xeva} object, the \textbf{experiment} slot stores the data for each individual PDX/mouse. With the exception of tumor growth data (time vs. tumor volume), for each individual PDX/mouse, you can access metadata such as the patient's age, sex, tissue histology, and passage information.
+All of this metadata is stored in the \textbf{pdxModel} class, where a unique ID called \texttt{model.id} is given to each PDX/mouse model. As for the tumor growth information, Xeva provides separate functions for retrieving and visualizing time vs. tumor volume data.
+We will see later how to get these data for an individual \textit{model.id}, but first, let's define some other terms that appear in the \Rpackage{Xeva} package.
+
+A PDX experiment can be one of the two categories:
+\begin{itemize}
+  \item \textbf{treatment} represents experiments in which the PDX receives some kind of drug (or drug combination)
+  \item \textbf{control} represents experiments in which the PDX receives no drug
+\end{itemize}
+
+To see the effect of a drug, several replicate experiments are done for both the control and the treatment categories.
+In \textbf{Xeva}, a collection of PDX \textit{model.ids} originating from the same patient is organized in \textbf{batches} (\textit{batch}). A \textit{batch} has two arms: \textit{control} and \textit{treatment}. This is illustrated in Figure~\ref{fig:1}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[keepaspectratio=true,width=1\textwidth]{images/Xeva_batch_2.pdf}
+    \caption{A PDX experiment. The text under each of the PDX/mouse (ie. m1, m2, p1, etc.) denotes the \textit{model.id} in \textbf{Xeva}. In this example, three PDXs are delclared as control (m1, m2, and m3). Similarly, in the treatment arm, 3 PDXs are given the drug paclitaxel (p1, p2, and p3), 3 are given tamoxifen (t1, t2, and t3), and 3 are given binimetinib (b1, b2, b3). The PDXs in the control arm and one of the treatment arms together constitute a \textit{batch}. For example, control arm models (m1, m2, and m3) and treatment arm models (t1,t2, and t3) together create a batch called batch-2. } \label{fig:1}
+\end{figure}
+
+A \textbf{Xeva} object binds together all individual experiments, batch information, and molecular data into one single class called \Sexpr{class(brca)[1]}.
+
+
+\section{Data Access}
+As mentioned earlier, \textbf{Xeva} stores metadata for each individual PDX model.
+We can retrieve the meta-information about each PDX, such as number of models and tissue type, using:
+<<l3>>=
+brca.mod <- modelInfo(brca)
+dim(brca.mod)
+brca.mod[1:4, ]
+@
+The output shows that the \textit{brca} dataset contains \Sexpr{nrow(brca.mod)} PDX models.
+We can also see the time vs. tumor volume data for a model using:
+
+<<expre>>=
+model.data <- getExperiment(brca, model.id = "X.1004.BG98")
+head(model.data)
+@
+
+Similarly, for \textbf{batch} names, we can obtain all predefined batch names using:
+
+<<batch1>>=
+batch.name <- batchInfo(brca)
+batch.name[1:4]
+@
+
+The information about a \textbf{batch} can be shown using:
+<<batch2>>=
+batchInfo(brca, batch = "X-1004.binimetinib")
+@
+Here, for the batch named \textit{X-1004.binimetinib}, we can see that the control sample is \textit{X.1004.uned} and the treatment sample is \textit{X.1004.biib}.
+
+
+
+\section{Visualizing PDX Growth Curve}
+
+Xeva provides a function to plot time vs. tumor volume data for individual models as well as for individual batches. These data can be plotted by using the name of the batch:
+<< plot1, fig.cap="Tumor growth curves for a batch of control and treated PDXs", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, batch = "X-4567.BKM120")
+@
+
+
+You can choose to see different aspects of this visualization. For example, we can plot normalized volume; we can also change the colors of the lines:
+<<pdxplot2, fig.cap="Tumor growth curves for a batch of control and treated PDXs. Here, the volume is normalized and plots are truncated at 40 days", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, batch = "X-4567.BKM120", vol.normal = TRUE, control.col = "#a6611a",
+        treatment.col = "#018571", major.line.size = 1, max.time = 40)
+@
+
+
+Data can also be visualized at the patient level by specifying \texttt{patient.id}:
+%%##X-2344, X-1004, X-3078 and X-5975
+<<pdxplot3, fig.cap="Tumor growth curves for a batch of control and treated PDXs generated using patient ID and drug name", out.width='4in', fig.wide=TRUE>>=
+plotPDX(brca, patient.id="X-3078", drug="paclitaxel",control.name = "untreated")
+@
+
+
+
+\section{Replicate-based PDX experiments}
+Xeva can also handle replicate-based experiment design. The datasets included in the package also contain replicate-based PDX experiments. To plot replicate-based data:
+<<repplot1, fig.cap="Tumor growth curves for a batch of control and treated PDXs with replicates", out.width='4in', fig.wide=TRUE>>=
+data("repdx")
+plotPDX(repdx, vol.normal = TRUE, batch = "P1")
+@
+
+<<repplot2, fig.cap="Errorbar visualization for tumor growth curves of a PDX batch", out.width='4in', fig.wide=TRUE>>=
+plotPDX(repdx, batch = "P3", SE.plot = "errorbar")
+@
+
+<<repplot3, fig.cap="Ribbon visualization for tumor growth curves of a PDX batch", out.width='4in', fig.wide=TRUE>>=
+plotPDX(repdx, batch = "P4", vol.normal = TRUE,  SE.plot = "ribbon")
+@
+
+
+\section{PDX Model Drug Response}
+Xeva can effectively summarize PDX drug response data. Here we summarize the \textbf{mRECIST} values for the models in our dataset:
+
+<<l4>>=
+brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
+brca.mr[1:5, 1:4]
+@
+
+Waterfall plots are also commonly used to visualize PDX drug response data.
+Xeva provides a function to visualize and color waterfall plots:
+<<waterFall1, fig.cap="Waterfall plot for binimetinib drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+waterfall(brca, drug="binimetinib", res.measure="best.average.response")
+@
+
+
+It is useful to color the bars of your waterfall plot by genomic properties.
+Here we create a waterfall plot for drug BYL719 and color it based on the mutation status of the CDK13 gene.
+First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
+<<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
+mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
+model.type <- Biobase::exprs(mut)["CDK13", ]
+model.type[grepl("Mut", model.type)] <- "mutation"
+model.type[model.type!="mutation"] <- "wild type"
+model.color <- list("mutation"="#b2182b", "wild type"="#878787")
+waterfall(brca, drug="BYL719", res.measure="best.average.response",
+          model.id=names(model.type), model.type= model.type,
+          type.color = model.color)
+
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In Xeva we have implemented difference matrix to compute PDX response.
+The Xeva function \textbf{\textcolor{red}{\hl{response}}} provides a unified interface for this purpose.
+In the example below we compute the angle between treatment and control PDXs
+
+<<response1>>=
+data("repdx")
+response(repdx, batch="P1", res.measure="angle")
+@
+
+A function for linear mixed-effects model (lmm) has also been implemented.
+<<response2>>=
+data("repdx")
+response(repdx, batch="P1", res.measure="lmm")
+@
+
+
+
+\section{Gene-drug association}
+The main aim of the pharmacogenomic experiments is to find biomarkers for drug response prediction.
+The Xeva package provides the \textbf{\textcolor{red}{drugSensitivitySig}} function to compute the univariate association between PDX's molecular data (such as gene expression) and response to a drug (gene-drug association). In the example bellow, we are computing the association between gene expression (RNASeq)
+and slope of the PDXs for the drug `tamoxifen` using linear regression (lm).
+
+<<biomarker1>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5), sensitivity.measure="slope", fit="lm")
+@
+
+In this above example we took only 5 features (genes), however this can be
+extended for any number of genes. For larger analyses, this function also provides
+out of box parallel computation. Users can set the number of cores using the parameter
+\textbf{\textcolor{red}{nthread}} in the function.
+
+Users can choose different sensitivity measures of the PDX response for the
+association analysis by setting the parameter \textbf{\textcolor{red}{sensitivity.measure}}.
+For example, below we use \textit{\textcolor{red}{best.average.response}} as
+the PDX's response matrix in the association analysis:
+<<biomarker2>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5),
+                   sensitivity.measure="best.average.response", fit = "lm")
+@
+
+
+For the drug-gene association analysis, users can also choose a different method
+of association calculation (such as concordance index, Pearson or Spearman
+correlation) by setting the parameter \textit{\textcolor{red}{fit}}.
+<<biomarker3, warning=FALSE>>=
+data(brca)
+drugSensitivitySig(object=brca, drug="tamoxifen", mDataType="RNASeq",
+                   features=c(1,2,3,4,5),
+                   sensitivity.measure="best.average.response", fit="pearson")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Creating new Xeva object}
+New Xeva objects can be created using \textit{createXevaSet}. The different components that are needed by the function is as follows:
+
+
+\begin{description}
+\setlength\itemsep{2em}
+
+\item[model]
+A data.frame containing \textbf{model.id} and other relevant
+model information, such as tissue of origin, patient ID, and passage information.
+All \textbf{PDXMI} variables can be inserted into this data.frame.
+A required column in the data.frame is \textbf{model.id}.
+An example of the \textbf{model} can be found in the package as:
+<<x1>>=
+model=read.csv(system.file("extdata", "model.csv", package = "Xeva"))
+head(model)
+@
+
+\item[drug]
+A data.frame containing information about the drugs used in the experiments.
+The required column is \textbf{drug.id}.
+An example of the \textbf{drug} can be found in the package as:
+<<x2>>=
+drug=read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
+head(drug)
+@
+
+\item[experiment]
+A data.frame with time vs. tumor volume information.
+The required columns are \textbf{model.id}, \textbf{time}, \textbf{volume}, and \textbf{drug}.
+Other avaliable information such as dose amount and mouse weight can be specified as columns of this data.frame .
+An example of the \textbf{experiment} can be found in the package as:
+<<x3>>=
+experiment=read.csv(system.file("extdata","experiments.csv",package="Xeva"))
+head(experiment)
+@
+
+\item[expDesign]
+This is an R \textbf{list} object that contains the batch information.
+Each element of the list should have 3 components \textbf{batch.name},
+\textbf{treatment} and \textbf{control}.
+The model.ids in the treatment and control must be present in \textbf{model} variable described earlier.
+An example of expDesign is:
+<<x4>>=
+expDesign=readRDS(system.file("extdata","batch_list.rds",package="Xeva"))
+expDesign[[1]]
+@
+
+\item[molecularProfiles]
+This list contains all the molecular data such as RNAseq or mutation information.
+Each element of this list should contain an \textbf{ExpressionSet} object.
+An example of such an object is:
+<<x5>>=
+RNASeq=readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))
+print(RNASeq)
+@
+
+\item[modToBiobaseMap]
+A data.frame which contains mapping between the PDX model.id and the molecularProfiles sample names.
+It requires 3 variables: \textbf{model.id}, \textbf{biobase.id}, and \textbf{mDataType}.
+An example of modToBiobaseMap is:
+<<x6>>=
+modToBiobaseMap=read.csv(system.file("extdata","modelToExpressionMap.csv",
+                                     package = "Xeva"))
+head(modToBiobaseMap)
+@
+
+\end{description}
+
+A new Xeva object can be created as:
+<<createXevaSet>>=
+xeva.set=createXevaSet(name="example xevaSet", model=model, drug=drug,
+                       experiment=experiment, expDesign=expDesign,
+                       molecularProfiles=list(RNASeq = RNASeq),
+                       modToBiobaseMap = modToBiobaseMap)
+print(xeva.set)
+@
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\bibliography{XevaBiblio}
+
+\newpage
+\section{SessionInfo}
+<<sess,>>=
+sessionInfo()
+@
+\end{document}
