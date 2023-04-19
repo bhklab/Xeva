@@ -4,10 +4,17 @@
 \alias{createXevaSet}
 \title{XevaSet constructor}
 \usage{
-createXevaSet(name, model = data.frame(), drug = data.frame(),
-  experiment = data.frame(), expDesign = list(),
-  modelSensitivity = data.frame(), batchSensitivity = data.frame(),
-  molecularProfiles = list(), modToBiobaseMap = data.frame())
+createXevaSet(
+  name,
+  model = data.frame(),
+  drug = data.frame(),
+  experiment = data.frame(),
+  expDesign = list(),
+  modelSensitivity = data.frame(),
+  batchSensitivity = data.frame(),
+  molecularProfiles = list(),
+  modToBiobaseMap = data.frame()
+)
 }
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset.}

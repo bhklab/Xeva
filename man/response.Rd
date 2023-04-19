@@ -4,11 +4,20 @@
 \alias{response}
 \title{compute PDX response}
 \usage{
-response(object, model.id = NULL, batch = NULL,
-  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI",
-  "lmm"), treatment.only = FALSE, max.time = NULL,
-  impute.value = TRUE, min.time = 10, concurrent.time = TRUE,
-  vol.normal = FALSE, log.volume = FALSE, verbose = TRUE)
+response(
+  object,
+  model.id = NULL,
+  batch = NULL,
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+  treatment.only = FALSE,
+  max.time = NULL,
+  impute.value = TRUE,
+  min.time = 10,
+  concurrent.time = TRUE,
+  vol.normal = FALSE,
+  log.volume = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{object}{Xeva object.}

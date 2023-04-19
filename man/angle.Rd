@@ -5,8 +5,13 @@
 \title{compute angle
 Computes the angle between two time-volume curves.}
 \usage{
-angle(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
-  treat.volume = NULL, degree = TRUE)
+angle(
+  contr.time = NULL,
+  contr.volume = NULL,
+  treat.time = NULL,
+  treat.volume = NULL,
+  degree = TRUE
+)
 }
 \arguments{
 \item{contr.time}{Time vector for control.}

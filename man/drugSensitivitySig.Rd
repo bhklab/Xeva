@@ -4,11 +4,21 @@
 \alias{drugSensitivitySig}
 \title{get drug sensitivity values}
 \usage{
-drugSensitivitySig(object, drug, mDataType = NULL, molData = NULL,
-  features = NULL, model.ids = NULL, model2bidMap = NULL,
-  sensitivity.measure = "slope", fit = c("lm", "CI", "pearson",
-  "spearman", NA), standardize = c("SD", "rescale", "none"),
-  nthread = 1, tissue = NULL, verbose = TRUE)
+drugSensitivitySig(
+  object,
+  drug,
+  mDataType = NULL,
+  molData = NULL,
+  features = NULL,
+  model.ids = NULL,
+  model2bidMap = NULL,
+  sensitivity.measure = "slope",
+  fit = c("lm", "CI", "pearson", "spearman", NA),
+  standardize = c("SD", "rescale", "none"),
+  nthread = 1,
+  tissue = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{object}{The \code{Xeva} dataset.}

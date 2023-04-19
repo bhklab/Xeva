@@ -4,7 +4,9 @@
 \name{PDXMI}
 \alias{PDXMI}
 \title{PDX-MI data}
-\format{An object of class \code{data.frame} with 45 rows and 4 columns.}
+\format{
+An object of class \code{data.frame} with 45 rows and 4 columns.
+}
 \source{
 \url{http://cancerres.aacrjournals.org/lookup/doi/10.1158/0008-5472.CAN-17-0582}
 }

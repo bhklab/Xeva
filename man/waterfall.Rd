@@ -5,10 +5,21 @@
 \title{waterfall plot
 Creates waterfall plot for a given drug.}
 \usage{
-waterfall(object, res.measure, drug = NULL, group.by = NULL,
-  summary.stat = c(";", "mean", "median"), tissue = NULL,
-  model.id = NULL, model.type = NULL, type.color = "#cc4c02",
-  legend.name = NULL, yname = NULL, title = NULL, sort = TRUE)
+waterfall(
+  object,
+  res.measure,
+  drug = NULL,
+  group.by = NULL,
+  summary.stat = c(";", "mean", "median"),
+  tissue = NULL,
+  model.id = NULL,
+  model.type = NULL,
+  type.color = "#cc4c02",
+  legend.name = NULL,
+  yname = NULL,
+  title = NULL,
+  sort = TRUE
+)
 }
 \arguments{
 \item{object}{The \code{XevaSet} object}

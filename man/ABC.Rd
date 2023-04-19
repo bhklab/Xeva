@@ -5,8 +5,12 @@
 \title{area between curves
 Computes the area between two time-volume curves.}
 \usage{
-ABC(contr.time = NULL, contr.volume = NULL, treat.time = NULL,
-  treat.volume = NULL)
+ABC(
+  contr.time = NULL,
+  contr.volume = NULL,
+  treat.time = NULL,
+  treat.volume = NULL
+)
 }
 \arguments{
 \item{contr.time}{Time vector for control.}

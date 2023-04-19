@@ -4,9 +4,15 @@
 \alias{summarizeResponse}
 \title{Summarize Response of PDXs}
 \usage{
-summarizeResponse(object, response.measure = "mRECIST",
-  model.id = NULL, batch.id = NULL, group.by = "patient.id",
-  summary.stat = c(";", "mean", "median"), tissue = NULL)
+summarizeResponse(
+  object,
+  response.measure = "mRECIST",
+  model.id = NULL,
+  batch.id = NULL,
+  group.by = "patient.id",
+  summary.stat = c(";", "mean", "median"),
+  tissue = NULL
+)
 }
 \arguments{
 \item{object}{The \code{XevaSet} object.}

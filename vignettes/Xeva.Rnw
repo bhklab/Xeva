@@ -170,12 +170,6 @@ brca.mr <- summarizeResponse(brca, response.measure = "mRECIST")
 brca.mr[1:5, 1:4]
 @
 
-These \textbf{mRECIST} values can be visualized using:
-<<mR_BRCA, fig.cap="mRECIST plot for PDXE breast cancer data", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
-plotmRECIST(brca.mr, control.name="untreated", row_fontsize=13, col_fontsize=12)
-@
-
-
 Waterfall plots are also commonly used to visualize PDX drug response data.
 Xeva provides a function to visualize and color waterfall plots:
 <<waterFall1, fig.cap="Waterfall plot for binimetinib drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=

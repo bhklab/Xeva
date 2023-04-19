@@ -4,7 +4,9 @@
 \name{brca}
 \alias{brca}
 \title{PDXE breast cancer dataset}
-\format{An object of class \code{XevaSet} of length 1.}
+\format{
+An object of class \code{XevaSet} of length 1.
+}
 \source{
 \url{https://www.nature.com/articles/nm.3954?draft=journal}
 }

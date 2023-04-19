@@ -4,8 +4,12 @@
 \alias{downloadXevaSet}
 \title{Download a XevaSet object or table of available XevaSet objects}
 \usage{
-downloadXevaSet(name = NULL, saveDir = file.path(".", "XevaSet"),
-  XevaSetFileName = NULL, verbose = TRUE)
+downloadXevaSet(
+  name = NULL,
+  saveDir = file.path(".", "XevaSet"),
+  XevaSetFileName = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{name}{Character string, the name of the XevaSet to download.}

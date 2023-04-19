@@ -4,10 +4,18 @@
 \alias{setResponse}
 \title{set PDX response}
 \usage{
-setResponse(object, res.measure = c("mRECIST", "slope", "AUC", "angle",
-  "abc", "TGI", "lmm"), min.time = 10, treatment.only = FALSE,
-  max.time = NULL, vol.normal = FALSE, impute.value = TRUE,
-  concurrent.time = TRUE, log.volume = FALSE, verbose = TRUE)
+setResponse(
+  object,
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+  min.time = 10,
+  treatment.only = FALSE,
+  max.time = NULL,
+  vol.normal = FALSE,
+  impute.value = TRUE,
+  concurrent.time = TRUE,
+  log.volume = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{object}{Xeva object.}

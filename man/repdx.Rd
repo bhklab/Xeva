@@ -4,7 +4,9 @@
 \name{repdx}
 \alias{repdx}
 \title{Example PDX dataset}
-\format{An object of class \code{XevaSet} of length 1.}
+\format{
+An object of class \code{XevaSet} of length 1.
+}
 \usage{
 data(repdx)
 }

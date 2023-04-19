@@ -4,8 +4,15 @@
 \alias{summarizeMolecularProfiles}
 \title{Summarize molecular profiles}
 \usage{
-summarizeMolecularProfiles(object, drug, mDataType, tissue = NULL,
-  sensitivity.measure = NULL, unique.model = TRUE, batch = NULL)
+summarizeMolecularProfiles(
+  object,
+  drug,
+  mDataType,
+  tissue = NULL,
+  sensitivity.measure = NULL,
+  unique.model = TRUE,
+  batch = NULL
+)
 }
 \arguments{
 \item{object}{The \code{XevaSet}.}
