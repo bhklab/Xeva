@@ -207,7 +207,7 @@ getCellBoxCordi <- function(x0,x1,y0,y1, N)
 #' @examples
 #' data(brca)
 #' brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
-#' plotmRECIST(brca.mr, control.name = "untreated")
+#' plotmRECIST(as.matrix(brca.mr), control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
 #' @import grid
