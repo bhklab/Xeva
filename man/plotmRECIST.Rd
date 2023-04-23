@@ -47,5 +47,5 @@ mRECIST plot.
 \examples{
 data(brca)
 brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
-plotmRECIST(brca.mr, control.name = "untreated")
+plotmRECIST(as.matrix(brca.mr), control.name = "untreated")
 }
