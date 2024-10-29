@@ -1,7 +1,7 @@
 Package: Xeva
 Type: Package
 Title: Analysis of patient-derived xenograft (PDX) data
-Version: 1.21.0
+Version: 1.22.0
 Date: 2023-05-19
 Authors@R: c(
     person(given="Arvind", family="Mer", role = c("aut")),
