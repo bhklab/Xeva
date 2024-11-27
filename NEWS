@@ -1,3 +1,8 @@
+CHANGES in version 1.23.1
+
+The datasets previously available have been deprecated.
+`downloadXevaSet` will no longer work.
+
 CHANGES in VERSION 0.99.7
 
 * This is the new version

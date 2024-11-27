@@ -34,7 +34,6 @@ getXevaSet <- function(dw.url, saveDir = file.path(".", "XevaSet"),
 #' analysis tools provided in Xeva.
 #'
 #' @examples
-#' downloadXevaSet()
 #' ##to download a dataset
 #' #library(Xeva)
 #' #PDXE_BRCA = downloadXevaSet(name="PDXE_BRCA", saveDir="XevaSet")
