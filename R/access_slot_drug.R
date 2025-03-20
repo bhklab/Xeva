@@ -1,5 +1,5 @@
 #' Get drug information
-#' Get the drug information slot from a {XevaSet} object.
+#' Get the drug information slot from a \code{XevaSet} object.
 #'
 #' @examples
 #' data(brca)
