@@ -21,7 +21,7 @@ getMolecularProfiles <- function(object, data.type)
                   paste(names(object@molecularProfiles), collapse ="\n"))
     stop(msg)
   }
-  molData <- getMolecularProfileAssay(object, data.type)
+  molData <- .getMolecularData(object, data.type)
 
   # Convert ExpressionSet to SummarizedExperiment if needed
   if (inherits(molData, "ExpressionSet")) {
