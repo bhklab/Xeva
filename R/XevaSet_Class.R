@@ -1,3 +1,7 @@
+#' @import SummarizedExperiment
+#' @import MultiAssayExperiment
+
+
 ##--------------------------------------------------------------------------
 ##------------ To create Sensitivity Slot ----------------------------------
 .checkUnqLength <- function(inVec)
@@ -158,7 +162,7 @@ XevaSet <- setClass(
     sensitivity = "list",
     expDesign = "list",
     experiment = "list",
-    molecularProfiles = "list",
+    molecularProfiles = "MultiAssayExperiment",
     modToBiobaseMap = "data.frame"
   )
 )
@@ -178,8 +182,8 @@ XevaSet <- setClass(
 #' @param expDesign A list containing name of the batch, control and treatment model.id
 #' @param modelSensitivity A \code{data.frame} containing sensitivity for each model
 #' @param batchSensitivity A \code{data.frame} containing sensitivity for each batch
-#' @param molecularProfiles A \code{list} of \code{ExpressionSet} objects containing
-#'   different molecular profiles.
+#' @param molecularProfiles A \code{list} of \code{SummarizedExperiment} (or \code{ExpressionSet}) objects,
+#'   or a \code{MultiAssayExperiment}, containing different molecular profiles.
 #' @param modToBiobaseMap A \code{data.frame} containing model.id corresponding Biobase object id and name of the molecularProfiles
 #'
 #' @return  Returns Xeva object
@@ -228,8 +232,29 @@ createXevaSet <- function(name,
   sensitivity <-
     .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
   drug <- .checkDrugSlot(drug)
+
+  # Handle molecularProfiles input
+  if (is.null(molecularProfiles)) {
+    mae <- MultiAssayExperiment::MultiAssayExperiment()
+  } else if (is.list(molecularProfiles)) {
+    mae <- MultiAssayExperiment::MultiAssayExperiment(
+      experiments = molecularProfiles
+    )
+  } else if (inherits(molecularProfiles, "MultiAssayExperiment")) {
+    mae <- molecularProfiles
+  } else {
+    stop("molecularProfiles must be NULL, a list of SummarizedExperiments, or a MultiAssayExperiment.")
+  }
+
+  # Check all experiments are SummarizedExperiment (if not empty)
+  if (length(MultiAssayExperiment::experiments(mae)) > 0) {
+    if (!all(vapply(experiments(mae), function(x) is(x, "SummarizedExperiment"),logical(1)))) {
+      stop("Each assay in molecularProfiles must be a SummarizedExperiment.")
+    }
+  }
+
   modToBiobaseMap <-
-    .checkmodToBiobaseMapSlot(modToBiobaseMap, molecularProfiles)
+    .checkmodToBiobaseMapSlot(modToBiobaseMap, MultiAssayExperiment::experiments(mae))
 
   pxset <- XevaSet(
     annotation = annotation,
@@ -238,7 +263,7 @@ createXevaSet <- function(name,
     sensitivity = sensitivity,
     expDesign = expDesign,
     experiment = expSlot,
-    molecularProfiles = molecularProfiles,
+    molecularProfiles = mae,
     modToBiobaseMap = modToBiobaseMap
   )
   return(pxset)
@@ -258,13 +283,13 @@ setMethod(
   {
     msg <-
       sprintf(
-        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
+        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMolecular dataset: %s\n",
         slot(object, "annotation")$name,
         slot(object, "annotation")$dateCreated,
         length(slot(object, "experiment")),
         nrow(slot(object, "drug")),
-        paste(names(slot(
-          object, "molecularProfiles"
+        paste(names(
+          MultiAssayExperiment::experiments(object@molecularProfiles
         )), collapse = ", ")
       )
     cat(msg)

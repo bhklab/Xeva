@@ -32,7 +32,9 @@ Imports:
   grid,
   nlme,
   PharmacoGx,
-  downloader
+  downloader,
+  SummarizedExperiment,
+  MultiAssayExperiment
 Depends: R (>= 3.6)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues

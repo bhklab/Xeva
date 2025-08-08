@@ -72,20 +72,22 @@
   return(mdfI)
 }
 
-#' @import methods
-#' @import Biobase
-.getExpressionSet <- function(tx, y, sensitivity.measure, tissue=NULL)
-{
-  pd <- data.frame(name=colnames(tx), stringsAsFactors = FALSE)
+#' @import SummarizedExperiment
+#' @import S4Vectors
+.getExpressionSet <- function(tx, y, sensitivity.measure, tissue = NULL) {
+  pd <- data.frame(name = colnames(tx), stringsAsFactors = FALSE)
   rownames(pd) <- as.character(pd$name)
   pd[, sensitivity.measure] <- y
-  if(!is.null(tissue))
-  { pd$tissue <- tissue }
+  if (!is.null(tissue)) {
+    pd$tissue <- tissue
+  }
 
-  eSet <- Biobase::ExpressionSet(assayData=as.matrix(tx),
-                        phenoData=new("AnnotatedDataFrame",
-                                      data=data.frame(pd)))
-  return(eSet)
+  se <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(exprs = as.matrix(tx)),
+    colData = S4Vectors::DataFrame(pd)
+  )
+
+  return(se)
 }
 
 ##====== drugSensitivitySig for one drug ==========================
@@ -129,7 +131,7 @@
 #' \item{"spearman" for Spearman correlation}
 #' }
 #'
-#' If fit is set to NA, processed data (an ExpressionSet) will be returned.
+#' If fit is set to NA, processed data (a SummarizedExperiment) will be returned.
 #'
 #' A matrix of values can be directly passed to molData.
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
@@ -150,7 +152,7 @@ drugSensitivitySig <- function(object, drug,
 
   if(is.null(molData))
   {
-    molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
+    molData <- assay(getMolecularProfiles(object, mDataType))
   }
 
   molData <- as.matrix(molData)
@@ -226,10 +228,10 @@ drugSensitivitySig <- function(object, drug,
 
   if(is.na(fit[1]))
   {
-    eSet <- .getExpressionSet(t(x), y= mdfI[,sensitivity.measure],
+    se <- .getExpressionSet(t(x), y= mdfI[,sensitivity.measure],
                               sensitivity.measure=sensitivity.measure,
                               tissue=mdfI[, "tissue"])
-    return(eSet)
+    return(se)
   }
 
   rtx <-compute_association(x, y = mdfI[,sensitivity.measure],

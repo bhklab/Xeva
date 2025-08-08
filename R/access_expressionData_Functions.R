@@ -5,11 +5,14 @@
 #'
 #' @param object The \code{XevaSet}.
 #' @param data.type \code{character}, where one of the molecular data types is needed.
-#' @return An \code{ExpressionSet} where sample names are the \code{biobase.id} of the model.
+#' @return A \code{SummarizedExperiment} object (converted from ExpressionSet if needed), where sample names are the \code{biobase.id} of the model.
 #' @examples
 #' data(brca)
 #' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
 #' @export
+#' @import SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
+#' @importFrom MultiAssayExperiment experiments
 getMolecularProfiles <- function(object, data.type)
 {
   if(is.element(data.type, names(slot(object, "molecularProfiles")))==FALSE)
@@ -18,8 +21,77 @@ getMolecularProfiles <- function(object, data.type)
                   paste(names(object@molecularProfiles), collapse ="\n"))
     stop(msg)
   }
-  expset <- slot(object, "molecularProfiles")[[data.type]]
-  return(expset)
+  molData <- getMolecularProfileAssay(object, data.type)
+
+  # Convert ExpressionSet to SummarizedExperiment if needed
+  if (inherits(molData, "ExpressionSet")) {
+    molData <- SummarizedExperiment::SummarizedExperiment(
+      assays = list(exprs = Biobase::exprs(molData)),
+      colData = S4Vectors::DataFrame(Biobase::pData(molData)),
+      rowData = S4Vectors::DataFrame(Biobase::fData(molData))
+    )
+    message(sprintf("Note: '%s' molecular data was stored as ExpressionSet and has been converted to SummarizedExperiment.", data.type))
+  }
+
+  return(molData)
+}
+
+#' Get a specific assay (SummarizedExperiment) from a XevaSet object's molecularProfiles
+#'
+#' This function provides direct access to a specific assay stored in the
+#' \code{MultiAssayExperiment} slot of a \code{XevaSet} object.
+#'
+#' @param object The \code{XevaSet} object.
+#' @param data.type \code{character} name of the assay (e.g. "RNASeq").
+#' @return A \code{SummarizedExperiment} corresponding to the given \code{data.type}.
+#' @examples
+#' data(brca)
+#' rna <- getMolecularProfileAssay(brca, "RNASeq")
+#' @export
+getMolecularProfileAssay <- function(object, data.type) {
+  mae <- object@molecularProfiles
+  if (!(data.type %in% names(MultiAssayExperiment::experiments(mae)))) {
+    stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+  }
+  return(MultiAssayExperiment::experiments(mae)[[data.type]])
+}
+
+#' Internal helper to retrieve molecular data (SE) from a XevaSet
+#'
+#' Returns a SummarizedExperiment from the XevaSet@molecularProfiles slot,
+#' regardless of whether it's a list or MultiAssayExperiment.
+#'
+#' @param object The \code{XevaSet} object.
+#' @param data.type \code{character}, the name of the molecular data type (e.g. "RNASeq").
+#' @return A \code{SummarizedExperiment} object.
+#' @keywords internal
+.getMolecularData <- function(object, data.type) {
+  molSlot <- object@molecularProfiles
+
+  if (inherits(molSlot, "MultiAssayExperiment")) {
+    if (!(data.type %in% names(MultiAssayExperiment::experiments(molSlot)))) {
+      stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+    }
+    molData <- MultiAssayExperiment::experiments(molSlot)[[data.type]]
+  } else if (is.list(molSlot)) {
+    if (!(data.type %in% names(molSlot))) {
+      stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+    }
+    molData <- molSlot[[data.type]]
+  } else {
+    stop("Unsupported format in 'molecularProfiles' slot.")
+  }
+
+  # Convert ExpressionSet to SummarizedExperiment if needed
+  if (inherits(molData, "ExpressionSet")) {
+    molData <- SummarizedExperiment::SummarizedExperiment(
+      assays = list(exprs = Biobase::exprs(molData)),
+      colData = S4Vectors::DataFrame(Biobase::pData(molData)),
+      rowData = S4Vectors::DataFrame(Biobase::fData(molData))
+    )
+  }
+
+  return(molData)
 }
 
 .modelID2biobaseID <- function(object, mDataType, drug=NULL, tissue=NULL, unique.model=TRUE)
@@ -64,6 +136,7 @@ getMolecularProfiles <- function(object, data.type)
   }
   return(list(data=modIn, bioName=bioName))
 }
+
 #####================= Summarize Molecular Profiles ==================
 #' Summarize molecular profiles
 #'
@@ -76,7 +149,7 @@ getMolecularProfiles <- function(object, data.type)
 #' @param sensitivity.measure Default \code{NULL} will return all sensitivity measures.
 #' @param unique.model Default \code{TRUE} will return only one sequncing ID, in the case where one model ID maps to several sequencing IDs.
 #' @param batch Name of the batch. Default \code{NULL}.
-#' @return An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
+#' @return A \code{SummarizedExperiment} object where sample names are \code{model.id}, and sensitivity measures are stored in \code{colData}.
 #'
 #' @examples
 #' data(brca)
@@ -87,7 +160,7 @@ getMolecularProfiles <- function(object, data.type)
 #' \itemize{
 #' \item {If a sequencing sample belongs to multiple models, \code{summarizeMolecularProfiles}
 #' will create a separate column for each model.}
-#' \item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
+#' \item {All models without molecular data will be removed from the output \code{SummarizedExperiment}.}
 #' }
 #' @export
 summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
@@ -126,14 +199,15 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
     modIn <- modInX$data; bioName <- modInX$bioName
 
     modIn[,c(sensitivity.measure)] <- sm[modIn$model.id, c(sensitivity.measure)]
-    molP <- getMolecularProfiles(object, mDataType)
+    molP <- .getMolecularData(object, mDataType) # good for backward compatibility
+    # molP <- getMolecularProfileAssay(object, mDataType) # good for clarity and performance
     molP <- molP[, modIn[, bioName]]
+    # Reassign sample-level metadata using colData
     colnames(molP) <- rownames(modIn)
-    rownames(Biobase::pData(molP)) <- rownames(modIn)
-    pd <- Biobase::pData(molP)
-    for(i in colnames(modIn))
-    { pd[,i] <- modIn[,i] }
-    Biobase::pData(molP) <- pd
+    rownames(modIn) <- rownames(modIn)  # Ensures proper alignment
+
+    colData(molP) <- S4Vectors::DataFrame(modIn)
+
     return(molP)
   }
 

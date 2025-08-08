@@ -30,7 +30,7 @@ summarizeMolecularProfiles(
 \item{batch}{Name of the batch. Default \code{NULL}.}
 }
 \value{
-An \code{ExpressionSet} where sample names are \code{model.id} and sensitivity measures will be presented in \code{pData}.
+A \code{SummarizedExperiment} object where sample names are \code{model.id}, and sensitivity measures are stored in \code{colData}.
 }
 \description{
 This function serves to get molecular profiles from a \code{XevaSet} object.
@@ -39,7 +39,7 @@ This function serves to get molecular profiles from a \code{XevaSet} object.
 \itemize{
 \item {If a sequencing sample belongs to multiple models, \code{summarizeMolecularProfiles}
 will create a separate column for each model.}
-\item {All models without molecular data will be removed from the output \code{ExpressionSet}.}
+\item {All models without molecular data will be removed from the output \code{SummarizedExperiment}.}
 }
 }
 \examples{
