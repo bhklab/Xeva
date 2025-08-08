@@ -279,25 +279,27 @@ createXevaSet <- function(name,
 setMethod(
   f = "show",
   signature = "XevaSet",
-  definition = function(object)
-  {
-    msg <-
-      sprintf(
-        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMolecular dataset: %s\n",
-        slot(object, "annotation")$name,
-        slot(object, "annotation")$dateCreated,
-        length(slot(object, "experiment")),
-        nrow(slot(object, "drug")),
-        paste(names(
-          MultiAssayExperiment::experiments(object@molecularProfiles
-        )), collapse = ", ")
-      )
+  definition = function(object) {
+    mp <- object@molecularProfiles
+    mp_type <- if (inherits(mp, "MultiAssayExperiment")) {
+      names(MultiAssayExperiment::experiments(mp))
+    } else if (is.list(mp)) {
+      names(mp)
+    } else {
+      "unknown"
+    }
+
+    msg <- sprintf(
+      "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMolecular dataset: %s\n",
+      slot(object, "annotation")$name,
+      slot(object, "annotation")$dateCreated,
+      length(slot(object, "experiment")),
+      nrow(slot(object, "drug")),
+      paste(mp_type, collapse = ", ")
+    )
     cat(msg)
   }
 )
-
-
-
 
 
 #' print Xeva object
