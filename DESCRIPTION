@@ -34,7 +34,8 @@ Imports:
   PharmacoGx,
   downloader,
   SummarizedExperiment,
-  MultiAssayExperiment
+  MultiAssayExperiment,
+  S4Vectors
 Depends: R (>= 3.6)
 biocViews: GeneExpression, Pharmacogenetics, Pharmacogenomics, Software, Classification
 BugReports: https://github.com/bhklab/Xeva/issues

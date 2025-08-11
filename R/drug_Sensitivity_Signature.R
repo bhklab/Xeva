@@ -72,8 +72,8 @@
   return(mdfI)
 }
 
-#' @import SummarizedExperiment
-#' @import S4Vectors
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
 .getExpressionSet <- function(tx, y, sensitivity.measure, tissue = NULL) {
   pd <- data.frame(name = colnames(tx), stringsAsFactors = FALSE)
   rownames(pd) <- as.character(pd$name)
