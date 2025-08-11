@@ -97,15 +97,30 @@ subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
   m2b <- slot(object, "modToBiobaseMap")
   slot(object, "modToBiobaseMap") <- m2b[m2b$model.id %in% mdn$model.id, ]
   m2b <- slot(object, "modToBiobaseMap")
-  for(mold in names(slot(object, "molecularProfiles")) )
-  {
-    ids2take <- unique(m2b[m2b$mDataType== mold, "biobase.id"])
-    ids2take <- ids2take[!is.na(ids2take)]
-    if(length(ids2take)>0)
-    {
-      mol <- slot(object, "molecularProfiles")[[mold]]
-      slot(object, "molecularProfiles")[[mold]] <- mol[, ids2take]
+
+  mp <- slot(object, "molecularProfiles")
+  if (inherits(mp, "MultiAssayExperiment")) {
+    exps <- MultiAssayExperiment::experiments(mp)
+    for (mold in names(exps)) {
+      ids2take <- unique(m2b[m2b$mDataType == mold, "biobase.id"])
+      ids2take <- ids2take[!is.na(ids2take)]
+      if (length(ids2take) > 0) {
+        exps[[mold]] <- exps[[mold]][, ids2take]
+      }
     }
+    MultiAssayExperiment::experiments(mp) <- exps
+    slot(object, "molecularProfiles") <- mp
+  } else if (is.list(mp)) {
+    for (mold in names(mp)) {
+      ids2take <- unique(m2b[m2b$mDataType == mold, "biobase.id"])
+      ids2take <- ids2take[!is.na(ids2take)]
+      if (length(ids2take) > 0) {
+        mp[[mold]] <- mp[[mold]][, ids2take]
+      }
+    }
+    # Convert list to MultiAssayExperiment for consistency with class definition
+    mae <- MultiAssayExperiment::MultiAssayExperiment(experiments = mp)
+    slot(object, "molecularProfiles") <- mae
   }
   return(object)
 }

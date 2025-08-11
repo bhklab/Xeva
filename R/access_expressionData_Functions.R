@@ -10,7 +10,7 @@
 #' data(brca)
 #' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
 #' @export
-#' @import SummarizedExperiment
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @importFrom S4Vectors DataFrame
 #' @importFrom MultiAssayExperiment experiments
 getMolecularProfiles <- function(object, data.type)
@@ -49,11 +49,28 @@ getMolecularProfiles <- function(object, data.type)
 #' rna <- getMolecularProfileAssay(brca, "RNASeq")
 #' @export
 getMolecularProfileAssay <- function(object, data.type) {
-  mae <- object@molecularProfiles
-  if (!(data.type %in% names(MultiAssayExperiment::experiments(mae)))) {
-    stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+  mp <- object@molecularProfiles
+  if (inherits(mp, "MultiAssayExperiment")) {
+    if (!(data.type %in% names(MultiAssayExperiment::experiments(mp)))) {
+      stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+    }
+    return(MultiAssayExperiment::experiments(mp)[[data.type]])
+  } else if (is.list(mp)) {
+    if (!(data.type %in% names(mp))) {
+      stop(sprintf("Data type '%s' not found in molecularProfiles", data.type))
+    }
+    se <- mp[[data.type]]
+    if (inherits(se, "ExpressionSet")) {
+      se <- SummarizedExperiment::SummarizedExperiment(
+        assays = list(exprs = Biobase::exprs(se)),
+        colData = S4Vectors::DataFrame(Biobase::pData(se)),
+        rowData = S4Vectors::DataFrame(Biobase::fData(se))
+      )
+    }
+    return(se)
+  } else {
+    stop("Unsupported format in 'molecularProfiles' slot.")
   }
-  return(MultiAssayExperiment::experiments(mae)[[data.type]])
 }
 
 #' Internal helper to retrieve molecular data (SE) from a XevaSet
@@ -206,7 +223,7 @@ summarizeMolecularProfiles <- function(object, drug, mDataType, tissue=NULL,
     colnames(molP) <- rownames(modIn)
     rownames(modIn) <- rownames(modIn)  # Ensures proper alignment
 
-    colData(molP) <- S4Vectors::DataFrame(modIn)
+    SummarizedExperiment::colData(molP) <- S4Vectors::DataFrame(modIn)
 
     return(molP)
   }

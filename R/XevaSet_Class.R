@@ -1,5 +1,5 @@
-#' @import SummarizedExperiment
-#' @import MultiAssayExperiment
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom MultiAssayExperiment experiments
 
 
 ##--------------------------------------------------------------------------
@@ -237,8 +237,21 @@ createXevaSet <- function(name,
   if (is.null(molecularProfiles)) {
     mae <- MultiAssayExperiment::MultiAssayExperiment()
   } else if (is.list(molecularProfiles)) {
+    # Backward-compatibility: convert ExpressionSet elements to SummarizedExperiment
+    mp_list <- molecularProfiles
+    mp_list <- lapply(mp_list, function(x) {
+      if (inherits(x, "ExpressionSet")) {
+        SummarizedExperiment::SummarizedExperiment(
+          assays = list(exprs = Biobase::exprs(x)),
+          colData = S4Vectors::DataFrame(Biobase::pData(x)),
+          rowData = S4Vectors::DataFrame(Biobase::fData(x))
+        )
+      } else {
+        x
+      }
+    })
     mae <- MultiAssayExperiment::MultiAssayExperiment(
-      experiments = molecularProfiles
+      experiments = mp_list
     )
   } else if (inherits(molecularProfiles, "MultiAssayExperiment")) {
     mae <- molecularProfiles
@@ -248,7 +261,20 @@ createXevaSet <- function(name,
 
   # Check all experiments are SummarizedExperiment (if not empty)
   if (length(MultiAssayExperiment::experiments(mae)) > 0) {
-    if (!all(vapply(experiments(mae), function(x) is(x, "SummarizedExperiment"),logical(1)))) {
+    # If any remaining ExpressionSet slipped through (e.g., inside MAE), convert them
+    exps <- MultiAssayExperiment::experiments(mae)
+    need_convert <- vapply(exps, function(x) inherits(x, "ExpressionSet"), logical(1))
+    if (any(need_convert)) {
+      exps[need_convert] <- lapply(exps[need_convert], function(x) {
+        SummarizedExperiment::SummarizedExperiment(
+          assays = list(exprs = Biobase::exprs(x)),
+          colData = S4Vectors::DataFrame(Biobase::pData(x)),
+          rowData = S4Vectors::DataFrame(Biobase::fData(x))
+        )
+      })
+      MultiAssayExperiment::experiments(mae) <- exps
+    }
+    if (!all(vapply(MultiAssayExperiment::experiments(mae), function(x) is(x, "SummarizedExperiment"), logical(1)))) {
       stop("Each assay in molecularProfiles must be a SummarizedExperiment.")
     }
   }
