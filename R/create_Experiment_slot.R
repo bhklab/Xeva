@@ -207,7 +207,7 @@ experimentSlotfromDf <- function(experiment) {
       "Drug columns are\n%s\n",
       paste(drugColsName, collapse = ', ')
     )
-    cat(msg)
+    message(msg)
   }
 
   doseColsName <- colnames(experiment)[grep("dose", colnames(experiment))]
@@ -244,7 +244,7 @@ experimentSlotfromDf <- function(experiment) {
       "drug column will be replaced by %s\n",
       paste(drgColName.No, collapse = " + ")
     )
-    cat(msg)
+    message(msg)
     pasteWithoutNA <- function(L, collapse = " + ") {
       paste(L[!is.na(L)], collapse = collapse)
     }
