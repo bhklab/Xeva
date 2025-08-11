@@ -29,7 +29,7 @@
 #' @import nlme
 lmm <- function(data) {
   if (any(!c("model.id", "volume", "time", "exp.type") %in% colnames(data))) {
-    msg <- "these columns must be present, 'model.id', 'volume', 'time', 'exp.type'"
+    msg = "these columns must be present, 'model.id', 'volume', 'time', 'exp.type'"
     stop(msg)
   }
 

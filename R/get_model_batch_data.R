@@ -423,7 +423,7 @@ getBatchFormatted <- function(
     return(rtx)
   }
 
-## ----- get experiment data in flat data.fram ----------------------------------
+##----- get experiment data in flat data.fram ----------------------------------
 #' Get PDX experiment data
 #'
 #' For a given \code{model.id}, \code{getExperiment} will
@@ -445,18 +445,16 @@ getBatchFormatted <- function(
 #' @examples
 #' data(brca)
 #'
-#' getExperiment(brca, model.id = "X.6047.uned", treatment.only = TRUE)
+#' getExperiment(brca, model.id="X.6047.uned", treatment.only=TRUE)
 #'
-#' getExperiment(brca, model.id = c("X.6047.uned", "X.6047.pael"), treatment.only = TRUE)
+#' getExperiment(brca, model.id=c("X.6047.uned", "X.6047.pael"), treatment.only=TRUE)
 #'
-#' getExperiment(brca, batch = "X-6047.paclitaxel", treatment.only = TRUE)
+#' getExperiment(brca, batch="X-6047.paclitaxel", treatment.only=TRUE)
 #'
-#' ed <- list(
-#'   batch.name = "myBatch", treatment = c("X.6047.LJ16", "X.6047.LJ16.trab"),
-#'   control = c("X.6047.uned")
-#' )
+#' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
+#'              control=c("X.6047.uned"))
 #'
-#' getExperiment(brca, batch = ed)
+#' getExperiment(brca, batch=ed)
 #'
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(

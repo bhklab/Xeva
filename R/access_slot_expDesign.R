@@ -21,14 +21,14 @@
 #'
 #' @examples
 #' data(brca)
-#' ## to get all the batch names
+#' ##to get all the batch names
 #' batch.name <- batchInfo(brca)
 #'
-#' ## to get a specific batch
-#' batch.design <- batchInfo(brca, batch = batch.name[1])
+#' ##to get a specific batch
+#' batch.design <- batchInfo(brca, batch=batch.name[1])
 #'
-#' ## to get all the batches where a model.id is present
-#' batchInfo(brca, model.id = "X.6047.uned")
+#' ##to get all the batches where a model.id is present
+#' batchInfo(brca, model.id="X.6047.uned")
 #'
 #' @return A \code{Vector} with batch names.
 #'

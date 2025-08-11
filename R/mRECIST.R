@@ -29,7 +29,7 @@
 
   exdf <- data.frame(time = time, response = response)
   if (!is.null(min.time)) {
-    exdfMinAge <- exdf[exdf$time >= min.time, ]
+    exdfMinAge = exdf[exdf$time >= min.time, ]
   } else {
     exdfMinAge <- exdf
   }
@@ -58,9 +58,9 @@
 #' @param return.detail Default \code{FALSE}. If \code{TRUE}, return all intermediate values.
 #' @return  Returns the mRECIST.
 #' @examples
-#' time <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
-#' volume <- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
-#' mRECIST(time, volume, min.time = 10, return.detail = FALSE)
+#' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
+#' mRECIST(time, volume, min.time=10, return.detail=FALSE)
 #' @export
 mRECIST <- function(time, volume, min.time = 10, return.detail = FALSE) {
   if (volume[1] == 0) {
@@ -101,7 +101,7 @@ mRECIST <- function(time, volume, min.time = 10, return.detail = FALSE) {
     exdf$mRECIST <- mRecist
 
     if (!is.na(best.response) & !is.na(best.average.response)) {
-      #### ---- the order of mRECIST assignment is important ----------
+      ####---- the order of mRECIST assignment is important ----------
       mRecist <- "PD"
 
       if (best.response < 35 & best.average.response < 30) {

@@ -203,7 +203,7 @@ createXevaModelClass <- function() {
   names(pdxmiVar) <- as.character(PDXMI$id)
   pdxmiPrototype <- as.list(rep(NA_character_, length(pdxmiVar)))
   names(pdxmiPrototype) <- names(pdxmiVar)
-  ## ----------------------------------------------------------------------------
+  ##----------------------------------------------------------------------------
   xevaVar <- list(
     model.id = "character",
     drug = "list",
@@ -245,7 +245,7 @@ setMethod(f = "show", signature = "pdxModel", definition = function(object) {
   print(head(slot(object, "data")))
   cat(sprintf("\n"))
 
-  ## ---------------
+  ##---------------
   otherSlot <- setdiff(slotNames(object), c("model.id", "drug", "data"))
   for (s in otherSlot) {
     if (!is.na(slot(object, s))) {

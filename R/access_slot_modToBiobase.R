@@ -3,7 +3,7 @@
 #'
 #' @examples
 #' data(brca)
-#' idMap <- model2BiobaseIdMap(brca, mDataType = "RNASeq")
+#' idMap <- model2BiobaseIdMap(brca, mDataType="RNASeq")
 #' head(idMap)
 #' @param object The \code{XevaSet}.
 #' @param mDataType Data type for which ids to be retrive. Default \code{NULL} will return a full data frame.
