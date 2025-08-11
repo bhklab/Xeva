@@ -36,3 +36,6 @@ vignettes/figure/*
 Xeva_*.tar.gz
 Rplots.pdf
 .DS_Store
+Xeva.BiocCheck/
+*.BiocCheck/
+00BiocCheck.log
