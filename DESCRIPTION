@@ -9,6 +9,7 @@ Authors@R: c(
         email = "benjamin.haibe.kains@utoronto.ca", role = c("aut", "cre"))
     ) 
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
+URL: https://github.com/bhklab/Xeva
 Description: The Xeva package provides efficient and powerful functions for patient-drived xenograft (PDX) based pharmacogenomic data analysis. 
             This package contains a set of functions to perform analysis of patient-derived xenograft data. This package was developed by the BHKLab, for further information please see our documentation.
 License: GPL-3
