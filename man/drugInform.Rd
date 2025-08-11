@@ -4,7 +4,7 @@
 \alias{drugInform}
 \alias{drugInform,XevaSet-method}
 \title{Get drug information
-Get the drug information slot from a {XevaSet} object.}
+Get the drug information slot from a \code{XevaSet} object.}
 \usage{
 drugInform(object)
 
@@ -18,7 +18,7 @@ A \code{data.frame} with the drug annotations.
 }
 \description{
 Get drug information
-Get the drug information slot from a {XevaSet} object.
+Get the drug information slot from a \code{XevaSet} object.
 }
 \examples{
 data(brca)
