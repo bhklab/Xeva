@@ -4,27 +4,27 @@
 ## inLst <- list(x=x, y=y)
 ## .rbindListOfDataframs(inLst)
 .rbindListOfDataframs <- function(inList) {
-  allColNames = lapply(inList, colnames)
-  allColNames = unique(unlist(allColNames))
-  rtx = data.frame()
-  ncolX = 0
+  allColNames <- lapply(inList, colnames)
+  allColNames <- unique(unlist(allColNames))
+  rtx <- data.frame()
+  ncolX <- 0
   for (dfi in inList) {
     if (length(colnames(dfi)) > ncolX) {
-      ncolX = length(colnames(dfi))
-      maxCols = colnames(dfi)
+      ncolX <- length(colnames(dfi))
+      maxCols <- colnames(dfi)
     }
 
     for (cx in allColNames) {
       if (is.element(cx, colnames(dfi)) == FALSE) {
-        dfi[, cx] = NA
+        dfi[, cx] <- NA
       }
     }
-    rtx = rbind(rtx, dfi[, allColNames])
+    rtx <- rbind(rtx, dfi[, allColNames])
   }
 
-  rtx1 = rtx[, maxCols]
-  rtx2 = rtx[, setdiff(colnames(rtx), maxCols)]
-  RTz = cbind(rtx1, rtx2)
+  rtx1 <- rtx[, maxCols]
+  rtx2 <- rtx[, setdiff(colnames(rtx), maxCols)]
+  RTz <- cbind(rtx1, rtx2)
   return(RTz)
 }
 
@@ -93,7 +93,7 @@ getIndex <- function(inVec, indxOf) {
 
 
 .appendToList <- function(in.list, value) {
-  in.list[[length(in.list) + 1]] = value
+  in.list[[length(in.list) + 1]] <- value
   return(in.list)
 }
 
@@ -107,8 +107,8 @@ getIndex <- function(inVec, indxOf) {
 ##---------------reorder column ------------------------------------------
 
 .reorderCol <- function(df, columnName, newIndx) {
-  OtherCN = colnames(df)[colnames(df) != columnName]
-  newCN = append(OtherCN, columnName, after = (newIndx - 1))
+  OtherCN <- colnames(df)[colnames(df) != columnName]
+  newCN <- append(OtherCN, columnName, after = (newIndx - 1))
   return(df[, newCN])
 }
 
@@ -149,7 +149,7 @@ pasteWithoutNA <- function(L, collapse = " + ") {
 # msg <- sprintf("data frame is:\n%s", printAndCapture(df))
 # warning(msg)
 printAndCapture <- function(x) {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(capture.output(x), collapse = "\n")
 }
 
 ###----------------------------
@@ -177,18 +177,18 @@ removeZeroVar <- function(df, varCutoff = 0, sort = TRUE) {
 
 
 extractBetweenTags <- function(inVec, start.tag = 0, end.tag = 0) {
-  inVIndx = seq_along(inVec)
-  stIndx = min(inVIndx[inVec != start.tag])
+  inVIndx <- seq_along(inVec)
+  stIndx <- min(inVIndx[inVec != start.tag])
 
-  V2 = inVec[stIndx:length(inVec)]
-  v2end = which(V2 == end.tag)
+  V2 <- inVec[stIndx:length(inVec)]
+  v2end <- which(V2 == end.tag)
   if (length(v2end) > 0) {
-    enIndx = min(v2end) - 1
-    enIndxR = enIndx + stIndx - 1
+    enIndx <- min(v2end) - 1
+    enIndxR <- enIndx + stIndx - 1
   } else {
-    enIndxR = length(inVec)
+    enIndxR <- length(inVec)
   }
 
-  Vi = stIndx:enIndxR
+  Vi <- stIndx:enIndxR
   return(Vi)
 }

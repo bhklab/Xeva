@@ -78,7 +78,7 @@
     is(modelSensitivity, "data.frame") == FALSE |
       is(batchSensitivity, "data.frame") == FALSE
   ) {
-    stop("slot class error")
+    stop("modelSensitivity and batchSensitivity must be data.frame")
   }
 
   rtx <- list(model = modelSensitivity, batch = batchSensitivity)
@@ -100,7 +100,7 @@
 
   for (I in expSlot) {
     if (is.element(slot(I, "model.id"), model$model.id) == FALSE) {
-      msg = sprintf(
+      msg <- sprintf(
         "No informaton present in Model datafram about model.id =%s",
         I$model.id
       )

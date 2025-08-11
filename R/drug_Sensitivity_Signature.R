@@ -196,8 +196,8 @@ drugSensitivitySig <- function(
 
   drugIx <- c(drug)[1]
 
-  if (verbose == TRUE) {
-    cat(sprintf("Running for drug %s\n\n", drugIx))
+  if (isTRUE(verbose)) {
+    message(sprintf("Running for drug %s", drugIx))
   }
   mdfI <- .getBioIdSensitivityDF(
     object,
@@ -225,7 +225,7 @@ drugSensitivitySig <- function(
 
   if (!is.null(tissue)) {
     if (length(tissue) == 1) {
-      cat(sprintf("setting 'tissue' = %s for all models", tissue[1]))
+      message(sprintf("setting 'tissue' = %s for all models", tissue[1]))
       tt <- rep(tissue[1], nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
