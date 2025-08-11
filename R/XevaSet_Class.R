@@ -78,7 +78,7 @@
     is(modelSensitivity, "data.frame") == FALSE |
       is(batchSensitivity, "data.frame") == FALSE
   ) {
-    stop("slot class error")
+    stop("modelSensitivity and batchSensitivity must be data.frame")
   }
 
   rtx <- list(model = modelSensitivity, batch = batchSensitivity)
