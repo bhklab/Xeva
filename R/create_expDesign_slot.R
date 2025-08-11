@@ -1,25 +1,25 @@
 .checkExperimentDesign <- function(expDesign) {
-  modNoControl = c()
-  modNoTreatme = c()
+  modNoControl <- c()
+  modNoTreatme <- c()
   for (I in expDesign) {
     if (length(I$control) == 0 & length(I$treatment) == 0) {
-      stop("Error Treatmetn and Control are missing in expDesign!")
+      stop("Treatment and control are missing in expDesign")
     }
 
     if (length(I$control) == 0) {
-      modNoControl = c(modNoControl, I$treatment)
+      modNoControl <- c(modNoControl, I$treatment)
     }
     if (length(I$treatment) == 0) {
-      modNoTreatme = c(modNoTreatme, I$control)
+      modNoTreatme <- c(modNoTreatme, I$control)
     }
   }
 
-  if (!is.null(modNoControl)) {
-    txt = sprintf(
+  if (length(modNoControl) > 0) {
+    txt <- sprintf(
       "These models have no Controls\n%s\n",
       paste(unique(modNoControl), collapse = "\n")
     )
-    cat(txt)
+    message(txt)
   }
 
   ##------- setting name -----------------
