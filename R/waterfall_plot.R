@@ -47,7 +47,7 @@ plotWaterFall <- function(x, y, type, color, title, yname, legend.name,
 #' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published")
 #' ## example with model.type where we color the models by TP53 mutation type
 #' mut <- summarizeMolecularProfiles(brca,drug = "binimetinib", mDataType="mutation")
-#' model.type <- Biobase::exprs(mut)["TP53", ]
+#' model.type <- SummarizedExperiment::assay(mut)["TP53", ]
 #' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published",
 #'           tissue="BRCA", model.id=names(model.type), model.type= model.type)
 #'

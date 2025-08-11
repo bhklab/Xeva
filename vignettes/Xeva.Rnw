@@ -182,7 +182,7 @@ Here we create a waterfall plot for drug BYL719 and color it based on the mutati
 First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
 <<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
 mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
-model.type <- Biobase::exprs(mut)["CDK13", ]
+model.type <- SummarizedExperiment::assay(mut)["CDK13", ]
 model.type[grepl("Mut", model.type)] <- "mutation"
 model.type[model.type!="mutation"] <- "wild type"
 model.color <- list("mutation"="#b2182b", "wild type"="#878787")
