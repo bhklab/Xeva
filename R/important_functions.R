@@ -4,33 +4,33 @@
 ## inLst <- list(x=x, y=y)
 ## .rbindListOfDataframs(inLst)
 .rbindListOfDataframs <- function(inList) {
-  allColNames = lapply(inList, colnames)
-  allColNames = unique(unlist(allColNames))
-  rtx = data.frame()
-  ncolX = 0
+  allColNames <- lapply(inList, colnames)
+  allColNames <- unique(unlist(allColNames))
+  rtx <- data.frame()
+  ncolX <- 0
   for (dfi in inList) {
     if (length(colnames(dfi)) > ncolX) {
-      ncolX = length(colnames(dfi))
-      maxCols = colnames(dfi)
+      ncolX <- length(colnames(dfi))
+      maxCols <- colnames(dfi)
     }
 
     for (cx in allColNames) {
       if (is.element(cx, colnames(dfi)) == FALSE) {
-        dfi[, cx] = NA
+        dfi[, cx] <- NA
       }
     }
-    rtx = rbind(rtx, dfi[, allColNames])
+    rtx <- rbind(rtx, dfi[, allColNames])
   }
 
-  rtx1 = rtx[, maxCols]
-  rtx2 = rtx[, setdiff(colnames(rtx), maxCols)]
-  RTz = cbind(rtx1, rtx2)
+  rtx1 <- rtx[, maxCols]
+  rtx2 <- rtx[, setdiff(colnames(rtx), maxCols)]
+  RTz <- cbind(rtx1, rtx2)
   return(RTz)
 }
 
 
-##---- gives index of element in vector
-##---- also works for NA
+## ---- gives index of element in vector
+## ---- also works for NA
 getIndex <- function(inVec, indxOf) {
   if (is.na(indxOf)) {
     return(which(is.na(inVec)))
@@ -57,7 +57,7 @@ getIndex <- function(inVec, indxOf) {
 
   for (I in seq_len(nrow(df))) {
     v <- ml[[df[I, row.var]]][[df[I, col.var]]]
-    ml[[df[I, row.var]]][[df[I, col.var]]] <- c(v, df[I, value]) #vx
+    ml[[df[I, row.var]]][[df[I, col.var]]] <- c(v, df[I, value]) # vx
   }
 
   for (r in rownames(dfx)) {
@@ -93,27 +93,27 @@ getIndex <- function(inVec, indxOf) {
 
 
 .appendToList <- function(in.list, value) {
-  in.list[[length(in.list) + 1]] = value
+  in.list[[length(in.list) + 1]] <- value
   return(in.list)
 }
 
-##---------------------------------------------------------------------------
-##---------------remove NA col-----------------------------------------------
+## ---------------------------------------------------------------------------
+## ---------------remove NA col-----------------------------------------------
 .removeNAcol <- function(df) {
   return(df[, !apply(is.na(df), 2, all)])
 }
 
-##------------------------------------------------------------------------
-##---------------reorder column ------------------------------------------
+## ------------------------------------------------------------------------
+## ---------------reorder column ------------------------------------------
 
 .reorderCol <- function(df, columnName, newIndx) {
-  OtherCN = colnames(df)[colnames(df) != columnName]
-  newCN = append(OtherCN, columnName, after = (newIndx - 1))
+  OtherCN <- colnames(df)[colnames(df) != columnName]
+  newCN <- append(OtherCN, columnName, after = (newIndx - 1))
   return(df[, newCN])
 }
 
-##-------------------------------------------------------------------------
-##-------------------------------------------------------------------------
+## -------------------------------------------------------------------------
+## -------------------------------------------------------------------------
 ## paste vector elements together while removing NAs
 ## \code{pasteWithoutNA} paste vector elements together while removing NAs
 ## @param L A vector with values and NAs
@@ -127,20 +127,20 @@ pasteWithoutNA <- function(L, collapse = " + ") {
 }
 
 
-##------------------------------------------------------------------------
-##--- this will creat empty theme for ggplot -----------------------------
+## ------------------------------------------------------------------------
+## --- this will creat empty theme for ggplot -----------------------------
 .ggplotEmptyTheme <- function(plt) {
   plt +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank(),
       panel.background = ggplot2::element_blank(),
-      legend.key = element_blank(), ##removes legend background
+      legend.key = element_blank(), ## removes legend background
       axis.line = ggplot2::element_line(colour = "black")
     )
 }
 
-##-------------------
+## -------------------
 # Function to print data.frame in message
 #
 # \code{printAndCapture} prints data.frame in stop or warning functions
@@ -149,17 +149,17 @@ pasteWithoutNA <- function(L, collapse = " + ") {
 # msg <- sprintf("data frame is:\n%s", printAndCapture(df))
 # warning(msg)
 printAndCapture <- function(x) {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(capture.output(x), collapse = "\n")
 }
 
-###----------------------------
-##Normalize a vector between 0 and 1
+### ----------------------------
+## Normalize a vector between 0 and 1
 .normalize01 <- function(x) {
   (x - min(x)) / (max(x) - min(x))
 }
 
-###------------------------------
-##-------------------
+### ------------------------------
+## -------------------
 ## Function to remove low variance features
 ## Function to remove low variance features
 ## @examples
@@ -177,18 +177,18 @@ removeZeroVar <- function(df, varCutoff = 0, sort = TRUE) {
 
 
 extractBetweenTags <- function(inVec, start.tag = 0, end.tag = 0) {
-  inVIndx = seq_along(inVec)
-  stIndx = min(inVIndx[inVec != start.tag])
+  inVIndx <- seq_along(inVec)
+  stIndx <- min(inVIndx[inVec != start.tag])
 
-  V2 = inVec[stIndx:length(inVec)]
-  v2end = which(V2 == end.tag)
+  V2 <- inVec[stIndx:length(inVec)]
+  v2end <- which(V2 == end.tag)
   if (length(v2end) > 0) {
-    enIndx = min(v2end) - 1
-    enIndxR = enIndx + stIndx - 1
+    enIndx <- min(v2end) - 1
+    enIndxR <- enIndx + stIndx - 1
   } else {
-    enIndxR = length(inVec)
+    enIndxR <- length(inVec)
   }
 
-  Vi = stIndx:enIndxR
+  Vi <- stIndx:enIndxR
   return(Vi)
 }
