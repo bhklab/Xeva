@@ -1,141 +1,210 @@
-.addlinetoplot <- function(dt, x, y, col='red', lty="dotted", alpha=1, size=0.5)
-{
+.addlinetoplot <- function(
+  dt,
+  x,
+  y,
+  col = 'red',
+  lty = "dotted",
+  alpha = 1,
+  size = 0.5
+) {
   list(
-    geom_line( data=dt, aes_string(x=x, y=y), color=col, linetype=lty,
-               alpha=alpha, size=size),
-    geom_point(data=dt, aes_string(x=x, y=y), color=col, shape=20, alpha=alpha)
+    geom_line(
+      data = dt,
+      aes_string(x = x, y = y),
+      color = col,
+      linetype = lty,
+      alpha = alpha,
+      size = size
+    ),
+    geom_point(
+      data = dt,
+      aes_string(x = x, y = y),
+      color = col,
+      shape = 20,
+      alpha = alpha
+    )
   )
 }
 
 #' @import ggplot2
-.plotModelErrorBar <- function(dfp,control.col="#6baed6",treatment.col="#fc8d59",
-                              title="", xlab = "Time", ylab = "Volume",
-                              log.y=FALSE, drgName="",
-                              SE.plot = c("all","none","errorbar", "ribbon"),
-                              modelLyt= "dotted",
-                              aspect.ratio=c(1, NULL), minor.line.size=0.5,
-                              major.line.size=0.7)
-{
+.plotModelErrorBar <- function(
+  dfp,
+  control.col = "#6baed6",
+  treatment.col = "#fc8d59",
+  title = "",
+  xlab = "Time",
+  ylab = "Volume",
+  log.y = FALSE,
+  drgName = "",
+  SE.plot = c("all", "none", "errorbar", "ribbon"),
+  modelLyt = "dotted",
+  aspect.ratio = c(1, NULL),
+  minor.line.size = 0.5,
+  major.line.size = 0.7
+) {
   SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
   df <- dfp$mean
   df <- df[!is.na(df$mean), ]
 
-  if(!is.null(df$upper) & !is.null(df$lower))
-  {
-    if(all(is.na(df$upper))==TRUE){ df$upper=NULL}
-    if(all(is.na(df$lower))==TRUE){ df$lower=NULL}
+  if (!is.null(df$upper) & !is.null(df$lower)) {
+    if (all(is.na(df$upper)) == TRUE) {
+      df$upper = NULL
+    }
+    if (all(is.na(df$lower)) == TRUE) {
+      df$lower = NULL
+    }
   }
 
-  if(nrow(df)==0)
-  {
+  if (nrow(df) == 0) {
     stop("No data left after removing NA")
   }
 
-  if(log.y==TRUE)
-  {
+  if (log.y == TRUE) {
     df$mean = log(df$mean)
-    if(!is.null(df$upper)) {df$upper <- log(df$upper)}
-    if(!is.null(df$upper)) {df$lower <- log(df$lower)}
+    if (!is.null(df$upper)) {
+      df$upper <- log(df$upper)
+    }
+    if (!is.null(df$upper)) {
+      df$lower <- log(df$lower)
+    }
   }
 
-  plt <- ggplot(df, aes_string(x="time", y="mean", color= "exp.type"))
-  plt <- plt + geom_line(linetype = 1, size=major.line.size)+ geom_point()
+  plt <- ggplot(df, aes_string(x = "time", y = "mean", color = "exp.type"))
+  plt <- plt + geom_line(linetype = 1, size = major.line.size) + geom_point()
 
-  if(SE.plot %in% c("errorbar", "ribbon"))
-  {
-    if(!is.null(df$upper) & !is.null(df$lower))
-    {
-      if(all(is.na(df$upper))==FALSE & all(is.na(df$lower))==FALSE)
-      {
-        if(SE.plot == "errorbar")
-        {
-          plt <- plt + geom_errorbar(aes_string(ymin = "lower", ymax = "upper"),
-                                     width=0.25)
+  if (SE.plot %in% c("errorbar", "ribbon")) {
+    if (!is.null(df$upper) & !is.null(df$lower)) {
+      if (all(is.na(df$upper)) == FALSE & all(is.na(df$lower)) == FALSE) {
+        if (SE.plot == "errorbar") {
+          plt <- plt +
+            geom_errorbar(
+              aes_string(ymin = "lower", ymax = "upper"),
+              width = 0.25
+            )
         }
-        if(SE.plot == "ribbon")
-        {
-          plt <- plt + geom_ribbon(aes_string(ymin ="lower", ymax ="upper",
-                                              fill ="exp.type"),
-                                   linetype=0,  alpha = 0.25)
+        if (SE.plot == "ribbon") {
+          plt <- plt +
+            geom_ribbon(
+              aes_string(ymin = "lower", ymax = "upper", fill = "exp.type"),
+              linetype = 0,
+              alpha = 0.25
+            )
         }
       }
     }
   }
 
-  if(SE.plot =="all")
-  {
-    if(!is.null(dfp$control))
-    {
-      for(ct in dfp$control)
-      { plt <- plt + .addlinetoplot(ct, x="time", y="volume", col=control.col,
-                                   lty=modelLyt, alpha=0.5, size = minor.line.size) }
+  if (SE.plot == "all") {
+    if (!is.null(dfp$control)) {
+      for (ct in dfp$control) {
+        plt <- plt +
+          .addlinetoplot(
+            ct,
+            x = "time",
+            y = "volume",
+            col = control.col,
+            lty = modelLyt,
+            alpha = 0.5,
+            size = minor.line.size
+          )
+      }
     }
-    if(!is.null(dfp$treatment))
-    {
-      for(tr in dfp$treatment)
-      { plt <- plt + .addlinetoplot(tr, "time", "volume", col=treatment.col,
-                                   lty=modelLyt, alpha=0.5,size = minor.line.size) }
+    if (!is.null(dfp$treatment)) {
+      for (tr in dfp$treatment) {
+        plt <- plt +
+          .addlinetoplot(
+            tr,
+            "time",
+            "volume",
+            col = treatment.col,
+            lty = modelLyt,
+            alpha = 0.5,
+            size = minor.line.size
+          )
+      }
     }
   }
 
-  plt <- plt + geom_point(data=df, aes_string(x="time", y="mean",
-                                              color= "exp.type"),
-                          shape=21, fill="white")
+  plt <- plt +
+    geom_point(
+      data = df,
+      aes_string(x = "time", y = "mean", color = "exp.type"),
+      shape = 21,
+      fill = "white"
+    )
 
   tcCol <- c("control" = control.col, "treatment" = treatment.col)
-  plt <- plt + scale_color_manual(values=tcCol)
-  if(SE.plot == "ribbon")
-  { plt <- plt + scale_fill_manual(values=tcCol) }
+  plt <- plt + scale_color_manual(values = tcCol)
+  if (SE.plot == "ribbon") {
+    plt <- plt + scale_fill_manual(values = tcCol)
+  }
   plt <- .ggplotEmptyTheme(plt)
-  plt <- plt + labs(title = title, x = xlab, y = ylab, colour = drgName,
-                    fill=drgName)
+  plt <- plt +
+    labs(title = title, x = xlab, y = ylab, colour = drgName, fill = drgName)
   plt <- plt + theme(plot.title = element_text(hjust = 0.5))
-  plt <- plt + theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
-  if(!is.null(aspect.ratio))
-  {
-    plt <- plt + theme(aspect.ratio=aspect.ratio)
+  plt <- plt +
+    theme(panel.border = element_rect(colour = "black", fill = NA, size = 1))
+  if (!is.null(aspect.ratio)) {
+    plt <- plt + theme(aspect.ratio = aspect.ratio)
   }
   return(plt)
 }
 
 #' @import ggplot2
-.plotMultipalModels <- function(dfx, color=NULL, major.line.size=1,
-                                aspect.ratio=NULL)
-{
-  plt <- ggplot(dfx, aes_string(x="time", y="volume", color= "model.id"))
-  plt <- plt + geom_line(linetype = 1, size=major.line.size)+ geom_point()
+.plotMultipalModels <- function(
+  dfx,
+  color = NULL,
+  major.line.size = 1,
+  aspect.ratio = NULL
+) {
+  plt <- ggplot(dfx, aes_string(x = "time", y = "volume", color = "model.id"))
+  plt <- plt + geom_line(linetype = 1, size = major.line.size) + geom_point()
 
-  if(!is.null(color))
-  { plt <- plt+scale_color_manual(values = color) }
+  if (!is.null(color)) {
+    plt <- plt + scale_color_manual(values = color)
+  }
 
   plt <- .ggplotEmptyTheme(plt)
 
-  if(!is.null(aspect.ratio))
-  {
-    plt <- plt + theme(aspect.ratio=aspect.ratio)
+  if (!is.null(aspect.ratio)) {
+    plt <- plt + theme(aspect.ratio = aspect.ratio)
   }
   return(plt)
-
 }
 
 
 #' @import ggplot2
-.plotDose <- function(do, point.shape=21, point.size=5, point.color="black",
-                     line.size=4, line.color="black", modify.x.axis=TRUE)
-{
-  plt <- ggplot(do, aes_string(x="time", y="model.id"))
-  plt <- plt + geom_point(size=0)
-  plt <- plt + geom_hline(aes_string(yintercept = "model.n"), do,
-                          size=line.size, color=line.color)
-  plt <- plt + geom_point(fill=do$color,shape=point.shape, size=point.size,
-                          color=point.color)
+.plotDose <- function(
+  do,
+  point.shape = 21,
+  point.size = 5,
+  point.color = "black",
+  line.size = 4,
+  line.color = "black",
+  modify.x.axis = TRUE
+) {
+  plt <- ggplot(do, aes_string(x = "time", y = "model.id"))
+  plt <- plt + geom_point(size = 0)
+  plt <- plt +
+    geom_hline(
+      aes_string(yintercept = "model.n"),
+      do,
+      size = line.size,
+      color = line.color
+    )
+  plt <- plt +
+    geom_point(
+      fill = do$color,
+      shape = point.shape,
+      size = point.size,
+      color = point.color
+    )
 
-  if(modify.x.axis==TRUE)
-  {
+  if (modify.x.axis == TRUE) {
     unqTime <- unique(do$time)
-    plt <- plt + scale_x_continuous(breaks=unqTime, labels=unqTime)
+    plt <- plt + scale_x_continuous(breaks = unqTime, labels = unqTime)
   }
 
   plt <- plt + theme_bw()
@@ -166,19 +235,31 @@
 #' data(brca)
 #' dosePlot(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"), fill.col=c("#f5f5f5", "#993404"))
 #' @export
-dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
-                     vol.normal=FALSE, concurrent.time=FALSE,
-                     point.shape=21, point.size=3, line.size=4,
-                     point.color="#878787", line.color="#bababa",
-                     fill.col=c("#f5f5f5", "#E55100"),
-                     modify.x.axis=FALSE)
-{
-  dfx <- getExperiment(object, model.id=model.id,
-                       treatment.only=treatment.only, max.time=max.time,
-                       vol.normal=vol.normal, return.list = FALSE,
-                       concurrent.time = concurrent.time)
-  if(is.null(dfx$dose))
-  {
+dosePlot <- function(
+  object,
+  model.id,
+  max.time = NULL,
+  treatment.only = FALSE,
+  vol.normal = FALSE,
+  concurrent.time = FALSE,
+  point.shape = 21,
+  point.size = 3,
+  line.size = 4,
+  point.color = "#878787",
+  line.color = "#bababa",
+  fill.col = c("#f5f5f5", "#E55100"),
+  modify.x.axis = FALSE
+) {
+  dfx <- getExperiment(
+    object,
+    model.id = model.id,
+    treatment.only = treatment.only,
+    max.time = max.time,
+    vol.normal = vol.normal,
+    return.list = FALSE,
+    concurrent.time = concurrent.time
+  )
+  if (is.null(dfx$dose)) {
     warning("no dose information present! assuming dose = 1")
     dfx$dose <- 1
   }
@@ -186,11 +267,21 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
   do <- dfx[, c("model.id", "time", "dose")]
   model.order <- unique(do$model.id)
 
-  do$model.n <- as.numeric(factor(as.character(do$model.id), levels = model.order))
-  do$color <- ifelse(do$dose==0, fill.col[1], fill.col[2])
+  do$model.n <- as.numeric(factor(
+    as.character(do$model.id),
+    levels = model.order
+  ))
+  do$color <- ifelse(do$dose == 0, fill.col[1], fill.col[2])
 
-  doplt <- .plotDose(do, point.shape, point.size, point.color, line.size,
-                     line.color, modify.x.axis)
+  doplt <- .plotDose(
+    do,
+    point.shape,
+    point.size,
+    point.color,
+    line.size,
+    line.color,
+    modify.x.axis
+  )
   return(doplt)
 }
 ######--------------------------------------------------------------------------
@@ -234,77 +325,133 @@ dosePlot <- function(object, model.id, max.time=NULL, treatment.only=FALSE,
 #' plotBatch(brca, batch=expDesign, vol.normal=TRUE)
 #' plotBatch(brca, batch=expDesign, vol.normal=FALSE, SE.plot = "errorbar")
 #' @export
-plotPDX <- function(object, batch=NULL,
-                    patient.id=NULL, drug=NULL, model.id=NULL, model.color=NULL,
-                    control.name=NULL,
-                    max.time=NULL, treatment.only=FALSE, vol.normal=FALSE,
-                    impute.value=TRUE, concurrent.time=FALSE,
-                    control.col = "#e41a1c", treatment.col = "#377eb8",
-                    title="", xlab = "Time", ylab = "Volume",
-                    log.y=FALSE, SE.plot = c("all", "none", "errorbar", "ribbon"),
-                    aspect.ratio=c(1, NULL),
-                    minor.line.size=0.5, major.line.size=0.7)
-{
-  if(!is.null(model.id))
-  {
-    dfx <- getExperiment(object, model.id=model.id,
-                         treatment.only=treatment.only, max.time=max.time,
-                         vol.normal=vol.normal, return.list = FALSE,
-                         concurrent.time = concurrent.time)
+plotPDX <- function(
+  object,
+  batch = NULL,
+  patient.id = NULL,
+  drug = NULL,
+  model.id = NULL,
+  model.color = NULL,
+  control.name = NULL,
+  max.time = NULL,
+  treatment.only = FALSE,
+  vol.normal = FALSE,
+  impute.value = TRUE,
+  concurrent.time = FALSE,
+  control.col = "#e41a1c",
+  treatment.col = "#377eb8",
+  title = "",
+  xlab = "Time",
+  ylab = "Volume",
+  log.y = FALSE,
+  SE.plot = c("all", "none", "errorbar", "ribbon"),
+  aspect.ratio = c(1, NULL),
+  minor.line.size = 0.5,
+  major.line.size = 0.7
+) {
+  if (!is.null(model.id)) {
+    dfx <- getExperiment(
+      object,
+      model.id = model.id,
+      treatment.only = treatment.only,
+      max.time = max.time,
+      vol.normal = vol.normal,
+      return.list = FALSE,
+      concurrent.time = concurrent.time
+    )
 
-    plt <- .plotMultipalModels(dfx, color=model.color,
-                               major.line.size=major.line.size,
-                               aspect.ratio=aspect.ratio)
+    plt <- .plotMultipalModels(
+      dfx,
+      color = model.color,
+      major.line.size = major.line.size,
+      aspect.ratio = aspect.ratio
+    )
     plt
-  } else
-  {
-    plotBatch(object, batch=batch, patient.id=patient.id, drug=drug,
-              control.name=control.name, max.time=max.time,
-              treatment.only=treatment.only, vol.normal=vol.normal,
-              impute.value=impute.value,
-              concurrent.time=concurrent.time,
-              control.col = control.col, treatment.col=treatment.col,
-              title=title, xlab = xlab, ylab = ylab,
-              log.y=log.y,
-              SE.plot =SE.plot,
-              aspect.ratio=aspect.ratio,
-              minor.line.size=minor.line.size, major.line.size=major.line.size)
+  } else {
+    plotBatch(
+      object,
+      batch = batch,
+      patient.id = patient.id,
+      drug = drug,
+      control.name = control.name,
+      max.time = max.time,
+      treatment.only = treatment.only,
+      vol.normal = vol.normal,
+      impute.value = impute.value,
+      concurrent.time = concurrent.time,
+      control.col = control.col,
+      treatment.col = treatment.col,
+      title = title,
+      xlab = xlab,
+      ylab = ylab,
+      log.y = log.y,
+      SE.plot = SE.plot,
+      aspect.ratio = aspect.ratio,
+      minor.line.size = minor.line.size,
+      major.line.size = major.line.size
+    )
   }
-
 }
 
 #' @rdname plotPDX
 #' @export
-plotBatch <- function(object, batch=NULL, patient.id=NULL, drug=NULL, control.name=NULL,
-                      max.time=NULL, treatment.only=FALSE, vol.normal=FALSE,
-                      impute.value=TRUE,
-                      concurrent.time=FALSE,
-                      control.col = "#6baed6", treatment.col="#fc8d59",
-                      title="", xlab = "Time", ylab = "Volume",
-                      log.y=FALSE,
-                      SE.plot = c("all", "none", "errorbar", "ribbon"),
-                      aspect.ratio=c(1, NULL),
-                      minor.line.size=0.5, major.line.size=0.7)
-{
+plotBatch <- function(
+  object,
+  batch = NULL,
+  patient.id = NULL,
+  drug = NULL,
+  control.name = NULL,
+  max.time = NULL,
+  treatment.only = FALSE,
+  vol.normal = FALSE,
+  impute.value = TRUE,
+  concurrent.time = FALSE,
+  control.col = "#6baed6",
+  treatment.col = "#fc8d59",
+  title = "",
+  xlab = "Time",
+  ylab = "Volume",
+  log.y = FALSE,
+  SE.plot = c("all", "none", "errorbar", "ribbon"),
+  aspect.ratio = c(1, NULL),
+  minor.line.size = 0.5,
+  major.line.size = 0.7
+) {
   SE.plot <- match.arg(SE.plot)
   aspect.ratio <- aspect.ratio[1]
 
-  dfp <- getExperiment(object, batch=batch,
-                       patient.id=patient.id, drug=drug, control.name=control.name,
-                       treatment.only=treatment.only, max.time=max.time,
-                       vol.normal=vol.normal, return.list = TRUE,
-                       impute.value=impute.value,
-                       concurrent.time = concurrent.time)
+  dfp <- getExperiment(
+    object,
+    batch = batch,
+    patient.id = patient.id,
+    drug = drug,
+    control.name = control.name,
+    treatment.only = treatment.only,
+    max.time = max.time,
+    vol.normal = vol.normal,
+    return.list = TRUE,
+    impute.value = impute.value,
+    concurrent.time = concurrent.time
+  )
 
   dfp$mean <- dfp$batch ##plot function uses mean as variable
 
-  if(is.null(drug))
-  {drug <- dfp$mean[dfp$mean$exp.type=="treatment", "drug.name"][1] }
+  if (is.null(drug)) {
+    drug <- dfp$mean[dfp$mean$exp.type == "treatment", "drug.name"][1]
+  }
 
-  .plotModelErrorBar(dfp, control.col=control.col, treatment.col=treatment.col,
-                     title=title, xlab = xlab, ylab = ylab,
-                     log.y=log.y, drgName=drug, #.name,
-                     SE.plot = SE.plot, aspect.ratio=aspect.ratio,
-                     minor.line.size=minor.line.size,
-                     major.line.size=major.line.size)
+  .plotModelErrorBar(
+    dfp,
+    control.col = control.col,
+    treatment.col = treatment.col,
+    title = title,
+    xlab = xlab,
+    ylab = ylab,
+    log.y = log.y,
+    drgName = drug, #.name,
+    SE.plot = SE.plot,
+    aspect.ratio = aspect.ratio,
+    minor.line.size = minor.line.size,
+    major.line.size = major.line.size
+  )
 }

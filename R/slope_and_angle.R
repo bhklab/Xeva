@@ -15,24 +15,25 @@
 #' plot(time, volume, type = "b", xlim = xylimit, ylim = xylimit)
 #' abline(lm(volume~time))
 #' @export
-slope <- function(time, volume, degree=TRUE)
-{
-  df <- data.frame(time=time, volume=volume)
+slope <- function(time, volume, degree = TRUE) {
+  df <- data.frame(time = time, volume = volume)
   ##---- remove all non finite (Inf, NA, NaN) data --------------
   df <- df[is.finite(df$time), ]
-  df <- df[is.finite(df$volume),]
+  df <- df[is.finite(df$volume), ]
 
-  df$time  <- df$time- df$time[1]
-  df$volume<- df$volume-df$volume[1]
+  df$time <- df$time - df$time[1]
+  df$volume <- df$volume - df$volume[1]
 
-  fit <- lm(volume~time +0, df)
+  fit <- lm(volume ~ time + 0, df)
   ang <- atan(coef(fit)[["time"]])
   ##----old way to compute angle ---
   #z <- sum(df$time*df$volume) / (sqrt(sum(df$time * df$time)) * sqrt(sum(df$volume * df$volume)) )
   #ang <- acos(z)
-  if(degree==TRUE) { ang <- ang*180/base::pi }
+  if (degree == TRUE) {
+    ang <- ang * 180 / base::pi
+  }
 
-  rtx <- model_response_class(name = "slope", value = ang, fit=fit)
+  rtx <- model_response_class(name = "slope", value = ang, fit = fit)
   return(rtx)
 }
 
@@ -59,35 +60,39 @@ slope <- function(time, volume, degree=TRUE)
 #' abline(lm(contr.volume~contr.time))
 #' abline(lm(treat.volume~treat.time))
 #' @export
-angle <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volume=NULL,
-                  degree=TRUE)
-{
-  con <- tre <- model_response_class(name = "slope", value = NA, fit=NA)
+angle <- function(
+  contr.time = NULL,
+  contr.volume = NULL,
+  treat.time = NULL,
+  treat.volume = NULL,
+  degree = TRUE
+) {
+  con <- tre <- model_response_class(name = "slope", value = NA, fit = NA)
   ang <- NA
 
-  if(!is.null(contr.time) & !is.null(contr.volume))
-  {
-    if(length(contr.volume)!=length(contr.time))
-    {
+  if (!is.null(contr.time) & !is.null(contr.volume)) {
+    if (length(contr.volume) != length(contr.time)) {
       msg <- sprintf("contr.time and contr.volume should have same length")
       stop(msg)
     }
-    con <- slope(contr.time, contr.volume, degree= degree)
+    con <- slope(contr.time, contr.volume, degree = degree)
   }
 
-
-  if(!is.null(treat.time) & !is.null(treat.volume))
-  {
-    if(length(treat.volume)!=length(treat.time))
-    {
+  if (!is.null(treat.time) & !is.null(treat.volume)) {
+    if (length(treat.volume) != length(treat.time)) {
       msg <- sprintf("treat.time and treat.volume should have same length")
       stop(msg)
     }
-    tre <- slope(treat.time, treat.volume, degree= degree)
+    tre <- slope(treat.time, treat.volume, degree = degree)
   }
 
   #if(c#lass(con)=="modelResponse" & c#lass(tre)=="modelResponse") ##old Class command
   ang <- con$value - tre$value
-  rtx <- batch_response_class(name="angle", value=ang, control=con, treatment=tre)
+  rtx <- batch_response_class(
+    name = "angle",
+    value = ang,
+    control = con,
+    treatment = tre
+  )
   return(rtx)
 }

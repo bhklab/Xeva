@@ -26,5 +26,3 @@
 #' @source \url{http://cancerres.aacrjournals.org/lookup/doi/10.1158/0008-5472.CAN-17-0582}
 #' @usage data(PDXMI)
 "PDXMI"
-
-

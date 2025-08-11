@@ -33,60 +33,73 @@
 #' @return A \code{Vector} with batch names.
 #'
 #' @name batchInfo
-setGeneric(name= "batchInfo",
-           def = function(object, batch=NULL, model.id=NULL,
-                          model.id.type=c("any", "control", "treatment"))
-{standardGeneric("batchInfo")} )
+setGeneric(
+  name = "batchInfo",
+  def = function(
+    object,
+    batch = NULL,
+    model.id = NULL,
+    model.id.type = c("any", "control", "treatment")
+  ) {
+    standardGeneric("batchInfo")
+  }
+)
 
 #' @rdname batchInfo
 #' @export
-setMethod( f="batchInfo",
-           signature=c(object = "XevaSet"),
-           definition=function(object, batch=NULL, model.id=NULL,
-                               model.id.type=c("any", "control", "treatment"))
-           {
-             if(is.null(batch) & is.null(model.id))
-             {
-               rtx <- names(slot(object, "expDesign"))
-               return(rtx)
-             }
+setMethod(
+  f = "batchInfo",
+  signature = c(object = "XevaSet"),
+  definition = function(
+    object,
+    batch = NULL,
+    model.id = NULL,
+    model.id.type = c("any", "control", "treatment")
+  ) {
+    if (is.null(batch) & is.null(model.id)) {
+      rtx <- names(slot(object, "expDesign"))
+      return(rtx)
+    }
 
-             if(is.null(batch) & !is.null(model.id))
-             {
-               model.id.type <- match.arg(model.id.type)
-               rtx <- list()
-               for(ed in slot(object, "expDesign"))
-               {
-                 if(model.id.type=="any")
-                 {
-                   if(is.element(model.id, ed$treatment) |
-                      is.element(model.id, ed$control))
-                   { rtx <- .appendToList(rtx, ed$batch.name) }
-                 }
+    if (is.null(batch) & !is.null(model.id)) {
+      model.id.type <- match.arg(model.id.type)
+      rtx <- list()
+      for (ed in slot(object, "expDesign")) {
+        if (model.id.type == "any") {
+          if (
+            is.element(model.id, ed$treatment) |
+              is.element(model.id, ed$control)
+          ) {
+            rtx <- .appendToList(rtx, ed$batch.name)
+          }
+        }
 
-                 if(model.id.type=="control" & is.element(model.id, ed$control))
-                 { rtx <- .appendToList(rtx, ed$batch.name) }
+        if (model.id.type == "control" & is.element(model.id, ed$control)) {
+          rtx <- .appendToList(rtx, ed$batch.name)
+        }
 
-                 if(model.id.type=="treatment" & is.element(model.id, ed$treatment))
-                 { rtx <- .appendToList(rtx, ed$batch.name) }
-               }
+        if (model.id.type == "treatment" & is.element(model.id, ed$treatment)) {
+          rtx <- .appendToList(rtx, ed$batch.name)
+        }
+      }
 
-               return(unique(unlist(rtx)))
-             }
+      return(unique(unlist(rtx)))
+    }
 
-             if(!is.null(batch) & is.null(model.id))
-             {
-               btRTX <- list()
-               for(bn in c(batch))
-               {
-                 bt <- slot(object, "expDesign")[[bn]]
-                 if(is.null(bt))
-                 {
-                   msg <- sprintf("batch name %s not present\nuse batchInfo(object) to see all batch names", bn)
-                   stop(msg)
-                 }
-                 btRTX[[bn]] <- bt
-               }
-               return(btRTX)
-             }
-           })
+    if (!is.null(batch) & is.null(model.id)) {
+      btRTX <- list()
+      for (bn in c(batch)) {
+        bt <- slot(object, "expDesign")[[bn]]
+        if (is.null(bt)) {
+          msg <- sprintf(
+            "batch name %s not present\nuse batchInfo(object) to see all batch names",
+            bn
+          )
+          stop(msg)
+        }
+        btRTX[[bn]] <- bt
+      }
+      return(btRTX)
+    }
+  }
+)

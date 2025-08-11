@@ -1,7 +1,6 @@
-.trapz_AUC <- function (x, y)
-{
+.trapz_AUC <- function(x, y) {
   n <- 2:length(x)
-  auc <- as.double((x[n]-x[n - 1]) %*% (y[n] + y[n - 1]))/2
+  auc <- as.double((x[n] - x[n - 1]) %*% (y[n] + y[n - 1])) / 2
   return(auc)
 }
 
@@ -25,8 +24,7 @@
 #' abline(lm(volume1~time))
 #' abline(lm(volume2~time))
 #' @export
-AUC <- function(time, volume)
-{
+AUC <- function(time, volume) {
   auc <- .trapz_AUC(time, volume)
   rtx <- model_response_class(name = "auc", value = auc)
   return(rtx)
@@ -55,26 +53,25 @@ AUC <- function(time, volume)
 #'         col = "#fa9fb5", border = NA)
 #'
 #' @export
-ABC <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volume=NULL)
-{
+ABC <- function(
+  contr.time = NULL,
+  contr.volume = NULL,
+  treat.time = NULL,
+  treat.volume = NULL
+) {
   con <- tre <- model_response_class(name = "auc", value = NA)
   abc <- NA
 
-  if(!is.null(contr.time) & !is.null(contr.volume))
-  {
-    if(length(contr.volume)!=length(contr.time))
-    {
+  if (!is.null(contr.time) & !is.null(contr.volume)) {
+    if (length(contr.volume) != length(contr.time)) {
       msg <- sprintf("contr.time and contr.volume should have same length")
       stop(msg)
     }
     con <- AUC(contr.time, contr.volume)
   }
 
-
-  if(!is.null(treat.time) & !is.null(treat.volume))
-  {
-    if(length(treat.volume)!=length(treat.time))
-    {
+  if (!is.null(treat.time) & !is.null(treat.volume)) {
+    if (length(treat.volume) != length(treat.time)) {
       msg <- sprintf("treat.time and treat.volume should have same length")
       stop(msg)
     }
@@ -83,6 +80,11 @@ ABC <- function(contr.time=NULL, contr.volume=NULL, treat.time=NULL, treat.volum
 
   abc <- con$value - tre$value
 
-  rtx <- batch_response_class(name="abc", value=abc, control=con, treatment=tre)
+  rtx <- batch_response_class(
+    name = "abc",
+    value = abc,
+    control = con,
+    treatment = tre
+  )
   return(rtx)
 }

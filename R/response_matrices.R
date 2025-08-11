@@ -1,8 +1,8 @@
-
-model_response_class <- function(name, value=NA, fit=NA)
-{
-  mr <- structure(list(name=name, value=value, fit=fit),
-                  class = "modelResponse")
+model_response_class <- function(name, value = NA, fit = NA) {
+  mr <- structure(
+    list(name = name, value = value, fit = fit),
+    class = "modelResponse"
+  )
   return(mr)
 }
 
@@ -11,17 +11,23 @@ model_response_class <- function(name, value=NA, fit=NA)
 #' @param ... Other arguments
 #' @return prints the modelResponse
 #' @export
-print.modelResponse <- function(x, ...)
-{
+print.modelResponse <- function(x, ...) {
   z <- sprintf("%s = %f\n", x$name, x$value)
   cat(z)
 }
 
 
-batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL, ...)
-{
-  br <- structure(list(name=name, value=value, control=control, treatment=treatment),
-                 class = "batchResponse")
+batch_response_class <- function(
+  name,
+  value = NA,
+  control = NULL,
+  treatment = NULL,
+  ...
+) {
+  br <- structure(
+    list(name = name, value = value, control = control, treatment = treatment),
+    class = "batchResponse"
+  )
   return(br)
 }
 
@@ -30,17 +36,17 @@ batch_response_class <- function(name, value=NA, control=NULL, treatment=NULL, .
 #' @param ... Other arguments
 #' @return prints the batchResponse
 #' @export
-print.batchResponse <- function(x, ...)
-{
+print.batchResponse <- function(x, ...) {
   cat(sprintf("%s = %f\n", x$name, x$value))
 
-  if(!is.null(x$control))
-  { cat(sprintf("control = %f\n", x$control$value)) }
+  if (!is.null(x$control)) {
+    cat(sprintf("control = %f\n", x$control$value))
+  }
 
-  if(!is.null(x$treatment))
-  { cat(sprintf("treatment = %f\n", x$treatment$value)) }
+  if (!is.null(x$treatment)) {
+    cat(sprintf("treatment = %f\n", x$treatment$value))
+  }
 }
-
 
 
 #' set PDX response
@@ -74,63 +80,92 @@ print.batchResponse <- function(x, ...)
 #' data(brca)
 #' brca  <- setResponse(brca, res.measure = c("mRECIST"), verbose=FALSE)
 #' @export
-setResponse <- function(object,
-                        res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
-                        min.time=10, treatment.only=FALSE, max.time=NULL,
-                        vol.normal=FALSE, impute.value=TRUE, concurrent.time =TRUE,
-                        log.volume=FALSE, verbose=TRUE)
-{
+setResponse <- function(
+  object,
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+  min.time = 10,
+  treatment.only = FALSE,
+  max.time = NULL,
+  vol.normal = FALSE,
+  impute.value = TRUE,
+  concurrent.time = TRUE,
+  log.volume = FALSE,
+  verbose = TRUE
+) {
   sen <- slot(object, "sensitivity")
 
   ###--------compute mRECIST ---------------------------------------------------
-  if(any(c("mRECIST", "best.response", "best.average.response") %in% res.measure))
-  {
-    vl2compute <- c("mRECIST", "best.response", "best.response.time",
-                    "best.average.response", "best.average.response.time")
-    sen$model[, vl2compute[!(vl2compute%in%colnames(sen$model))]] <- NA
+  if (
+    any(c("mRECIST", "best.response", "best.average.response") %in% res.measure)
+  ) {
+    vl2compute <- c(
+      "mRECIST",
+      "best.response",
+      "best.response.time",
+      "best.average.response",
+      "best.average.response.time"
+    )
+    sen$model[, vl2compute[!(vl2compute %in% colnames(sen$model))]] <- NA
 
-    for(mid in modelInfo(object)$model.id)
-    {
-      mr <- response(object, model.id=mid, res.measure="mRECIST",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE,
-                     vol.normal=vol.normal,
-                     log.volume=log.volume, verbose=verbose)
-      for(si in vl2compute)
-      { sen$model[mid, si] <- mr[[si]] }
+    for (mid in modelInfo(object)$model.id) {
+      mr <- response(
+        object,
+        model.id = mid,
+        res.measure = "mRECIST",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = FALSE,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
+      for (si in vl2compute) {
+        sen$model[mid, si] <- mr[[si]]
+      }
     }
   }
 
   ###--------compute slope -----------------------------------------------------
-  if("slope" %in% res.measure)
-  {
+  if ("slope" %in% res.measure) {
     sen$model[, "slope"] <- NA
-    for(mid in modelInfo(object)$model.id)
-    {
-      sl <- response(object, model.id=mid, res.measure="slope",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE,
-                     vol.normal=vol.normal, log.volume=log.volume,
-                     verbose=verbose)
+    for (mid in modelInfo(object)$model.id) {
+      sl <- response(
+        object,
+        model.id = mid,
+        res.measure = "slope",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = FALSE,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$model[mid, "slope"] <- sl$value #$slope
     }
   }
 
   ###--------compute AUC -------------------------------------------------------
 
-  if("AUC" %in% res.measure)
-  {
+  if ("AUC" %in% res.measure) {
     sen$model[, "AUC"] <- NA
-    for(mid in modelInfo(object)$model.id)
-    {
-      auc <- response(object, model.id=mid, res.measure="AUC",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=FALSE,
-                     vol.normal=vol.normal, log.volume=log.volume,
-                     verbose=verbose)
+    for (mid in modelInfo(object)$model.id) {
+      auc <- response(
+        object,
+        model.id = mid,
+        res.measure = "AUC",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = FALSE,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$model[mid, "AUC"] <- auc$value
     }
   }
@@ -139,67 +174,87 @@ setResponse <- function(object,
   ##-----------------for batch -------------------------------------------------
 
   ###--------compute angle for batch -------------------------------------------
-  if("angle" %in% res.measure)
-  {
+  if ("angle" %in% res.measure) {
     sen$batch[, c("slope.control", "slope.treatment", "angle")] <- NA
-    for(bid in batchInfo(object))
-    {
-      sl <- response(object, batch = bid, res.measure="angle",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time,
-                     vol.normal=vol.normal, log.volume=log.volume,
-                     verbose=verbose)
+    for (bid in batchInfo(object)) {
+      sl <- response(
+        object,
+        batch = bid,
+        res.measure = "angle",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = concurrent.time,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$batch[bid, c("slope.control", "slope.treatment", "angle")] <-
         c(sl$control$value, sl$treatment$value, sl$value)
     }
   }
 
   ###--------compute abc for batch ---------------------------------------------
-  if("abc" %in% res.measure)
-  {
+  if ("abc" %in% res.measure) {
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
-    for(bid in batchInfo(object))
-    {
-      sl <- response(object, batch = bid, res.measure="abc",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time,
-                     vol.normal=vol.normal, log.volume=log.volume,
-                     verbose=verbose)
+    for (bid in batchInfo(object)) {
+      sl <- response(
+        object,
+        batch = bid,
+        res.measure = "abc",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = concurrent.time,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$batch[bid, c("auc.control", "auc.treatment", "abc")] <-
         c(sl$control$value, sl$treatment$value, sl$value)
     }
   }
 
   ###--------compute TGI for batch ---------------------------------------------
-  if("TGI" %in% res.measure)
-  {
+  if ("TGI" %in% res.measure) {
     sen$batch[, c("TGI")] <- NA
-    for(bid in batchInfo(object))
-    {
-      sl <- response(object, batch = bid, res.measure="TGI",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time,
-                     vol.normal=vol.normal, log.volume=log.volume,
-                     verbose=verbose)
+    for (bid in batchInfo(object)) {
+      sl <- response(
+        object,
+        batch = bid,
+        res.measure = "TGI",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = concurrent.time,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$batch[bid, c("TGI")] <- sl$value
     }
   }
 
   ###--------compute lmm for batch ---------------------------------------------
-  if("lmm" %in% res.measure)
-  {
+  if ("lmm" %in% res.measure) {
     sen$batch[, c("lmm")] <- NA
-    for(bid in batchInfo(object))
-    {
-      sl <- response(object, batch = bid, res.measure="lmm",
-                     treatment.only=treatment.only, max.time=max.time,
-                     impute.value=impute.value, min.time=min.time,
-                     concurrent.time=concurrent.time,
-                     vol.normal=vol.normal,
-                     log.volume=log.volume, verbose=verbose)
+    for (bid in batchInfo(object)) {
+      sl <- response(
+        object,
+        batch = bid,
+        res.measure = "lmm",
+        treatment.only = treatment.only,
+        max.time = max.time,
+        impute.value = impute.value,
+        min.time = min.time,
+        concurrent.time = concurrent.time,
+        vol.normal = vol.normal,
+        log.volume = log.volume,
+        verbose = verbose
+      )
       sen$batch[bid, c("lmm")] <- sl$value
     }
   }
@@ -209,7 +264,6 @@ setResponse <- function(object,
   slot(object, "sensitivity") <- sen
   return(object)
 }
-
 
 
 #' compute PDX response
@@ -252,95 +306,132 @@ setResponse <- function(object,
 #' response(brca, batch=ed, res.measure="angle")
 #'
 #' @export
-response <- function(object, model.id=NULL, batch=NULL,
-                     res.measure=c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
-                     treatment.only=FALSE, max.time=NULL, impute.value=TRUE,
-                     min.time=10, concurrent.time =TRUE, vol.normal=FALSE,
-                     log.volume=FALSE, verbose=TRUE)
-{
-  if(is.null(model.id) & is.null(batch)) #Name) & is.null(expDig))
-  { stop("'model.id', 'batch' all NULL") }
+response <- function(
+  object,
+  model.id = NULL,
+  batch = NULL,
+  res.measure = c("mRECIST", "slope", "AUC", "angle", "abc", "TGI", "lmm"),
+  treatment.only = FALSE,
+  max.time = NULL,
+  impute.value = TRUE,
+  min.time = 10,
+  concurrent.time = TRUE,
+  vol.normal = FALSE,
+  log.volume = FALSE,
+  verbose = TRUE
+) {
+  if (is.null(model.id) & is.null(batch)) {
+    #Name) & is.null(expDig))
+    stop("'model.id', 'batch' all NULL")
+  }
 
   ##------------- for model ----------------------------------------------------
-  if(!is.null(model.id))
-  {
-    dl <- getExperiment(object, model.id=model.id[1], treatment.only=treatment.only,
-                        max.time=max.time, vol.normal=vol.normal,
-                        log.volume=log.volume, impute.value=impute.value)
+  if (!is.null(model.id)) {
+    dl <- getExperiment(
+      object,
+      model.id = model.id[1],
+      treatment.only = treatment.only,
+      max.time = max.time,
+      vol.normal = vol.normal,
+      log.volume = log.volume,
+      impute.value = impute.value
+    )
 
     ###--------compute mRECIST -------------------------------------------------
-    if(any(c("mRECIST", "best.response", "best.average.response") %in% res.measure))
-    {
-      if(verbose==TRUE) {cat(sprintf("computing mRECIST for %s\n", model.id))}
-      mr <- mRECIST(dl$time, dl$volume, min.time=min.time, return.detail=TRUE)
+    if (
+      any(
+        c("mRECIST", "best.response", "best.average.response") %in% res.measure
+      )
+    ) {
+      if (verbose == TRUE) {
+        cat(sprintf("computing mRECIST for %s\n", model.id))
+      }
+      mr <- mRECIST(
+        dl$time,
+        dl$volume,
+        min.time = min.time,
+        return.detail = TRUE
+      )
       return(mr)
     }
 
     ###--------compute slope -----------------------------------------------------
-    if(res.measure=="slope")
-    {
-      if(verbose==TRUE) {cat(sprintf("computing slope for %s\n", model.id))}
-      return(slope(dl$time, dl$volume, degree=TRUE))
+    if (res.measure == "slope") {
+      if (verbose == TRUE) {
+        cat(sprintf("computing slope for %s\n", model.id))
+      }
+      return(slope(dl$time, dl$volume, degree = TRUE))
     }
 
     ###--------compute AUC -------------------------------------------------------
-    if(res.measure=="AUC")
-    {
-      if(verbose==TRUE) {cat(sprintf("computing AUC for %s\n", model.id))}
-      return( AUC(dl$time, dl$volume))
+    if (res.measure == "AUC") {
+      if (verbose == TRUE) {
+        cat(sprintf("computing AUC for %s\n", model.id))
+      }
+      return(AUC(dl$time, dl$volume))
     }
-
   }
 
-
   ##-----------------for batch -------------------------------------------------
-  if(is.null(model.id))
-  {
-    dl <- getExperiment(object, batch=batch,
-                        treatment.only=treatment.only, max.time=max.time,
-                        vol.normal=vol.normal, impute.value=impute.value,
-                        concurrent.time=concurrent.time)
+  if (is.null(model.id)) {
+    dl <- getExperiment(
+      object,
+      batch = batch,
+      treatment.only = treatment.only,
+      max.time = max.time,
+      vol.normal = vol.normal,
+      impute.value = impute.value,
+      concurrent.time = concurrent.time
+    )
 
     cInd <- dl$batch$exp.type == "control"
     tInd <- dl$batch$exp.type == "treatment"
 
     contr.time <- contr.volume <- treat.time <- treat.volume <- NULL
-    if(sum(cInd)>1)
-    { contr.time <- dl$batch$time[cInd]; contr.volume <- dl$batch$mean[cInd] }
+    if (sum(cInd) > 1) {
+      contr.time <- dl$batch$time[cInd]
+      contr.volume <- dl$batch$mean[cInd]
+    }
 
-    if(sum(tInd)>1)
-    { treat.time <- dl$batch$time[tInd]; treat.volume <- dl$batch$mean[tInd]}
+    if (sum(tInd) > 1) {
+      treat.time <- dl$batch$time[tInd]
+      treat.volume <- dl$batch$mean[tInd]
+    }
 
-    if(verbose==TRUE){
-      if(is.character(batch))
-        {bName <- batch} else {bName <- batch$batch.name}
-      cat(sprintf("computing %s for batch %s\n",res.measure, bName))
-
+    if (verbose == TRUE) {
+      if (is.character(batch)) {
+        bName <- batch
+      } else {
+        bName <- batch$batch.name
       }
+      cat(sprintf("computing %s for batch %s\n", res.measure, bName))
+    }
     ###--------compute angle for batch -----------------------------------------
-    if(res.measure =="angle")
-    {
-      rtx <- angle(contr.time, contr.volume, treat.time,treat.volume, degree=TRUE)
+    if (res.measure == "angle") {
+      rtx <- angle(
+        contr.time,
+        contr.volume,
+        treat.time,
+        treat.volume,
+        degree = TRUE
+      )
       return(rtx)
     }
 
     ###--------compute abc for batch ---------------------------------------------
-    if(res.measure=="abc")
-    {
+    if (res.measure == "abc") {
       rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume)
       return(rtx)
     }
 
     ###--------compute abc for batch ---------------------------------------------
-    if(res.measure=="TGI")
-    {
+    if (res.measure == "TGI") {
       rtx <- TGI(contr.volume, treat.volume)
       return(rtx)
     }
 
     ###--------compute lmm for batch ---------------------------------------------
-    if(res.measure=="lmm")
-    {
+    if (res.measure == "lmm") {
       rtx <- lmm(dl$model)
       return(rtx)
     }

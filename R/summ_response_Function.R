@@ -1,50 +1,77 @@
-.summarizePerModelResponse <- function(object, response.measure, model.id,
-                                       group.by, summary.stat, tissue)
-{
-  if(is.element(response.measure, colnames(slot(object, "sensitivity")[["model"]]) )==FALSE)
-  { stop(sprintf("'%s' is not present in sensitivity slot\n", response.measure)) }
+.summarizePerModelResponse <- function(
+  object,
+  response.measure,
+  model.id,
+  group.by,
+  summary.stat,
+  tissue
+) {
+  if (
+    is.element(
+      response.measure,
+      colnames(slot(object, "sensitivity")[["model"]])
+    ) ==
+      FALSE
+  ) {
+    stop(sprintf("'%s' is not present in sensitivity slot\n", response.measure))
+  }
 
-  dfVal <- slot(object, "sensitivity")[["model"]] [,c("model.id", response.measure)]
+  dfVal <- slot(object, "sensitivity")[["model"]][, c(
+    "model.id",
+    response.measure
+  )]
   df <- modelInfo(object)
   df[, response.measure] <- dfVal[df$model.id, response.measure]
 
-  if(!is.null(model.id))
-  {
+  if (!is.null(model.id)) {
     df <- df[model.id, ]
-    if(nrow(df)==0)
-    { stop(sprintf("given model.id not present in the Xeva object\n")) }
+    if (nrow(df) == 0) {
+      stop(sprintf("given model.id not present in the Xeva object\n"))
+    }
   }
 
-  if(!is.null(tissue))
-  {
-    df <- df[df$tissue==tissue,]
-    if(nrow(df)==0)
-    { stop(sprintf("given tissue not present in the Xeva object\n")) }
+  if (!is.null(tissue)) {
+    df <- df[df$tissue == tissue, ]
+    if (nrow(df) == 0) {
+      stop(sprintf("given tissue not present in the Xeva object\n"))
+    }
   }
 
-  if(is.null(group.by)){group.by <- "model.id"}
+  if (is.null(group.by)) {
+    group.by <- "model.id"
+  }
 
-  if(is.element(group.by, colnames(df))==FALSE)
-  { stop(sprintf("'group.by' %s not present in model\n", group.by)) }
+  if (is.element(group.by, colnames(df)) == FALSE) {
+    stop(sprintf("'group.by' %s not present in model\n", group.by))
+  }
 
-  mat <- .castDataFram(df, row.var="drug", col.var = group.by,
-                       value=response.measure, collapse = summary.stat)
+  mat <- .castDataFram(
+    df,
+    row.var = "drug",
+    col.var = group.by,
+    value = response.measure,
+    collapse = summary.stat
+  )
   return(mat)
 }
 
 
-.summarizePerBatchResponse <- function(object, response.measure = NULL, batch.name=NULL)
-{
+.summarizePerBatchResponse <- function(
+  object,
+  response.measure = NULL,
+  batch.name = NULL
+) {
   rtx <- slot(object, "sensitivity")[["batch"]]
-  if(!is.null(response.measure))
-  { rtx <- rtx[, c("batch.name", response.measure)] }
+  if (!is.null(response.measure)) {
+    rtx <- rtx[, c("batch.name", response.measure)]
+  }
 
-  if(!is.null(batch.name))
-  {
+  if (!is.null(batch.name)) {
     bn2take <- batch.name[batch.name %in% rtx$batch.name]
-    if(length(bn2take)==0)
-    {
-      msg <- sprintf("No batch.name present in dataset. Please check the batch.name")
+    if (length(bn2take) == 0) {
+      msg <- sprintf(
+        "No batch.name present in dataset. Please check the batch.name"
+      )
       stop(msg)
     }
     rtx <- rtx[rtx$batch.name %in% bn2take, ]
@@ -53,21 +80,22 @@
 }
 
 
-.checkResMes <- function(object, response.measure)
-{
+.checkResMes <- function(object, response.measure) {
   rm.type <- NULL
-  if(response.measure %in% colnames(slot(object, "sensitivity")[["model"]]))
-  { rm.type <- "model" }
+  if (response.measure %in% colnames(slot(object, "sensitivity")[["model"]])) {
+    rm.type <- "model"
+  }
 
-  if(response.measure %in% colnames(slot(object, "sensitivity")[["batch"]]))
-  { rm.type <- "batch" }
+  if (response.measure %in% colnames(slot(object, "sensitivity")[["batch"]])) {
+    rm.type <- "batch"
+  }
 
-  if(is.null(rm.type))
-  {
-    msg <- sprintf("valid response.measure values are\nFor model: %s\n\nFor batch: %s\n",
-                   paste0(colnames(slot(object, "sensitivity")[["model"]]), collapse = ", "),
-                   paste0(colnames(slot(object, "sensitivity")[["batch"]]), collapse = ", ")
-                   )
+  if (is.null(rm.type)) {
+    msg <- sprintf(
+      "valid response.measure values are\nFor model: %s\n\nFor batch: %s\n",
+      paste0(colnames(slot(object, "sensitivity")[["model"]]), collapse = ", "),
+      paste0(colnames(slot(object, "sensitivity")[["batch"]]), collapse = ", ")
+    )
     stop(msg)
   }
 
@@ -102,28 +130,37 @@
 #' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
 #'
 #' @export
-summarizeResponse <- function(object, response.measure = "mRECIST",
-                              model.id=NULL, batch.id=NULL,
-                              group.by="patient.id",
-                              summary.stat=c(";", "mean", "median"), tissue=NULL)
-{
+summarizeResponse <- function(
+  object,
+  response.measure = "mRECIST",
+  model.id = NULL,
+  batch.id = NULL,
+  group.by = "patient.id",
+  summary.stat = c(";", "mean", "median"),
+  tissue = NULL
+) {
   summary.stat <- c(summary.stat)[1]
 
   rm.type <- .checkResMes(object, response.measure)
 
-  if(rm.type=="model")
-  {
-    mat <- .summarizePerModelResponse(object, response.measure=response.measure,
-                                      model.id=model.id, group.by=group.by,
-                                      summary.stat=summary.stat,
-                                      tissue=tissue)
+  if (rm.type == "model") {
+    mat <- .summarizePerModelResponse(
+      object,
+      response.measure = response.measure,
+      model.id = model.id,
+      group.by = group.by,
+      summary.stat = summary.stat,
+      tissue = tissue
+    )
     return(mat)
   }
 
-  if(rm.type=="batch")
-  {
-    mat <- .summarizePerBatchResponse(object, response.measure = response.measure,
-                                      batch.name=batch.id)
+  if (rm.type == "batch") {
+    mat <- .summarizePerBatchResponse(
+      object,
+      response.measure = response.measure,
+      batch.name = batch.id
+    )
     return(mat)
   }
 }
