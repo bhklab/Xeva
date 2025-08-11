@@ -1,6 +1,6 @@
 .generateNewNameForBatch <- function(inVec, txt) {
   for (I in (length(inVec) + 1):(3 * length(inVec))) {
-    tn = sprintf("%s.%d", txt, I)
+    tn <- sprintf("%s.%d", txt, I)
     if (is.element(tn, inVec) == FALSE) {
       return(tn)
     }
@@ -14,8 +14,10 @@
 #' Add a new experimental design in the \code{expDesign} slot.
 #' @examples
 #' data(brca)
-#' brca <- addExperimentalDesign(object=brca, treatment=c("X.6047.LL71"),
-#'         control=c("X.6047.uned"), batch.id="new.batch", replace=FALSE)
+#' brca <- addExperimentalDesign(
+#'   object = brca, treatment = c("X.6047.LL71"),
+#'   control = c("X.6047.uned"), batch.id = "new.batch", replace = FALSE
+#' )
 #'
 #' @param object The \code{Xeva} dataset.
 #' @param treatment The \code{model.id} of treatment.
@@ -69,7 +71,7 @@ setMethod(
     if (!is.null(batch.id)) {
       if (is.element(batch.id, allBatchName) == TRUE) {
         if (replace == FALSE) {
-          msg = sprintf(
+          msg <- sprintf(
             "\nbatch.id %s already exist\nPlease give a new name\n",
             batch.id
           )
@@ -77,7 +79,7 @@ setMethod(
         }
 
         if (replace == TRUE) {
-          msg = sprintf("\nThis will replace the old batch.id %s\n", batch.id)
+          msg <- sprintf("\nThis will replace the old batch.id %s\n", batch.id)
           cat(msg)
         }
       }

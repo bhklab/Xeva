@@ -22,8 +22,8 @@
     message(txt)
   }
 
-  ##------- setting name -----------------
-  ###bnam <- xapply(expDesign, "[[", "batch.name")
+  ## ------- setting name -----------------
+  ### bnam <- xapply(expDesign, "[[", "batch.name")
   bnam <- c()
   for (i in expDesign) {
     bnam <- c(bnam, i[["batch.name"]])

@@ -21,7 +21,7 @@
 }
 
 
-##----- get modelInfo -------------
+## ----- get modelInfo -------------
 #' modelInfo Generic
 #' Generic for modelInfo method
 #'
@@ -65,12 +65,12 @@ setMethod(
   }
 )
 
-##------------------------------------------------------------------------------
-##------------------------------------------------------------------------------
+## ------------------------------------------------------------------------------
+## ------------------------------------------------------------------------------
 
 .checkIfColPresentinModel <- function(object, nameCol) {
   if (is.element(nameCol, colnames(modelInfo(object))) == FALSE) {
-    msg = sprintf(
+    msg <- sprintf(
       "%s is not a valid id.name\nValid id.names are:\n\n%s",
       nameCol,
       paste(colnames(object@model), collapse = "\n")
@@ -79,7 +79,7 @@ setMethod(
   }
 }
 
-##---------------------------------------------------
+## ---------------------------------------------------
 ##
 #' Map ids of model slot
 #'
@@ -89,9 +89,9 @@ setMethod(
 #'
 #' @examples
 #' data(brca)
-#' mapModelSlotIds(brca, id="X-1004", id.name="patient.id", map.to="model.id")
-#' ##map batch ids
-#' mapModelSlotIds(brca, id="X-1004.BGJ398", id.name="batch.name", map.to="tissue")
+#' mapModelSlotIds(brca, id = "X-1004", id.name = "patient.id", map.to = "model.id")
+#' ## map batch ids
+#' mapModelSlotIds(brca, id = "X-1004.BGJ398", id.name = "batch.name", map.to = "tissue")
 #' @param object The \code{Xeva} dataset
 #' @param id The \code{id}
 #' @param id.name The \code{id} name
@@ -117,27 +117,27 @@ mapModelSlotIds <- function(
     rtd <- object@model[object@model[, id.name] %in% id, ]
     if (map.to != "all") {
       .checkIfColPresentinModel(object, map.to)
-      rtd = rtd[, c(id.name, map.to)]
+      rtd <- rtd[, c(id.name, map.to)]
       if (id.name == map.to) {
-        rtd = rtd[, id.name, drop = FALSE]
+        rtd <- rtd[, id.name, drop = FALSE]
       }
-      rtd = unique(rtd)
+      rtd <- unique(rtd)
     }
     if (unique == FALSE) {
-      rtd = rtd[match(id, rtd[, id.name]), ]
+      rtd <- rtd[match(id, rtd[, id.name]), ]
     }
   }
   return(rtd)
 }
 
-##--------------------------------------------------------------------------------------
-##-------------------------------------------------------------------------------------
-##-----map batch to patient.id --------------------------------------------------------
+## --------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------
+## -----map batch to patient.id --------------------------------------------------------
 ##
 .mapBatchName2Id <- function(object, id, map.to) {
   btMapRet <- data.frame()
   for (bn in c(id)) {
-    #bt <- expDesign(object, batch.name = bn)
+    # bt <- expDesign(object, batch.name = bn)
     bt <- batchInfo(object, batch = bn)
     bt.Mod <- unique(c(bt[[bn]]$treatment, bt[[bn]]$control))
     btMap <- mapModelSlotIds(
@@ -153,6 +153,6 @@ mapModelSlotIds <- function(
   }
   btMapRet <- btMapRet[, c("batch.name", map.to)]
   btMapRet <- unique(btMapRet)
-  rownames(btMapRet) = NULL
+  rownames(btMapRet) <- NULL
   return(btMapRet)
 }

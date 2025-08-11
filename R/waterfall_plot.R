@@ -33,11 +33,11 @@ plotWaterFall <- function(
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank()
     )
-  ##--------- add x axis line ----------------------------
+  ## --------- add x axis line ----------------------------
   plt <- plt + geom_hline(yintercept = 0, size = 0.25)
   plt <- .ggplotEmptyTheme(plt)
 
-  ##----remove x axis ------------------
+  ## ----remove x axis ------------------
   plt <- plt +
     theme(
       axis.title.x = element_blank(),
@@ -59,12 +59,14 @@ plotWaterFall <- function(
 #'
 #' @examples
 #' data(brca)
-#' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published")
+#' waterfall(brca, drug = "binimetinib", res.measure = "best.avg.response_published")
 #' ## example with model.type where we color the models by TP53 mutation type
-#' mut <- summarizeMolecularProfiles(brca,drug = "binimetinib", mDataType="mutation")
+#' mut <- summarizeMolecularProfiles(brca, drug = "binimetinib", mDataType = "mutation")
 #' model.type <- SummarizedExperiment::assay(mut)["TP53", ]
-#' waterfall(brca, drug="binimetinib", res.measure="best.avg.response_published",
-#'           tissue="BRCA", model.id=names(model.type), model.type= model.type)
+#' waterfall(brca,
+#'   drug = "binimetinib", res.measure = "best.avg.response_published",
+#'   tissue = "BRCA", model.id = names(model.type), model.type = model.type
+#' )
 #'
 #' @param object The \code{XevaSet} object
 #' @param res.measure PDX model drug response measure

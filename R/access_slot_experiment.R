@@ -31,13 +31,13 @@
   return(rdx)
 }
 
-##----- select model.id based on drug, tissue -----------------------------------------------------
+## ----- select model.id based on drug, tissue -----------------------------------------------------
 #' To select model IDs based on drug name and/or tissue type.
 #' @examples
 #' data(brca)
-#' df = selectModelIds(brca, drug="trastuzumab", drug.match.exact=TRUE, tissue="BRCA")
+#' df <- selectModelIds(brca, drug = "trastuzumab", drug.match.exact = TRUE, tissue = "BRCA")
 #' head(df)
-#' df2 = selectModelIds(brca, drug="trastuzumab", drug.match.exact=FALSE)
+#' df2 <- selectModelIds(brca, drug = "trastuzumab", drug.match.exact = FALSE)
 #' head(df2)
 #'
 #' @param object The \code{XevaSet}.

@@ -7,17 +7,17 @@
 #' @param degree Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.
 #' @return Returns the slope and a \code{fit} object.
 #' @examples
-#' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
-#' volume<- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
+#' time <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' volume <- c(250.8, 320.4, 402.3, 382.6, 384, 445.9, 460.2, 546.8, 554.3, 617.9)
 #' sl <- slope(time, volume)
-#' par(pty="s")
+#' par(pty = "s")
 #' xylimit <- range(c(time, volume))
 #' plot(time, volume, type = "b", xlim = xylimit, ylim = xylimit)
-#' abline(lm(volume~time))
+#' abline(lm(volume ~ time))
 #' @export
 slope <- function(time, volume, degree = TRUE) {
   df <- data.frame(time = time, volume = volume)
-  ##---- remove all non finite (Inf, NA, NaN) data --------------
+  ## ---- remove all non finite (Inf, NA, NaN) data --------------
   df <- df[is.finite(df$time), ]
   df <- df[is.finite(df$volume), ]
 
@@ -26,9 +26,9 @@ slope <- function(time, volume, degree = TRUE) {
 
   fit <- lm(volume ~ time + 0, df)
   ang <- atan(coef(fit)[["time"]])
-  ##----old way to compute angle ---
-  #z <- sum(df$time*df$volume) / (sqrt(sum(df$time * df$time)) * sqrt(sum(df$volume * df$volume)) )
-  #ang <- acos(z)
+  ## ----old way to compute angle ---
+  # z <- sum(df$time*df$volume) / (sqrt(sum(df$time * df$time)) * sqrt(sum(df$volume * df$volume)) )
+  # ang <- acos(z)
   if (degree == TRUE) {
     ang <- ang * 180 / base::pi
   }
@@ -48,17 +48,17 @@ slope <- function(time, volume, degree = TRUE) {
 #' @param degree Default \code{TRUE} will give angle in degrees and \code{FALSE} will return in radians.
 #' @return Returns batch response object.
 #' @examples
-#' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
-#' contr.volume<- contr.time * tan(60*pi/180)
-#' treat.volume<- treat.time * tan(15*pi/180)
+#' contr.time <- treat.time <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' contr.volume <- contr.time * tan(60 * pi / 180)
+#' treat.volume <- treat.time * tan(15 * pi / 180)
 #' ang <- angle(contr.time, contr.volume, treat.time, treat.volume)
 #' print(ang)
-#' par(pty="s")
+#' par(pty = "s")
 #' xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
 #' plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)
 #' lines(treat.time, treat.volume, type = "b")
-#' abline(lm(contr.volume~contr.time))
-#' abline(lm(treat.volume~treat.time))
+#' abline(lm(contr.volume ~ contr.time))
+#' abline(lm(treat.volume ~ treat.time))
 #' @export
 angle <- function(
   contr.time = NULL,
@@ -86,7 +86,7 @@ angle <- function(
     tre <- slope(treat.time, treat.volume, degree = degree)
   }
 
-  #if(c#lass(con)=="modelResponse" & c#lass(tre)=="modelResponse") ##old Class command
+  # if(c#lass(con)=="modelResponse" & c#lass(tre)=="modelResponse") ##old Class command
   ang <- con$value - tre$value
   rtx <- batch_response_class(
     name = "angle",

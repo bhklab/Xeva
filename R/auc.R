@@ -12,17 +12,17 @@
 #' @param volume First \code{vector} of volume.
 #' @return  Returns \code{angle} and \code{slope} object.
 #' @examples
-#' time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
-#' volume1<- time * tan(30*pi/180)
-#' volume2<- time * tan(45*pi/180)
+#' time <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' volume1 <- time * tan(30 * pi / 180)
+#' volume2 <- time * tan(45 * pi / 180)
 #' auc1 <- AUC(time, volume1)
 #' auc2 <- AUC(time, volume2)
-#' par(pty="s")
+#' par(pty = "s")
 #' xylimit <- range(c(time, volume1, volume2))
 #' plot(time, volume1, type = "b", xlim = xylimit, ylim = xylimit)
 #' lines(time, volume2, type = "b")
-#' abline(lm(volume1~time))
-#' abline(lm(volume2~time))
+#' abline(lm(volume1 ~ time))
+#' abline(lm(volume2 ~ time))
 #' @export
 AUC <- function(time, volume) {
   auc <- .trapz_AUC(time, volume)
@@ -41,16 +41,17 @@ AUC <- function(time, volume) {
 #' @return Returns batch response object.
 #'
 #' @examples
-#' contr.time <- treat.time  <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
-#' contr.volume<- contr.time * tan(60*pi/180)
-#' treat.volume<- treat.time * tan(15*pi/180)
+#' contr.time <- treat.time <- c(0, 3, 7, 11, 18, 22, 26, 30, 32, 35)
+#' contr.volume <- contr.time * tan(60 * pi / 180)
+#' treat.volume <- treat.time * tan(15 * pi / 180)
 #' abc <- ABC(contr.time, contr.volume, treat.time, treat.volume)
-#' par(pty="s")
+#' par(pty = "s")
 #' xylimit <- range(c(contr.time, contr.volume, treat.time, treat.volume))
 #' plot(contr.time, contr.volume, type = "b", xlim = xylimit, ylim = xylimit)
 #' lines(treat.time, treat.volume, type = "b")
 #' polygon(c(treat.time, rev(treat.time)), c(contr.volume, rev(treat.volume)),
-#'         col = "#fa9fb5", border = NA)
+#'   col = "#fa9fb5", border = NA
+#' )
 #'
 #' @export
 ABC <- function(

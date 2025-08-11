@@ -32,7 +32,7 @@
 #' @examples
 #' data(brca)
 #' print(brca)
-#' df <- subsetXeva(brca, ids = c("X-1004", "X-1008", "X-1286"), id.name="patient.id", keep.batch=TRUE)
+#' df <- subsetXeva(brca, ids = c("X-1004", "X-1008", "X-1286"), id.name = "patient.id", keep.batch = TRUE)
 #' print(df)
 #' @param object The \code{XevaSet} object.
 #' @param ids IDs to be selected for.

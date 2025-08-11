@@ -101,7 +101,7 @@
 
   return(rm.type)
 }
-#####================= summarizeResponse ==================
+##### ================= summarizeResponse ==================
 #' Summarize Response of PDXs
 #'
 #' This function summarizes the drug response information of PDXs.
@@ -127,7 +127,7 @@
 #'
 #' @examples
 #' data(brca)
-#' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+#' brca.mR <- summarizeResponse(brca, response.measure = "mRECIST", group.by = "patient.id")
 #'
 #' @export
 summarizeResponse <- function(

@@ -78,7 +78,7 @@ print.batchResponse <- function(x, ...) {
 #'
 #' @examples
 #' data(brca)
-#' brca  <- setResponse(brca, res.measure = c("mRECIST"), verbose=FALSE)
+#' brca <- setResponse(brca, res.measure = c("mRECIST"), verbose = FALSE)
 #' @export
 setResponse <- function(
   object,
@@ -94,7 +94,7 @@ setResponse <- function(
 ) {
   sen <- slot(object, "sensitivity")
 
-  ###--------compute mRECIST ---------------------------------------------------
+  ### --------compute mRECIST ---------------------------------------------------
   if (
     any(c("mRECIST", "best.response", "best.average.response") %in% res.measure)
   ) {
@@ -127,7 +127,7 @@ setResponse <- function(
     }
   }
 
-  ###--------compute slope -----------------------------------------------------
+  ### --------compute slope -----------------------------------------------------
   if ("slope" %in% res.measure) {
     sen$model[, "slope"] <- NA
     for (mid in modelInfo(object)$model.id) {
@@ -144,11 +144,11 @@ setResponse <- function(
         log.volume = log.volume,
         verbose = verbose
       )
-      sen$model[mid, "slope"] <- sl$value #$slope
+      sen$model[mid, "slope"] <- sl$value # $slope
     }
   }
 
-  ###--------compute AUC -------------------------------------------------------
+  ### --------compute AUC -------------------------------------------------------
 
   if ("AUC" %in% res.measure) {
     sen$model[, "AUC"] <- NA
@@ -170,10 +170,10 @@ setResponse <- function(
     }
   }
 
-  ##----------------------------------------------------------------------------
-  ##-----------------for batch -------------------------------------------------
+  ## ----------------------------------------------------------------------------
+  ## -----------------for batch -------------------------------------------------
 
-  ###--------compute angle for batch -------------------------------------------
+  ### --------compute angle for batch -------------------------------------------
   if ("angle" %in% res.measure) {
     sen$batch[, c("slope.control", "slope.treatment", "angle")] <- NA
     for (bid in batchInfo(object)) {
@@ -195,7 +195,7 @@ setResponse <- function(
     }
   }
 
-  ###--------compute abc for batch ---------------------------------------------
+  ### --------compute abc for batch ---------------------------------------------
   if ("abc" %in% res.measure) {
     sen$batch[, c("auc.control", "auc.treatment", "abc")] <- NA
     for (bid in batchInfo(object)) {
@@ -217,7 +217,7 @@ setResponse <- function(
     }
   }
 
-  ###--------compute TGI for batch ---------------------------------------------
+  ### --------compute TGI for batch ---------------------------------------------
   if ("TGI" %in% res.measure) {
     sen$batch[, c("TGI")] <- NA
     for (bid in batchInfo(object)) {
@@ -238,7 +238,7 @@ setResponse <- function(
     }
   }
 
-  ###--------compute lmm for batch ---------------------------------------------
+  ### --------compute lmm for batch ---------------------------------------------
   if ("lmm" %in% res.measure) {
     sen$batch[, c("lmm")] <- NA
     for (bid in batchInfo(object)) {
@@ -258,8 +258,8 @@ setResponse <- function(
       sen$batch[bid, c("lmm")] <- sl$value
     }
   }
-  ##--------------code for batch level mR --------------------------------------
-  ##----------------------------------------------------------------------------
+  ## --------------code for batch level mR --------------------------------------
+  ## ----------------------------------------------------------------------------
 
   slot(object, "sensitivity") <- sen
   return(object)
@@ -297,13 +297,15 @@ setResponse <- function(
 #'
 #' @examples
 #' data(brca)
-#' response(brca, model.id="X.1004.BG98", res.measure="mRECIST")
+#' response(brca, model.id = "X.1004.BG98", res.measure = "mRECIST")
 #'
-#' response(brca, batch="X-6047.paclitaxel", res.measure="angle")
+#' response(brca, batch = "X-6047.paclitaxel", res.measure = "angle")
 #'
-#' ed <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
-#'              control=c("X.6047.uned"))
-#' response(brca, batch=ed, res.measure="angle")
+#' ed <- list(
+#'   batch.name = "myBatch", treatment = c("X.6047.LJ16", "X.6047.LJ16.trab"),
+#'   control = c("X.6047.uned")
+#' )
+#' response(brca, batch = ed, res.measure = "angle")
 #'
 #' @export
 response <- function(
@@ -321,11 +323,11 @@ response <- function(
   verbose = TRUE
 ) {
   if (is.null(model.id) & is.null(batch)) {
-    #Name) & is.null(expDig))
+    # Name) & is.null(expDig))
     stop("'model.id', 'batch' all NULL")
   }
 
-  ##------------- for model ----------------------------------------------------
+  ## ------------- for model ----------------------------------------------------
   if (!is.null(model.id)) {
     dl <- getExperiment(
       object,
@@ -337,7 +339,7 @@ response <- function(
       impute.value = impute.value
     )
 
-    ###--------compute mRECIST -------------------------------------------------
+    ### --------compute mRECIST -------------------------------------------------
     if (
       any(
         c("mRECIST", "best.response", "best.average.response") %in% res.measure
@@ -355,7 +357,7 @@ response <- function(
       return(mr)
     }
 
-    ###--------compute slope -----------------------------------------------------
+    ### --------compute slope -----------------------------------------------------
     if (res.measure == "slope") {
       if (verbose == TRUE) {
         cat(sprintf("computing slope for %s\n", model.id))
@@ -363,7 +365,7 @@ response <- function(
       return(slope(dl$time, dl$volume, degree = TRUE))
     }
 
-    ###--------compute AUC -------------------------------------------------------
+    ### --------compute AUC -------------------------------------------------------
     if (res.measure == "AUC") {
       if (verbose == TRUE) {
         cat(sprintf("computing AUC for %s\n", model.id))
@@ -372,7 +374,7 @@ response <- function(
     }
   }
 
-  ##-----------------for batch -------------------------------------------------
+  ## -----------------for batch -------------------------------------------------
   if (is.null(model.id)) {
     dl <- getExperiment(
       object,
@@ -406,7 +408,7 @@ response <- function(
       }
       cat(sprintf("computing %s for batch %s\n", res.measure, bName))
     }
-    ###--------compute angle for batch -----------------------------------------
+    ### --------compute angle for batch -----------------------------------------
     if (res.measure == "angle") {
       rtx <- angle(
         contr.time,
@@ -418,19 +420,19 @@ response <- function(
       return(rtx)
     }
 
-    ###--------compute abc for batch ---------------------------------------------
+    ### --------compute abc for batch ---------------------------------------------
     if (res.measure == "abc") {
       rtx <- ABC(contr.time, contr.volume, treat.time, treat.volume)
       return(rtx)
     }
 
-    ###--------compute abc for batch ---------------------------------------------
+    ### --------compute abc for batch ---------------------------------------------
     if (res.measure == "TGI") {
       rtx <- TGI(contr.volume, treat.volume)
       return(rtx)
     }
 
-    ###--------compute lmm for batch ---------------------------------------------
+    ### --------compute lmm for batch ---------------------------------------------
     if (res.measure == "lmm") {
       rtx <- lmm(dl$model)
       return(rtx)

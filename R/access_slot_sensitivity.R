@@ -6,8 +6,8 @@
 #'
 #' @examples
 #' data(brca)
-#' head(sensitivity(brca, type="batch"))
-#' head(sensitivity(brca, type="model"))
+#' head(sensitivity(brca, type = "batch"))
+#' head(sensitivity(brca, type = "model"))
 #' @param object The \code{Xeva} dataset.
 #' @param type Sensitivity type (either model or batch).
 #' @param sensitivity.measure Name of the \code{sensitivity.measure}. Default \code{NULL} will return all sensitivity measures.
@@ -84,7 +84,7 @@ setGeneric(name = "setSensitivity", def = function(object, type, name, value) {
 
 #' @keywords internal
 #' @noRd
-####@export
+#### @export
 setMethod(
   f = "setSensitivity",
   signature = signature(object = "XevaSet"),

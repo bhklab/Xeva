@@ -2,7 +2,7 @@
   dt,
   x,
   y,
-  col = 'red',
+  col = "red",
   lty = "dotted",
   alpha = 1,
   size = 0.5
@@ -50,10 +50,10 @@
 
   if (!is.null(df$upper) & !is.null(df$lower)) {
     if (all(is.na(df$upper)) == TRUE) {
-      df$upper = NULL
+      df$upper <- NULL
     }
     if (all(is.na(df$lower)) == TRUE) {
-      df$lower = NULL
+      df$lower <- NULL
     }
   }
 
@@ -62,7 +62,7 @@
   }
 
   if (log.y == TRUE) {
-    df$mean = log(df$mean)
+    df$mean <- log(df$mean)
     if (!is.null(df$upper)) {
       df$upper <- log(df$upper)
     }
@@ -233,7 +233,7 @@
 #'
 #' @examples
 #' data(brca)
-#' dosePlot(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"), fill.col=c("#f5f5f5", "#993404"))
+#' dosePlot(brca, model.id = c("X.6047.LJ16", "X.6047.LJ16.trab"), fill.col = c("#f5f5f5", "#993404"))
 #' @export
 dosePlot <- function(
   object,
@@ -284,7 +284,7 @@ dosePlot <- function(
   )
   return(doplt)
 }
-######--------------------------------------------------------------------------
+###### --------------------------------------------------------------------------
 
 #' Plot batch data
 #'
@@ -317,13 +317,15 @@ dosePlot <- function(
 #'
 #' @examples
 #' data(brca)
-#' plotPDX(brca, model.id=c("X.6047.LJ16","X.6047.LJ16.trab"))
+#' plotPDX(brca, model.id = c("X.6047.LJ16", "X.6047.LJ16.trab"))
 #'
-#' plotPDX(brca, batch="X-1004.BGJ398", vol.normal=TRUE)
-#' expDesign <- list(batch.name="myBatch", treatment=c("X.6047.LJ16","X.6047.LJ16.trab"),
-#'              control=c("X.6047.uned"))
-#' plotBatch(brca, batch=expDesign, vol.normal=TRUE)
-#' plotBatch(brca, batch=expDesign, vol.normal=FALSE, SE.plot = "errorbar")
+#' plotPDX(brca, batch = "X-1004.BGJ398", vol.normal = TRUE)
+#' expDesign <- list(
+#'   batch.name = "myBatch", treatment = c("X.6047.LJ16", "X.6047.LJ16.trab"),
+#'   control = c("X.6047.uned")
+#' )
+#' plotBatch(brca, batch = expDesign, vol.normal = TRUE)
+#' plotBatch(brca, batch = expDesign, vol.normal = FALSE, SE.plot = "errorbar")
 #' @export
 plotPDX <- function(
   object,
@@ -434,7 +436,7 @@ plotBatch <- function(
     concurrent.time = concurrent.time
   )
 
-  dfp$mean <- dfp$batch ##plot function uses mean as variable
+  dfp$mean <- dfp$batch ## plot function uses mean as variable
 
   if (is.null(drug)) {
     drug <- dfp$mean[dfp$mean$exp.type == "treatment", "drug.name"][1]
@@ -448,7 +450,7 @@ plotBatch <- function(
     xlab = xlab,
     ylab = ylab,
     log.y = log.y,
-    drgName = drug, #.name,
+    drgName = drug, # .name,
     SE.plot = SE.plot,
     aspect.ratio = aspect.ratio,
     minor.line.size = minor.line.size,

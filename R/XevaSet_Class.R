@@ -1,8 +1,8 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom MultiAssayExperiment experiments
 
-##--------------------------------------------------------------------------
-##------------ To create Sensitivity Slot ----------------------------------
+## --------------------------------------------------------------------------
+## ------------ To create Sensitivity Slot ----------------------------------
 .checkUnqLength <- function(inVec) {
   length(inVec) == length(unique(inVec))
 }
@@ -13,7 +13,7 @@
   expSlot,
   expDesign
 ) {
-  ##------------ for modelSensitivity ------------------------------------
+  ## ------------ for modelSensitivity ------------------------------------
   if (nrow(modelSensitivity) == 0) {
     modelSensitivity <- data.frame(
       model.id = names(expSlot),
@@ -36,8 +36,8 @@
   }
   rownames(modelSensitivity) <- as.character(modelSensitivity$model.id)
   modelSensitivity <- modelSensitivity[names(expSlot), , drop = FALSE]
-  ##--------------------------------------------------------------------------
-  ##------------ for Batch Sensitivity ---------------------------------------
+  ## --------------------------------------------------------------------------
+  ## ------------ for Batch Sensitivity ---------------------------------------
 
   if (nrow(batchSensitivity) > 0) {
     if (is.element("batch.name", colnames(batchSensitivity)) == FALSE) {
@@ -86,21 +86,21 @@
 }
 
 
-##--------------------------------------------------------------------------
-##------------ To check the input parameters--------------------------------
+## --------------------------------------------------------------------------
+## ------------ To check the input parameters--------------------------------
 .checkModel <- function(model, expSlot) {
   reqColName <- c("model.id", "patient.id")
   if (all(reqColName %in% colnames(model)) == FALSE) {
     msg <- sprintf(
       "The required colmns for model are\n%s",
-      paste(reqColName, collapse = ', ')
+      paste(reqColName, collapse = ", ")
     )
     stop(msg)
   }
 
   for (I in expSlot) {
     if (is.element(slot(I, "model.id"), model$model.id) == FALSE) {
-      msg = sprintf(
+      msg <- sprintf(
         "No informaton present in Model datafram about model.id =%s",
         I$model.id
       )
@@ -174,8 +174,8 @@
 }
 
 
-##-------------------------------------------------------------------------
-##--------- An S4 class for XevaSet ---------------------------------------
+## -------------------------------------------------------------------------
+## --------- An S4 class for XevaSet ---------------------------------------
 XevaSet <- setClass(
   "XevaSet",
   slots = list(
@@ -217,18 +217,20 @@ XevaSet <- setClass(
 #'
 #' @examples
 #' ## read raw data files containg PDX experiment information and genomic data
-#' model = read.csv(system.file("extdata", "model.csv", package = "Xeva"))
-#' drug = read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
-#' experiment= read.csv(system.file("extdata", "experiments.csv", package = "Xeva"))
-#' expDesign=readRDS(system.file("extdata", "batch_list.rds", package = "Xeva"))
-#' RNASeq=readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))
-#' modToBiobaseMap=read.csv(system.file("extdata", "modelToExpressionMap.csv", package = "Xeva"))
+#' model <- read.csv(system.file("extdata", "model.csv", package = "Xeva"))
+#' drug <- read.csv(system.file("extdata", "drug.csv", package = "Xeva"))
+#' experiment <- read.csv(system.file("extdata", "experiments.csv", package = "Xeva"))
+#' expDesign <- readRDS(system.file("extdata", "batch_list.rds", package = "Xeva"))
+#' RNASeq <- readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))
+#' modToBiobaseMap <- read.csv(system.file("extdata", "modelToExpressionMap.csv", package = "Xeva"))
 #'
 #' ## create Xeva object
-#' xeva.set = createXevaSet(name="example xevaSet", model=model, drug=drug,
-#'                          experiment=experiment, expDesign=expDesign,
-#'                          molecularProfiles=list(RNASeq = RNASeq),
-#'                          modToBiobaseMap = modToBiobaseMap)
+#' xeva.set <- createXevaSet(
+#'   name = "example xevaSet", model = model, drug = drug,
+#'   experiment = experiment, expDesign = expDesign,
+#'   molecularProfiles = list(RNASeq = RNASeq),
+#'   modToBiobaseMap = modToBiobaseMap
+#' )
 #' print(xeva.set)
 #'
 #' @export

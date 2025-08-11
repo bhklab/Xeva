@@ -1,36 +1,36 @@
-getTestMat = function() {
-  mat = matrix(NA, nrow = 5, ncol = 4)
-  mat[1, ] = c("CR", "PR", "SD", "PD")
-  mat[2, ] = c("CR;PR", NA, "SD;PD", "PD")
-  mat[3, ] = c("CR;PR;CR", "SD;PD;PD;SD", "PD;PD", "PR")
-  mat[4, ] = c("PR", "CR", "SD", "PR")
-  mat[5, ] = c("CR", "SD;SD", "PR;PD", "SD")
-  rownames(mat) = paste0("Drug", seq_len(dim(mat)[1]))
-  colnames(mat) = paste0("Sample", seq_len(dim(mat)[2]))
+getTestMat <- function() {
+  mat <- matrix(NA, nrow = 5, ncol = 4)
+  mat[1, ] <- c("CR", "PR", "SD", "PD")
+  mat[2, ] <- c("CR;PR", NA, "SD;PD", "PD")
+  mat[3, ] <- c("CR;PR;CR", "SD;PD;PD;SD", "PD;PD", "PR")
+  mat[4, ] <- c("PR", "CR", "SD", "PR")
+  mat[5, ] <- c("CR", "SD;SD", "PR;PD", "SD")
+  rownames(mat) <- paste0("Drug", seq_len(dim(mat)[1]))
+  colnames(mat) <- paste0("Sample", seq_len(dim(mat)[2]))
   mat
 }
 
-###-------------------------------------------------
+### -------------------------------------------------
 .splitValue <- function(mRx, splitBy = ";", sort = TRUE) {
   if (is.na(mRx)) {
     return(NA)
   }
-  mRy = strsplit(mRx, splitBy)[[1]]
+  mRy <- strsplit(mRx, splitBy)[[1]]
   if (sort == TRUE) {
-    mRy = sort(mRy)
+    mRy <- sort(mRy)
   }
   return(mRy)
 }
 
 getCellBoxCordi <- function(x0, x1, y0, y1, N) {
-  XV = rep(c(x0, x1, x1, x0), N)
-  sqD = (y1 - y0) / N
-  Nseq = seq(y0, y1, sqD)
-  Yv = unlist(lapply(Nseq, function(i) rep(i, 4)))
-  Li = length(Yv) - 2
-  YV = Yv[3:Li]
-  XV = c(x0, x1, x1, x0, XV)
-  YV = c(y0, y0, y1, y1, YV)
+  XV <- rep(c(x0, x1, x1, x0), N)
+  sqD <- (y1 - y0) / N
+  Nseq <- seq(y0, y1, sqD)
+  Yv <- unlist(lapply(Nseq, function(i) rep(i, 4)))
+  Li <- length(Yv) - 2
+  YV <- Yv[3:Li]
+  XV <- c(x0, x1, x1, x0, XV)
+  YV <- c(y0, y0, y1, y1, YV)
   return(list(x = XV, y = YV))
 }
 
@@ -45,23 +45,23 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
   splitBy = ";",
   sort = TRUE
 ) {
-  factR = 01.0
-  wr = w * 0.5 * factR
-  hr = h * 0.5 * factR
-  x0 = x - wr
-  x1 = x + wr
-  y0 = y - hr
-  y1 = y + hr
-  x0 = convertX(x0, "npc", valueOnly = TRUE)
-  x1 = convertX(x1, "npc", valueOnly = TRUE)
-  y0 = convertX(y0, "npc", valueOnly = TRUE)
-  y1 = convertX(y1, "npc", valueOnly = TRUE)
-  vx = .splitValue(value, splitBy = ";", sort = sort)
-  filCol = unlist(colPalette[vx])
-  N = length(vx)
-  cordXY = getCellBoxCordi(x0, x1, y0, y1, N)
-  cordXY$x = unit(cordXY$x, "npc")
-  cordXY$y = unit(cordXY$y, "npc")
+  factR <- 01.0
+  wr <- w * 0.5 * factR
+  hr <- h * 0.5 * factR
+  x0 <- x - wr
+  x1 <- x + wr
+  y0 <- y - hr
+  y1 <- y + hr
+  x0 <- convertX(x0, "npc", valueOnly = TRUE)
+  x1 <- convertX(x1, "npc", valueOnly = TRUE)
+  y0 <- convertX(y0, "npc", valueOnly = TRUE)
+  y1 <- convertX(y1, "npc", valueOnly = TRUE)
+  vx <- .splitValue(value, splitBy = ";", sort = sort)
+  filCol <- unlist(colPalette[vx])
+  N <- length(vx)
+  cordXY <- getCellBoxCordi(x0, x1, y0, y1, N)
+  cordXY$x <- unit(cordXY$x, "npc")
+  cordXY$y <- unit(cordXY$y, "npc")
   grid.polygon(
     x = cordXY$x,
     y = cordXY$y,
@@ -77,27 +77,27 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
   scaleRow = TRUE,
   scaleCol = TRUE
 ) {
-  cltab = list()
+  cltab <- list()
   for (I in seq_len(dim(mat)[1])) {
-    C = unlist(lapply(mat[I, ], .splitValue, splitBy = splitBy))
-    cltab[[I]] = as.vector(table(C), mode = "list")
+    C <- unlist(lapply(mat[I, ], .splitValue, splitBy = splitBy))
+    cltab[[I]] <- as.vector(table(C), mode = "list")
   }
 
-  rwtab = list()
+  rwtab <- list()
   for (I in seq_len(dim(mat)[2])) {
-    R = unlist(lapply(mat[, I], .splitValue, splitBy = splitBy))
-    rwtab[[I]] = as.vector(table(R), mode = "list")
+    R <- unlist(lapply(mat[, I], .splitValue, splitBy = splitBy))
+    rwtab[[I]] <- as.vector(table(R), mode = "list")
   }
 
   creatDataFram <- function(inLst) {
-    nColVal = unique(unlist(lapply(inLst, names)))
-    rxt = data.frame(matrix(NA, nrow = length(inLst), ncol = length(nColVal)))
-    colnames(rxt) = nColVal
+    nColVal <- unique(unlist(lapply(inLst, names)))
+    rxt <- data.frame(matrix(NA, nrow = length(inLst), ncol = length(nColVal)))
+    colnames(rxt) <- nColVal
     for (I in seq_along(inLst)) {
-      rx = vapply(
+      rx <- vapply(
         nColVal,
         function(x) {
-          w = inLst[[I]][[x]]
+          w <- inLst[[I]][[x]]
           if (is.null(w)) {
             return(NA)
           } else {
@@ -106,21 +106,21 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
         },
         FUN.VALUE = numeric(1)
       )
-      rxt[I, ] = rx[nColVal]
+      rxt[I, ] <- rx[nColVal]
     }
     return(rxt)
   }
-  rwdf = creatDataFram(rwtab)
-  cldf = creatDataFram(cltab)
+  rwdf <- creatDataFram(rwtab)
+  cldf <- creatDataFram(cltab)
 
-  rwdf[is.na(rwdf)] = 0
-  cldf[is.na(cldf)] = 0
+  rwdf[is.na(rwdf)] <- 0
+  cldf[is.na(cldf)] <- 0
 
   if (scaleRow == TRUE) {
-    rwdf = t(apply(rwdf, 1, function(x) 100 * x / sum(x)))
+    rwdf <- t(apply(rwdf, 1, function(x) 100 * x / sum(x)))
   }
   if (scaleCol == TRUE) {
-    cldf = t(apply(cldf, 1, function(x) 100 * x / sum(x)))
+    cldf <- t(apply(cldf, 1, function(x) 100 * x / sum(x)))
   }
 
   return(list(rowSt = cldf, colSt = rwdf))
@@ -134,36 +134,36 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
   scaleRow = TRUE,
   scaleCol = TRUE
 ) {
-  rcDF = .calculatRowColStat(
+  rcDF <- .calculatRowColStat(
     mat,
     splitBy,
     scaleRow = scaleRow,
     scaleCol = scaleCol
   )
 
-  colorX = unlist(colPalette[colnames(rcDF$colSt)])
+  colorX <- unlist(colPalette[colnames(rcDF$colSt)])
 
-  colBar = ComplexHeatmap::anno_barplot(
+  colBar <- ComplexHeatmap::anno_barplot(
     rcDF$colSt,
     which = "column",
     axis = TRUE,
     gp = grid::gpar(fill = colorX)
   )
 
-  column_ha = ComplexHeatmap::HeatmapAnnotation(
+  column_ha <- ComplexHeatmap::HeatmapAnnotation(
     barplot = colBar,
     height = grid::unit(2, "cm"),
     show_annotation_name = FALSE
   )
 
-  colorX = unlist(colPalette[colnames(rcDF$rowSt)])
+  colorX <- unlist(colPalette[colnames(rcDF$rowSt)])
 
-  #rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
+  # rowbar = ComplexHeatmap::anno_barplot(rcDF$rowSt, which = "row", axis = TRUE,
   #                                      axis_side = "top",
   #                                      #axis_param = list(side = "top"),
   #                                      gp = gpar(fill = colorX))
 
-  rowbar = tryCatch(
+  rowbar <- tryCatch(
     {
       ComplexHeatmap::anno_barplot(
         rcDF$rowSt,
@@ -184,7 +184,7 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
     }
   )
 
-  row_ha = ComplexHeatmap::rowAnnotation(
+  row_ha <- ComplexHeatmap::rowAnnotation(
     row_anno_barplot = rowbar,
     width = grid::unit(2, "cm"),
     show_annotation_name = FALSE
@@ -193,15 +193,15 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
 }
 
 .sortPlotMat <- function(mat, controlD, control.col, drug.col) {
-  ##-------first sort by number of NA --------------------------
+  ## -------first sort by number of NA --------------------------
   rowNa <- apply(mat, 1, function(x) sum(is.na(x)))
   colNa <- apply(mat, 2, function(x) sum(is.na(x)))
   mat <- mat[names(sort(rowNa)), names(sort(colNa))]
-  ##------------------------------------------------------------
+  ## ------------------------------------------------------------
   rwNM <- rownames(mat)
   clNm <- colnames(mat)
-  ##---------for row ------------------------------------------
-  controlD = c(controlD)
+  ## ---------for row ------------------------------------------
+  controlD <- c(controlD)
   if (length(controlD[!is.na(controlD)]) > 0) {
     nonCntr <- rwNM[!(rwNM %in% controlD)]
     rwNMx <- c(controlD, nonCntr)
@@ -213,7 +213,7 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
     rwNMx <- rwNM
     rwNameCol <- rep(drug.col, length(rwNM))
   }
-  ##--------for column ------------------------------------------
+  ## --------for column ------------------------------------------
 
   if (length(controlD[!is.na(controlD)]) > 0) {
     contMat <- mat[controlD[1], clNm]
@@ -221,7 +221,7 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
   }
   clNameCol <- rep("black", length(clNm))
 
-  rtx = list(
+  rtx <- list(
     mat = mat[rwNMx, clNm],
     row.name.col = rwNameCol,
     col.name.col = clNameCol
@@ -248,7 +248,7 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
   return(colPal)
 }
 
-##============================================================================
+## ============================================================================
 #' To plot mRECIST values
 #'
 #' \code{plotmRECIST} plots the mRECIST matrix obtained from \code{summarizeResponse}.
@@ -266,7 +266,7 @@ getCellBoxCordi <- function(x0, x1, y0, y1, N) {
 #' @return mRECIST plot.
 #' @examples
 #' data(brca)
-#' brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by="patient.id")
+#' brca.mr <- summarizeResponse(brca, response.measure = "mRECIST", group.by = "patient.id")
 #' plotmRECIST(as.matrix(brca.mr), control.name = "untreated")
 #' @export
 #' @import ComplexHeatmap
@@ -284,7 +284,7 @@ plotmRECIST <- function(
   col_fontsize = 12,
   draw_plot = TRUE
 ) {
-  control.name = c(control.name)
+  control.name <- c(control.name)
 
   unqMat <- as.character(unique(unlist(lapply(colnames(mat), function(x) {
     unique(mat[, x])
@@ -302,7 +302,7 @@ plotmRECIST <- function(
     if (any(colPre) == TRUE) {
       colAbName <- names(colPre[colPre == TRUE])
       colAb <- paste(colAbName, collapse = "\n")
-      msg1 = sprintf(
+      msg1 <- sprintf(
         "color for these values are not present in colPalette\n%s",
         colAb
       )
@@ -328,11 +328,11 @@ plotmRECIST <- function(
     rowColors[control.name] <- control.col
   }
 
-  nameSpc = unique(as.vector(as.matrix(mat)))
-  backgroundCol = "gray"
-  bgCol = rep(backgroundCol, length(nameSpc))
+  nameSpc <- unique(as.vector(as.matrix(mat)))
+  backgroundCol <- "gray"
+  bgCol <- rep(backgroundCol, length(nameSpc))
   splitBy <- ";"
-  sortCellValue = TRUE
+  sortCellValue <- TRUE
   sidePlt <- .creatSideBarPlot(
     mat,
     colPalette,
@@ -384,7 +384,7 @@ plotmRECIST <- function(
       title = "",
       legend_gp = gpar(col = colVec, fill = colVec)
     )
-    padding = unit(c(2, 2, 2, 2), "mm")
+    padding <- unit(c(2, 2, 2, 2), "mm")
     draw(pltX, heatmap_legend_list = list(HLeg), padding = padding)
   } else {
     return(pltX)

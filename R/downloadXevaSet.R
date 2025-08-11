@@ -18,7 +18,7 @@ getXevaSet <- function(
     XevaSetFileName <- rev(strsplit(dw.url, "/")[[1]])[1]
   }
 
-  destfile = file.path(saveDir, XevaSetFileName)
+  destfile <- file.path(saveDir, XevaSetFileName)
   downloader::download(url = dw.url, destfile = destfile, quiet = !verbose)
 
   xs <- readRDS(destfile)
@@ -34,9 +34,9 @@ getXevaSet <- function(
 #' analysis tools provided in Xeva.
 #'
 #' @examples
-#' ##to download a dataset
-#' #library(Xeva)
-#' #PDXE_BRCA = downloadXevaSet(name="PDXE_BRCA", saveDir="XevaSet")
+#' ## to download a dataset
+#' # library(Xeva)
+#' # PDXE_BRCA = downloadXevaSet(name="PDXE_BRCA", saveDir="XevaSet")
 #'
 #' @param name Character string, the name of the XevaSet to download.
 #' @param saveDir	\code{Character} string with the folder path where the XevaSet should be saved. Defaults to './XevaSet/'. Will create directory if it does not exist.

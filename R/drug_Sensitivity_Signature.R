@@ -118,7 +118,7 @@
   return(se)
 }
 
-##====== drugSensitivitySig for one drug ==========================
+## ====== drugSensitivitySig for one drug ==========================
 #' get drug sensitivity values
 #'
 #' @description
@@ -142,14 +142,18 @@
 #'
 #' @examples
 #' data(brca)
-#' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
-#'                              sensitivity.measure="slope", fit = "lm")
+#' senSig <- drugSensitivitySig(
+#'   object = brca, drug = "tamoxifen",
+#'   mDataType = "RNASeq", features = c(1, 2, 3, 4, 5),
+#'   sensitivity.measure = "slope", fit = "lm"
+#' )
 #'
 #' ## example to compute the Pearson correlation between gene expression and PDX response
-#' senSig <- drugSensitivitySig(object=brca, drug="tamoxifen",
-#'                              mDataType="RNASeq", features=c(1,2,3,4,5),
-#'                              sensitivity.measure="slope", fit = "pearson")
+#' senSig <- drugSensitivitySig(
+#'   object = brca, drug = "tamoxifen",
+#'   mDataType = "RNASeq", features = c(1, 2, 3, 4, 5),
+#'   sensitivity.measure = "slope", fit = "pearson"
+#' )
 #'
 #' @details Method to compute association can be specified by \code{fit}. It can be one of the:
 #' \itemize{

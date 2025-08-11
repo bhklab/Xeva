@@ -1,4 +1,4 @@
-#####================= getMolecularProfiles ==================
+##### ================= getMolecularProfiles ==================
 #' Get molecular profiles from a XevaSet object
 #'
 #' This function serves to get molecular profiles from a \code{XevaSet} object.
@@ -8,7 +8,7 @@
 #' @return A \code{SummarizedExperiment} object (converted from ExpressionSet if needed), where sample names are the \code{biobase.id} of the model.
 #' @examples
 #' data(brca)
-#' brca.RNA <- getMolecularProfiles(brca, data.type="RNASeq")
+#' brca.RNA <- getMolecularProfiles(brca, data.type = "RNASeq")
 #' @export
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @importFrom S4Vectors DataFrame
@@ -17,7 +17,7 @@ getMolecularProfiles <- function(object, data.type) {
   if (
     is.element(data.type, names(slot(object, "molecularProfiles"))) == FALSE
   ) {
-    msg = sprintf(
+    msg <- sprintf(
       "available molecular data are\n%s\n",
       paste(names(object@molecularProfiles), collapse = "\n")
     )
@@ -165,7 +165,7 @@ getMolecularProfileAssay <- function(object, data.type) {
   return(list(data = modIn, bioName = bioName))
 }
 
-#####================= Summarize Molecular Profiles ==================
+##### ================= Summarize Molecular Profiles ==================
 #' Summarize molecular profiles
 #'
 #' This function serves to get molecular profiles from a \code{XevaSet} object.
@@ -181,8 +181,10 @@ getMolecularProfileAssay <- function(object, data.type) {
 #'
 #' @examples
 #' data(brca)
-#' pacRNA <- summarizeMolecularProfiles(brca, drug="paclitaxel", mDataType="RNASeq",
-#'                                      tissue= "BRCA", sensitivity.measure="mRECIST")
+#' pacRNA <- summarizeMolecularProfiles(brca,
+#'   drug = "paclitaxel", mDataType = "RNASeq",
+#'   tissue = "BRCA", sensitivity.measure = "mRECIST"
+#' )
 #' print(pacRNA)
 #' @details
 #' \itemize{
@@ -224,8 +226,8 @@ summarizeMolecularProfiles <- function(
     )
     stop(msg)
   }
-  ##----------------------------------------------------------------------------
-  ##----------------------------------------------------------------------------
+  ## ----------------------------------------------------------------------------
+  ## ----------------------------------------------------------------------------
   if (senType == "model") {
     sm <- sensitivity(
       object,

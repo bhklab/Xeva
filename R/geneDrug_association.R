@@ -148,10 +148,10 @@ compute_association <-
     fit = c("lm", "CI", "pearson", "spearman"),
     nthread = 1,
     type = NULL,
-    standardize = 'SD',
+    standardize = "SD",
     verbose = TRUE
   ) {
-    fit = fit[1]
+    fit <- fit[1]
     if (is(x, "matrix") == FALSE) {
       stop("x must be a matrix")
     }
@@ -185,7 +185,7 @@ compute_association <-
       return(rr)
     }
 
-    ##------ for other fits --------
+    ## ------ for other fits --------
     if (nthread != 1) {
       availcore <- parallel::detectCores()
       if (missing(nthread) || nthread < 1 || nthread > availcore) {
