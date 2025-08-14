@@ -11,7 +11,6 @@
 # d <- getExperiment(lpdx, batch = "P1")
 # data=d$model
 
-
 #' linear mixed model
 #'
 #' Comput the linear mixed model (lmm) statistics for a PDX batch
@@ -28,15 +27,17 @@
 #'
 #' @export
 #' @import nlme
-lmm <- function(data)
-{
-  if(any(!c("model.id", "volume", "time", "exp.type")%in% colnames(data)))
-  {
-    msg="these columns must be present, 'model.id', 'volume', 'time', 'exp.type'"
+lmm <- function(data) {
+  if (any(!c("model.id", "volume", "time", "exp.type") %in% colnames(data))) {
+    msg = "these columns must be present, 'model.id', 'volume', 'time', 'exp.type'"
     stop(msg)
   }
 
-  fit <- lme(log(volume)~time*exp.type, data=data, random= ~1|model.id)
+  fit <- lme(
+    log(volume) ~ time * exp.type,
+    data = data,
+    random = ~ 1 | model.id
+  )
   fit$value <- as.numeric(fit$coefficients$fixed[4])
   return(fit)
 }

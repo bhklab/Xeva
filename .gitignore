@@ -30,3 +30,12 @@ vignettes/Roger.save
 ##ignore vignette figure dir
 vignettes/figure
 vignettes/figure/*
+
+# Local build/check artifacts
+*.Rcheck/
+Xeva_*.tar.gz
+Rplots.pdf
+.DS_Store
+Xeva.BiocCheck/
+*.BiocCheck/
+00BiocCheck.log

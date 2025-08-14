@@ -12,7 +12,7 @@ getMolecularProfiles(object, data.type)
 \item{data.type}{\code{character}, where one of the molecular data types is needed.}
 }
 \value{
-An \code{ExpressionSet} where sample names are the \code{biobase.id} of the model.
+A \code{SummarizedExperiment} object (converted from ExpressionSet if needed), where sample names are the \code{biobase.id} of the model.
 }
 \description{
 This function serves to get molecular profiles from a \code{XevaSet} object.

@@ -1,59 +1,69 @@
-getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
-                              control.name=NULL)
-{
-  if(all(c(is.null(batch), is.null(patient.id), is.null(drug), is.null(control.name))))
-  {  stop("all variables NULL") }
+getBatchFormatted <- function(
+  object,
+  batch = NULL,
+  patient.id = NULL,
+  drug = NULL,
+  control.name = NULL
+) {
+  if (
+    all(c(
+      is.null(batch),
+      is.null(patient.id),
+      is.null(drug),
+      is.null(control.name)
+    ))
+  ) {
+    stop("all variables NULL")
+  }
 
-  if(!is.null(batch))
-  {
-    if(is.character(batch))
-    {
+  if (!is.null(batch)) {
+    if (is.character(batch)) {
       bt <- slot(object, "expDesign")[[batch]]
-      if(is.null(bt))
-      {
+      if (is.null(bt)) {
         msg <- sprintf("batch name %s not present in object", batch)
         stop(msg)
       }
       return(bt)
     }
 
-    if(is.list(batch))
-    {
-      if(!"batch.name" %in% names(batch))
-      { stop(sprintf("'batch.name' is required")) }
+    if (is.list(batch)) {
+      if (!"batch.name" %in% names(batch)) {
+        stop(sprintf("'batch.name' is required"))
+      }
 
-      if(is.null(batch$treatment) & is.null(batch$control))
-      { stop(sprintf("'treatment' and 'control' both can't be NULL")) }
+      if (is.null(batch$treatment) & is.null(batch$control)) {
+        stop(sprintf("'treatment' and 'control' both can't be NULL"))
+      }
 
       allMod <- c(batch$treatment, batch$control)
       modNotPr <- setdiff(allMod, rownames(modelInfo(object)))
-      if(length(modNotPr)>0)
-      {
-        stop(sprintf("model.id not present in dataset: %s", paste(modNotPr, collapse = ", ")))
+      if (length(modNotPr) > 0) {
+        stop(sprintf(
+          "model.id not present in dataset: %s",
+          paste(modNotPr, collapse = ", ")
+        ))
       }
 
       return(batch)
     }
   } else {
     mid <- modelInfo(object)
-    mid <- mid[mid$patient.id==patient.id, ]
-    rtx <- list(name=patient.id)
-    rtx$treatment <- mid[mid$drug==drug, "model.id"]
-    if(!is.null(control.name))
-    { rtx$control <- mid[mid$drug==control.name, "model.id"]}
+    mid <- mid[mid$patient.id == patient.id, ]
+    rtx <- list(name = patient.id)
+    rtx$treatment <- mid[mid$drug == drug, "model.id"]
+    if (!is.null(control.name)) {
+      rtx$control <- mid[mid$drug == control.name, "model.id"]
+    }
     return(rtx)
   }
 }
 
-.normalizeVolume <- function(X)
-{
-  if (is.na(X[1]) == TRUE)
-  {
+.normalizeVolume <- function(X) {
+  if (is.na(X[1]) == TRUE) {
     warning("First value not numeric.")
     return(rep(NA, length(X)))
   }
-  if (X[1] == 0)
-  {
+  if (X[1] == 0) {
     warning("start volume zero, adding 1 to compute volume.normal")
     X <- X + 1
   }
@@ -64,38 +74,35 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
 #' @import grDevices
 #' @import stats
 #' @import utils
-.smoothCurve <- function(trDF, tsDF, x, y, approx.method = "approx")
-{
+.smoothCurve <- function(trDF, tsDF, x, y, approx.method = "approx") {
   lmdf <- data.frame(X = trDF[, x], Y = trDF[, y])
   prdf <- data.frame(X = tsDF[, x])
-  if (approx.method == "lm")
-  {
+  if (approx.method == "lm") {
     lmod <- lm(Y ~ X, data = lmdf)
     tsDF[, y] <- predict(lmod, prdf, se.fit = FALSE)
   }
 
-  if (approx.method == "approx")
-  {
+  if (approx.method == "approx") {
     prdValue <- approx(lmdf$X, lmdf$Y, xout = prdf$X)
     tsDF[, y] <- prdValue$y
   }
   return(tsDF)
 }
 
-.smoothModel <- function(dw, timeVec, var = "volume")
-{
+.smoothModel <- function(dw, timeVec, var = "volume") {
   dw$impute.value <- "NO"
   t2imp <- setdiff(timeVec, dw$time)
   t2imp <- t2imp[t2imp <= max(dw$time)]
-  if (length(t2imp) > 0)
-  {
+  if (length(t2imp) > 0) {
     nwRws <-
-      data.frame(matrix(
-        data = NA,
-        nrow = length(t2imp),
-        ncol = ncol(dw)
-      ),
-      stringsAsFactors = FALSE)
+      data.frame(
+        matrix(
+          data = NA,
+          nrow = length(t2imp),
+          ncol = ncol(dw)
+        ),
+        stringsAsFactors = FALSE
+      )
     colnames(nwRws) <- colnames(dw)
     nwRws$time <- t2imp
     nwRws$model.id <- dw$model.id[1]
@@ -110,11 +117,9 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
 }
 
 .getExperimentDataFromAExpID <-
-  function(object, model.id, treatment.only)
-  {
+  function(object, model.id, treatment.only) {
     mod <- slot(object, "experiment")[[model.id]]
-    if (is.null(mod))
-    {
+    if (is.null(mod)) {
       msg <- sprintf("model.id '%s' not present in object", model.id)
       stop(msg)
     }
@@ -123,16 +128,14 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
     mod.data$model.id <- slot(mod, "model.id")
     mod.data$drug.join.name <- slot(mod, "drug")$join.name
 
-
     mod.data <- .removeNAcol(mod.data)
     mod.data <- .reorderCol(mod.data, "model.id", 1)
     mod.data <- .reorderCol(mod.data, "drug.join.name", 2)
 
-    if (treatment.only == TRUE & !is.null(mod.data$dose))
-    {
+    if (treatment.only == TRUE & !is.null(mod.data$dose)) {
       tretIndx <-
         extractBetweenTags(mod.data$dose, start.tag = 0, end.tag = 0)
-      mod.data <- mod.data[tretIndx,]
+      mod.data <- mod.data[tretIndx, ]
     }
 
     mod.data$volume.normal <- .normalizeVolume(mod.data$volume)
@@ -141,68 +144,70 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
   }
 
 .getExperimentMultipalIDs <-
-  function(object,
-           mids,
-           treatment.only = TRUE,
-           max.time = NULL,
-           return.list = TRUE,
-           impute.value = FALSE,
-           vol.normal = FALSE,
-           log.volume=FALSE,
-           var = "volume")
-  {
+  function(
+    object,
+    mids,
+    treatment.only = TRUE,
+    max.time = NULL,
+    return.list = TRUE,
+    impute.value = FALSE,
+    vol.normal = FALSE,
+    log.volume = FALSE,
+    var = "volume"
+  ) {
     rtx <- list()
-    for (i in mids)
-    {
+    for (i in mids) {
       miD <-
-        .getExperimentDataFromAExpID(object, model.id = i, treatment.only = treatment.only)
+        .getExperimentDataFromAExpID(
+          object,
+          model.id = i,
+          treatment.only = treatment.only
+        )
       rtx[[i]] <- miD
     }
 
-    if (length(rtx) > 0)
-    {
-      if (impute.value == TRUE)
-      {
+    if (length(rtx) > 0) {
+      if (impute.value == TRUE) {
         inLst2 <- list()
         timeVec <- sort(unique(unlist(lapply(
-          rtx, "[[", "time"
+          rtx,
+          "[[",
+          "time"
         ))))
-        for (mid in names(rtx))
-        {
-          inLst2[[mid]] <- .smoothModel(rtx[[mid]], timeVec = timeVec, var = var)
+        for (mid in names(rtx)) {
+          inLst2[[mid]] <- .smoothModel(
+            rtx[[mid]],
+            timeVec = timeVec,
+            var = var
+          )
           inLst2[[mid]]$volume.normal <-
             .normalizeVolume(inLst2[[mid]]$volume)
         }
         rtx <- inLst2
       }
 
-      for (i in names(rtx))
-      {
+      for (i in names(rtx)) {
         miD <- rtx[[i]]
 
-        if(log.volume==TRUE)
-        {
-          miD$volume <- log(miD$volume+1)
+        if (log.volume == TRUE) {
+          miD$volume <- log(miD$volume + 1)
           miD$volume.normal <- .normalizeVolume(miD$volume)
         }
 
-        if (vol.normal == TRUE)
-        {
+        if (vol.normal == TRUE) {
           miD$volume.raw <- miD$volume
           miD$volume <- miD$volume.normal
           miD$volume.normal <- NULL
         }
 
-        if (!is.null(max.time))
-        {
-          miD <- miD[miD$time <= max.time,]
+        if (!is.null(max.time)) {
+          miD <- miD[miD$time <= max.time, ]
         }
 
         rtx[[i]] <- miD
       }
 
-      if (return.list == FALSE)
-      {
+      if (return.list == FALSE) {
         rtx <- .rbindListOfDataframs(rtx)
       }
     }
@@ -210,10 +215,8 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
   }
 
 
-.reformatExpDesig <- function(expDig)
-{
-  if (any(c("batch.name", "treatment", "control") %in% names(expDig)))
-  {
+.reformatExpDesig <- function(expDig) {
+  if (any(c("batch.name", "treatment", "control") %in% names(expDig))) {
     expDig <- list(expDig)
   }
   names(expDig) <- unlist(lapply(expDig, "[[", "batch.name"))
@@ -221,52 +224,54 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
   return(expDig)
 }
 
-.collapseRplicate <- function(inLst, var = "volume")
-{
-  if (is.null(names(inLst)))
-  {
-    names(inLst) <- vapply(inLst, function(x)
-      {x$model.id[1]}, FUN.VALUE = character(1))
+.collapseRplicate <- function(inLst, var = "volume") {
+  if (is.null(names(inLst))) {
+    names(inLst) <- vapply(
+      inLst,
+      function(x) {
+        x$model.id[1]
+      },
+      FUN.VALUE = character(1)
+    )
   }
   timeAll <- sort(unique(unlist(lapply(
-    inLst, "[[", "time"
+    inLst,
+    "[[",
+    "time"
   ))))
   rd <- data.frame()
-  for (t in timeAll)
-  {
-    vx <- unlist(lapply(inLst, function(x) {x[x$time == t, var] }))
+  for (t in timeAll) {
+    vx <- unlist(lapply(inLst, function(x) {
+      x[x$time == t, var]
+    }))
     vx <- vx[!is.na(vx)]
     vz <- as.list(Rmisc::STDERR(vx))
     rd <-
-      rbind(rd,
-            data.frame(
-              time = t,
-              mean = vz$mean,
-              upper = vz$upper,
-              lower = vz$lower
-            ))
+      rbind(
+        rd,
+        data.frame(
+          time = t,
+          mean = vz$mean,
+          upper = vz$upper,
+          lower = vz$lower
+        )
+      )
   }
   return(rd)
 }
 
-.getTimeVarData <- function(dfp,
-                            drug.name = TRUE,
-                            var = "volume")
-{
+.getTimeVarData <- function(dfp, drug.name = TRUE, var = "volume") {
   df <- data.frame()
-  if (!is.null(dfp$control))
-  {
+  if (!is.null(dfp$control)) {
     dfc <- .collapseRplicate(dfp$control, var = var)
     dfc$exp.type <- "control"
 
-    if (drug.name == TRUE)
-    {
+    if (drug.name == TRUE) {
       drugAll <-
         sort(unique(unlist(
           lapply(dfp$control, "[[", "drug.join.name")
         )))
-      if (length(drugAll) > 1)
-      {
+      if (length(drugAll) > 1) {
         txt <-
           sprintf(
             "multiple drugs for batch (in control arm), will collapse by ;\nDrugs are %s\n",
@@ -279,19 +284,16 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
     df <- rbind(df, dfc)
   }
 
-  if (!is.null(dfp$treatment))
-  {
+  if (!is.null(dfp$treatment)) {
     dft <- .collapseRplicate(dfp$treatment, var = var)
     dft$exp.type <- "treatment"
 
-    if (drug.name == TRUE)
-    {
+    if (drug.name == TRUE) {
       drugAll <-
         sort(unique(unlist(
           lapply(dfp$treatment, "[[", "drug.join.name")
         )))
-      if (length(drugAll) > 1)
-      {
+      if (length(drugAll) > 1) {
         txt <-
           sprintf(
             "multiple drugs for batch (in treatment arm), will collapse by ;\nDrugs are %s\n",
@@ -308,26 +310,26 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
 }
 
 .getBatchData <-
-  function(object,
-           batch = NULL,
-           patient.id = NULL,
-           drug = NULL,
-           control.name = NULL,
-           treatment.only = FALSE,
-           max.time = NULL,
-           return.list = TRUE,
-           impute.value = FALSE,
-           vol.normal = FALSE,
-           log.volume =FALSE,
-           drug.name = TRUE,
-           concurrent.time = FALSE)
-  {
+  function(
+    object,
+    batch = NULL,
+    patient.id = NULL,
+    drug = NULL,
+    control.name = NULL,
+    treatment.only = FALSE,
+    max.time = NULL,
+    return.list = TRUE,
+    impute.value = FALSE,
+    vol.normal = FALSE,
+    log.volume = FALSE,
+    drug.name = TRUE,
+    concurrent.time = FALSE
+  ) {
     expDig <- getBatchFormatted(object, batch, patient.id, drug, control.name)
     expDig <- .reformatExpDesig(expDig)[[1]]
 
     dfp <- list()
-    if (length(expDig$control) > 0)
-    {
+    if (length(expDig$control) > 0) {
       dfp$control <-
         .getExperimentMultipalIDs(
           object,
@@ -337,16 +339,14 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
           return.list = TRUE,
           impute.value = impute.value,
           vol.normal = vol.normal,
-          log.volume =log.volume
+          log.volume = log.volume
         )
-      for (ci in seq_along(dfp$control))
-      {
+      for (ci in seq_along(dfp$control)) {
         dfp$control[[ci]]$exp.type <- "control"
       }
     }
 
-    if (length(expDig$treatment) > 0)
-    {
+    if (length(expDig$treatment) > 0) {
       dfp$treatment <-
         .getExperimentMultipalIDs(
           object,
@@ -356,46 +356,37 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
           return.list = TRUE,
           impute.value = impute.value,
           vol.normal = vol.normal,
-          log.volume =log.volume
+          log.volume = log.volume
         )
-      for (ti in seq_along(dfp$treatment))
-      {
+      for (ti in seq_along(dfp$treatment)) {
         dfp$treatment[[ti]]$exp.type <- "treatment"
       }
     }
 
     dfp$batch <- .getTimeVarData(dfp, drug.name = drug.name)
 
-    if (concurrent.time == TRUE)
-    {
+    if (concurrent.time == TRUE) {
       mc <- mt <- NA
-      if ("control" %in% dfp$batch$exp.type)
-      {
+      if ("control" %in% dfp$batch$exp.type) {
         mc <- max(dfp$batch[dfp$batch$exp.type == "control", "time"])
       }
-      if ("treatment" %in% dfp$batch$exp.type)
-      {
+      if ("treatment" %in% dfp$batch$exp.type) {
         mt <- max(dfp$batch[dfp$batch$exp.type == "treatment", "time"])
       }
 
       tx <- c(mc, mt)
       tx <- tx[!is.na(tx)]
-      if (length(tx) > 1)
-      {
-        dfp$batch <- dfp$batch[dfp$batch$time <= min(tx),]
-        if (!is.null(dfp$control))
-        {
-          for (ci in seq_along(dfp$control))
-          {
+      if (length(tx) > 1) {
+        dfp$batch <- dfp$batch[dfp$batch$time <= min(tx), ]
+        if (!is.null(dfp$control)) {
+          for (ci in seq_along(dfp$control)) {
             dfp$control[[ci]] <-
               dfp$control[[ci]][dfp$control[[ci]]$time <= min(tx), ]
           }
         }
 
-        if (!is.null(dfp$treatment))
-        {
-          for (ci in seq_along(dfp$treatment))
-          {
+        if (!is.null(dfp$treatment)) {
+          for (ci in seq_along(dfp$treatment)) {
             dfp$treatment[[ci]] <-
               dfp$treatment[[ci]][dfp$treatment[[ci]]$time <= min(tx), ]
           }
@@ -403,27 +394,22 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
       }
     }
 
-    if (return.list == TRUE)
-    {
+    if (return.list == TRUE) {
       rtx <- dfp
-    } else
-    {
+    } else {
       rtx <- list(batch = dfp$batch)
       dfcnt <- data.frame()
       dftre <- data.frame()
 
-      if (length(dfp$control) > 0)
-      {
+      if (length(dfp$control) > 0) {
         dfcnt <- .rbindListOfDataframs(dfp$control)
       }
 
-      if (length(dfp$treatment) > 0)
-      {
+      if (length(dfp$treatment) > 0) {
         dftre <- .rbindListOfDataframs(dfp$treatment)
       }
 
-      if (nrow(dfcnt) > 0 & nrow(dftre) > 0)
-      {
+      if (nrow(dfcnt) > 0 & nrow(dftre) > 0) {
         allClNames <- unique(c(colnames(dfcnt), colnames(dftre)))
         dfcnt[, setdiff(allClNames, colnames(dfcnt))] <- NA
         dftre[, setdiff(allClNames, colnames(dftre))] <- NA
@@ -473,20 +459,21 @@ getBatchFormatted <- function(object, batch=NULL, patient.id=NULL, drug=NULL,
 #' @return a \code{data.fram} will all the the values stored in experiment slot
 setGeneric(
   name = "getExperiment",
-  def = function(object,
-                 model.id = NULL,
-                 batch = NULL,
-                 patient.id = NULL,
-                 drug = NULL,
-                 control.name = NULL,
-                 treatment.only = FALSE,
-                 max.time = NULL,
-                 vol.normal = FALSE,
-                 log.volume = FALSE,
-                 return.list = FALSE,
-                 impute.value = FALSE,
-                 concurrent.time = FALSE)
-  {
+  def = function(
+    object,
+    model.id = NULL,
+    batch = NULL,
+    patient.id = NULL,
+    drug = NULL,
+    control.name = NULL,
+    treatment.only = FALSE,
+    max.time = NULL,
+    vol.normal = FALSE,
+    log.volume = FALSE,
+    return.list = FALSE,
+    impute.value = FALSE,
+    concurrent.time = FALSE
+  ) {
     standardGeneric("getExperiment")
   }
 )
@@ -496,28 +483,27 @@ setGeneric(
 setMethod(
   f = getExperiment,
   signature = "XevaSet",
-  definition = function(object,
-                        model.id = NULL,
-                        batch = NULL,
-                        patient.id = NULL,
-                        drug = NULL,
-                        control.name = NULL,
-                        treatment.only = FALSE,
-                        max.time = NULL,
-                        vol.normal = FALSE,
-                        log.volume = FALSE,
-                        return.list = FALSE,
-                        impute.value = FALSE,
-                        concurrent.time = FALSE)
-  {
-    if (is.null(model.id) & is.null(batch) & is.null(patient.id))
-    {
+  definition = function(
+    object,
+    model.id = NULL,
+    batch = NULL,
+    patient.id = NULL,
+    drug = NULL,
+    control.name = NULL,
+    treatment.only = FALSE,
+    max.time = NULL,
+    vol.normal = FALSE,
+    log.volume = FALSE,
+    return.list = FALSE,
+    impute.value = FALSE,
+    concurrent.time = FALSE
+  ) {
+    if (is.null(model.id) & is.null(batch) & is.null(patient.id)) {
       msg <- sprintf("'model.id' 'batch' and 'patient.id' all NULL")
       stop(msg)
     }
 
-    if (!is.null(model.id))
-    {
+    if (!is.null(model.id)) {
       mids <- unique(c(model.id))
       rtz <- .getExperimentMultipalIDs(
         object,
@@ -527,17 +513,15 @@ setMethod(
         return.list = return.list,
         impute.value = impute.value,
         vol.normal = vol.normal,
-        log.volume =log.volume
+        log.volume = log.volume
       )
 
-      if (!is.null(max.time))
-      {
-        rtz <- rtz[rtz$time <= max.time,]
+      if (!is.null(max.time)) {
+        rtz <- rtz[rtz$time <= max.time, ]
       }
     }
 
-    if (!is.null(batch) | !is.null(patient.id))
-    {
+    if (!is.null(batch) | !is.null(patient.id)) {
       rtz <- .getBatchData(
         object,
         batch = batch,
@@ -549,7 +533,7 @@ setMethod(
         return.list = return.list,
         impute.value = impute.value,
         vol.normal = vol.normal,
-        log.volume =log.volume,
+        log.volume = log.volume,
         concurrent.time = concurrent.time
       )
     }

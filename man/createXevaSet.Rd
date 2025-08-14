@@ -33,8 +33,8 @@ profiled in the dataset, across all data types.}
 
 \item{batchSensitivity}{A \code{data.frame} containing sensitivity for each batch}
 
-\item{molecularProfiles}{A \code{list} of \code{ExpressionSet} objects containing
-different molecular profiles.}
+\item{molecularProfiles}{A \code{list} of \code{SummarizedExperiment} (or \code{ExpressionSet}) objects,
+or a \code{MultiAssayExperiment}, containing different molecular profiles.}
 
 \item{modToBiobaseMap}{A \code{data.frame} containing model.id corresponding Biobase object id and name of the molecularProfiles}
 }

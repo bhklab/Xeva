@@ -182,7 +182,11 @@ Here we create a waterfall plot for drug BYL719 and color it based on the mutati
 First, we extract the genomic data for the models. Then, we can plot the waterfall plots:
 <<waterFall2, fig.cap="Waterfall plot for BYL719 drug response in PDXs", fig.width=14.1, fig.height=7.8, fig.wide=TRUE>>=
 mut <- summarizeMolecularProfiles(brca,drug = "BYL719", mDataType="mutation")
-model.type <- Biobase::exprs(mut)["CDK13", ]
+model.type <- if (inherits(mut, "SummarizedExperiment")) {
+  assay(mut)["CDK13", ]
+} else {
+  Biobase::exprs(mut)["CDK13", ]
+}
 model.type[grepl("Mut", model.type)] <- "mutation"
 model.type[model.type!="mutation"] <- "wild type"
 model.color <- list("mutation"="#b2182b", "wild type"="#878787")
@@ -299,7 +303,7 @@ expDesign[[1]]
 
 \item[molecularProfiles]
 This list contains all the molecular data such as RNAseq or mutation information.
-Each element of this list should contain an \textbf{ExpressionSet} object.
+Each element of the \texttt{experiments} slot in the \textbf{MultiAssayExperiment} should contain a \textbf{SummarizedExperiment} object.
 An example of such an object is:
 <<x5>>=
 RNASeq=readRDS(system.file("extdata", "rnaseq.rds", package = "Xeva"))

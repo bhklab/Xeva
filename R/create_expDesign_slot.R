@@ -1,39 +1,46 @@
-.checkExperimentDesign<- function(expDesign)
-{
-  modNoControl = c()
-  modNoTreatme = c()
-  for(I in expDesign)
-  {
-    if(length(I$control)==0 & length(I$treatment)==0)
-    {stop("Error Treatmetn and Control are missing in expDesign!")}
+.checkExperimentDesign <- function(expDesign) {
+  modNoControl <- c()
+  modNoTreatme <- c()
+  for (I in expDesign) {
+    if (length(I$control) == 0 & length(I$treatment) == 0) {
+      stop("Treatment and control are missing in expDesign")
+    }
 
-    if(length(I$control)==0)  { modNoControl = c(modNoControl, I$treatment)}
-    if(length(I$treatment)==0){ modNoTreatme = c(modNoTreatme, I$control)}
+    if (length(I$control) == 0) {
+      modNoControl <- c(modNoControl, I$treatment)
+    }
+    if (length(I$treatment) == 0) {
+      modNoTreatme <- c(modNoTreatme, I$control)
+    }
   }
 
-
-  if(!is.null(modNoControl))
-  {
-    txt = sprintf("These models have no Controls\n%s\n", paste(unique(modNoControl), collapse = "\n"))
-    cat(txt)
+  if (length(modNoControl) > 0) {
+    txt <- sprintf(
+      "These models have no Controls\n%s\n",
+      paste(unique(modNoControl), collapse = "\n")
+    )
+    message(txt)
   }
 
   ##------- setting name -----------------
   ###bnam <- xapply(expDesign, "[[", "batch.name")
   bnam <- c()
-  for(i in expDesign){bnam <- c(bnam, i[["batch.name"]])}
+  for (i in expDesign) {
+    bnam <- c(bnam, i[["batch.name"]])
+  }
 
   bnamDup <- bnam[duplicated(bnam)]
-  if(length(bnamDup)>0)
-  {
-    txt <- sprintf("These batch names are duplicated\n%s\n", paste(bnamDup, collapse = "\n"))
+  if (length(bnamDup) > 0) {
+    txt <- sprintf(
+      "These batch names are duplicated\n%s\n",
+      paste(bnamDup, collapse = "\n")
+    )
     stop(txt)
   }
   names(expDesign) <- bnam
 
-  for(i in names(expDesign))
-  {
-    class(expDesign[[i]]) <- append(class(expDesign[[i]]),"pdxBatch")
+  for (i in names(expDesign)) {
+    class(expDesign[[i]]) <- append(class(expDesign[[i]]), "pdxBatch")
   }
 
   return(expDesign)
@@ -44,12 +51,18 @@
 #' @param ... Other arguments
 #' @return prints pdxBatch
 #' @export
-print.pdxBatch <- function(x, ...)
-{
-  if(is.null(x$control))  { x$control  <- "NA"}
-  if(is.null(x$treatment)){ x$treatment<- "NA"}
-  txt <- sprintf("name = %s\ncontrol = %s\ntreatment = %s\n", x$batch.name,
-                 paste0(x$control, collapse = ", "),
-                 paste0(x$treatment, collapse = ", "))
+print.pdxBatch <- function(x, ...) {
+  if (is.null(x$control)) {
+    x$control <- "NA"
+  }
+  if (is.null(x$treatment)) {
+    x$treatment <- "NA"
+  }
+  txt <- sprintf(
+    "name = %s\ncontrol = %s\ntreatment = %s\n",
+    x$batch.name,
+    paste0(x$control, collapse = ", "),
+    paste0(x$treatment, collapse = ", ")
+  )
   cat(txt)
 }

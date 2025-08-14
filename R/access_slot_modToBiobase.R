@@ -11,15 +11,15 @@
 #' @keywords internal
 #' @noRd
 ##### @export
-model2BiobaseIdMap <- function(object, mDataType=NULL)
-{
+model2BiobaseIdMap <- function(object, mDataType = NULL) {
   idMap <- slot(object, "modToBiobaseMap")
-  if(!is.null(mDataType))
-  {
+  if (!is.null(mDataType)) {
     idMap <- idMap[idMap$mDataType == mDataType, ]
-    if(nrow(idMap)==0)
-    {
-      msg <- sprintf("mDataType %s not present in moleculer profile\n", mDataType)
+    if (nrow(idMap) == 0) {
+      msg <- sprintf(
+        "mDataType %s not present in moleculer profile\n",
+        mDataType
+      )
       stop(msg)
     }
   }

@@ -62,7 +62,7 @@ Method to compute association can be specified by \code{fit}. It can be one of t
 \item{"spearman" for Spearman correlation}
 }
 
-If fit is set to NA, processed data (an ExpressionSet) will be returned.
+If fit is set to NA, processed data (a SummarizedExperiment) will be returned.
 
 A matrix of values can be directly passed to molData.
 In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.

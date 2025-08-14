@@ -30,7 +30,6 @@ curated and organised within a XevaSet class, enabling use with all the
 analysis tools provided in Xeva.
 }
 \examples{
-downloadXevaSet()
 ##to download a dataset
 #library(Xeva)
 #PDXE_BRCA = downloadXevaSet(name="PDXE_BRCA", saveDir="XevaSet")

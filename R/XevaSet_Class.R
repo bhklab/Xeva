@@ -1,97 +1,119 @@
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom MultiAssayExperiment experiments
+
 ##--------------------------------------------------------------------------
 ##------------ To create Sensitivity Slot ----------------------------------
-.checkUnqLength <- function(inVec)
-{ length(inVec)== length(unique(inVec)) }
+.checkUnqLength <- function(inVec) {
+  length(inVec) == length(unique(inVec))
+}
 
-.creatSensitivitySlot <- function(modelSensitivity, batchSensitivity, expSlot,
-                                  expDesign)
-{
+.creatSensitivitySlot <- function(
+  modelSensitivity,
+  batchSensitivity,
+  expSlot,
+  expDesign
+) {
   ##------------ for modelSensitivity ------------------------------------
-  if(nrow(modelSensitivity)==0)
-  {
-    modelSensitivity <-data.frame(model.id= names(expSlot), stringsAsFactors = FALSE)
+  if (nrow(modelSensitivity) == 0) {
+    modelSensitivity <- data.frame(
+      model.id = names(expSlot),
+      stringsAsFactors = FALSE
+    )
   }
 
-  for(mid in names(expSlot))
-  {
-    if(is.element(mid, modelSensitivity$model.id) ==FALSE)
-    {
-      msg <- sprintf("provide modelSensitivity for all models\nmodelSensitivity missing for %s", mid)
+  for (mid in names(expSlot)) {
+    if (is.element(mid, modelSensitivity$model.id) == FALSE) {
+      msg <- sprintf(
+        "provide modelSensitivity for all models\nmodelSensitivity missing for %s",
+        mid
+      )
       stop(msg)
     }
   }
 
-  if( .checkUnqLength(modelSensitivity$model.id)==FALSE)
-  {stop("model.ids are not unique")}
+  if (.checkUnqLength(modelSensitivity$model.id) == FALSE) {
+    stop("model.ids are not unique")
+  }
   rownames(modelSensitivity) <- as.character(modelSensitivity$model.id)
-  modelSensitivity <- modelSensitivity[names(expSlot), ,drop=FALSE]
+  modelSensitivity <- modelSensitivity[names(expSlot), , drop = FALSE]
   ##--------------------------------------------------------------------------
   ##------------ for Batch Sensitivity ---------------------------------------
 
-  if(nrow(batchSensitivity)>0)
-  {
-    if(is.element("batch.name", colnames(batchSensitivity)) ==FALSE)
-    {
+  if (nrow(batchSensitivity) > 0) {
+    if (is.element("batch.name", colnames(batchSensitivity)) == FALSE) {
       stop("in 'batchSensitivity' datafram one column must be 'batch.name'")
     }
 
-    if(nrow(batchSensitivity)!= length(names(expDesign)))
-    {
+    if (nrow(batchSensitivity) != length(names(expDesign))) {
       batchSensitivity <- .reorderCol(batchSensitivity, "batch.name", 1)
-      missingId <- unique(setdiff(names(expDesign), batchSensitivity$batch.name))
-      bsN <- data.frame(matrix(NA, nrow = length(missingId),
-                               ncol = ncol(batchSensitivity)))
+      missingId <- unique(setdiff(
+        names(expDesign),
+        batchSensitivity$batch.name
+      ))
+      bsN <- data.frame(matrix(
+        NA,
+        nrow = length(missingId),
+        ncol = ncol(batchSensitivity)
+      ))
       colnames(bsN) <- colnames(batchSensitivity)
       bsN$batch.name <- missingId
       batchSensitivity <- rbind(batchSensitivity, bsN)
     }
   }
 
-  if(nrow(batchSensitivity)==0)
-  {
-    batchSensitivity <- data.frame(batch.name= names(expDesign),
-                                   stringsAsFactors = FALSE)
+  if (nrow(batchSensitivity) == 0) {
+    batchSensitivity <- data.frame(
+      batch.name = names(expDesign),
+      stringsAsFactors = FALSE
+    )
   }
 
-  if( .checkUnqLength(batchSensitivity$batch.name)==FALSE)
-  {stop("batch names are not unique")}
+  if (.checkUnqLength(batchSensitivity$batch.name) == FALSE) {
+    stop("batch names are not unique")
+  }
   rownames(batchSensitivity) <- as.character(batchSensitivity$batch.name)
-  batchSensitivity <- batchSensitivity[names(expDesign), ,drop=FALSE]
+  batchSensitivity <- batchSensitivity[names(expDesign), , drop = FALSE]
 
-  if(is(modelSensitivity, "data.frame")==FALSE | is(batchSensitivity, "data.frame")==FALSE)
-  {stop("slot class error")}
+  if (
+    is(modelSensitivity, "data.frame") == FALSE |
+      is(batchSensitivity, "data.frame") == FALSE
+  ) {
+    stop("modelSensitivity and batchSensitivity must be data.frame")
+  }
 
-  rtx <- list(model = modelSensitivity,
-              batch = batchSensitivity)
+  rtx <- list(model = modelSensitivity, batch = batchSensitivity)
   return(rtx)
 }
 
 
-
 ##--------------------------------------------------------------------------
 ##------------ To check the input parameters--------------------------------
-.checkModel <- function(model, expSlot)
-{
+.checkModel <- function(model, expSlot) {
   reqColName <- c("model.id", "patient.id")
-  if(all(reqColName %in% colnames(model))==FALSE)
-  {
-    msg <- sprintf("The required colmns for model are\n%s", paste(reqColName, collapse = ', '))
+  if (all(reqColName %in% colnames(model)) == FALSE) {
+    msg <- sprintf(
+      "The required colmns for model are\n%s",
+      paste(reqColName, collapse = ', ')
+    )
     stop(msg)
   }
 
-  for(I in expSlot)
-  {
-    if(is.element(slot(I, "model.id"), model$model.id)==FALSE)
-    {
-      msg = sprintf("No informaton present in Model datafram about model.id =%s", I$model.id)
+  for (I in expSlot) {
+    if (is.element(slot(I, "model.id"), model$model.id) == FALSE) {
+      msg = sprintf(
+        "No informaton present in Model datafram about model.id =%s",
+        I$model.id
+      )
       stop(msg)
     }
   }
 
   mdup <- model$model.id[duplicated(model$model.id)]
-  if(length(mdup)>0)
-  {
-    msg <- sprintf("duplicated model.id in model slot:\n%s\n", paste(mdup, collapse = "\n"))
+  if (length(mdup) > 0) {
+    msg <- sprintf(
+      "duplicated model.id in model slot:\n%s\n",
+      paste(mdup, collapse = "\n")
+    )
     stop(msg)
   }
   rownames(model) <- as.character(model$model.id)
@@ -99,48 +121,53 @@
 }
 
 
-.checkDrugSlot <- function(drf)
-{
-  if(is(drf, "data.frame"))
-  {
-    if(!"drug.id" %in% colnames(drf))
-    {
+.checkDrugSlot <- function(drf) {
+  if (is(drf, "data.frame")) {
+    if (!"drug.id" %in% colnames(drf)) {
       stop("drug data.frame must have column drug.id")
     }
     drf <- data.frame(apply(drf, 2, as.character), stringsAsFactors = FALSE)
-  } else {stop("drug not in data.frame")}
+  } else {
+    stop("drug not in data.frame")
+  }
   return(drf)
 }
 
-.checkmodToBiobaseMapSlot <- function(modToBiobaseMap, molecularProfiles)
-{
-  if(!is.null(modToBiobaseMap) & nrow(modToBiobaseMap) > 0 & length(molecularProfiles)>0)
-  {
+.checkmodToBiobaseMapSlot <- function(modToBiobaseMap, molecularProfiles) {
+  if (
+    !is.null(modToBiobaseMap) &
+      nrow(modToBiobaseMap) > 0 &
+      length(molecularProfiles) > 0
+  ) {
     rqdCol <- c("model.id", "biobase.id", "mDataType")
-    for(cx in rqdCol)
-    {
-      if(is.element(cx, colnames(modToBiobaseMap))==FALSE)
-      {
-        msg <- sprintf("column %s not present is modToBiobaseMap\nmodToBiobaseMap must have the columns\n%s\n",
-                       cx, paste(rqdCol, collapse = "\n"))
+    for (cx in rqdCol) {
+      if (is.element(cx, colnames(modToBiobaseMap)) == FALSE) {
+        msg <- sprintf(
+          "column %s not present is modToBiobaseMap\nmodToBiobaseMap must have the columns\n%s\n",
+          cx,
+          paste(rqdCol, collapse = "\n")
+        )
         stop(msg)
       }
     }
 
     mbDataTypes <- unique(as.character(modToBiobaseMap$mDataType))
     w <- names(molecularProfiles)[!(names(molecularProfiles) %in% mbDataTypes)]
-    if(length(w)>0)
-    {
-      msg <- sprintf("Id mapping for molecular data type %s not present in modToBiobaseMap", paste(w, collapse = "\n"))
+    if (length(w) > 0) {
+      msg <- sprintf(
+        "Id mapping for molecular data type %s not present in modToBiobaseMap",
+        paste(w, collapse = "\n")
+      )
       warning(msg)
     }
-  } else
-  {
-    if(nrow(modToBiobaseMap) > 0)
-    { warning("modToBiobaseMap not present")}
+  } else {
+    if (nrow(modToBiobaseMap) > 0) {
+      warning("modToBiobaseMap not present")
+    }
 
-    if(length(molecularProfiles)>0)
-    { warning("molecularProfiles not present")}
+    if (length(molecularProfiles) > 0) {
+      warning("molecularProfiles not present")
+    }
   }
 
   return(modToBiobaseMap)
@@ -158,7 +185,7 @@ XevaSet <- setClass(
     sensitivity = "list",
     expDesign = "list",
     experiment = "list",
-    molecularProfiles = "list",
+    molecularProfiles = "MultiAssayExperiment",
     modToBiobaseMap = "data.frame"
   )
 )
@@ -178,8 +205,8 @@ XevaSet <- setClass(
 #' @param expDesign A list containing name of the batch, control and treatment model.id
 #' @param modelSensitivity A \code{data.frame} containing sensitivity for each model
 #' @param batchSensitivity A \code{data.frame} containing sensitivity for each batch
-#' @param molecularProfiles A \code{list} of \code{ExpressionSet} objects containing
-#'   different molecular profiles.
+#' @param molecularProfiles A \code{list} of \code{SummarizedExperiment} (or \code{ExpressionSet}) objects,
+#'   or a \code{MultiAssayExperiment}, containing different molecular profiles.
 #' @param modToBiobaseMap A \code{data.frame} containing model.id corresponding Biobase object id and name of the molecularProfiles
 #'
 #' @return  Returns Xeva object
@@ -206,16 +233,17 @@ XevaSet <- setClass(
 #'
 #' @export
 #' @import methods
-createXevaSet <- function(name,
-                         model = data.frame(),
-                         drug  = data.frame(),
-                         experiment = data.frame(),
-                         expDesign  = list(),
-                         modelSensitivity = data.frame(),
-                         batchSensitivity = data.frame(),
-                         molecularProfiles = list(),
-                         modToBiobaseMap = data.frame())
-{
+createXevaSet <- function(
+  name,
+  model = data.frame(),
+  drug = data.frame(),
+  experiment = data.frame(),
+  expDesign = list(),
+  modelSensitivity = data.frame(),
+  batchSensitivity = data.frame(),
+  molecularProfiles = list(),
+  modToBiobaseMap = data.frame()
+) {
   annotation <- list(
     name = as.character(name),
     dateCreated = date(),
@@ -226,24 +254,90 @@ createXevaSet <- function(name,
   model <- .checkModel(model, expSlot)
   expDesign <- .checkExperimentDesign(expDesign)
   sensitivity <-
-    .creatSensitivitySlot(modelSensitivity, batchSensitivity, expSlot, expDesign)
+    .creatSensitivitySlot(
+      modelSensitivity,
+      batchSensitivity,
+      expSlot,
+      expDesign
+    )
   drug <- .checkDrugSlot(drug)
+
+  # Handle molecularProfiles input
+  if (is.null(molecularProfiles)) {
+    mae <- MultiAssayExperiment::MultiAssayExperiment()
+  } else if (is.list(molecularProfiles)) {
+    # Backward-compatibility: convert ExpressionSet elements to SummarizedExperiment
+    mp_list <- molecularProfiles
+    mp_list <- lapply(mp_list, function(x) {
+      if (inherits(x, "ExpressionSet")) {
+        SummarizedExperiment::SummarizedExperiment(
+          assays = list(exprs = Biobase::exprs(x)),
+          colData = S4Vectors::DataFrame(Biobase::pData(x)),
+          rowData = S4Vectors::DataFrame(Biobase::fData(x))
+        )
+      } else {
+        x
+      }
+    })
+    mae <- MultiAssayExperiment::MultiAssayExperiment(
+      experiments = mp_list
+    )
+  } else if (inherits(molecularProfiles, "MultiAssayExperiment")) {
+    mae <- molecularProfiles
+  } else {
+    stop(
+      "molecularProfiles must be NULL, a list of SummarizedExperiments, or a MultiAssayExperiment."
+    )
+  }
+
+  # Check all experiments are SummarizedExperiment (if not empty)
+  if (length(MultiAssayExperiment::experiments(mae)) > 0) {
+    # If any remaining ExpressionSet slipped through (e.g., inside MAE), convert them
+    exps <- MultiAssayExperiment::experiments(mae)
+    need_convert <- vapply(
+      exps,
+      function(x) inherits(x, "ExpressionSet"),
+      logical(1)
+    )
+    if (any(need_convert)) {
+      exps[need_convert] <- lapply(exps[need_convert], function(x) {
+        SummarizedExperiment::SummarizedExperiment(
+          assays = list(exprs = Biobase::exprs(x)),
+          colData = S4Vectors::DataFrame(Biobase::pData(x)),
+          rowData = S4Vectors::DataFrame(Biobase::fData(x))
+        )
+      })
+      MultiAssayExperiment::experiments(mae) <- exps
+    }
+    if (
+      !all(vapply(
+        MultiAssayExperiment::experiments(mae),
+        function(x) is(x, "SummarizedExperiment"),
+        logical(1)
+      ))
+    ) {
+      stop("Each assay in molecularProfiles must be a SummarizedExperiment.")
+    }
+  }
+
   modToBiobaseMap <-
-    .checkmodToBiobaseMapSlot(modToBiobaseMap, molecularProfiles)
+    .checkmodToBiobaseMapSlot(
+      modToBiobaseMap,
+      MultiAssayExperiment::experiments(mae)
+    )
 
   pxset <- XevaSet(
     annotation = annotation,
     model = model,
-    drug  = drug,
+    drug = drug,
     sensitivity = sensitivity,
     expDesign = expDesign,
     experiment = expSlot,
-    molecularProfiles = molecularProfiles,
+    molecularProfiles = mae,
     modToBiobaseMap = modToBiobaseMap
   )
   return(pxset)
 }
-
 
 
 #' A method to display object
@@ -254,25 +348,27 @@ createXevaSet <- function(name,
 setMethod(
   f = "show",
   signature = "XevaSet",
-  definition = function(object)
-  {
-    msg <-
-      sprintf(
-        "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMoleculer dataset: %s\n",
-        slot(object, "annotation")$name,
-        slot(object, "annotation")$dateCreated,
-        length(slot(object, "experiment")),
-        nrow(slot(object, "drug")),
-        paste(names(slot(
-          object, "molecularProfiles"
-        )), collapse = ", ")
-      )
+  definition = function(object) {
+    mp <- object@molecularProfiles
+    mp_type <- if (inherits(mp, "MultiAssayExperiment")) {
+      names(MultiAssayExperiment::experiments(mp))
+    } else if (is.list(mp)) {
+      names(mp)
+    } else {
+      "unknown"
+    }
+
+    msg <- sprintf(
+      "XevaSet\nname: %s\nCreation date: %s\nNumber of models: %d\nNumber of drugs: %d\nMolecular dataset: %s\n",
+      slot(object, "annotation")$name,
+      slot(object, "annotation")$dateCreated,
+      length(slot(object, "experiment")),
+      nrow(slot(object, "drug")),
+      paste(mp_type, collapse = ", ")
+    )
     cat(msg)
   }
 )
-
-
-
 
 
 #' print Xeva object
@@ -297,22 +393,18 @@ setMethod(
 #' }
 #' @keywords internal
 #' @noRd
-print.XevaSet <- function(object, id=NULL)
-{
-  if(is.null(id))
-  {
+print.XevaSet <- function(object, id = NULL) {
+  if (is.null(id)) {
     show(object)
-  } else
-  {
-    if(is.character(id)==FALSE)
-    {
+  } else {
+    if (is.character(id) == FALSE) {
       msg <- sprintf("id should be character type")
       stop(msg)
     }
     mod <- slot(object, "experiment")[[id]]
-    if(!is.null(mod))
-    {show(mod)} else
-    {
+    if (!is.null(mod)) {
+      show(mod)
+    } else {
       mod <- slot(object, "expDesign")[[id]]
       print(mod)
     }

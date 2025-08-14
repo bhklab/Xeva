@@ -1,30 +1,30 @@
-.resetBatchDesign <- function(batch, vid)
-{
+.resetBatchDesign <- function(batch, vid) {
   rtx <- list()
-  for(i in names(batch))
-  {
+  for (i in names(batch)) {
     rtB <- list()
     rtB$batch.name <- batch[[i]]$batch.name
 
-    if(!is.null(batch[[i]]$treatment))
-    {
+    if (!is.null(batch[[i]]$treatment)) {
       rtB$treatment <- batch[[i]]$treatment[batch[[i]]$treatment %in% vid]
-      if(length(rtB$treatment)==0){ rtB$treatment<- NULL}
+      if (length(rtB$treatment) == 0) {
+        rtB$treatment <- NULL
+      }
     }
 
-    if(!is.null(batch[[i]]$control))
-    {
+    if (!is.null(batch[[i]]$control)) {
       rtB$control <- batch[[i]]$control[batch[[i]]$control %in% vid]
-      if(length(rtB$control)==0){ rtB$control<- NULL}
+      if (length(rtB$control) == 0) {
+        rtB$control <- NULL
+      }
     }
 
     rtx[[i]] <- rtB
-    if(is.null(rtx[[i]]$treatment) & is.null(rtx[[i]]$control))
-    {rtx[[i]] <- NULL}
+    if (is.null(rtx[[i]]$treatment) & is.null(rtx[[i]]$control)) {
+      rtx[[i]] <- NULL
+    }
   }
   return(rtx)
 }
-
 
 
 #' Subset Xeva object.
@@ -40,72 +40,88 @@
 #' @param keep.batch Default \code{TRUE}. If \code{FALSE}, remove all other \code{model.ids} from the experiemt design that do not belong to selection.
 #' @return New Xeva object.
 #' @export
-subsetXeva <- function(object, ids, id.name, keep.batch=TRUE)
-{
+subsetXeva <- function(object, ids, id.name, keep.batch = TRUE) {
   md <- modelInfo(object)
-  if(is.element(id.name, colnames(md))==FALSE)
-  {
-    msg <- sprintf("'id.name = %s' not present in modelInfo\nValid 'id.name' are\n%s\n",
-                   id.name, paste(colnames(md), collapse = "\n"))
+  if (is.element(id.name, colnames(md)) == FALSE) {
+    msg <- sprintf(
+      "'id.name = %s' not present in modelInfo\nValid 'id.name' are\n%s\n",
+      id.name,
+      paste(colnames(md), collapse = "\n")
+    )
     stop(msg)
   }
   ids <- unique(c(ids))
   mdn <- md[md[, id.name] %in% ids, ]
-  if(nrow(mdn)==0)
-  {
+  if (nrow(mdn) == 0) {
     warning("No model for input ids present, returning NULL")
     return(NULL)
   }
 
   expDesign <- slot(object, "expDesign")
   expDeNew <- list()
-  for(i in seq_along(expDesign))
-  {
+  for (i in seq_along(expDesign)) {
     bn <- expDesign[[i]]$batch.name
     tr <- expDesign[[i]]$treatment
     ct <- expDesign[[i]]$control
-    if(!is.null(tr) & any(tr %in% mdn$model.id))
-    {
+    if (!is.null(tr) & any(tr %in% mdn$model.id)) {
       expDeNew[[bn]] <- expDesign[[i]]
       next()
     }
 
-    if(!is.null(ct) & any(ct %in% mdn$model.id))
-    {
+    if (!is.null(ct) & any(ct %in% mdn$model.id)) {
       expDeNew[[bn]] <- expDesign[[i]]
       next()
     }
   }
 
-  if(keep.batch==FALSE)
-  { expDeNew <- .resetBatchDesign(expDeNew, mdn$model.id) }
+  if (keep.batch == FALSE) {
+    expDeNew <- .resetBatchDesign(expDeNew, mdn$model.id)
+  }
 
-  nwModId <- unique( unlist(lapply(expDeNew,
-                                   function(x){c(x[["treatment"]],x[["control"]])})))
+  nwModId <- unique(unlist(lapply(expDeNew, function(x) {
+    c(x[["treatment"]], x[["control"]])
+  })))
   newModId <- unique(c(mdn$model.id, nwModId))
   mdn <- md[newModId, ]
 
   slot(object, "expDesign") <- expDeNew
   slot(object, "experiment") <- slot(object, "experiment")[mdn$model.id]
   slot(object, "model") <- slot(object, "model")[mdn$model.id, ]
-  slot(object, "drug")  <- slot(object, "drug")[slot(object, "drug")$drug.id %in% mdn$drug,]
+  slot(object, "drug") <- slot(object, "drug")[
+    slot(object, "drug")$drug.id %in% mdn$drug,
+  ]
   sn <- slot(object, "sensitivity")
   sn$model <- sn$model[sn$model$model.id %in% mdn$model.id, ]
-  sn$batch <- sn$batch[sn$batch$batch.name %in% names(expDeNew),]
+  sn$batch <- sn$batch[sn$batch$batch.name %in% names(expDeNew), ]
   slot(object, "sensitivity") <- sn
 
   m2b <- slot(object, "modToBiobaseMap")
   slot(object, "modToBiobaseMap") <- m2b[m2b$model.id %in% mdn$model.id, ]
   m2b <- slot(object, "modToBiobaseMap")
-  for(mold in names(slot(object, "molecularProfiles")) )
-  {
-    ids2take <- unique(m2b[m2b$mDataType== mold, "biobase.id"])
-    ids2take <- ids2take[!is.na(ids2take)]
-    if(length(ids2take)>0)
-    {
-      mol <- slot(object, "molecularProfiles")[[mold]]
-      slot(object, "molecularProfiles")[[mold]] <- mol[, ids2take]
+
+  mp <- slot(object, "molecularProfiles")
+  if (inherits(mp, "MultiAssayExperiment")) {
+    exps <- MultiAssayExperiment::experiments(mp)
+    for (mold in names(exps)) {
+      ids2take <- unique(m2b[m2b$mDataType == mold, "biobase.id"])
+      ids2take <- ids2take[!is.na(ids2take)]
+      if (length(ids2take) > 0) {
+        exps[[mold]] <- exps[[mold]][, ids2take]
+      }
     }
+    MultiAssayExperiment::experiments(mp) <- exps
+    slot(object, "molecularProfiles") <- mp
+  } else if (is.list(mp)) {
+    for (mold in names(mp)) {
+      ids2take <- unique(m2b[m2b$mDataType == mold, "biobase.id"])
+      ids2take <- ids2take[!is.na(ids2take)]
+      if (length(ids2take) > 0) {
+        mp[[mold]] <- mp[[mold]][, ids2take]
+      }
+    }
+    # Convert list to MultiAssayExperiment for consistency with class definition
+    mae <- MultiAssayExperiment::MultiAssayExperiment(experiments = mp)
+    slot(object, "molecularProfiles") <- mae
   }
   return(object)
 }

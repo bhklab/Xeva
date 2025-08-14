@@ -1,29 +1,44 @@
-.getSensitivityVal <- function(object, sensitivity.measure, mdf, drug, collapse.by="mean")
-{
+.getSensitivityVal <- function(
+  object,
+  sensitivity.measure,
+  mdf,
+  drug,
+  collapse.by = "mean"
+) {
   senType <- "model"
-  if(is.element(sensitivity.measure, colnames(object@sensitivity$model))==FALSE)
-  {
+  if (
+    is.element(sensitivity.measure, colnames(object@sensitivity$model)) == FALSE
+  ) {
     msg1 <- sprintf("sensitivity.measure '%s' not present", sensitivity.measure)
     stop(msg1)
   }
 
-  mdfI <- mdf[mdf$drug==drug,]
-  modNotPresent <- setdiff(mdfI$model.id, rownames(sensitivity(object, senType)))
-  if(length(modNotPresent)>0)
-  {
-    msg1 <- sprintf("models not present in sensitivity slot:\n%s\n",
-                    paste(modNotPresent, collapse = "\n"))
+  mdfI <- mdf[mdf$drug == drug, ]
+  modNotPresent <- setdiff(
+    mdfI$model.id,
+    rownames(sensitivity(object, senType))
+  )
+  if (length(modNotPresent) > 0) {
+    msg1 <- sprintf(
+      "models not present in sensitivity slot:\n%s\n",
+      paste(modNotPresent, collapse = "\n")
+    )
     warning(msg1)
     mdfI <- mdfI[!(mdfI$model.id %in% modNotPresent), ]
   }
 
-  mdfI[,sensitivity.measure] <- sensitivity(object, senType)[mdfI$model.id, sensitivity.measure]
+  mdfI[, sensitivity.measure] <- sensitivity(object, senType)[
+    mdfI$model.id,
+    sensitivity.measure
+  ]
 
   dupBID <- mdfI$biobase.id[duplicated(mdfI$biobase.id)]
-  if(length(dupBID)>0)
-  {
-    dupDF <- mdfI[mdfI$biobase.id %in%dupBID,]
-    msg1 <- sprintf("model.ids have same 'biobase.id'\n%s", printAndCapture(dupDF))
+  if (length(dupBID) > 0) {
+    dupDF <- mdfI[mdfI$biobase.id %in% dupBID, ]
+    msg1 <- sprintf(
+      "model.ids have same 'biobase.id'\n%s",
+      printAndCapture(dupDF)
+    )
     warning(msg1)
 
     msg2 <- sprintf("collapsing same 'biobase.id' using %s", collapse.by)
@@ -35,57 +50,72 @@
 }
 
 
-
-.getBioIdSensitivityDF <- function(object, molData, drug, sensitivity.measure,
-                                   collapse.by="mean", model.ids, mDataType,
-                                   model2bidMap)
-{
+.getBioIdSensitivityDF <- function(
+  object,
+  molData,
+  drug,
+  sensitivity.measure,
+  collapse.by = "mean",
+  model.ids,
+  mDataType,
+  model2bidMap
+) {
   mdf <- modelInfo(object)
-  if(!is.null(model.ids))
-  {
+  if (!is.null(model.ids)) {
     mdf <- mdf[mdf$model.id %in% model.ids, ]
-    if(nrow(mdf)==0)
-    {
+    if (nrow(mdf) == 0) {
       msg <- sprintf("'model.ids' are not present in Xeva object")
       stop(msg)
     }
   }
-  mdf[,"biobase.id"] <- NA
+  mdf[, "biobase.id"] <- NA
 
-  for(I in seq_len(nrow(mdf)))
-  {
-    bid <- model2bidMap[model2bidMap$model.id==mdf[I, "model.id"], "biobase.id"]
-    if(length(bid)==0){ bid <- NA }
-    mdf[I,"biobase.id"] <- bid[1]
+  for (I in seq_len(nrow(mdf))) {
+    bid <- model2bidMap[
+      model2bidMap$model.id == mdf[I, "model.id"],
+      "biobase.id"
+    ]
+    if (length(bid) == 0) {
+      bid <- NA
+    }
+    mdf[I, "biobase.id"] <- bid[1]
   }
-  mdf <- mdf[ !is.na(mdf[,"biobase.id"]), ]
-  mdf <- mdf[ as.character(mdf[,"biobase.id"]) %in% colnames(molData),]
-  if(nrow(mdf)==0)
-  {
-    msg <- sprintf("No '%s' ids are common in molecular data and experimental data",
-                   mDataType)
+  mdf <- mdf[!is.na(mdf[, "biobase.id"]), ]
+  mdf <- mdf[as.character(mdf[, "biobase.id"]) %in% colnames(molData), ]
+  if (nrow(mdf) == 0) {
+    msg <- sprintf(
+      "No '%s' ids are common in molecular data and experimental data",
+      mDataType
+    )
     stop(msg)
   }
 
-  mdfI <- .getSensitivityVal(object, sensitivity.measure, mdf, drug=drug,
-                             collapse.by=collapse.by)
+  mdfI <- .getSensitivityVal(
+    object,
+    sensitivity.measure,
+    mdf,
+    drug = drug,
+    collapse.by = collapse.by
+  )
   return(mdfI)
 }
 
-#' @import methods
-#' @import Biobase
-.getExpressionSet <- function(tx, y, sensitivity.measure, tissue=NULL)
-{
-  pd <- data.frame(name=colnames(tx), stringsAsFactors = FALSE)
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
+.getExpressionSet <- function(tx, y, sensitivity.measure, tissue = NULL) {
+  pd <- data.frame(name = colnames(tx), stringsAsFactors = FALSE)
   rownames(pd) <- as.character(pd$name)
   pd[, sensitivity.measure] <- y
-  if(!is.null(tissue))
-  { pd$tissue <- tissue }
+  if (!is.null(tissue)) {
+    pd$tissue <- tissue
+  }
 
-  eSet <- Biobase::ExpressionSet(assayData=as.matrix(tx),
-                        phenoData=new("AnnotatedDataFrame",
-                                      data=data.frame(pd)))
-  return(eSet)
+  se <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(exprs = as.matrix(tx)),
+    colData = S4Vectors::DataFrame(pd)
+  )
+
+  return(se)
 }
 
 ##====== drugSensitivitySig for one drug ==========================
@@ -129,85 +159,104 @@
 #' \item{"spearman" for Spearman correlation}
 #' }
 #'
-#' If fit is set to NA, processed data (an ExpressionSet) will be returned.
+#' If fit is set to NA, processed data (a SummarizedExperiment) will be returned.
 #'
 #' A matrix of values can be directly passed to molData.
 #' In case where a \code{model.id} maps to multiple \code{biobase.id}s, the first \code{biobase.id} in the \code{data.frame} will be used.
 #'
 #' @export
-drugSensitivitySig <- function(object, drug,
-                               mDataType=NULL, molData=NULL, features=NULL,
-                               model.ids=NULL, model2bidMap = NULL,
-                               sensitivity.measure="slope",
-                               fit = c("lm", "CI", "pearson", "spearman", NA),
-                               standardize=c("SD", "rescale", "none"),
-                               nthread=1, tissue=NULL, verbose=TRUE)
-{
-  if(is.null(mDataType)& is.null(molData))
-  {
+drugSensitivitySig <- function(
+  object,
+  drug,
+  mDataType = NULL,
+  molData = NULL,
+  features = NULL,
+  model.ids = NULL,
+  model2bidMap = NULL,
+  sensitivity.measure = "slope",
+  fit = c("lm", "CI", "pearson", "spearman", NA),
+  standardize = c("SD", "rescale", "none"),
+  nthread = 1,
+  tissue = NULL,
+  verbose = TRUE
+) {
+  if (is.null(mDataType) & is.null(molData)) {
     stop("'mDataType' and 'molData' both can't be NULL ")
   }
 
-  if(is.null(molData))
-  {
-    molData <- Biobase::exprs(getMolecularProfiles(object, mDataType))
+  if (is.null(molData)) {
+    molData <- assay(getMolecularProfiles(object, mDataType))
   }
 
   molData <- as.matrix(molData)
 
-  if(is.null(model2bidMap))
-  {model2bidMap <- model2BiobaseIdMap(object, mDataType)}
+  if (is.null(model2bidMap)) {
+    model2bidMap <- model2BiobaseIdMap(object, mDataType)
+  }
 
   drugIx <- c(drug)[1]
 
-  if(verbose==TRUE){cat(sprintf("Running for drug %s\n\n", drugIx))}
-  mdfI <- .getBioIdSensitivityDF(object, molData, drugIx, sensitivity.measure,
-                                 collapse.by="mean", model.ids, mDataType,
-                                 model2bidMap)
+  if (isTRUE(verbose)) {
+    message(sprintf("Running for drug %s", drugIx))
+  }
+  mdfI <- .getBioIdSensitivityDF(
+    object,
+    molData,
+    drugIx,
+    sensitivity.measure,
+    collapse.by = "mean",
+    model.ids,
+    mDataType,
+    model2bidMap
+  )
 
-  if(nrow(mdfI)<2)
-  {
-    msg <- sprintf("Too few samples for drug %s\nNumber of samples %d",
-                   drugIx, nrow(mdfI))
+  if (nrow(mdfI) < 2) {
+    msg <- sprintf(
+      "Too few samples for drug %s\nNumber of samples %d",
+      drugIx,
+      nrow(mdfI)
+    )
     stop(msg)
   }
 
-  if(is.null(features))
-  { features <- rownames(molData)}
+  if (is.null(features)) {
+    features <- rownames(molData)
+  }
 
-  if(!is.null(tissue))
-  {
-    if(length(tissue) == 1)
-    {
-      cat(sprintf("setting 'tissue' = %s for all models", tissue[1]))
+  if (!is.null(tissue)) {
+    if (length(tissue) == 1) {
+      message(sprintf("setting 'tissue' = %s for all models", tissue[1]))
       tt <- rep(tissue[1], nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
 
-    if(length(tissue) > 1)
-    {
-      if(length(tissue)!= nrow(mdfI))
-      {stop("length of type should be equal to length of models")}
+    if (length(tissue) > 1) {
+      if (length(tissue) != nrow(mdfI)) {
+        stop("length of type should be equal to length of models")
+      }
 
-      if(is.null(names(tissue)))
-      {
+      if (is.null(names(tissue))) {
         msg <- sprintf("'tissue' has no names. Please provide a named list")
         stop(msg)
       }
 
       tt <- tissue
     }
-  } else
-  {
-    if("tissue" %in% colnames(modelInfo(object)))
-    {
-      typeDF <- mapModelSlotIds(object, id=mdfI$model.id, id.name = "model.id",
-                                map.to = "tissue", unique = FALSE)
+  } else {
+    if ("tissue" %in% colnames(modelInfo(object))) {
+      typeDF <- mapModelSlotIds(
+        object,
+        id = mdfI$model.id,
+        id.name = "model.id",
+        map.to = "tissue",
+        unique = FALSE
+      )
       tt <- typeDF[, "tissue"]
       names(tt) <- typeDF$model.id
-    } else
-    {
-      warning("'tissue' not present in modelInfo, setting tissue = 'tumor' for all models")
+    } else {
+      warning(
+        "'tissue' not present in modelInfo, setting tissue = 'tumor' for all models"
+      )
       tt <- rep("tumor", nrow(mdfI))
       names(tt) <- mdfI$model.id
     }
@@ -215,26 +264,33 @@ drugSensitivitySig <- function(object, drug,
 
   mdfI[, "tissue"] <- tt[mdfI$model.id]
   x <- t(molData[features, mdfI$biobase.id])
-  x <- removeZeroVar(x, varCutoff=0, sort=FALSE)
+  x <- removeZeroVar(x, varCutoff = 0, sort = FALSE)
 
   fetDiff <- ncol(t(molData[features, mdfI$biobase.id])) - ncol(x)
-  if(fetDiff>0)
-  {
+  if (fetDiff > 0) {
     msg1 <- sprintf("%d features removed because of 0 variance", fetDiff)
     warning(msg1)
   }
 
-  if(is.na(fit[1]))
-  {
-    eSet <- .getExpressionSet(t(x), y= mdfI[,sensitivity.measure],
-                              sensitivity.measure=sensitivity.measure,
-                              tissue=mdfI[, "tissue"])
-    return(eSet)
+  if (is.na(fit[1])) {
+    se <- .getExpressionSet(
+      t(x),
+      y = mdfI[, sensitivity.measure],
+      sensitivity.measure = sensitivity.measure,
+      tissue = mdfI[, "tissue"]
+    )
+    return(se)
   }
 
-  rtx <-compute_association(x, y = mdfI[,sensitivity.measure],
-                            fit = fit[1], nthread= nthread, type=mdfI[, "tissue"],
-                            standardize=standardize[1], verbose=verbose)
+  rtx <- compute_association(
+    x,
+    y = mdfI[, sensitivity.measure],
+    fit = fit[1],
+    nthread = nthread,
+    type = mdfI[, "tissue"],
+    standardize = standardize[1],
+    verbose = verbose
+  )
 
   rtx$drug <- drugIx
   rtx <- .reorderCol(rtx, "drug", 2)
